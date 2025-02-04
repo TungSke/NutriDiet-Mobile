@@ -1,11 +1,10 @@
-import 'dart:io';
-
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:fitnessapp/utils/app_colors.dart';
 import 'package:fitnessapp/view/activity/activity_screen.dart';
 import 'package:fitnessapp/view/camera/camera_screen.dart';
 import 'package:fitnessapp/view/profile/user_profile.dart';
-import 'package:flutter/material.dart';
-
 import '../home/home_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -29,6 +28,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine platform-specific heights safely
+    final bottomBarHeight = kIsWeb ? 65 : (Platform.isIOS ? 70 : 65);
+    final containerHeight = kIsWeb ? 65 : (Platform.isIOS ? 70 : 65);
+
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -56,11 +59,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: _widgetOptions,
       ),
       bottomNavigationBar: BottomAppBar(
-        height: Platform.isIOS ? 70 : 65,
+        height: 70,
         color: Colors.transparent,
         padding: const EdgeInsets.all(0),
         child: Container(
-          height: Platform.isIOS ? 70 : 65,
+          height: 70,
           decoration: const BoxDecoration(
               color: AppColors.whiteColor,
               boxShadow: [
@@ -131,13 +134,13 @@ class TabButton extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
 
-  const TabButton(
-      {Key? key,
-      required this.icon,
-      required this.selectIcon,
-      required this.isActive,
-      required this.onTap})
-      : super(key: key);
+  const TabButton({
+    Key? key,
+    required this.icon,
+    required this.selectIcon,
+    required this.isActive,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
