@@ -1,3 +1,8 @@
+# Có thể convert models bằng trang này
+```sh
+https://app.quicktype.io/
+```
+
 # Hướng dẫn chạy dự án Flutter
 
 ## Cập nhật dependencies
