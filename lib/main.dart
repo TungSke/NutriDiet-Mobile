@@ -1,10 +1,6 @@
 import 'package:fitnessapp/routes.dart';
 import 'package:fitnessapp/utils/app_colors.dart';
-import 'package:fitnessapp/view/dashboard/dashboard_screen.dart';
-import 'package:fitnessapp/view/login/login_screen.dart';
-import 'package:fitnessapp/view/profile/complete_profile_screen.dart';
-import 'package:fitnessapp/view/welcome/welcome_screen.dart';
-import 'package:fitnessapp/view/your_goal/your_goal_screen.dart';
+import 'package:fitnessapp/view/signup/signup_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -26,7 +22,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: "Poppins"
       ),
-      home: const DashboardScreen(),
+      home: const SignupScreen(),
     );
   }
 }
