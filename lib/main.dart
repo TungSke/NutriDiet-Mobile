@@ -1,29 +1,70 @@
-import 'package:fitnessapp/routes.dart';
-import 'package:fitnessapp/utils/app_colors.dart';
-import 'package:fitnessapp/view/signup/signup_screen.dart';
+// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
+
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'flutter_flow/flutter_flow_util.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  GoRouter.optionURLReflectsImperativeAPIs = true;
+  usePathUrlStrategy();
+
+  final appState = FFAppState(); // Initialize FFAppState
+  await appState.initializePersistedState();
+
+  runApp(ChangeNotifierProvider(
+    create: (context) => appState,
+    child: const MyApp(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
+  State<MyApp> createState() => _MyAppState();
+
+  static _MyAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>()!;
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  late AppStateNotifier _appStateNotifier;
+  late GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _appStateNotifier = AppStateNotifier.instance;
+    _router = createRouter(_appStateNotifier);
+  }
+
+  void setThemeMode(ThemeMode mode) => safeSetState(() {
+        _themeMode = mode;
+      });
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Fitness',
-      debugShowCheckedModeBanner: false,
-      routes: routes,
+    return MaterialApp.router(
+      title: 'diet plan app',
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en', '')],
       theme: ThemeData(
-        primaryColor: AppColors.primaryColor1,
-        useMaterial3: true,
-        fontFamily: "Poppins"
+        brightness: Brightness.light,
       ),
-      home: const SignupScreen(),
+      themeMode: _themeMode,
+      routerConfig: _router,
     );
   }
 }
-

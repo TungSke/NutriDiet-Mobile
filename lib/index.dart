@@ -1,0 +1,56 @@
+// Export pages
+export '/splace_scren/splace_scren_widget.dart' show SplaceScrenWidget;
+export '/pages/onbodying_screen/onbodying_screen_widget.dart'
+    show OnbodyingScreenWidget;
+export '/log_in_flow/login_screen/login_screen_widget.dart'
+    show LoginScreenWidget;
+export '/log_in_flow/sign_up_screen/sign_up_screen_widget.dart'
+    show SignUpScreenWidget;
+export '/log_in_flow/forget_screen/forget_screen_widget.dart'
+    show ForgetScreenWidget;
+export '/log_in_flow/verification_screen/verification_screen_widget.dart'
+    show VerificationScreenWidget;
+export '/log_in_flow/reset_password_screen/reset_password_screen_widget.dart'
+    show ResetPasswordScreenWidget;
+export '/log_in_flow/whats_your_goal/whats_your_goal_widget.dart'
+    show WhatsYourGoalWidget;
+export '/log_in_flow/tell_us_about_yourself/tell_us_about_yourself_widget.dart'
+    show TellUsAboutYourselfWidget;
+export '/log_in_flow/which_diet_do_you_prefer/which_diet_do_you_prefer_widget.dart'
+    show WhichDietDoYouPreferWidget;
+export '/log_in_flow/which_cuisines_include_diet/which_cuisines_include_diet_widget.dart'
+    show WhichCuisinesIncludeDietWidget;
+export '/home_flow/notification_screen/notification_screen_widget.dart'
+    show NotificationScreenWidget;
+export '/home_flow/breskfast_screen/breskfast_screen_widget.dart'
+    show BreskfastScreenWidget;
+export '/home_flow/brek_fast_i_ingredients/brek_fast_i_ingredients_widget.dart'
+    show BrekFastIIngredientsWidget;
+export '/home_flow/search_result_screen/search_result_screen_widget.dart'
+    show SearchResultScreenWidget;
+export '/profile_flow/my_profile/my_profile_widget.dart' show MyProfileWidget;
+export '/profile_flow/edit_profile_screen/edit_profile_screen_widget.dart'
+    show EditProfileScreenWidget;
+export '/profile_flow/security_screen/security_screen_widget.dart'
+    show SecurityScreenWidget;
+export '/profile_flow/change_password_screen/change_password_screen_widget.dart'
+    show ChangePasswordScreenWidget;
+export '/profile_flow/setting_screen/setting_screen_widget.dart'
+    show SettingScreenWidget;
+export '/profile_flow/about_us_screen/about_us_screen_widget.dart'
+    show AboutUsScreenWidget;
+export '/profile_flow/help_screen/help_screen_widget.dart'
+    show HelpScreenWidget;
+export '/profile_flow/feedback_screen/feedback_screen_widget.dart'
+    show FeedbackScreenWidget;
+export '/profile_flow/privcy_policy_screen/privcy_policy_screen_widget.dart'
+    show PrivcyPolicyScreenWidget;
+export '/bottom_navbar_screen/bottom_navbar_screen_widget.dart'
+    show BottomNavbarScreenWidget;
+export '/select_date_of_birth/select_date_of_birth_widget.dart'
+    show SelectDateOfBirthWidget;
+export '/hight_enter_screen/hight_enter_screen_widget.dart'
+    show HightEnterScreenWidget;
+export '/home_flow/fav_screen/fav_screen_widget.dart' show FavScreenWidget;
+export '/weight_enter_screen/weight_enter_screen_widget.dart'
+    show WeightEnterScreenWidget;
