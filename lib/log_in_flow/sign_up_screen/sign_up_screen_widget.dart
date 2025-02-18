@@ -338,7 +338,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                             controller: _model.textController4,
                             focusNode: _model.textFieldFocusNode4,
                             autofocus: false,
-                            textInputAction: TextInputAction.done,
+                            textInputAction: TextInputAction.unspecified,
                             obscureText: !_model.passwordVisibility,
                             decoration: InputDecoration(
                               labelText: 'Password',
@@ -430,16 +430,13 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                                   !_model.formKey.currentState!.validate()) {
                                 return;
                               }
-                              FFAppState().isLogin = true;
-                              FFAppState().firstname =
-                                  _model.textController1.text;
-                              FFAppState().lastname =
-                                  _model.textController2.text;
-                              FFAppState().email = _model.textController3.text;
                               safeSetState(() {});
-                              context.safePop();
+                              //context.safePop();
+
+                              await _model.handleSignUp(context);
+
                             },
-                            text: 'Sign up ',
+                            text: _model.isLoading ? 'Signing up...' : 'Sign up',
                             options: FFButtonOptions(
                               width: double.infinity,
                               height: 54.0,

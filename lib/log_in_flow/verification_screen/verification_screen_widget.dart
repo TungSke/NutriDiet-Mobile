@@ -105,7 +105,7 @@ class _VerificationScreenWidgetState extends State<VerificationScreenWidget> {
                           child: PinCodeTextField(
                             autoDisposeControllers: false,
                             appContext: context,
-                            length: 4,
+                            length: 6,
                             textStyle:
                                 FlutterFlowTheme.of(context).bodyLarge.override(
                                       fontFamily: 'figtree',

@@ -1,12 +1,17 @@
+import 'dart:convert';
+
+import 'package:diet_plan_app/services/user_service.dart';
+
 import '/flutter_flow/flutter_flow_util.dart';
 import 'sign_up_screen_widget.dart' show SignUpScreenWidget;
 import 'package:flutter/material.dart';
 
 class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
   ///  State fields for stateful widgets in this page.
-
+  final UserService _userService = UserService();
   final formKey = GlobalKey<FormState>();
   // State field(s) for TextField widget.
+  bool isLoading = false;
   FocusNode? textFieldFocusNode1;
   TextEditingController? textController1;
   String? Function(BuildContext, String?)? textController1Validator;
@@ -57,6 +62,48 @@ class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
 
     return null;
   }
+
+  Future<void> handleSignUp(BuildContext context) async {
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
+    isLoading = true;
+    try {
+      final response = await _userService.Register(
+        textController3!.text, // Email
+        textController4!.text, // Password
+      );
+
+      if (response.statusCode == 200) {
+        FFAppState().isLogin = true;
+        FFAppState().firstname = textController1!.text;
+        FFAppState().lastname = textController2!.text;
+        FFAppState().email = textController3!.text;
+
+        Navigator.pop(context);
+      } else {
+        // Giải mã JSON và lấy thông báo lỗi
+        final Map<String, dynamic> responseBody = json.decode(response.body);
+        String errorMessage = responseBody["message"] ?? "Registration failed.";
+
+        showErrorMessage(context, errorMessage);
+      }
+    } catch (e) {
+      showErrorMessage(context, "An error occurred: $e");
+    }
+    isLoading = false;
+  }
+
+  void showErrorMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
 
   @override
   void initState(BuildContext context) {

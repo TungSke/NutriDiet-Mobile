@@ -86,6 +86,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                       children: [
                         Text(
                           'Log in',
+                          textAlign: TextAlign.center,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     fontFamily: 'figtree',
@@ -94,7 +95,8 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                     fontWeight: FontWeight.bold,
                                     useGoogleFonts: false,
                                   ),
-                        ).animateOnPageLoad(
+                        )
+                            .animateOnPageLoad(
                             animationsMap['textOnPageLoadAnimation']!),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
