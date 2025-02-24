@@ -46,4 +46,11 @@ class UserService {
     }
   }
 
+  Future<http.Response> login(String email, String password) async{
+    final response = await _apiService.post(
+      "api/user/login",
+      body: {'email': email, 'password': password},
+    );
+    return response;
+  }
 }

@@ -305,11 +305,12 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                 return;
                               }
 
-                              await _model.loginFaceBook();
+
+                              await _model.handleLogin(context);
                               //FFAppState().isLogin = true;
                               safeSetState(() {});
 
-                              context.goNamed('Whats_your_goal');
+                              // context.goNamed('Whats_your_goal');
                             },
                             text: 'Log in',
                             options: FFButtonOptions(

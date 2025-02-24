@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:diet_plan_app/services/user_service.dart';
 
 import '/flutter_flow/flutter_flow_util.dart';
@@ -36,7 +38,52 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
     return null;
   }
+  Future<void> handleLogin(BuildContext context) async{
+    if(!formKey.currentState!.validate()){
+      return;
+    }
+    try{
+      final response = await _userService.login(textController1!.text, textController2!.text);
 
+      if(response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        if (responseBody["data"] != null && responseBody["data"]["accessToken"] != null) {
+          String token = responseBody["data"]["accessToken"];
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Login success!"),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+
+          // Chuyển hướng sau khi hiển thị thông báo
+          await Future.delayed(Duration(seconds: 1));
+
+          context.push("/bottomNavbarScreen");
+        }
+
+      }
+        else{
+          final responseBody = jsonDecode(response.body);
+          String errorMessage = responseBody["message"] ?? "Login failed!";
+          showErrorMessage(context, errorMessage);
+
+      }
+    } catch (e){
+      showErrorMessage(context, "An error occurred: $e");
+    }
+  }
+  void showErrorMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
   Future<void> loginFaceBook() async{
      final response = _userService.loginWithFacebook();
 
