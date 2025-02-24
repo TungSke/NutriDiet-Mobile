@@ -75,14 +75,11 @@ class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
       );
 
       if (response.statusCode == 200) {
-        FFAppState().isLogin = true;
         FFAppState().firstname = textController1!.text;
         FFAppState().lastname = textController2!.text;
         FFAppState().email = textController3!.text;
-
-        Navigator.pop(context);
+        context.push("/verificationScreen");
       } else {
-        // Giải mã JSON và lấy thông báo lỗi
         final Map<String, dynamic> responseBody = json.decode(response.body);
         String errorMessage = responseBody["message"] ?? "Registration failed.";
 

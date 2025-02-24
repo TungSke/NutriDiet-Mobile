@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -11,12 +13,14 @@ class VerificationScreenWidget extends StatefulWidget {
   const VerificationScreenWidget({super.key});
 
   @override
-  State<VerificationScreenWidget> createState() =>
-      _VerificationScreenWidgetState();
+  State<VerificationScreenWidget> createState() => _VerificationScreenWidgetState();
 }
 
 class _VerificationScreenWidgetState extends State<VerificationScreenWidget> {
   late VerificationScreenModel _model;
+  int _countdown = 0;
+  Timer? _timer;
+  String email = FFAppState().email.isEmpty ? "trinhsontung2410@gmail.com" : FFAppState().email;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -31,6 +35,25 @@ class _VerificationScreenWidgetState extends State<VerificationScreenWidget> {
     _model.dispose();
 
     super.dispose();
+  }
+
+  void _startCountdown() {
+    setState(() {
+      _countdown = 60;
+    });
+
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_countdown > 0) {
+        setState(() {
+          _countdown--;
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+
+    _model.ResendOTP();
   }
 
   @override
@@ -80,8 +103,8 @@ class _VerificationScreenWidgetState extends State<VerificationScreenWidget> {
                                     useGoogleFonts: false,
                                   ),
                             ),
-                            const TextSpan(
-                              text: ' janecooper@gmail.com',
+                             TextSpan(
+                              text: '  ${email}',
                               style: TextStyle(),
                             )
                           ],
@@ -153,8 +176,8 @@ class _VerificationScreenWidgetState extends State<VerificationScreenWidget> {
                               !_model.formKey.currentState!.validate()) {
                             return;
                           }
-
-                          context.pushNamed('reset_password_screen');
+                          await _model.VerifyAccount(context);
+                          //context.pushNamed('reset_password_screen');
                         },
                         text: 'Continue',
                         options: FFButtonOptions(
@@ -187,44 +210,51 @@ class _VerificationScreenWidgetState extends State<VerificationScreenWidget> {
                         child: Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 24.0, 0.0, 0.0),
-                          child: RichText(
-                            textScaler: MediaQuery.of(context).textScaler,
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Don’t get the code?',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'figtree',
-                                        color:
-                                            FlutterFlowTheme.of(context).grey,
-                                        fontSize: 17.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                        lineHeight: 1.5,
-                                      ),
-                                ),
-                                TextSpan(
-                                  text: '  Resend code',
-                                  style: TextStyle(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16.0,
-                                    height: 1.5,
+                          child: GestureDetector(
+                            onTap: _countdown == 0 ? _startCountdown : null,
+                            child: RichText(
+                              textScaler: MediaQuery.of(context).textScaler,
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Don’t get the code?',
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          fontFamily: 'figtree',
+                                          color:
+                                              FlutterFlowTheme.of(context).grey,
+                                          fontSize: 17.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.normal,
+                                          useGoogleFonts: false,
+                                          lineHeight: 1.5,
+                                        ),
                                   ),
-                                )
-                              ],
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
+                                  TextSpan(
+                                    text: _countdown > 0
+                                        ? '  Resend in $_countdown s' // Hiển thị thời gian đếm ngược
+                                        : '  Resend code', // Hiển thị lại khi hết thời gian
+                                    style: TextStyle(
+                                      color: _countdown > 0
+                                          ? Colors.grey // Vô hiệu hóa khi đang đếm ngược
+                                          : FlutterFlowTheme.of(context).primary,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16.0,
+                                      height: 1.5,
+                                    ),
                                   ),
+                                ],
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      fontFamily: 'figtree',
+                                      letterSpacing: 0.0,
+                                      useGoogleFonts: false,
+                                    ),
+                              ),
+                              maxLines: 1,
                             ),
-                            maxLines: 1,
                           ),
                         ),
                       ),

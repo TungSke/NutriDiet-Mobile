@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:diet_plan_app/services/user_service.dart';
+
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'verification_screen_widget.dart' show VerificationScreenWidget;
@@ -6,7 +10,7 @@ import 'package:flutter/material.dart';
 class VerificationScreenModel
     extends FlutterFlowModel<VerificationScreenWidget> {
   ///  State fields for stateful widgets in this page.
-
+  UserService _userService = UserService();
   final formKey = GlobalKey<FormState>();
   // Model for appbar component.
   late AppbarModel appbarModel;
@@ -17,10 +21,57 @@ class VerificationScreenModel
     if (val == null || val.isEmpty) {
       return 'Please enter a valid OTP';
     }
-    if (val.length < 4) {
-      return 'Requires 4 characters.';
+    if (val.length < 6) {
+      return 'Requires 6 characters.';
     }
     return null;
+  }
+
+  Future<void> VerifyAccount(BuildContext context) async {
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
+    // String email = FFAppState().email;
+    String email = FFAppState().email.isEmpty ? "trinhsontung2410@gmail.com" : FFAppState().email;
+    final response = await _userService.VerifyAccount(email, pinCodeController.text);
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Verification successful!"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      context.push("/homeScreen");
+    } else {
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+      String errorMessage = responseBody["message"] ?? "Verification failed.";
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> ResendOTP() async{
+    String email = FFAppState().email.isEmpty ? "trinhsontung2410@gmail.com" : FFAppState().email;
+    print("resed");
+    final response = await _userService.ResendOTP(email);
+    if(response.statusCode == 200){
+      print("resend success");
+      return;
+    }
+    else {
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+      String errorMessage = responseBody["message"] ?? "Resend code failed.";
+
+      print("error: ${errorMessage}");
+    }
   }
 
   @override
