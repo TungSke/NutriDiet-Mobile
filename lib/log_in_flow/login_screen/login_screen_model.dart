@@ -1,3 +1,5 @@
+import 'package:diet_plan_app/services/user_service.dart';
+
 import '/flutter_flow/flutter_flow_util.dart';
 import 'login_screen_widget.dart' show LoginScreenWidget;
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/material.dart';
 class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
   ///  State fields for stateful widgets in this page.
 
+  final UserService _userService = UserService();
   final formKey = GlobalKey<FormState>();
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode1;
@@ -32,6 +35,11 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
     }
 
     return null;
+  }
+
+  Future<void> loginFaceBook() async{
+     final response = _userService.loginWithFacebook();
+
   }
 
   @override

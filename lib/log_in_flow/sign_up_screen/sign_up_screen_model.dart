@@ -69,7 +69,7 @@ class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
     }
     isLoading = true;
     try {
-      final response = await _userService.Register(
+      final response = await _userService.register(
         textController3!.text, // Email
         textController4!.text, // Password
       );

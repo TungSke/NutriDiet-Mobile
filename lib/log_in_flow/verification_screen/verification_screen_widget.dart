@@ -104,7 +104,7 @@ class _VerificationScreenWidgetState extends State<VerificationScreenWidget> {
                                   ),
                             ),
                              TextSpan(
-                              text: '  ${email}',
+                              text: '  $email',
                               style: TextStyle(),
                             )
                           ],

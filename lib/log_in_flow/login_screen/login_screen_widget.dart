@@ -304,7 +304,9 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                   !_model.formKey.currentState!.validate()) {
                                 return;
                               }
-                              FFAppState().isLogin = true;
+
+                              await _model.loginFaceBook();
+                              //FFAppState().isLogin = true;
                               safeSetState(() {});
 
                               context.goNamed('Whats_your_goal');

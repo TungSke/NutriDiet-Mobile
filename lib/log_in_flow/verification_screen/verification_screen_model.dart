@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 class VerificationScreenModel
     extends FlutterFlowModel<VerificationScreenWidget> {
   ///  State fields for stateful widgets in this page.
-  UserService _userService = UserService();
+  final UserService _userService = UserService();
   final formKey = GlobalKey<FormState>();
   // Model for appbar component.
   late AppbarModel appbarModel;
@@ -33,7 +33,7 @@ class VerificationScreenModel
     }
     // String email = FFAppState().email;
     String email = FFAppState().email.isEmpty ? "trinhsontung2410@gmail.com" : FFAppState().email;
-    final response = await _userService.VerifyAccount(email, pinCodeController.text);
+    final response = await _userService.verifyAccount(email, pinCodeController.text);
 
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -61,7 +61,7 @@ class VerificationScreenModel
   Future<void> ResendOTP() async{
     String email = FFAppState().email.isEmpty ? "trinhsontung2410@gmail.com" : FFAppState().email;
     print("resed");
-    final response = await _userService.ResendOTP(email);
+    final response = await _userService.resendOTP(email);
     if(response.statusCode == 200){
       print("resend success");
       return;
@@ -70,7 +70,7 @@ class VerificationScreenModel
       final Map<String, dynamic> responseBody = json.decode(response.body);
       String errorMessage = responseBody["message"] ?? "Resend code failed.";
 
-      print("error: ${errorMessage}");
+      print("error: $errorMessage");
     }
   }
 
