@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '/backend/schema/structs/index.dart';
-
-import '/index.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/index.dart';
 
 export 'package:go_router/go_router.dart';
+
 export 'serialization_util.dart';
 
 const kTransitionInfoKey = '__transition_info__';
@@ -167,6 +167,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'Select_date_of_birth',
           path: '/selectDateOfBirth',
           builder: (context, params) => const SelectDateOfBirthWidget(),
+        ),
+        FFRoute(
+          name: 'Select_allergy_screen',
+          path: '/selectAllergyScreen',
+          builder: (context, params) => const SelectAllergyScreenWidget(),
+        ),
+        FFRoute(
+          name: 'Select_disease_screen',
+          path: '/selectDiseaseScreen',
+          builder: (context, params) => const SelectDiseaseScreenWidget(),
         ),
         FFRoute(
           name: 'hight_Enter_screen',
@@ -347,7 +357,8 @@ class TransitionInfo {
   final Duration duration;
   final Alignment? alignment;
 
-  static TransitionInfo appDefault() => const TransitionInfo(hasTransition: false);
+  static TransitionInfo appDefault() =>
+      const TransitionInfo(hasTransition: false);
 }
 
 class RootPageContext {
