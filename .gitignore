@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/flutter,dart
-# Edit at https://www.toptal.com/developers/gitignore?templates=flutter,dart
+# Created by https://www.toptal.com/developers/gitignore/api/dart,flutter
+# Edit at https://www.toptal.com/developers/gitignore?templates=dart,flutter
 
 ### Dart ###
 # See https://www.dartlang.org/guides/libraries/private-files
@@ -14,7 +14,7 @@ pubspec.lock
 # Directory created by dartdoc
 # If you don't generate documentation locally you can remove this line.
 doc/api/
-
+.idea/
 # dotenv environment variables file
 .env*
 
@@ -93,4 +93,4 @@ lib/generated_plugin_registrant.dart
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
-# End of https://www.toptal.com/developers/gitignore/api/flutter,dart
+# End of https://www.toptal.com/developers/gitignore/api/dart,flutter

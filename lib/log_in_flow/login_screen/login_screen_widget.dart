@@ -1,3 +1,5 @@
+import 'package:sign_in_button/sign_in_button.dart';
+
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -305,11 +307,9 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                 return;
                               }
 
-
                               await _model.handleLogin(context);
                               //FFAppState().isLogin = true;
                               safeSetState(() {});
-
                               // context.goNamed('Whats_your_goal');
                             },
                             text: 'Log in',
@@ -338,6 +338,66 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                               ),
                               borderRadius: BorderRadius.circular(16.0),
                             ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Divider với dòng chữ "Or log in with"
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey.shade400,
+                                thickness: 1,
+                                indent: 20,
+                                endIndent: 10,
+                              ),
+                            ),
+                            const Text(
+                              "Or log in with",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey.shade400,
+                                thickness: 1,
+                                indent: 10,
+                                endIndent: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+
+                        const SizedBox(height: 20),
+
+                        // Nút đăng nhập bằng Google
+                        SizedBox(
+                          width: 10,
+                          height: 50, // Đảm bảo chiều cao đồng đều
+                          child: SignInButton(
+                            Buttons.google,
+                            onPressed: () {},
+                          )
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // Nút đăng nhập bằng Facebook
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50, // Đảm bảo chiều cao đồng đều
+                          child: SignInButton(
+                            Buttons.facebookNew,
+                            onPressed: () {},
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                         ),
                       ],
