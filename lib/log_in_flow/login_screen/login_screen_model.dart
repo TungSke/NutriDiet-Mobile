@@ -85,8 +85,14 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
     );
   }
   Future<void> loginFaceBook() async{
-     final response = _userService.loginWithFacebook();
-
+     final response = await _userService.loginWithFacebook();
+     if(response.statusCode == 200){
+       print("sucess");
+       print(response.body);
+     }
+     else{
+       print(response);
+     }
   }
 
   @override

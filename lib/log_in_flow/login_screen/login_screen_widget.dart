@@ -396,7 +396,9 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                           height: 50, // Đảm bảo chiều cao đồng đều
                           child: SignInButton(
                             Buttons.facebookNew,
-                            onPressed: () {},
+                            onPressed: () async {
+                              await _model.loginFaceBook();
+                            },
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                         ),

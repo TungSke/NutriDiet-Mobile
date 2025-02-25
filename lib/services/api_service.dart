@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = "https://localhost:7211";
+  final String baseUrl = "https://nutridietapi-be.azurewebsites.net";
 
   /// Hàm GET - Đọc dữ liệu
   Future<dynamic> get(String endpoint) async {
