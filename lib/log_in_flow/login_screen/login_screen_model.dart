@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:diet_plan_app/services/user_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '/flutter_flow/flutter_flow_util.dart';
 import 'login_screen_widget.dart' show LoginScreenWidget;
@@ -38,16 +39,19 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
     return null;
   }
-  Future<void> handleLogin(BuildContext context) async{
-    if(!formKey.currentState!.validate()){
+
+  Future<void> handleLogin(BuildContext context) async {
+    if (!formKey.currentState!.validate()) {
       return;
     }
-    try{
-      final response = await _userService.login(textController1!.text, textController2!.text);
+    try {
+      final response = await _userService.login(
+          textController1!.text, textController2!.text);
 
-      if(response.statusCode == 200) {
+      if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        if (responseBody["data"] != null && responseBody["data"]["accessToken"] != null) {
+        if (responseBody["data"] != null &&
+            responseBody["data"]["accessToken"] != null) {
           String token = responseBody["data"]["accessToken"];
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -63,18 +67,16 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
           context.push("/bottomNavbarScreen");
         }
-
+      } else {
+        final responseBody = jsonDecode(response.body);
+        String errorMessage = responseBody["message"] ?? "Login failed!";
+        showErrorMessage(context, errorMessage);
       }
-        else{
-          final responseBody = jsonDecode(response.body);
-          String errorMessage = responseBody["message"] ?? "Login failed!";
-          showErrorMessage(context, errorMessage);
-
-      }
-    } catch (e){
+    } catch (e) {
       showErrorMessage(context, "An error occurred: $e");
     }
   }
+
   void showErrorMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -84,16 +86,63 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
       ),
     );
   }
-  Future<void> loginFaceBook() async{
-     final response = await _userService.loginWithFacebook();
-     if(response.statusCode == 200){
-       print("sucess");
-       print(response.body);
-     }
-     else{
-       print(response);
-     }
+
+  Future<void> loginFaceBook(BuildContext context) async {
+    try {
+      final response = await _userService.loginWithFacebook();
+
+      if (response.statusCode == 200) {
+        print("Login with Facebook successful");
+
+        final responseBody = jsonDecode(response.body);
+        final String? accessToken = responseBody["data"]["accessToken"];
+        final String? refreshToken = responseBody["data"]["refreshToken"];
+
+        // Kiểm tra token hợp lệ
+        if (accessToken == null || refreshToken == null) {
+          throw Exception("Invalid response: Missing accessToken or refreshToken");
+        }
+
+        // ✅ Lưu accessToken trước khi gọi whoAmI()
+        await setDataAfterLogin(accessToken, refreshToken);
+
+        // ✅ Gọi whoAmI() sau khi đã lưu accessToken
+        final userData = await _userService.whoAmI();
+
+        if (userData.statusCode != 200) {
+          throw Exception("Failed to fetch user data: ${userData.statusCode}");
+        }
+
+        final userDataJson = jsonDecode(userData.body);
+        print(userDataJson);
+        final String? email = userDataJson["email"];
+
+        if (email == null || email.isEmpty) {
+          throw Exception("User email not found.");
+        }
+
+        FFAppState().email = email;
+        context.pushNamed("splace_scren");
+      } else {
+        print("Login failed: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      print("Error during Facebook login: $e");
+    }
   }
+
+  Future<void> setDataAfterLogin(String accessToken, String refreshToken) async {
+    final storage = FlutterSecureStorage();
+
+    await storage.write(key: 'accessToken', value: accessToken);
+    await storage.write(key: 'refreshToken', value: refreshToken);
+
+    FFAppState().isLogin = true;
+
+    print("User data saved successfully.");
+  }
+
+
 
   @override
   void initState(BuildContext context) {

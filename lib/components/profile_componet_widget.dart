@@ -122,7 +122,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                       ),
                                 ),
                                 Text(
-                                  'johnabram@gmail.com',
+                                  FFAppState().email,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(

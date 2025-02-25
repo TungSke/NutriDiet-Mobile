@@ -1,3 +1,4 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:diet_plan_app/services/api_service.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -33,7 +34,7 @@ class UserService {
     final LoginResult result = await FacebookAuth.instance.login(); // by default we request the email and the public profile
 
     final AccessToken accessToken = result.accessToken!;
-    print(accessToken.tokenString);
+
     final response = await _apiService.post(
           "api/user/login-with-facebook?idToken=${accessToken.tokenString}",
           body: {});
@@ -45,6 +46,17 @@ class UserService {
       "api/user/login",
       body: {'email': email, 'password': password},
     );
+    return response;
+  }
+
+  Future<http.Response> whoAmI() async {
+    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
+
+    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    if (token == null || token.isEmpty) {
+      throw Exception("Access token not found.");
+    }
+    final response = await _apiService.get("/api/user/whoami", token: token);
     return response;
   }
 }

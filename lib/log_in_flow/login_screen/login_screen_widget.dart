@@ -380,7 +380,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
 
                         // Nút đăng nhập bằng Google
                         SizedBox(
-                          width: 10,
+                          width: double.infinity,
                           height: 50, // Đảm bảo chiều cao đồng đều
                           child: SignInButton(
                             Buttons.google,
@@ -397,7 +397,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                           child: SignInButton(
                             Buttons.facebookNew,
                             onPressed: () async {
-                              await _model.loginFaceBook();
+                              await _model.loginFaceBook(context);
                             },
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
