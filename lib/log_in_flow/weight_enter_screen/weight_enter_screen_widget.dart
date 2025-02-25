@@ -1,12 +1,14 @@
-import '/components/appbar_widget.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '/components/appbar_widget.dart';
+import '/flutter_flow/custom_functions.dart' as functions;
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
 import 'weight_enter_screen_model.dart';
+
 export 'weight_enter_screen_model.dart';
 
 class WeightEnterScreenWidget extends StatefulWidget {
@@ -65,13 +67,14 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 0.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 24.0, 0.0, 0.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +273,8 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                                               BorderRadius.circular(12.0),
                                         ),
                                         contentPadding:
-                                            const EdgeInsetsDirectional.fromSTEB(
+                                            const EdgeInsetsDirectional
+                                                .fromSTEB(
                                                 16.0, 13.0, 16.0, 13.0),
                                       ),
                                       style: FlutterFlowTheme.of(context)
@@ -403,19 +407,20 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 20.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 20.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    context.pushNamed('Which_diet_do_you_prefer');
+                    context.pushNamed('Select_allergy_screen');
                   },
-                  text: 'Contuine',
+                  text: 'Next',
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 54.0,
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                    iconPadding:
-                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        24.0, 0.0, 24.0, 0.0),
+                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'figtree',
