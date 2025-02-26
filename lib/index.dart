@@ -1,4 +1,7 @@
 // Export pages
+export 'package:diet_plan_app/log_in_flow/whats_your_goal/decrease_weight_goal_widget.dart'
+    show DecreaseWeightGoalScreenWidget;
+
 export '/bottom_navbar_screen/bottom_navbar_screen_widget.dart'
     show BottomNavbarScreenWidget;
 export '/hight_enter_screen/hight_enter_screen_widget.dart'
@@ -14,6 +17,8 @@ export '/home_flow/search_result_screen/search_result_screen_widget.dart'
     show SearchResultScreenWidget;
 export '/log_in_flow/forget_screen/forget_screen_widget.dart'
     show ForgetScreenWidget;
+export '/log_in_flow/frequency_exercise_screen/frequency_exercise_screen_widget.dart'
+    show FrequencyExerciseScreenWidget;
 export '/log_in_flow/login_screen/login_screen_widget.dart'
     show LoginScreenWidget;
 export '/log_in_flow/reset_password_screen/reset_password_screen_widget.dart'
@@ -30,6 +35,8 @@ export '/log_in_flow/verification_screen/verification_screen_widget.dart'
     show VerificationScreenWidget;
 export '/log_in_flow/weight_enter_screen/weight_enter_screen_widget.dart'
     show WeightEnterScreenWidget;
+export '/log_in_flow/whats_your_goal/increase_weight_goal_widget.dart'
+    show IncreaseWeightGoalScreenWidget;
 export '/log_in_flow/whats_your_goal/whats_your_goal_widget.dart'
     show WhatsYourGoalWidget;
 export '/log_in_flow/which_cuisines_include_diet/which_cuisines_include_diet_widget.dart'
