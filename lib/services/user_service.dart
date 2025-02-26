@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:diet_plan_app/services/api_service.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -49,6 +50,28 @@ class UserService {
     return response;
   }
 
+  Future<http.Response> loginWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email'],
+      );
+
+      final GoogleSignInAccount? signInAccount = await googleSignIn.signIn();
+      if (signInAccount == null) {
+        throw Exception("Đăng nhập Google đã bị hủy");
+      }
+      final GoogleSignInAuthentication googleAuth = await signInAccount.authentication;
+
+      final response = await _apiService.post(
+          "api/user/login-with-google?idToken=${googleAuth.idToken
+          }",
+          body: {});
+
+      return response;
+    } catch (e) {
+      throw Exception("Google login failed: $e");
+    }
+  }
   Future<http.Response> whoAmI() async {
     final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
 

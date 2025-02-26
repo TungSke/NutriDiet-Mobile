@@ -384,7 +384,9 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                           height: 50, // Đảm bảo chiều cao đồng đều
                           child: SignInButton(
                             Buttons.google,
-                            onPressed: () {},
+                            onPressed: () async {
+                              await _model.loginGoogle(context);
+                            },
                           )
                         ),
 

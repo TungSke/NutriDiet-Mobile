@@ -52,7 +52,14 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
         final responseBody = jsonDecode(response.body);
         if (responseBody["data"] != null &&
             responseBody["data"]["accessToken"] != null) {
-          String token = responseBody["data"]["accessToken"];
+          final String? accessToken = responseBody["data"]["accessToken"];
+          final String? refreshToken = responseBody["data"]["refreshToken"];
+
+          if (accessToken == null || refreshToken == null) {
+            throw Exception("Invalid response: Missing accessToken or refreshToken");
+          }
+
+          await setDataAfterLogin(accessToken, refreshToken);
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -85,6 +92,42 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
         duration: const Duration(seconds: 2),
       ),
     );
+  }
+
+  Future<void> loginGoogle(BuildContext context) async {
+    try{
+      final response = await _userService.loginWithGoogle();
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        final String? accessToken = responseBody["data"]["accessToken"];
+        final String? refreshToken = responseBody["data"]["refreshToken"];
+
+        if (accessToken == null || refreshToken == null) {
+          throw Exception("Invalid response: Missing accessToken or refreshToken");
+        }
+
+        await setDataAfterLogin(accessToken, refreshToken);
+
+        final userData = await _userService.whoAmI();
+        if (userData.statusCode != 200) {
+          throw Exception("Failed to fetch user data: ${userData.statusCode}");
+        }
+
+        final userDataJson = jsonDecode(userData.body);
+        final String? email = userDataJson["email"];
+        if (email == null || email.isEmpty) {
+          throw Exception("User email not found.");
+        }
+
+        FFAppState().email = email;
+        context.pushNamed("splace_scren");
+      } else {
+        print("Google Login failed: ${response.statusCode} - ${response.body}");
+      }
+    }catch (e) {
+      showErrorMessage(context, "Error during login Google: ${e}");
+    }
   }
 
   Future<void> loginFaceBook(BuildContext context) async {
