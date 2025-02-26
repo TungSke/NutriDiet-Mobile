@@ -411,7 +411,7 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                     const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 20.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    context.pushNamed('Select_allergy_screen');
+                    context.pushNamed('Whats_your_goal');
                   },
                   text: 'Next',
                   options: FFButtonOptions(

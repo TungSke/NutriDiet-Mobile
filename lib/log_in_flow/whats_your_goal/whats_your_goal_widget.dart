@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:flutter/material.dart';
 import 'whats_your_goal_model.dart';
+
 export 'whats_your_goal_model.dart';
 
 class WhatsYourGoalWidget extends StatefulWidget {
@@ -52,7 +54,8 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 0.0),
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(
                       0,
@@ -580,19 +583,20 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    context.pushNamed('Tell_us_about_yourself');
+                    context.pushNamed('Select_allergy_screen');
                   },
                   text: 'Next',
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 54.0,
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                    iconPadding:
-                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        24.0, 0.0, 24.0, 0.0),
+                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'figtree',

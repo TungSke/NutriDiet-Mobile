@@ -1,3 +1,5 @@
+import 'package:diet_plan_app/services/disease_service.dart';
+import 'package:diet_plan_app/services/models/disease.dart';
 import 'package:flutter/material.dart';
 
 import '/components/appbar_widget.dart';
@@ -15,28 +17,38 @@ class SelectDiseaseScreenWidget extends StatefulWidget {
 
 class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  Set<String> selectedDiseases = {};
+  final DiseaseService _diseaseService = DiseaseService();
 
-  final List<String> diseases = [
-    "Diabetes",
-    "Hypertension",
-    "Heart Disease",
-    "Asthma",
-    "Arthritis",
-    "Cancer",
-    "Obesity",
-    "Kidney Disease",
-    "Liver Disease",
-    "Alzheimer's",
-    "Stroke"
-  ];
+  Set<int> selectedDiseaseIds = {};
+  List<Disease> diseases = [];
+  bool isLoading = true;
 
-  void toggleSelection(String disease) {
+  @override
+  void initState() {
+    super.initState();
+    fetchDiseases();
+  }
+
+  Future<void> fetchDiseases() async {
+    try {
+      final data =
+          await _diseaseService.getAllDiseases(pageIndex: 1, pageSize: 20);
+      setState(() {
+        diseases = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      print("Error loading diseases: $e");
+    }
+  }
+
+  void toggleSelection(int diseaseId) {
     setState(() {
-      if (selectedDiseases.contains(disease)) {
-        selectedDiseases.remove(disease);
+      if (selectedDiseaseIds.contains(diseaseId)) {
+        selectedDiseaseIds.remove(diseaseId);
       } else {
-        selectedDiseases.add(disease);
+        selectedDiseaseIds.add(diseaseId);
       }
     });
   }
@@ -55,28 +67,35 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
-                  child: Scrollbar(
-                    thickness: 4.0,
-                    radius: const Radius.circular(10),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(right: 10.0),
-                      itemCount: diseases.length,
-                      itemBuilder: (context, index) {
-                        final disease = diseases[index];
-                        final isSelected = selectedDiseases.contains(disease);
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Scrollbar(
+                          thickness: 4.0,
+                          radius: const Radius.circular(10),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            itemCount: diseases.length,
+                            itemBuilder: (context, index) {
+                              final disease = diseases[index];
+                              final isSelected = selectedDiseaseIds
+                                  .contains(disease.diseaseId);
 
-                        return CheckboxListTile(
-                          title: Text(disease,
-                              style: FlutterFlowTheme.of(context).bodyMedium),
-                          value: isSelected,
-                          activeColor: FlutterFlowTheme.of(context).primary,
-                          onChanged: (bool? value) {
-                            toggleSelection(disease);
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                              return CheckboxListTile(
+                                title: Text(
+                                  disease.diseaseName,
+                                  style:
+                                      FlutterFlowTheme.of(context).bodyMedium,
+                                ),
+                                value: isSelected,
+                                activeColor:
+                                    FlutterFlowTheme.of(context).primary,
+                                onChanged: (bool? value) {
+                                  toggleSelection(disease.diseaseId);
+                                },
+                              );
+                            },
+                          ),
+                        ),
                 ),
               ),
               Padding(
@@ -84,6 +103,7 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                     const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 20.0),
                 child: FFButtonWidget(
                   onPressed: () async {
+                    print("Selected Disease IDs: $selectedDiseaseIds");
                     context.pushNamed('Which_diet_do_you_prefer');
                   },
                   text: 'Next',
@@ -92,22 +112,17 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                     height: 54.0,
                     padding: const EdgeInsetsDirectional.fromSTEB(
                         24.0, 0.0, 24.0, 0.0),
-                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'figtree',
                           color: Colors.white,
                           fontSize: 18.0,
-                          letterSpacing: 0.0,
                           fontWeight: FontWeight.bold,
                           useGoogleFonts: false,
                         ),
                     elevation: 0.0,
-                    borderSide: const BorderSide(
-                      color: Colors.transparent,
-                      width: 0.0,
-                    ),
+                    borderSide:
+                        const BorderSide(color: Colors.transparent, width: 0.0),
                     borderRadius: BorderRadius.circular(16.0),
                   ),
                 ),
