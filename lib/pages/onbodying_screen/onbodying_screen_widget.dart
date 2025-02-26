@@ -1,11 +1,13 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart'
+    as smooth_page_indicator;
+
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart'
-    as smooth_page_indicator;
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'onbodying_screen_model.dart';
+
 export 'onbodying_screen_model.dart';
 
 class OnbodyingScreenWidget extends StatefulWidget {
@@ -275,14 +277,16 @@ class _OnbodyingScreenWidgetState extends State<OnbodyingScreenWidget> {
               ),
             ),
             Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 64.0),
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 64.0),
               child: FFButtonWidget(
                 onPressed: () async {
                   if (FFAppState().isintroindex == 2) {
                     FFAppState().isintro = true;
                     safeSetState(() {});
 
-                    context.goNamed('bottom_navbar_screen');
+                    // context.goNamed('bottom_navbar_screen');
+                    context.goNamed('Tell_us_about_yourself');
                   } else {
                     await _model.pageViewController?.nextPage(
                       duration: const Duration(milliseconds: 300),
@@ -294,7 +298,8 @@ class _OnbodyingScreenWidgetState extends State<OnbodyingScreenWidget> {
                 options: FFButtonOptions(
                   width: double.infinity,
                   height: 56.0,
-                  padding: const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      24.0, 0.0, 24.0, 0.0),
                   iconPadding:
                       const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
                   color: FlutterFlowTheme.of(context).primary,
@@ -320,7 +325,8 @@ class _OnbodyingScreenWidgetState extends State<OnbodyingScreenWidget> {
               child: Align(
                 alignment: const AlignmentDirectional(0.0, 1.0),
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
                   child: Text(
                     'Skip',
                     maxLines: 1,

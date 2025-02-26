@@ -1,3 +1,5 @@
+import 'package:diet_plan_app/services/allergy_service.dart';
+import 'package:diet_plan_app/services/models/allergy.dart';
 import 'package:flutter/material.dart';
 
 import '/components/appbar_widget.dart';
@@ -15,28 +17,38 @@ class SelectAllergyScreenWidget extends StatefulWidget {
 
 class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  Set<String> selectedAllergies = {};
+  final AllergyService _allergyService = AllergyService();
 
-  final List<String> allergies = [
-    "Peanuts",
-    "Seafood",
-    "Dairy",
-    "Gluten",
-    "Soy",
-    "Eggs",
-    "Tree Nuts",
-    "Shellfish",
-    "Sesame",
-    "Wheat",
-    "Corn"
-  ];
+  Set<int> selectedAllergyIds = {};
+  List<Allergy> allergies = [];
+  bool isLoading = true;
 
-  void toggleSelection(String allergy) {
+  @override
+  void initState() {
+    super.initState();
+    fetchAllergies();
+  }
+
+  Future<void> fetchAllergies() async {
+    try {
+      final data =
+          await _allergyService.getAllAllergies(pageIndex: 1, pageSize: 20);
+      setState(() {
+        allergies = data as List<Allergy>; // ❌ Lỗi ép kiểu sai
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      print("Error loading allergies: $e");
+    }
+  }
+
+  void toggleSelection(int allergyId) {
     setState(() {
-      if (selectedAllergies.contains(allergy)) {
-        selectedAllergies.remove(allergy);
+      if (selectedAllergyIds.contains(allergyId)) {
+        selectedAllergyIds.remove(allergyId);
       } else {
-        selectedAllergies.add(allergy);
+        selectedAllergyIds.add(allergyId);
       }
     });
   }
@@ -55,28 +67,37 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
-                  child: Scrollbar(
-                    thickness: 4.0, // Độ dày thanh cuộn
-                    radius: const Radius.circular(10), // Bo góc thanh cuộn
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(right: 10.0),
-                      itemCount: allergies.length,
-                      itemBuilder: (context, index) {
-                        final allergy = allergies[index];
-                        final isSelected = selectedAllergies.contains(allergy);
+                  child: isLoading
+                      ? const Center(
+                          child:
+                              CircularProgressIndicator()) // Hiển thị loading khi đang tải API
+                      : Scrollbar(
+                          thickness: 4.0,
+                          radius: const Radius.circular(10),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            itemCount: allergies.length,
+                            itemBuilder: (context, index) {
+                              final allergy = allergies[index];
+                              final isSelected = selectedAllergyIds
+                                  .contains(allergy.allergyId);
 
-                        return CheckboxListTile(
-                          title: Text(allergy,
-                              style: FlutterFlowTheme.of(context).bodyMedium),
-                          value: isSelected,
-                          activeColor: FlutterFlowTheme.of(context).primary,
-                          onChanged: (bool? value) {
-                            toggleSelection(allergy);
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                              return CheckboxListTile(
+                                title: Text(
+                                  allergy.allergyName,
+                                  style:
+                                      FlutterFlowTheme.of(context).bodyMedium,
+                                ),
+                                value: isSelected,
+                                activeColor:
+                                    FlutterFlowTheme.of(context).primary,
+                                onChanged: (bool? value) {
+                                  toggleSelection(allergy.allergyId);
+                                },
+                              );
+                            },
+                          ),
+                        ),
                 ),
               ),
               Padding(
@@ -84,6 +105,7 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
                     const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 20.0),
                 child: FFButtonWidget(
                   onPressed: () async {
+                    print("Selected Allergy IDs: $selectedAllergyIds");
                     context.pushNamed('Select_disease_screen');
                   },
                   text: 'Next',
@@ -92,22 +114,17 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
                     height: 54.0,
                     padding: const EdgeInsetsDirectional.fromSTEB(
                         24.0, 0.0, 24.0, 0.0),
-                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'figtree',
                           color: Colors.white,
                           fontSize: 18.0,
-                          letterSpacing: 0.0,
                           fontWeight: FontWeight.bold,
                           useGoogleFonts: false,
                         ),
                     elevation: 0.0,
-                    borderSide: const BorderSide(
-                      color: Colors.transparent,
-                      width: 0.0,
-                    ),
+                    borderSide:
+                        const BorderSide(color: Colors.transparent, width: 0.0),
                     borderRadius: BorderRadius.circular(16.0),
                   ),
                 ),
