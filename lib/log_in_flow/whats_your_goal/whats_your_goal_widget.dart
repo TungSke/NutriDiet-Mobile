@@ -587,7 +587,13 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                     const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    context.pushNamed('Select_allergy_screen');
+                    if (_model.select == 0) {
+                      // Nếu chọn "Fat loss", điều hướng sang DecreaseWeightGoalScreen
+                      context.pushNamed('decrease_weight_goal_screen');
+                    } else if (_model.select == 1) {
+                      context.pushNamed('Select_allergy_screen');
+                    } else if (_model.select == 2)
+                      context.pushNamed('decrease_weight_goal_screen');
                   },
                   text: 'Next',
                   options: FFButtonOptions(
@@ -595,22 +601,14 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                     height: 54.0,
                     padding: const EdgeInsetsDirectional.fromSTEB(
                         24.0, 0.0, 24.0, 0.0),
-                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'figtree',
                           color: Colors.white,
                           fontSize: 18.0,
-                          letterSpacing: 0.0,
                           fontWeight: FontWeight.bold,
                           useGoogleFonts: false,
                         ),
-                    elevation: 0.0,
-                    borderSide: const BorderSide(
-                      color: Colors.transparent,
-                      width: 0.0,
-                    ),
                     borderRadius: BorderRadius.circular(16.0),
                   ),
                 ),

@@ -34,7 +34,7 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
       final data =
           await _allergyService.getAllAllergies(pageIndex: 1, pageSize: 20);
       setState(() {
-        allergies = data as List<Allergy>; // ❌ Lỗi ép kiểu sai
+        allergies = data as List<Allergy>;
         isLoading = false;
       });
     } catch (e) {
