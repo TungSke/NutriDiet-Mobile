@@ -1,12 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 import '/components/home_componet_widget.dart';
 import '/components/profile_componet_widget.dart';
 import '/components/recipe_compnoet_widget.dart';
 import '/components/serch_data_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'bottom_navbar_screen_model.dart';
+
 export 'bottom_navbar_screen_model.dart';
 
 class BottomNavbarScreenWidget extends StatefulWidget {
@@ -83,7 +85,8 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                 color: FlutterFlowTheme.of(context).secondaryBackground,
               ),
               child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 20.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 20.0),
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -119,7 +122,8 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                       color: const Color(0xFFEDEDED),
                                       borderRadius: BorderRadius.circular(30.0),
                                     ),
-                                    alignment: const AlignmentDirectional(0.0, 0.0),
+                                    alignment:
+                                        const AlignmentDirectional(0.0, 0.0),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
@@ -144,7 +148,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                               },
                             ),
                             Text(
-                              'Home',
+                              'Trang chủ',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -194,7 +198,8 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                       color: const Color(0xFFEDEDED),
                                       borderRadius: BorderRadius.circular(30.0),
                                     ),
-                                    alignment: const AlignmentDirectional(0.0, 0.0),
+                                    alignment:
+                                        const AlignmentDirectional(0.0, 0.0),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
@@ -219,7 +224,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                               },
                             ),
                             Text(
-                              'Search',
+                              'Tìm kiếm',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -270,7 +275,8 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                           FlutterFlowTheme.of(context).bottom,
                                       borderRadius: BorderRadius.circular(30.0),
                                     ),
-                                    alignment: const AlignmentDirectional(0.0, 0.0),
+                                    alignment:
+                                        const AlignmentDirectional(0.0, 0.0),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
@@ -295,7 +301,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                               },
                             ),
                             Text(
-                              'Recipe',
+                              'Công thức',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -346,7 +352,8 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                           FlutterFlowTheme.of(context).bottom,
                                       borderRadius: BorderRadius.circular(30.0),
                                     ),
-                                    alignment: const AlignmentDirectional(0.0, 0.0),
+                                    alignment:
+                                        const AlignmentDirectional(0.0, 0.0),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
@@ -371,7 +378,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                               },
                             ),
                             Text(
-                              'Profile',
+                              'Hồ sơ',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(

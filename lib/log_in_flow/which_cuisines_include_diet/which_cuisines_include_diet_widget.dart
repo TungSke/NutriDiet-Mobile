@@ -51,7 +51,7 @@ class _WhichCuisinesIncludeDietWidgetState
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'Which cuisines include diet?',
+                  title: 'Những món ăn nào trong chế độ ăn kiêng?',
                 ),
               ),
               Expanded(
@@ -728,7 +728,7 @@ class _WhichCuisinesIncludeDietWidgetState
                   onPressed: () async {
                     context.pushNamed('frequency_exercise_screen');
                   },
-                  text: 'Next',
+                  text: 'Tiếp tục',
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 54.0,

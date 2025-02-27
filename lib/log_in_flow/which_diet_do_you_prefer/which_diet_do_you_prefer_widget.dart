@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:flutter/material.dart';
 import 'which_diet_do_you_prefer_model.dart';
+
 export 'which_diet_do_you_prefer_model.dart';
 
 class WhichDietDoYouPreferWidget extends StatefulWidget {
@@ -49,12 +51,13 @@ class _WhichDietDoYouPreferWidgetState
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'Which diet do you prefer?',
+                  title: 'Bạn thích chế độ ăn kiêng nào??',
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 0.0),
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(
                       0,
@@ -935,19 +938,20 @@ class _WhichDietDoYouPreferWidgetState
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
                 child: FFButtonWidget(
                   onPressed: () async {
                     context.pushNamed('Which_cuisines_include_diet');
                   },
-                  text: 'Next',
+                  text: 'Tiếp tục',
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 54.0,
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                    iconPadding:
-                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        24.0, 0.0, 24.0, 0.0),
+                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'figtree',

@@ -63,7 +63,7 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
         body: SafeArea(
           child: Column(
             children: [
-              const AppbarWidget(title: 'Select Allergies'),
+              const AppbarWidget(title: 'Bạn bị dị ứng với?'),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -103,30 +103,71 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
               Padding(
                 padding:
                     const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 20.0),
-                child: FFButtonWidget(
-                  onPressed: () async {
-                    print("Selected Allergy IDs: $selectedAllergyIds");
-                    context.pushNamed('Select_disease_screen');
-                  },
-                  text: 'Next',
-                  options: FFButtonOptions(
-                    width: double.infinity,
-                    height: 54.0,
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        24.0, 0.0, 24.0, 0.0),
-                    color: FlutterFlowTheme.of(context).primary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'figtree',
-                          color: Colors.white,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          useGoogleFonts: false,
-                        ),
-                    elevation: 0.0,
-                    borderSide:
-                        const BorderSide(color: Colors.transparent, width: 0.0),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
+                child: Column(
+                  children: [
+                    FFButtonWidget(
+                      onPressed: () {
+                        if (selectedAllergyIds.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text("Bạn cần chọn ít nhất một loại bệnh!"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        } else {
+                          context.pushNamed('Select_disease_screen');
+                        }
+                      },
+                      text: 'Tiếp tục',
+                      options: FFButtonOptions(
+                        width: double.infinity,
+                        height: 54.0,
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            24.0, 0.0, 24.0, 0.0),
+                        color: FlutterFlowTheme.of(context).primary,
+                        textStyle:
+                            FlutterFlowTheme.of(context).titleSmall.override(
+                                  fontFamily: 'figtree',
+                                  color: Colors.white,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                  useGoogleFonts: false,
+                                ),
+                        elevation: 0.0,
+                        borderSide: const BorderSide(
+                            color: Colors.transparent, width: 0.0),
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    FFButtonWidget(
+                      onPressed: () async {
+                        print("Selected Allergy IDs: $selectedAllergyIds");
+                        context.pushNamed('Select_disease_screen');
+                      },
+                      text: 'Bỏ qua',
+                      options: FFButtonOptions(
+                        width: double.infinity,
+                        height: 54.0,
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            24.0, 0.0, 24.0, 0.0),
+                        color: Colors.grey,
+                        textStyle:
+                            FlutterFlowTheme.of(context).titleSmall.override(
+                                  fontFamily: 'figtree',
+                                  color: Colors.white,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                  useGoogleFonts: false,
+                                ),
+                        elevation: 0.0,
+                        borderSide: const BorderSide(
+                            color: Colors.transparent, width: 0.0),
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

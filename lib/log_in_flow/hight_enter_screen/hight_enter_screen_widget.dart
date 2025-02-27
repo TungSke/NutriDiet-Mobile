@@ -6,29 +6,28 @@ import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'weight_enter_screen_model.dart';
+import 'hight_enter_screen_model.dart';
 
-export 'weight_enter_screen_model.dart';
+export 'hight_enter_screen_model.dart';
 
-class WeightEnterScreenWidget extends StatefulWidget {
-  const WeightEnterScreenWidget({super.key});
+class HightEnterScreenWidget extends StatefulWidget {
+  const HightEnterScreenWidget({super.key});
 
   @override
-  State<WeightEnterScreenWidget> createState() =>
-      _WeightEnterScreenWidgetState();
+  State<HightEnterScreenWidget> createState() => _HightEnterScreenWidgetState();
 }
 
-class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
-  late WeightEnterScreenModel _model;
+class _HightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
+  late HightEnterScreenModel _model;
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => WeightEnterScreenModel());
-    _model.kgTextController ??=
-        TextEditingController(text: FFAppState().kgvalue);
-    _model.kgFocusNode ??= FocusNode();
+    _model = createModel(context, () => HightEnterScreenModel());
+    _model.cmTextController ??=
+        TextEditingController(text: FFAppState().cmvalue);
+    _model.cmFocusNode ??= FocusNode();
   }
 
   @override
@@ -51,7 +50,7 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              const AppbarWidget(title: 'Nhập cân nặng'),
+              const AppbarWidget(title: 'Nhập chiều cao'),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -59,13 +58,13 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       TextFormField(
-                        controller: _model.kgTextController,
-                        focusNode: _model.kgFocusNode,
+                        controller: _model.cmTextController,
+                        focusNode: _model.cmFocusNode,
                         onChanged: (_) => EasyDebounce.debounce(
-                          '_model.kgTextController',
+                          '_model.cmTextController',
                           const Duration(milliseconds: 2000),
                           () async {
-                            FFAppState().cmvalue = _model.kgTextController.text;
+                            FFAppState().cmvalue = _model.cmTextController.text;
                             FFAppState().update(() {});
                           },
                         ),
@@ -73,7 +72,7 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                         textInputAction: TextInputAction.next,
                         obscureText: false,
                         decoration: InputDecoration(
-                          labelText: 'Nhập cân nặng (kg)',
+                          labelText: 'Nhập chiều cao (cm)',
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: FlutterFlowTheme.of(context).grey,
@@ -93,7 +92,7 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                         style: FlutterFlowTheme.of(context).bodyMedium,
                         keyboardType: TextInputType.number,
                         cursorColor: FlutterFlowTheme.of(context).primary,
-                        validator: _model.kgTextControllerValidator
+                        validator: _model.cmTextControllerValidator
                             .asValidator(context),
                       ),
                       const SizedBox(height: 20.0),
@@ -102,7 +101,7 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                           if (_model.formKey.currentState != null) {
                             _model.formKey.currentState!.validate();
                           }
-                          context.pushNamed('Whats_your_goal');
+                          context.pushNamed('weight_Enter_screen');
                         },
                         text: 'Tiếp tục',
                         options: FFButtonOptions(

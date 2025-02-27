@@ -49,7 +49,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'What’s your goal',
+                  title: 'Mục tiêu của bạn là gì?',
                 ),
               ),
               Expanded(
@@ -119,7 +119,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Fat loss',
+                                              'Giảm cân',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -133,7 +133,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                                       ),
                                             ),
                                             Text(
-                                              'Optimize fat loss whilemaintrainig muscle mass',
+                                              'Giảm mỡ trong khi vẫn duy trì khối lượng cơ',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -195,7 +195,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Fat loss',
+                                              'Giảm cân',
                                               maxLines: 1,
                                               style:
                                                   FlutterFlowTheme.of(context)
@@ -210,7 +210,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                                       ),
                                             ),
                                             Text(
-                                              'Optimize fat loss whilemaintrainig muscle mass',
+                                              'Giảm mỡ trong khi vẫn duy trì khối lượng cơ',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -290,7 +290,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Weight maintenance',
+                                              'Giữ cân',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -304,7 +304,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                                       ),
                                             ),
                                             Text(
-                                              'Keep your current weight while staying healthy',
+                                              'Duy trì cân nặng hiện tại của bạn',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -366,7 +366,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Weight maintenance',
+                                              'Giữ cân',
                                               maxLines: 1,
                                               style:
                                                   FlutterFlowTheme.of(context)
@@ -381,7 +381,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                                       ),
                                             ),
                                             Text(
-                                              'Keep your current weight while staying healthy',
+                                              'Duy trì cân nặng hiện tại của bạn',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -461,7 +461,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Muscle growth',
+                                              'Tăng cân',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -475,7 +475,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                                       ),
                                             ),
                                             Text(
-                                              'Gain muscle mass while getting stronger',
+                                              'Tăng cơ, tăng mỡ và trở nên khỏe mạnh hơn',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -537,7 +537,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Muscle growth',
+                                              'Tăng cân',
                                               maxLines: 1,
                                               style:
                                                   FlutterFlowTheme.of(context)
@@ -552,7 +552,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                                                       ),
                                             ),
                                             Text(
-                                              'Gain muscle mass while getting stronger',
+                                              'Tăng cơ, tăng mỡ và trở nên khỏe mạnh hơn',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -593,9 +593,9 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                     } else if (_model.select == 1) {
                       context.pushNamed('Select_allergy_screen');
                     } else if (_model.select == 2)
-                      context.pushNamed('decrease_weight_goal_screen');
+                      context.pushNamed('increase_weight_goal_screen');
                   },
-                  text: 'Next',
+                  text: 'Tiếp tục',
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 54.0,

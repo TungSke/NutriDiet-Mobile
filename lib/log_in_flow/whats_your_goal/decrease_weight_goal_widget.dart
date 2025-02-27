@@ -76,7 +76,7 @@ class _DecreaseWeightGoalScreenWidgetState
                           print('Người dùng chọn: $selectedKg kg');
 
                           // Chuyển sang trang Select_allergy_screen
-                          context.pushNamed('Select_allergy_screen');
+                          context.pushNamed('decrease_weight_change_rate_screen');
                         },
                         text: 'Xác nhận',
                         options: FFButtonOptions(

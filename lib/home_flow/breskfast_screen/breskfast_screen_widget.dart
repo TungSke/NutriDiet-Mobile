@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
 import '/components/appbar_widget.dart';
 import '/components/comon_componet_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:flutter/material.dart';
 import 'breskfast_screen_model.dart';
+
 export 'breskfast_screen_model.dart';
 
 class BreskfastScreenWidget extends StatefulWidget {
@@ -47,12 +49,13 @@ class _BreskfastScreenWidgetState extends State<BreskfastScreenWidget> {
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'Break fast',
+                  title: 'Bữa sáng',
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 0.0),
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(
                       0,
