@@ -1,3 +1,4 @@
+import '../components/my_mealplan_component_model.dart';
 import '/components/home_componet_widget.dart';
 import '/components/profile_componet_widget.dart';
 import '/components/recipe_compnoet_widget.dart';
@@ -30,6 +31,8 @@ class BottomNavbarScreenModel
   late RecipeCompnoetModel recipeCompnoetModel;
   // Model for profile_componet component.
   late ProfileComponetModel profileComponetModel;
+  // Model for mealplan_componet component.
+  late MyMealPlanComponentModel mymealplanComponentModel;
 
   @override
   void initState(BuildContext context) {
@@ -37,6 +40,7 @@ class BottomNavbarScreenModel
     serchDataModel = createModel(context, () => SerchDataModel());
     recipeCompnoetModel = createModel(context, () => RecipeCompnoetModel());
     profileComponetModel = createModel(context, () => ProfileComponetModel());
+    mymealplanComponentModel = createModel(context, () => MyMealPlanComponentModel());
   }
 
   @override
@@ -45,5 +49,6 @@ class BottomNavbarScreenModel
     serchDataModel.dispose();
     recipeCompnoetModel.dispose();
     profileComponetModel.dispose();
+    mymealplanComponentModel.dispose();
   }
 }
