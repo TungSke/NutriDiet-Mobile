@@ -1,40 +1,25 @@
+import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'tell_us_about_yourself_model.dart';
+import '../../components/appbar_widget.dart';
 
-export 'tell_us_about_yourself_model.dart';
-
-class TellUsAboutYourselfWidget extends StatefulWidget {
-  const TellUsAboutYourselfWidget({super.key});
+class IncreaseWeightChangeRateScreenWidget extends StatefulWidget {
+  const IncreaseWeightChangeRateScreenWidget({super.key});
 
   @override
-  State<TellUsAboutYourselfWidget> createState() =>
-      _TellUsAboutYourselfWidgetState();
+  State<IncreaseWeightChangeRateScreenWidget> createState() =>
+      _IncreaseWeightChangeRateScreenWidgetState();
 }
 
-class _TellUsAboutYourselfWidgetState extends State<TellUsAboutYourselfWidget> {
-  late TellUsAboutYourselfModel _model;
+class _IncreaseWeightChangeRateScreenWidgetState
+    extends State<IncreaseWeightChangeRateScreenWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  int selectedGenderIndex = 0; // Mặc định chọn Male
-  final List<String> genderOptions = ["Nam", "Nữ"];
-
-  @override
-  void initState() {
-    super.initState();
-    _model = createModel(context, () => TellUsAboutYourselfModel());
-  }
-
-  @override
-  void dispose() {
-    _model.dispose();
-    super.dispose();
-  }
+  double selectedKgPerWeek = 0.25; // Giá trị mặc định
+  final List<double> kgPerWeekOptions = [0.25, 0.5, 0.75, 1.0]; // 0.25 - 1 kg
 
   @override
   Widget build(BuildContext context) {
@@ -48,27 +33,19 @@ class _TellUsAboutYourselfWidgetState extends State<TellUsAboutYourselfWidget> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              wrapWithModel(
-                model: _model.appbarModel,
-                updateCallback: () => safeSetState(() {}),
-                child: const AppbarWidget(title: 'Giới thiệu về bạn'),
-              ),
+              const AppbarWidget(title: 'Mục tiêu của bạn'),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Vui lòng chọn giới tính của bạn',
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily: 'figtree',
-                            fontSize: 16.0,
-                            useGoogleFonts: false,
-                            fontWeight: FontWeight.normal,
-                          ),
+                      'Bạn muốn tăng bao nhiêu kg mỗi tuần?',
+                      style: FlutterFlowTheme.of(context).headlineMedium,
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
                     Container(
-                      height: 150,
+                      height: 200,
                       color: FlutterFlowTheme.of(context).secondaryBackground,
                       child: CupertinoPicker(
                         itemExtent: 40,
@@ -77,13 +54,13 @@ class _TellUsAboutYourselfWidgetState extends State<TellUsAboutYourselfWidget> {
                         useMagnifier: true,
                         onSelectedItemChanged: (index) {
                           setState(() {
-                            selectedGenderIndex = index;
+                            selectedKgPerWeek = kgPerWeekOptions[index];
                           });
                         },
-                        children: genderOptions.map((gender) {
+                        children: kgPerWeekOptions.map((kg) {
                           return Center(
                             child: Text(
-                              gender,
+                              '$kg kg',
                               style: FlutterFlowTheme.of(context).bodyLarge,
                             ),
                           );
@@ -95,24 +72,25 @@ class _TellUsAboutYourselfWidgetState extends State<TellUsAboutYourselfWidget> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: FFButtonWidget(
                         onPressed: () {
-                          print(
-                              'Selected gender: ${genderOptions[selectedGenderIndex]}');
-                          context.pushNamed('Select_date_of_birth');
+                          print('Người dùng chọn: $selectedKgPerWeek kg/tuần');
+
+                          // Chuyển sang trang tiếp theo
+                          context.pushNamed('Select_allergy_screen');
                         },
-                        text: 'Tiếp tục',
+                        text: 'Xác nhận',
                         options: FFButtonOptions(
                           width: double.infinity,
                           height: 54.0,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           color: FlutterFlowTheme.of(context).primary,
                           textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.override(
-                                    fontFamily: 'figtree',
+                              FlutterFlowTheme.of(context).titleSmall.copyWith(
                                     color: Colors.white,
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
-                                    useGoogleFonts: false,
                                   ),
-                          borderRadius: BorderRadius.circular(16.0),
+                          elevation: 2.0,
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),

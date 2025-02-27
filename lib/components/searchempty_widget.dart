@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
+
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:flutter/material.dart';
 import 'searchempty_model.dart';
+
 export 'searchempty_model.dart';
 
 class SearchemptyWidget extends StatefulWidget {
@@ -60,9 +62,10 @@ class _SearchemptyWidgetState extends State<SearchemptyWidget> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 14.0, 0.0, 0.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 14.0, 0.0, 0.0),
                   child: Text(
-                    'No results found',
+                    'Không có kết quả tìm kiếm',
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           fontFamily: 'figtree',
                           fontSize: 20.0,
@@ -73,9 +76,10 @@ class _SearchemptyWidgetState extends State<SearchemptyWidget> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
                   child: Text(
-                    'Try using simpler search terms and then filtering the correct tog',
+                    'Hãy thử sử dụng các thuật ngữ tìm kiếm đơn giản hơn và sau đó lọc các từ khóa chính xác',
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           fontFamily: 'figtree',

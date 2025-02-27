@@ -1,12 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
+
 import '/components/comon_componet_widget.dart';
 import '/components/searchempty_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
 import 'serch_data_model.dart';
+
 export 'serch_data_model.dart';
 
 class SerchDataWidget extends StatefulWidget {
@@ -77,9 +79,10 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
             child: Align(
               alignment: const AlignmentDirectional(0.0, 1.0),
               child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                 child: Text(
-                  'Search',
+                  'Tìm kiếm',
                   maxLines: 1,
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                         fontFamily: 'figtree',
@@ -114,7 +117,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                       letterSpacing: 0.0,
                       useGoogleFonts: false,
                     ),
-                hintText: 'Search',
+                hintText: 'Tìm kiếm',
                 hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
                       fontFamily: 'figtree',
                       color: FlutterFlowTheme.of(context).grey,
@@ -191,8 +194,8 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                                   children: [
                                     if (FFAppState().searchList.isNotEmpty)
                                       Padding(
-                                        padding: const EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 16.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 16.0, 0.0, 0.0),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
@@ -270,7 +273,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                                                     padding:
                                                         const EdgeInsetsDirectional
                                                             .fromSTEB(16.0, 0.0,
-                                                                0.0, 0.0),
+                                                            0.0, 0.0),
                                                     child: InkWell(
                                                       splashColor:
                                                           Colors.transparent,

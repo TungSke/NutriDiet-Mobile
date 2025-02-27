@@ -1,10 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 import '/components/comon_componet_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'recipe_compnoet_model.dart';
+
 export 'recipe_compnoet_model.dart';
 
 class RecipeCompnoetWidget extends StatefulWidget {
@@ -68,7 +70,8 @@ class _RecipeCompnoetWidgetState extends State<RecipeCompnoetWidget>
           child: Align(
             alignment: const AlignmentDirectional(0.0, 1.0),
             child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
               child: Text(
                 'Recipe',
                 maxLines: 1,
@@ -101,7 +104,7 @@ class _RecipeCompnoetWidgetState extends State<RecipeCompnoetWidget>
                     letterSpacing: 0.0,
                     useGoogleFonts: false,
                   ),
-              hintText: 'Search',
+              hintText: 'Tìm kiếm',
               hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
                     fontFamily: 'figtree',
                     color: FlutterFlowTheme.of(context).grey,

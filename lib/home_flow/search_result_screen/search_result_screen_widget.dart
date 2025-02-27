@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
 import '/components/appbar_widget.dart';
 import '/components/comon_componet_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:flutter/material.dart';
 import 'search_result_screen_model.dart';
+
 export 'search_result_screen_model.dart';
 
 class SearchResultScreenWidget extends StatefulWidget {
@@ -48,12 +50,13 @@ class _SearchResultScreenWidgetState extends State<SearchResultScreenWidget> {
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'Search result',
+                  title: 'Kết quả tìm kiếm',
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 0.0),
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(
                       0,

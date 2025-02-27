@@ -1,13 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
-import '/flutter_flow/flutter_flow_animations.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+
+import '/flutter_flow/flutter_flow_animations.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
 import 'splace_scren_model.dart';
+
 export 'splace_scren_model.dart';
 
 class SplaceScrenWidget extends StatefulWidget {
@@ -65,6 +67,18 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
           ),
         ],
       ),
+      'subtitleOnPageLoadAnimation': AnimationInfo(
+        trigger: AnimationTrigger.onPageLoad,
+        effectsBuilder: () => [
+          FadeEffect(
+            curve: Curves.easeInOut,
+            delay: 100.0.ms,
+            duration: 2000.0.ms,
+            begin: 0.0,
+            end: 1.0,
+          ),
+        ],
+      ),
     });
   }
 
@@ -93,7 +107,8 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(0.0),
                     child: Image.asset(
@@ -106,7 +121,7 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
                       animationsMap['imageOnPageLoadAnimation']!),
                 ),
                 Text(
-                  'Diet plan',
+                  'NutriDiet',
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                         fontFamily: 'figtree',
                         fontSize: 28.0,
@@ -115,6 +130,18 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
                         useGoogleFonts: false,
                       ),
                 ).animateOnPageLoad(animationsMap['textOnPageLoadAnimation']!),
+                const SizedBox(height: 8.0),
+                Text(
+                  'Hệ thống đề xuất chế độ ăn uống lành mạnh',
+                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                        fontFamily: 'figtree',
+                        fontSize: 16.0,
+                        letterSpacing: 0.0,
+                        fontWeight: FontWeight.normal,
+                        useGoogleFonts: false,
+                      ),
+                ).animateOnPageLoad(
+                    animationsMap['subtitleOnPageLoadAnimation']!),
               ],
             ),
           ),

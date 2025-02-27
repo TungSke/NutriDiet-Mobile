@@ -1,11 +1,13 @@
 // Export pages
+export 'package:diet_plan_app/log_in_flow/whats_your_goal/decrease_weight_change_rate_widget.dart'
+    show DecreaseWeightChangeRateScreenWidget;
 export 'package:diet_plan_app/log_in_flow/whats_your_goal/decrease_weight_goal_widget.dart'
     show DecreaseWeightGoalScreenWidget;
+export 'package:diet_plan_app/log_in_flow/whats_your_goal/increase_weight_change_rate_widget.dart'
+    show IncreaseWeightChangeRateScreenWidget;
 
 export '/bottom_navbar_screen/bottom_navbar_screen_widget.dart'
     show BottomNavbarScreenWidget;
-export '/hight_enter_screen/hight_enter_screen_widget.dart'
-    show HightEnterScreenWidget;
 export '/home_flow/brek_fast_i_ingredients/brek_fast_i_ingredients_widget.dart'
     show BrekFastIIngredientsWidget;
 export '/home_flow/breskfast_screen/breskfast_screen_widget.dart'
@@ -19,6 +21,8 @@ export '/log_in_flow/forget_screen/forget_screen_widget.dart'
     show ForgetScreenWidget;
 export '/log_in_flow/frequency_exercise_screen/frequency_exercise_screen_widget.dart'
     show FrequencyExerciseScreenWidget;
+export '/log_in_flow/hight_enter_screen/hight_enter_screen_widget.dart'
+    show HightEnterScreenWidget;
 export '/log_in_flow/login_screen/login_screen_widget.dart'
     show LoginScreenWidget;
 export '/log_in_flow/reset_password_screen/reset_password_screen_widget.dart'

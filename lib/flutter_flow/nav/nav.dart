@@ -204,6 +204,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const DecreaseWeightGoalScreenWidget(),
         ),
         FFRoute(
+          name: 'decrease_weight_change_rate_screen',
+          path: '/decreaseWeightChangeRateScreen',
+          builder: (context, params) => const DecreaseWeightChangeRateScreenWidget(),
+        ),
+        FFRoute(
+          name: 'increase_weight_change_rate_screen',
+          path: '/increaseWeightChangeRateScreen',
+          builder: (context, params) => const IncreaseWeightChangeRateScreenWidget(),
+        ),
+        FFRoute(
           name: 'weight_Enter_screen',
           path: '/weightEnterScreen',
           builder: (context, params) => const WeightEnterScreenWidget(),

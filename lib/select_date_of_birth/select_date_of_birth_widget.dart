@@ -1,10 +1,12 @@
+import 'package:flutter/material.dart';
+
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_calendar.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:flutter/material.dart';
 import 'select_date_of_birth_model.dart';
+
 export 'select_date_of_birth_model.dart';
 
 class SelectDateOfBirthWidget extends StatefulWidget {
@@ -49,21 +51,22 @@ class _SelectDateOfBirthWidgetState extends State<SelectDateOfBirthWidget> {
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'Select date of birth',
+                  title: 'Chọn ngày sinh của bạn',
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 0.0),
                   child: ListView(
                     padding: EdgeInsets.zero,
                     scrollDirection: Axis.vertical,
                     children: [
                       Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 24.0, 0.0, 0.0),
                         child: Text(
-                          'Select date of birth',
+                          'Chọn ngày sinh của bạn',
                           maxLines: 1,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
@@ -77,8 +80,8 @@ class _SelectDateOfBirthWidgetState extends State<SelectDateOfBirthWidget> {
                         ),
                       ),
                       Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 24.0, 0.0, 0.0),
                         child: FlutterFlowCalendar(
                           color: FlutterFlowTheme.of(context).primary,
                           iconColor: FlutterFlowTheme.of(context).secondaryText,
@@ -130,19 +133,20 @@ class _SelectDateOfBirthWidgetState extends State<SelectDateOfBirthWidget> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
                 child: FFButtonWidget(
                   onPressed: () async {
                     context.pushNamed('hight_Enter_screen');
                   },
-                  text: 'Next',
+                  text: 'Tiếp tục',
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 54.0,
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                    iconPadding:
-                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        24.0, 0.0, 24.0, 0.0),
+                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'figtree',

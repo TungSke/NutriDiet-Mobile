@@ -1,12 +1,14 @@
-import '/components/comon_componet_widget.dart';
-import '/flutter_flow/flutter_flow_calendar.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
+
+import '/components/comon_componet_widget.dart';
+import '/flutter_flow/flutter_flow_calendar.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
 import 'home_componet_model.dart';
+
 export 'home_componet_model.dart';
 
 class HomeComponetWidget extends StatefulWidget {
@@ -61,7 +63,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -71,7 +74,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Good morning',
+                        'Chào ngày mới !',
                         maxLines: 1,
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               fontFamily: 'figtree',
@@ -139,8 +142,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
               scrollDirection: Axis.vertical,
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 16.0, 20.0, 0.0),
                   child: Container(
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).lightGrey,
@@ -195,10 +198,10 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   ),
                 ),
                 Padding(
-                  padding:
-                      const EdgeInsetsDirectional.fromSTEB(20.0, 24.0, 20.0, 16.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 24.0, 20.0, 16.0),
                   child: Text(
-                    'Today calories',
+                    'Calories hôm nay',
                     maxLines: 1,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           fontFamily: 'figtree',
@@ -216,8 +219,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                     Align(
                       alignment: const AlignmentDirectional(0.0, 0.0),
                       child: Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 0.0, 0.0, 24.0),
                         child: CircularPercentIndicator(
                           percent: 0.5,
                           radius: 75.0,
@@ -244,8 +247,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                     Align(
                       alignment: const AlignmentDirectional(0.0, 1.0),
                       child: Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 20.0, 0.0, 0.0),
                         child: Text(
                           'Kcal',
                           maxLines: 1,
@@ -265,7 +268,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -484,14 +488,14 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   ),
                 ),
                 Padding(
-                  padding:
-                      const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Expanded(
                         child: Text(
-                          'Break fast',
+                          'Bữa sáng',
                           maxLines: 1,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
@@ -513,7 +517,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                           context.pushNamed('breskfast_screen');
                         },
                         child: Text(
-                          'View all',
+                          'Tất cả',
                           maxLines: 1,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
@@ -531,8 +535,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   ),
                 ),
                 Padding(
-                  padding:
-                      const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
                   child: InkWell(
                     splashColor: Colors.transparent,
                     focusColor: Colors.transparent,
@@ -549,8 +553,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   ),
                 ),
                 Padding(
-                  padding:
-                      const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
                   child: InkWell(
                     splashColor: Colors.transparent,
                     focusColor: Colors.transparent,
@@ -567,8 +571,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   ),
                 ),
                 Padding(
-                  padding:
-                      const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
                   child: InkWell(
                     splashColor: Colors.transparent,
                     focusColor: Colors.transparent,
