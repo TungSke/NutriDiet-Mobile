@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/components/my_mealplan_component_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -70,6 +71,11 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     model: _model.recipeCompnoetModel,
                     updateCallback: () => safeSetState(() {}),
                     child: const RecipeCompnoetWidget(),
+                  ),
+                  wrapWithModel(
+                    model: _model.mymealplanComponentModel, // <-- Thêm model mới ở đây
+                    updateCallback: () => safeSetState(() {}),
+                    child: const MyMealPlanScreenWidget(), // <-- Thêm widget mới ở đây
                   ),
                   wrapWithModel(
                     model: _model.profileComponetModel,
@@ -328,7 +334,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          _model.bottomadd = 3;
+                          _model.bottomadd = 3; // Cập nhật vị trí index
                           safeSetState(() {});
                           await _model.pageViewController?.animateToPage(
                             3,
@@ -344,6 +350,78 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                             Builder(
                               builder: (context) {
                                 if (_model.bottomadd == 3) {
+                                  return Container(
+                                    width: 59.0,
+                                    height: 32.0,
+                                    decoration: BoxDecoration(
+                                      color: FlutterFlowTheme.of(context).bottom,
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                    alignment: const AlignmentDirectional(0.0, 0.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      child: SvgPicture.asset(
+                                        'assets/images/BLACK-FILL-MEALPLAN-BOTTOM.svg', // Icon Meal Plan
+                                        width: 24.0,
+                                        height: 24.0,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(0.0),
+                                    child: SvgPicture.asset(
+                                      'assets/images/GREY-MEALPLAN-BOTTOM.svg', // Icon khi không chọn
+                                      width: 24.0,
+                                      height: 24.0,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                            Text(
+                              'Thực đơn',
+                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'figtree',
+                                color: _model.bottomadd == 3
+                                    ? FlutterFlowTheme.of(context).primaryText
+                                    : FlutterFlowTheme.of(context).grey,
+                                fontSize: 13.0,
+                                letterSpacing: 0.0,
+                                useGoogleFonts: false,
+                                lineHeight: 1.5,
+                              ),
+                            ),
+                          ].divide(SizedBox(height: _model.bottomadd == 3 ? 4.0 : 8.0)),
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          _model.bottomadd = 4;
+                          safeSetState(() {});
+                          await _model.pageViewController?.animateToPage(
+                            4,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.ease,
+                          );
+                        },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Builder(
+                              builder: (context) {
+                                if (_model.bottomadd == 4) {
                                   return Container(
                                     width: 59.0,
                                     height: 32.0,
@@ -383,7 +461,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   .bodyMedium
                                   .override(
                                     fontFamily: 'figtree',
-                                    color: _model.bottomadd == 3
+                                    color: _model.bottomadd == 4
                                         ? FlutterFlowTheme.of(context)
                                             .primaryText
                                         : FlutterFlowTheme.of(context).grey,

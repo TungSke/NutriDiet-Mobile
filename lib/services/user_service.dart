@@ -51,6 +51,7 @@ class UserService {
   }
 
   Future<http.Response> loginWithGoogle() async {
+
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: ['email'],

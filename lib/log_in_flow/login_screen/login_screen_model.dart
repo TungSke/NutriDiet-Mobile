@@ -68,7 +68,18 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
               duration: Duration(seconds: 2),
             ),
           );
+          final userData = await _userService.whoAmI();
+          if (userData.statusCode != 200) {
+            throw Exception("Failed to fetch user data: ${userData.statusCode}");
+          }
 
+          final userDataJson = jsonDecode(userData.body);
+          final String? email = userDataJson["email"];
+          if (email == null || email.isEmpty) {
+            throw Exception("User email not found.");
+          }
+
+          FFAppState().email = email;
           // Chuyển hướng sau khi hiển thị thông báo
           await Future.delayed(Duration(seconds: 1));
 
