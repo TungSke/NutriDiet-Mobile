@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-import '/components/comon_componet_widget.dart';
+import '/components/food_component_widget.dart';
 import '/flutter_flow/flutter_flow_calendar.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -546,9 +546,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.comonComponetModel1,
+                      model: _model.foodComponentModel1,
                       updateCallback: () => safeSetState(() {}),
-                      child: const ComonComponetWidget(),
+                      child: const FoodComponentWidget(),
                     ),
                   ),
                 ),
@@ -564,9 +564,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.comonComponetModel2,
+                      model: _model.foodComponentModel2,
                       updateCallback: () => safeSetState(() {}),
-                      child: const ComonComponetWidget(),
+                      child: const FoodComponentWidget(),
                     ),
                   ),
                 ),
@@ -582,9 +582,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.comonComponetModel3,
+                      model: _model.foodComponentModel3,
                       updateCallback: () => safeSetState(() {}),
-                      child: const ComonComponetWidget(),
+                      child: const FoodComponentWidget(),
                     ),
                   ),
                 ),

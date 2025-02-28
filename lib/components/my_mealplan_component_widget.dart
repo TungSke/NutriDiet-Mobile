@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../flutter_flow/flutter_flow_theme.dart';
 
 class MyMealPlanScreenWidget extends StatefulWidget {
@@ -33,7 +34,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       ),
       body: Column(
         children: [
-          // Tabs trong cùng một thành phần màu xanh lá
           Container(
             color: primaryColor,
             padding: const EdgeInsets.symmetric(vertical: 10),
@@ -41,12 +41,10 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(
                 tabs.length,
-                    (index) => _buildTabItem(tabs[index], index),
+                (index) => _buildTabItem(tabs[index], index),
               ),
             ),
           ),
-
-          // Danh sách Meal Plan
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),

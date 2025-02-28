@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
-import '/components/comon_componet_widget.dart';
+import '/components/food_component_widget.dart';
 import '/components/searchempty_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -386,9 +386,9 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                                           .pushNamed('brek_fast_iIngredients');
                                     },
                                     child: wrapWithModel(
-                                      model: _model.comonComponetModel1,
+                                      model: _model.foodComponentModel1,
                                       updateCallback: () => safeSetState(() {}),
-                                      child: const ComonComponetWidget(),
+                                      child: const FoodComponentWidget(),
                                     ),
                                   ),
                                   InkWell(
@@ -401,9 +401,9 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                                           .pushNamed('brek_fast_iIngredients');
                                     },
                                     child: wrapWithModel(
-                                      model: _model.comonComponetModel2,
+                                      model: _model.foodComponentModel2,
                                       updateCallback: () => safeSetState(() {}),
-                                      child: const ComonComponetWidget(),
+                                      child: const FoodComponentWidget(),
                                     ),
                                   ),
                                 ].divide(const SizedBox(height: 20.0)),
