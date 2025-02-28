@@ -1,8 +1,9 @@
-import '/components/appbar_widget.dart';
-import '/components/comon_componet_widget.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import 'fav_screen_widget.dart' show FavScreenWidget;
 import 'package:flutter/material.dart';
+
+import '/components/appbar_widget.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '../../components/food_component_model.dart';
+import 'fav_screen_widget.dart' show FavScreenWidget;
 
 class FavScreenModel extends FlutterFlowModel<FavScreenWidget> {
   ///  State fields for stateful widgets in this page.
@@ -10,33 +11,33 @@ class FavScreenModel extends FlutterFlowModel<FavScreenWidget> {
   // Model for appbar component.
   late AppbarModel appbarModel;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel1;
+  late FoodComponentModel foodComponentModel1;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel2;
+  late FoodComponentModel foodComponentModel2;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel3;
+  late FoodComponentModel foodComponentModel3;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel4;
+  late FoodComponentModel foodComponentModel4;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel5;
+  late FoodComponentModel foodComponentModel5;
 
   @override
   void initState(BuildContext context) {
     appbarModel = createModel(context, () => AppbarModel());
-    comonComponetModel1 = createModel(context, () => ComonComponetModel());
-    comonComponetModel2 = createModel(context, () => ComonComponetModel());
-    comonComponetModel3 = createModel(context, () => ComonComponetModel());
-    comonComponetModel4 = createModel(context, () => ComonComponetModel());
-    comonComponetModel5 = createModel(context, () => ComonComponetModel());
+    foodComponentModel1 = createModel(context, () => FoodComponentModel());
+    foodComponentModel2 = createModel(context, () => FoodComponentModel());
+    foodComponentModel3 = createModel(context, () => FoodComponentModel());
+    foodComponentModel4 = createModel(context, () => FoodComponentModel());
+    foodComponentModel5 = createModel(context, () => FoodComponentModel());
   }
 
   @override
   void dispose() {
     appbarModel.dispose();
-    comonComponetModel1.dispose();
-    comonComponetModel2.dispose();
-    comonComponetModel3.dispose();
-    comonComponetModel4.dispose();
-    comonComponetModel5.dispose();
+    foodComponentModel1.dispose();
+    foodComponentModel2.dispose();
+    foodComponentModel3.dispose();
+    foodComponentModel4.dispose();
+    foodComponentModel5.dispose();
   }
 }

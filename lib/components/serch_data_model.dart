@@ -1,8 +1,9 @@
-import '/components/comon_componet_widget.dart';
+import 'package:flutter/material.dart';
+
 import '/components/searchempty_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import 'food_component_model.dart';
 import 'serch_data_widget.dart' show SerchDataWidget;
-import 'package:flutter/material.dart';
 
 class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
   ///  Local state fields for this component.
@@ -18,16 +19,16 @@ class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
   TextEditingController? textController;
   String? Function(BuildContext, String?)? textControllerValidator;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel1;
+  late FoodComponentModel foodComponentModel1;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel2;
+  late FoodComponentModel foodComponentModel2;
   // Model for searchempty component.
   late SearchemptyModel searchemptyModel;
 
   @override
   void initState(BuildContext context) {
-    comonComponetModel1 = createModel(context, () => ComonComponetModel());
-    comonComponetModel2 = createModel(context, () => ComonComponetModel());
+    foodComponentModel1 = createModel(context, () => FoodComponentModel());
+    foodComponentModel2 = createModel(context, () => FoodComponentModel());
     searchemptyModel = createModel(context, () => SearchemptyModel());
   }
 
@@ -36,8 +37,8 @@ class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
     textFieldFocusNode?.dispose();
     textController?.dispose();
 
-    comonComponetModel1.dispose();
-    comonComponetModel2.dispose();
+    foodComponentModel1.dispose();
+    foodComponentModel2.dispose();
     searchemptyModel.dispose();
   }
 }

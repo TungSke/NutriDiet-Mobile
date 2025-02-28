@@ -1,8 +1,9 @@
-import '/components/comon_componet_widget.dart';
+import 'package:flutter/material.dart';
+
 import '/flutter_flow/flutter_flow_calendar.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import 'food_component_model.dart';
 import 'home_componet_widget.dart' show HomeComponetWidget;
-import 'package:flutter/material.dart';
 
 class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   ///  State fields for stateful widgets in this component.
@@ -10,11 +11,11 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   // State field(s) for Calendar widget.
   DateTimeRange? calendarSelectedDay;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel1;
+  late FoodComponentModel foodComponentModel1;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel2;
+  late FoodComponentModel foodComponentModel2;
   // Model for comon_componet component.
-  late ComonComponetModel comonComponetModel3;
+  late FoodComponentModel foodComponentModel3;
 
   @override
   void initState(BuildContext context) {
@@ -22,15 +23,15 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
       start: DateTime.now().startOfDay,
       end: DateTime.now().endOfDay,
     );
-    comonComponetModel1 = createModel(context, () => ComonComponetModel());
-    comonComponetModel2 = createModel(context, () => ComonComponetModel());
-    comonComponetModel3 = createModel(context, () => ComonComponetModel());
+    foodComponentModel1 = createModel(context, () => FoodComponentModel());
+    foodComponentModel2 = createModel(context, () => FoodComponentModel());
+    foodComponentModel3 = createModel(context, () => FoodComponentModel());
   }
 
   @override
   void dispose() {
-    comonComponetModel1.dispose();
-    comonComponetModel2.dispose();
-    comonComponetModel3.dispose();
+    foodComponentModel1.dispose();
+    foodComponentModel2.dispose();
+    foodComponentModel3.dispose();
   }
 }

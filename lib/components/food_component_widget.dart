@@ -1,19 +1,21 @@
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'comon_componet_model.dart';
-export 'comon_componet_model.dart';
 
-class ComonComponetWidget extends StatefulWidget {
-  const ComonComponetWidget({super.key});
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import 'food_component_model.dart';
+
+export 'food_component_model.dart';
+
+class FoodComponentWidget extends StatefulWidget {
+  const FoodComponentWidget({super.key});
 
   @override
-  State<ComonComponetWidget> createState() => _ComonComponetWidgetState();
+  State<FoodComponentWidget> createState() => _FoodComponentWidgetState();
 }
 
-class _ComonComponetWidgetState extends State<ComonComponetWidget> {
-  late ComonComponetModel _model;
+class _FoodComponentWidgetState extends State<FoodComponentWidget> {
+  late FoodComponentModel _model;
 
   @override
   void setState(VoidCallback callback) {
@@ -24,7 +26,7 @@ class _ComonComponetWidgetState extends State<ComonComponetWidget> {
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => ComonComponetModel());
+    _model = createModel(context, () => FoodComponentModel());
   }
 
   @override
@@ -79,8 +81,8 @@ class _ComonComponetWidgetState extends State<ComonComponetWidget> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 4.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 0.0, 4.0, 0.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(0.0),
                           child: SvgPicture.asset(
@@ -111,8 +113,8 @@ class _ComonComponetWidgetState extends State<ComonComponetWidget> {
                         ),
                       ),
                       Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 4.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 0.0, 4.0, 0.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(0.0),
                           child: SvgPicture.asset(
