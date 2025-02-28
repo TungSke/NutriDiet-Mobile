@@ -555,19 +555,48 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(
                       20.0, 0.0, 20.0, 16.0),
-                  child: InkWell(
-                    splashColor: Colors.transparent,
-                    focusColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () async {
-                      context.pushNamed('brek_fast_iIngredients');
-                    },
-                    child: wrapWithModel(
-                      model: _model.foodComponentModel2,
-                      updateCallback: () => safeSetState(() {}),
-                      child: const FoodComponentWidget(),
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Bữa phụ',
+                          maxLines: 1,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    fontSize: 20.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.bold,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                        ),
+                      ),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          context.pushNamed('breskfast_screen');
+                        },
+                        child: Text(
+                          'Tất cả',
+                          maxLines: 1,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    color: FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Padding(
@@ -582,7 +611,202 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.foodComponentModel3,
+                      model: _model.foodComponentModel1,
+                      updateCallback: () => safeSetState(() {}),
+                      child: const FoodComponentWidget(),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Bữa trưa',
+                          maxLines: 1,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    fontSize: 20.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.bold,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                        ),
+                      ),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          context.pushNamed('breskfast_screen');
+                        },
+                        child: Text(
+                          'Tất cả',
+                          maxLines: 1,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    color: FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
+                  child: InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      context.pushNamed('brek_fast_iIngredients');
+                    },
+                    child: wrapWithModel(
+                      model: _model.foodComponentModel1,
+                      updateCallback: () => safeSetState(() {}),
+                      child: const FoodComponentWidget(),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Bữa chiều',
+                          maxLines: 1,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    fontSize: 20.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.bold,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                        ),
+                      ),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          context.pushNamed('breskfast_screen');
+                        },
+                        child: Text(
+                          'Tất cả',
+                          maxLines: 1,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    color: FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
+                  child: InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      context.pushNamed('brek_fast_iIngredients');
+                    },
+                    child: wrapWithModel(
+                      model: _model.foodComponentModel1,
+                      updateCallback: () => safeSetState(() {}),
+                      child: const FoodComponentWidget(),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Bữa tối',
+                          maxLines: 1,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    fontSize: 20.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.bold,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                        ),
+                      ),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          context.pushNamed('breskfast_screen');
+                        },
+                        child: Text(
+                          'Tất cả',
+                          maxLines: 1,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    color: FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 16.0),
+                  child: InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      context.pushNamed('brek_fast_iIngredients');
+                    },
+                    child: wrapWithModel(
+                      model: _model.foodComponentModel1,
                       updateCallback: () => safeSetState(() {}),
                       child: const FoodComponentWidget(),
                     ),
