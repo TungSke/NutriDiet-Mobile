@@ -74,49 +74,7 @@ class _BreskfastScreenWidgetState extends State<BreskfastScreenWidget> {
                           context.pushNamed('brek_fast_iIngredients');
                         },
                         child: wrapWithModel(
-                          model: _model.foodComponentModel1,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodComponentModel2,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodComponentModel3,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodComponentModel4,
+                          model: _model.foodComponentModel,
                           updateCallback: () => safeSetState(() {}),
                           child: const FoodComponentWidget(),
                         ),

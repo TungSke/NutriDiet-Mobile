@@ -66,7 +66,7 @@ class _FoodComponentWidgetState extends State<FoodComponentWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Healthy breakfast with toas ',
+                    'Phở bò ',
                     maxLines: 1,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           fontFamily: 'figtree',
@@ -98,7 +98,7 @@ class _FoodComponentWidgetState extends State<FoodComponentWidget> {
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 8.0, 0.0),
                           child: Text(
-                            '256 Calories',
+                            '350 Calories',
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -116,18 +116,12 @@ class _FoodComponentWidgetState extends State<FoodComponentWidget> {
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             0.0, 0.0, 4.0, 0.0),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(0.0),
-                          child: SvgPicture.asset(
-                            'assets/images/wacth-icon-home.svg',
-                            width: 24.0,
-                            height: 24.0,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                            borderRadius: BorderRadius.circular(0.0),
+                            child: Text("Khẩu phần:")),
                       ),
                       Expanded(
                         child: Text(
-                          '20 Min',
+                          '1 tô',
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     fontFamily: 'figtree',

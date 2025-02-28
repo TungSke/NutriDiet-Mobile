@@ -11,29 +11,17 @@ class BreskfastScreenModel extends FlutterFlowModel<BreskfastScreenWidget> {
   // Model for appbar component.
   late AppbarModel appbarModel;
   // Model for comon_componet component.
-  late FoodComponentModel foodComponentModel1;
-  // Model for comon_componet component.
-  late FoodComponentModel foodComponentModel2;
-  // Model for comon_componet component.
-  late FoodComponentModel foodComponentModel3;
-  // Model for comon_componet component.
-  late FoodComponentModel foodComponentModel4;
+  late FoodComponentModel foodComponentModel;
 
   @override
   void initState(BuildContext context) {
     appbarModel = createModel(context, () => AppbarModel());
-    foodComponentModel1 = createModel(context, () => FoodComponentModel());
-    foodComponentModel2 = createModel(context, () => FoodComponentModel());
-    foodComponentModel3 = createModel(context, () => FoodComponentModel());
-    foodComponentModel4 = createModel(context, () => FoodComponentModel());
+    foodComponentModel = createModel(context, () => FoodComponentModel());
   }
 
   @override
   void dispose() {
     appbarModel.dispose();
-    foodComponentModel1.dispose();
-    foodComponentModel2.dispose();
-    foodComponentModel3.dispose();
-    foodComponentModel4.dispose();
+    foodComponentModel.dispose();
   }
 }
