@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
-import '../flutter_flow/flutter_flow_theme.dart';
-import '../meal_plan_flow/ai_meal_plan_screen/ai_meal_plan_widget.dart';
-import '../meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_widget.dart';
+import '../../flutter_flow/flutter_flow_theme.dart';
 
-class MyMealPlanScreenWidget extends StatefulWidget {
-  const MyMealPlanScreenWidget({super.key});
+class SampleMealPlanWidget extends StatefulWidget {
+  const SampleMealPlanWidget({super.key});
 
   @override
-  State<MyMealPlanScreenWidget> createState() => _MyMealPlanScreenWidgetState();
+  State<SampleMealPlanWidget> createState() => _SampleMealPlanWidgetState();
 }
 
-class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
+class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
   String searchQuery = "";
   String? selectedFilter;
 
-  final List<Map<String, dynamic>> mealPlans = [
-    {"name": "Thực đơn A", "goal": "Giảm cân", "days": 7, "isActive": false},
-    {"name": "Thực đơn B", "goal": "Tăng cơ", "days": 14, "isActive": true},
-    {"name": "Thực đơn C", "goal": "Giữ dáng", "days": 10, "isActive": false},
+  final List<Map<String, dynamic>> sampleMealPlans = [
+    {"name": "Thực đơn Keto", "goal": "Giảm cân", "days": 7},
+    {"name": "Thực đơn Protein", "goal": "Tăng cơ", "days": 14},
+    {"name": "Thực đơn Low-Carb", "goal": "Giữ dáng", "days": 10},
   ];
 
   @override
@@ -26,20 +24,24 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Center(
+          child: Text(
+            "Thực đơn mẫu",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        backgroundColor: theme.primary,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 119.0,
-              alignment: AlignmentDirectional(0.0, 1.0),
-              child: Text(
-                "Quản lý thực đơn",
-                style: theme.titleLarge.copyWith(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -66,19 +68,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                   icon: const Icon(Icons.filter_list, color: Colors.grey, size: 28),
                   onPressed: () => _showFilterDialog(),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildLargeButton("Thực đơn mẫu", SampleMealPlanWidget()),
-                FloatingActionButton(
-                  backgroundColor: theme.primary,
-                  onPressed: () {},
-                  child: const Icon(Icons.add, color: Colors.white),
-                ),
-                _buildLargeButton("Thực đơn AI", AIMealPlanWidget()),
               ],
             ),
             const SizedBox(height: 16),
@@ -133,7 +122,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   }
 
   List<Map<String, dynamic>> _filteredMealPlans() {
-    return mealPlans.where((plan) {
+    return sampleMealPlans.where((plan) {
       final matchesSearch = searchQuery.isEmpty || plan["name"].toLowerCase().contains(searchQuery.toLowerCase());
       final matchesFilter = selectedFilter == null || plan["goal"] == selectedFilter;
       return matchesSearch && matchesFilter;
@@ -145,33 +134,12 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: Color(0xFFF5F5F5),
+      color: FlutterFlowTheme.of(context).secondaryBackground,
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         title: Text(mealPlan["name"], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         subtitle: Text("${mealPlan["goal"]} - Số ngày: ${mealPlan["days"]}", style: const TextStyle(fontSize: 14, color: Colors.grey)),
-        trailing: Switch(
-          value: mealPlan["isActive"],
-          activeColor: FlutterFlowTheme.of(context).primary,
-          onChanged: (bool value) => setState(() => mealPlan["isActive"] = value),
-        ),
         onTap: () {},
-      ),
-    );
-  }
-
-  Widget _buildLargeButton(String title, Widget targetScreen) {
-    return SizedBox(
-      width: 160,
-      height: 60,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: FlutterFlowTheme.of(context).primary,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen)),
-        child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 18)),
       ),
     );
   }
