@@ -6,15 +6,15 @@ class Food {
   final String? foodType;
   final String? description;
   final String? servingSize;
-  final String? calories;
-  final String? protein;
-  final String? carbs;
-  final String? fat;
-  final String? glucid;
-  final String? fiber;
+  final int? calories; // Sửa thành int?
+  final int? protein; // Sửa thành int?
+  final int? carbs; // Sửa thành int?
+  final int? fat; // Sửa thành int?
+  final int? glucid; // Sửa thành int?
+  final int? fiber; // Sửa thành int?
   final String? others;
-  final List<String>? allergies; // Danh sách dị ứng
-  final List<String>? diseases; // Danh sách bệnh
+  final List<String>? allergies;
+  final List<String>? diseases;
 
   Food({
     required this.foodId,
@@ -43,13 +43,14 @@ class Food {
       imageUrl: json['imageUrl'] as String?,
       foodType: json['foodType'] as String?,
       description: json['description'] as String?,
-      servingSize: json['servingSize'] as String?,
-      calories: json['calories'] as String?,
-      protein: json['protein'] as String?,
-      carbs: json['carbs'] as String?,
-      fat: json['fat'] as String?,
-      glucid: json['glucid'] as String?,
-      fiber: json['fiber'] as String?,
+      servingSize: json['servingSize']
+          ?.toString(), // Chuyển servingSize thành String nếu cần
+      calories: json['calories'] as int?, // Sửa lại kiểu dữ liệu
+      protein: json['protein'] as int?, // Sửa lại kiểu dữ liệu
+      carbs: json['carbs'] as int?, // Sửa lại kiểu dữ liệu
+      fat: json['fat'] as int?, // Sửa lại kiểu dữ liệu
+      glucid: json['glucid'] as int?, // Sửa lại kiểu dữ liệu
+      fiber: json['fiber'] as int?, // Sửa lại kiểu dữ liệu
       others: json['others'] as String?,
       allergies: (json['allergies'] as List<dynamic>?)
           ?.map((e) => e as String)

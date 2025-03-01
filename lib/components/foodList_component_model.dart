@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '/flutter_flow/flutter_flow_util.dart';
-import 'food_component_widget.dart' show FoodComponentWidget;
+import 'foodList_component_widget.dart' show FoodListComponentWidget;
 
-class FoodComponentModel extends FlutterFlowModel<FoodComponentWidget> {
+class FoodListComponentModel extends FlutterFlowModel<FoodListComponentWidget> {
   @override
   void initState(BuildContext context) {}
 

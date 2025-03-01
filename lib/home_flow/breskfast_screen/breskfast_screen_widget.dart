@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/components/appbar_widget.dart';
-import '/components/food_component_widget.dart';
+import '/components/foodList_component_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'breskfast_screen_model.dart';
@@ -74,9 +74,9 @@ class _BreskfastScreenWidgetState extends State<BreskfastScreenWidget> {
                           context.pushNamed('brek_fast_iIngredients');
                         },
                         child: wrapWithModel(
-                          model: _model.foodComponentModel,
+                          model: _model.foodListComponentModel,
                           updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
+                          child: const FoodListComponentWidget(),
                         ),
                       ),
                     ].divide(const SizedBox(height: 16.0)),

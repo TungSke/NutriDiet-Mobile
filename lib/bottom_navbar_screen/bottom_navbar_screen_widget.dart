@@ -5,9 +5,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '/components/home_componet_widget.dart';
 import '/components/profile_componet_widget.dart';
 import '/components/recipe_compnoet_widget.dart';
-import '/components/serch_data_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '../components/food_screen_widget.dart';
 import 'bottom_navbar_screen_model.dart';
 
 export 'bottom_navbar_screen_model.dart';
@@ -63,9 +63,9 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     child: const HomeComponetWidget(),
                   ),
                   wrapWithModel(
-                    model: _model.serchDataModel,
+                    model: _model.foodScreenModel,
                     updateCallback: () => safeSetState(() {}),
-                    child: const SerchDataWidget(),
+                    child: const FoodScreenWidget(),
                   ),
                   wrapWithModel(
                     model: _model.recipeCompnoetModel,
@@ -73,9 +73,11 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     child: const RecipeCompnoetWidget(),
                   ),
                   wrapWithModel(
-                    model: _model.mymealplanComponentModel, // <-- Thêm model mới ở đây
+                    model: _model
+                        .mymealplanComponentModel, // <-- Thêm model mới ở đây
                     updateCallback: () => safeSetState(() {}),
-                    child: const MyMealPlanScreenWidget(), // <-- Thêm widget mới ở đây
+                    child:
+                        const MyMealPlanScreenWidget(), // <-- Thêm widget mới ở đây
                   ),
                   wrapWithModel(
                     model: _model.profileComponetModel,
@@ -354,10 +356,12 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                     width: 59.0,
                                     height: 32.0,
                                     decoration: BoxDecoration(
-                                      color: FlutterFlowTheme.of(context).bottom,
+                                      color:
+                                          FlutterFlowTheme.of(context).bottom,
                                       borderRadius: BorderRadius.circular(30.0),
                                     ),
-                                    alignment: const AlignmentDirectional(0.0, 0.0),
+                                    alignment:
+                                        const AlignmentDirectional(0.0, 0.0),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
@@ -383,22 +387,25 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                             ),
                             Text(
                               'Thực đơn',
-                              style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'figtree',
-                                color: _model.bottomadd == 3
-                                    ? FlutterFlowTheme.of(context).primaryText
-                                    : FlutterFlowTheme.of(context).grey,
-                                fontSize: 13.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                                lineHeight: 1.5,
-                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'figtree',
+                                    color: _model.bottomadd == 3
+                                        ? FlutterFlowTheme.of(context)
+                                            .primaryText
+                                        : FlutterFlowTheme.of(context).grey,
+                                    fontSize: 13.0,
+                                    letterSpacing: 0.0,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
                             ),
-                          ].divide(SizedBox(height: _model.bottomadd == 3 ? 4.0 : 8.0)),
+                          ].divide(SizedBox(
+                              height: _model.bottomadd == 3 ? 4.0 : 8.0)),
                         ),
                       ),
                     ),
-
                     Expanded(
                       child: InkWell(
                         splashColor: Colors.transparent,

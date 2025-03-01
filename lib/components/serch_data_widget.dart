@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
-import '/components/food_component_widget.dart';
+import '/components/foodList_component_widget.dart';
 import '/components/searchempty_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -363,7 +363,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                                 scrollDirection: Axis.vertical,
                                 children: [
                                   Text(
-                                    'Reslut',
+                                    'Result',
                                     maxLines: 1,
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
@@ -386,24 +386,9 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                                           .pushNamed('brek_fast_iIngredients');
                                     },
                                     child: wrapWithModel(
-                                      model: _model.foodComponentModel1,
+                                      model: _model.foodListComponentModel1,
                                       updateCallback: () => safeSetState(() {}),
-                                      child: const FoodComponentWidget(),
-                                    ),
-                                  ),
-                                  InkWell(
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () async {
-                                      context
-                                          .pushNamed('brek_fast_iIngredients');
-                                    },
-                                    child: wrapWithModel(
-                                      model: _model.foodComponentModel2,
-                                      updateCallback: () => safeSetState(() {}),
-                                      child: const FoodComponentWidget(),
+                                      child: const FoodListComponentWidget(),
                                     ),
                                   ),
                                 ].divide(const SizedBox(height: 20.0)),

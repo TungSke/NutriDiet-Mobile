@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '../../components/food_component_model.dart';
+import '../../components/foodList_component_model.dart';
 import 'breskfast_screen_widget.dart' show BreskfastScreenWidget;
 
 class BreskfastScreenModel extends FlutterFlowModel<BreskfastScreenWidget> {
@@ -11,17 +11,18 @@ class BreskfastScreenModel extends FlutterFlowModel<BreskfastScreenWidget> {
   // Model for appbar component.
   late AppbarModel appbarModel;
   // Model for comon_componet component.
-  late FoodComponentModel foodComponentModel;
+  late FoodListComponentModel foodListComponentModel;
 
   @override
   void initState(BuildContext context) {
     appbarModel = createModel(context, () => AppbarModel());
-    foodComponentModel = createModel(context, () => FoodComponentModel());
+    foodListComponentModel =
+        createModel(context, () => FoodListComponentModel());
   }
 
   @override
   void dispose() {
     appbarModel.dispose();
-    foodComponentModel.dispose();
+    foodListComponentModel.dispose();
   }
 }
