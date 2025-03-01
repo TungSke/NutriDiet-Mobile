@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../meal_plan_flow/ai_meal_plan_screen/ai_meal_plan_widget.dart';
+import '../meal_plan_flow/meal_plan_detail/meal_plan_detail_widget.dart';
 import '../meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_widget.dart';
 
 class MyMealPlanScreenWidget extends StatefulWidget {
@@ -15,9 +16,9 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   String? selectedFilter;
 
   final List<Map<String, dynamic>> mealPlans = [
-    {"name": "Thực đơn A", "goal": "Giảm cân", "days": 7, "isActive": false},
-    {"name": "Thực đơn B", "goal": "Tăng cơ", "days": 14, "isActive": true},
-    {"name": "Thực đơn C", "goal": "Giữ dáng", "days": 10, "isActive": false},
+    {"name": "Thực đơn A", "goal": "Giảm cân", "days": 3, "createby": "User", "isActive": false},
+    {"name": "Thực đơn B", "goal": "Tăng cơ", "days": 7,"createby": "User", "isActive": true},
+    {"name": "Thực đơn C", "goal": "Giữ dáng", "days": 10,"createby": "User", "isActive": false},
   ];
 
   @override
@@ -155,10 +156,23 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
           activeColor: FlutterFlowTheme.of(context).primary,
           onChanged: (bool value) => setState(() => mealPlan["isActive"] = value),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MealPlanDetailWidget(
+                mealPlanName: mealPlan["name"],
+                goal: mealPlan["goal"],
+                days: mealPlan["days"],
+                createdBy: mealPlan["createby"],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
+
 
   Widget _buildLargeButton(String title, Widget targetScreen) {
     return SizedBox(
