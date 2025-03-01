@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '/components/searchempty_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'food_component_model.dart';
+import 'foodList_component_model.dart';
 import 'serch_data_widget.dart' show SerchDataWidget;
 
 class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
@@ -19,16 +19,16 @@ class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
   TextEditingController? textController;
   String? Function(BuildContext, String?)? textControllerValidator;
   // Model for comon_componet component.
-  late FoodComponentModel foodComponentModel1;
+  late FoodListComponentModel foodListComponentModel1;
   // Model for comon_componet component.
-  late FoodComponentModel foodComponentModel2;
-  // Model for searchempty component.
+
   late SearchemptyModel searchemptyModel;
 
   @override
   void initState(BuildContext context) {
-    foodComponentModel1 = createModel(context, () => FoodComponentModel());
-    foodComponentModel2 = createModel(context, () => FoodComponentModel());
+    foodListComponentModel1 =
+        createModel(context, () => FoodListComponentModel());
+
     searchemptyModel = createModel(context, () => SearchemptyModel());
   }
 
@@ -37,8 +37,8 @@ class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
     textFieldFocusNode?.dispose();
     textController?.dispose();
 
-    foodComponentModel1.dispose();
-    foodComponentModel2.dispose();
+    foodListComponentModel1.dispose();
+
     searchemptyModel.dispose();
   }
 }

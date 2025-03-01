@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/components/food_screen_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -5,20 +6,17 @@ import '/components/foodList_component_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'recipe_compnoet_model.dart';
 
-export 'recipe_compnoet_model.dart';
-
-class RecipeCompnoetWidget extends StatefulWidget {
-  const RecipeCompnoetWidget({super.key});
+class FoodScreenWidget extends StatefulWidget {
+  const FoodScreenWidget({super.key});
 
   @override
-  State<RecipeCompnoetWidget> createState() => _RecipeCompnoetWidgetState();
+  State<FoodScreenWidget> createState() => _FoodScreenWidgetState();
 }
 
-class _RecipeCompnoetWidgetState extends State<RecipeCompnoetWidget>
+class _FoodScreenWidgetState extends State<FoodScreenWidget>
     with TickerProviderStateMixin {
-  late RecipeCompnoetModel _model;
+  late FoodScreenModel _model;
 
   final animationsMap = <String, AnimationInfo>{};
 
@@ -31,7 +29,7 @@ class _RecipeCompnoetWidgetState extends State<RecipeCompnoetWidget>
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => RecipeCompnoetModel());
+    _model = createModel(context, () => FoodScreenModel());
 
     _model.textController ??= TextEditingController();
     _model.textFieldFocusNode ??= FocusNode();
@@ -73,7 +71,7 @@ class _RecipeCompnoetWidgetState extends State<RecipeCompnoetWidget>
               padding:
                   const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
               child: Text(
-                'Recipe',
+                'Thực phẩm',
                 maxLines: 1,
                 style: FlutterFlowTheme.of(context).bodyMedium.override(
                       fontFamily: 'figtree',

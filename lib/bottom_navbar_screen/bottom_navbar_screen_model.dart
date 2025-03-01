@@ -1,11 +1,12 @@
-import '../components/my_mealplan_component_model.dart';
+import 'package:diet_plan_app/components/food_screen_model.dart';
+import 'package:flutter/material.dart';
+
 import '/components/home_componet_widget.dart';
 import '/components/profile_componet_widget.dart';
 import '/components/recipe_compnoet_widget.dart';
-import '/components/serch_data_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '../components/my_mealplan_component_model.dart';
 import 'bottom_navbar_screen_widget.dart' show BottomNavbarScreenWidget;
-import 'package:flutter/material.dart';
 
 class BottomNavbarScreenModel
     extends FlutterFlowModel<BottomNavbarScreenWidget> {
@@ -26,8 +27,9 @@ class BottomNavbarScreenModel
   // Model for Home_componet component.
   late HomeComponetModel homeComponetModel;
   // Model for serch_data component.
-  late SerchDataModel serchDataModel;
-  // Model for recipe_compnoet component.
+  // late SerchDataModel serchDataModel;
+  // // Model for recipe_compnoet component.
+  late FoodScreenModel foodScreenModel;
   late RecipeCompnoetModel recipeCompnoetModel;
   // Model for profile_componet component.
   late ProfileComponetModel profileComponetModel;
@@ -37,17 +39,19 @@ class BottomNavbarScreenModel
   @override
   void initState(BuildContext context) {
     homeComponetModel = createModel(context, () => HomeComponetModel());
-    serchDataModel = createModel(context, () => SerchDataModel());
+    foodScreenModel = createModel(context, () => FoodScreenModel());
     recipeCompnoetModel = createModel(context, () => RecipeCompnoetModel());
     profileComponetModel = createModel(context, () => ProfileComponetModel());
-    mymealplanComponentModel = createModel(context, () => MyMealPlanComponentModel());
+    mymealplanComponentModel =
+        createModel(context, () => MyMealPlanComponentModel());
   }
 
   @override
   void dispose() {
     homeComponetModel.dispose();
-    serchDataModel.dispose();
+    // serchDataModel.dispose();
     recipeCompnoetModel.dispose();
+    foodScreenModel.dispose();
     profileComponetModel.dispose();
     mymealplanComponentModel.dispose();
   }

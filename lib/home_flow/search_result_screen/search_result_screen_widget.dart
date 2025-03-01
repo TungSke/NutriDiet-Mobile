@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/components/appbar_widget.dart';
-import '/components/food_component_widget.dart';
+import '/components/foodList_component_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'search_result_screen_model.dart';
@@ -75,9 +75,9 @@ class _SearchResultScreenWidgetState extends State<SearchResultScreenWidget> {
                           context.pushNamed('brek_fast_iIngredients');
                         },
                         child: wrapWithModel(
-                          model: _model.foodComponentModel1,
+                          model: _model.foodListComponentModel1,
                           updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
+                          child: const FoodListComponentWidget(),
                         ),
                       ),
                       InkWell(
@@ -89,9 +89,9 @@ class _SearchResultScreenWidgetState extends State<SearchResultScreenWidget> {
                           context.pushNamed('brek_fast_iIngredients');
                         },
                         child: wrapWithModel(
-                          model: _model.foodComponentModel2,
+                          model: _model.foodListComponentModel2,
                           updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
+                          child: const FoodListComponentWidget(),
                         ),
                       ),
                       InkWell(
@@ -103,9 +103,9 @@ class _SearchResultScreenWidgetState extends State<SearchResultScreenWidget> {
                           context.pushNamed('brek_fast_iIngredients');
                         },
                         child: wrapWithModel(
-                          model: _model.foodComponentModel3,
+                          model: _model.foodListComponentModel3,
                           updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
+                          child: const FoodListComponentWidget(),
                         ),
                       ),
                       InkWell(
@@ -117,9 +117,9 @@ class _SearchResultScreenWidgetState extends State<SearchResultScreenWidget> {
                           context.pushNamed('brek_fast_iIngredients');
                         },
                         child: wrapWithModel(
-                          model: _model.foodComponentModel4,
+                          model: _model.foodListComponentModel4,
                           updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
+                          child: const FoodListComponentWidget(),
                         ),
                       ),
                       InkWell(
@@ -131,9 +131,9 @@ class _SearchResultScreenWidgetState extends State<SearchResultScreenWidget> {
                           context.pushNamed('brek_fast_iIngredients');
                         },
                         child: wrapWithModel(
-                          model: _model.foodComponentModel5,
+                          model: _model.foodListComponentModel5,
                           updateCallback: () => safeSetState(() {}),
-                          child: const FoodComponentWidget(),
+                          child: const FoodListComponentWidget(),
                         ),
                       ),
                     ].divide(const SizedBox(height: 16.0)),

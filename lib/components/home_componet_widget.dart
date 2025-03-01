@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-import '/components/food_component_widget.dart';
+import '/components/foodList_component_widget.dart';
 import '/flutter_flow/flutter_flow_calendar.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -546,9 +546,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.foodComponentModel1,
+                      model: _model.foodListComponentModel1,
                       updateCallback: () => safeSetState(() {}),
-                      child: const FoodComponentWidget(),
+                      child: const FoodListComponentWidget(),
                     ),
                   ),
                 ),
@@ -611,9 +611,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.foodComponentModel1,
+                      model: _model.foodListComponentModel1,
                       updateCallback: () => safeSetState(() {}),
-                      child: const FoodComponentWidget(),
+                      child: const FoodListComponentWidget(),
                     ),
                   ),
                 ),
@@ -676,9 +676,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.foodComponentModel1,
+                      model: _model.foodListComponentModel1,
                       updateCallback: () => safeSetState(() {}),
-                      child: const FoodComponentWidget(),
+                      child: const FoodListComponentWidget(),
                     ),
                   ),
                 ),
@@ -741,9 +741,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.foodComponentModel1,
+                      model: _model.foodListComponentModel1,
                       updateCallback: () => safeSetState(() {}),
-                      child: const FoodComponentWidget(),
+                      child: const FoodListComponentWidget(),
                     ),
                   ),
                 ),
@@ -806,9 +806,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       context.pushNamed('brek_fast_iIngredients');
                     },
                     child: wrapWithModel(
-                      model: _model.foodComponentModel1,
+                      model: _model.foodListComponentModel1,
                       updateCallback: () => safeSetState(() {}),
-                      child: const FoodComponentWidget(),
+                      child: const FoodListComponentWidget(),
                     ),
                   ),
                 ),
