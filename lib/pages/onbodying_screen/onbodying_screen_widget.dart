@@ -443,18 +443,26 @@ class _OnbodyingScreenWidgetState extends State<OnbodyingScreenWidget> {
                 child: Padding(
                   padding:
                       const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
-                  child: Text(
-                    'Bỏ qua',
-                    maxLines: 1,
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          fontFamily: 'figtree',
-                          fontSize: 16.0,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.normal,
-                          useGoogleFonts: false,
-                          lineHeight: 1.5,
-                        ),
+                  child: GestureDetector(
+                    onTap: () {
+                      FFAppState().isintro = true;
+                      safeSetState(() {});
+                      context.goNamed('Tell_us_about_yourself');
+                    },
+                    child: Text(
+                      'Bỏ qua',
+                      maxLines: 1,
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                        fontFamily: 'figtree',
+                        fontSize: 16.0,
+                        letterSpacing: 0.0,
+                        fontWeight: FontWeight.normal,
+                        useGoogleFonts: false,
+                        lineHeight: 1.5,
+                      ),
+                    ),
                   ),
+
                 ),
               ),
             ),
