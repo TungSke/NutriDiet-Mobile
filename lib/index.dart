@@ -1,4 +1,6 @@
 // Export pages
+export 'package:diet_plan_app/log_in_flow/health_indicator_screen/health_indicator_screen_widget.dart'
+    show HealthIndicatorScreenWidget;
 export 'package:diet_plan_app/log_in_flow/whats_your_goal/decrease_weight_change_rate_widget.dart'
     show DecreaseWeightChangeRateScreenWidget;
 export 'package:diet_plan_app/log_in_flow/whats_your_goal/decrease_weight_goal_widget.dart'
@@ -69,5 +71,5 @@ export '/profile_flow/setting_screen/setting_screen_widget.dart'
 export '/select_date_of_birth/select_date_of_birth_widget.dart'
     show SelectDateOfBirthWidget;
 export '/splace_scren/splace_scren_widget.dart' show SplaceScrenWidget;
-
-export 'components/my_mealplan_component_widget.dart' show MyMealPlanScreenWidget;
+export 'components/my_mealplan_component_widget.dart'
+    show MyMealPlanScreenWidget;

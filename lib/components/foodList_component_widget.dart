@@ -85,7 +85,7 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                                 fit: BoxFit.cover,
                               )
                             : Image.asset(
-                                '/images/placeholder.png',
+                                'assets/images/placeholder.png',
                                 width: 96.0,
                                 height: 96.0,
                                 fit: BoxFit.cover,

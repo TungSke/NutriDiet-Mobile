@@ -175,7 +175,7 @@ class FFAppState extends ChangeNotifier {
     prefs.setString('ff_lastcm', value);
   }
 
-  String _cmvalue = '0.00';
+  String _cmvalue = '0';
   String get cmvalue => _cmvalue;
   set cmvalue(String value) {
     _cmvalue = value;

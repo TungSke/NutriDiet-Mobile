@@ -49,6 +49,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const OnbodyingScreenWidget(),
         ),
         FFRoute(
+          name: 'health_indicator_screen',
+          path: '/healthIndicatorScreen',
+          builder: (context, params) => const HealthIndicatorScreenWidget(),
+        ),
+        FFRoute(
           name: 'login_screen',
           path: '/loginScreen',
           builder: (context, params) => const LoginScreenWidget(),
@@ -206,12 +211,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: 'decrease_weight_change_rate_screen',
           path: '/decreaseWeightChangeRateScreen',
-          builder: (context, params) => const DecreaseWeightChangeRateScreenWidget(),
+          builder: (context, params) =>
+              const DecreaseWeightChangeRateScreenWidget(),
         ),
         FFRoute(
           name: 'increase_weight_change_rate_screen',
           path: '/increaseWeightChangeRateScreen',
-          builder: (context, params) => const IncreaseWeightChangeRateScreenWidget(),
+          builder: (context, params) =>
+              const IncreaseWeightChangeRateScreenWidget(),
         ),
         FFRoute(
           name: 'weight_Enter_screen',
