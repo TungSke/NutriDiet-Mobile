@@ -71,7 +71,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
             child: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0.0, 63.0, 0.0, 16.0),
               child: Text(
-                'Profile',
+                'Hồ sơ',
                 maxLines: 1,
                 style: FlutterFlowTheme.of(context).bodyMedium.override(
                       fontFamily: 'figtree',
@@ -91,6 +91,9 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
               children: [
                 Builder(
                   builder: (context) {
+                    if (_model.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
                     if (FFAppState().isLogin == true) {
                       return Row(
                         mainAxisSize: MainAxisSize.max,
@@ -110,7 +113,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Jane Cooper',
+                                  _model.name,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -122,7 +125,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                       ),
                                 ),
                                 Text(
-                                  FFAppState().email,
+                                  _model.email,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -162,7 +165,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Guest profile',
+                                    'Khách',
                                     maxLines: 1,
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
@@ -187,7 +190,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                           context.pushNamed('login_screen');
                                         },
                                         child: Text(
-                                          'log In',
+                                          'Đăng nhập',
                                           maxLines: 1,
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
@@ -212,7 +215,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                           context.pushNamed('Sign_up_screen');
                                         },
                                         child: Text(
-                                          '  |   Sign up',
+                                          '  |   Đăng ký',
                                           maxLines: 1,
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
@@ -285,7 +288,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       12.0, 0.0, 0.0, 0.0),
                                   child: Text(
-                                    'My profile',
+                                    'Thông tin cá nhân',
                                     maxLines: 1,
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
@@ -360,7 +363,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       12.0, 0.0, 0.0, 0.0),
                                   child: Text(
-                                    'Security',
+                                    'Bảo mật',
                                     maxLines: 1,
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
@@ -435,7 +438,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       12.0, 0.0, 0.0, 0.0),
                                   child: Text(
-                                    'My favorite',
+                                    'Danh sách yêu thích',
                                     maxLines: 1,
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
@@ -508,7 +511,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     12.0, 0.0, 0.0, 0.0),
                                 child: Text(
-                                  'Settings',
+                                  'Cài đặt',
                                   maxLines: 1,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -581,7 +584,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     12.0, 0.0, 0.0, 0.0),
                                 child: Text(
-                                  'Privacy policy',
+                                  'Chính sách bảo mật',
                                   maxLines: 1,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -673,7 +676,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                     padding: const EdgeInsetsDirectional.fromSTEB(
                                         12.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Logout',
+                                      'Đăng xuất',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium

@@ -22,7 +22,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => MyProfileModel());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _model.fetchUserProfile();
+      setState(() {}); // Cập nhật lại UI sau khi dữ liệu tải xong
+    });
   }
+
 
   @override
   void dispose() {
@@ -85,7 +91,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                         ),
                         Expanded(
                           child: Text(
-                            'My profile',
+                            'Thông tin cá nhân',
                             textAlign: TextAlign.center,
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
@@ -190,7 +196,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Jane Cooper',
+                                        _model.name,
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -202,7 +208,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                             ),
                                       ),
                                       Text(
-                                        'janecooper@gmail.com',
+                                        _model.email,
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -216,6 +222,47 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                               useGoogleFonts: false,
                                             ),
                                       ),
+
+                                    ].divide(const SizedBox(height: 4.0)),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _model.gender,
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                          fontFamily: 'figtree',
+                                          color:
+                                          FlutterFlowTheme.of(context)
+                                              .grey,
+                                          fontSize: 16.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.normal,
+                                          useGoogleFonts: false,
+                                        ),
+                                      ),
+                                      Text(
+                                        _model.age + " tuổi",
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                          fontFamily: 'figtree',
+                                          color:
+                                          FlutterFlowTheme.of(context)
+                                              .grey,
+                                          fontSize: 16.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.normal,
+                                          useGoogleFonts: false,
+                                        ),
+                                      ),
+
                                     ].divide(const SizedBox(height: 4.0)),
                                   ),
                                 ),
@@ -241,7 +288,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'First name',
+                                'Tên',
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -253,7 +300,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                     ),
                               ),
                               Text(
-                                'Jane',
+                                _model.name,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -270,9 +317,10 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                         ),
                       ),
                     ),
+
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
+                      const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -286,29 +334,29 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Last name',
+                                'Số điện thoại',
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 18.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      useGoogleFonts: false,
-                                    ),
+                                  fontFamily: 'figtree',
+                                  fontSize: 18.0,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.w500,
+                                  useGoogleFonts: false,
+                                ),
                               ),
                               Text(
-                                'Cooper',
+                                _model.phoneNumber,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
-                                      fontFamily: 'figtree',
-                                      color: FlutterFlowTheme.of(context).grey,
-                                      fontSize: 16.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
-                                      useGoogleFonts: false,
-                                    ),
+                                  fontFamily: 'figtree',
+                                  color: FlutterFlowTheme.of(context).grey,
+                                  fontSize: 16.0,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.normal,
+                                  useGoogleFonts: false,
+                                ),
                               ),
                             ].divide(const SizedBox(height: 4.0)),
                           ),
@@ -317,7 +365,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                     ),
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                      const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -331,29 +379,29 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Email address',
+                                'Nơi sinh sống',
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 18.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      useGoogleFonts: false,
-                                    ),
+                                  fontFamily: 'figtree',
+                                  fontSize: 18.0,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.w500,
+                                  useGoogleFonts: false,
+                                ),
                               ),
                               Text(
-                                'janecooper@gmail.com',
+                                _model.location,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
-                                      fontFamily: 'figtree',
-                                      color: FlutterFlowTheme.of(context).grey,
-                                      fontSize: 16.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
-                                      useGoogleFonts: false,
-                                    ),
+                                  fontFamily: 'figtree',
+                                  color: FlutterFlowTheme.of(context).grey,
+                                  fontSize: 16.0,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.normal,
+                                  useGoogleFonts: false,
+                                ),
                               ),
                             ].divide(const SizedBox(height: 4.0)),
                           ),
