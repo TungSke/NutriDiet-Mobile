@@ -38,9 +38,6 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
     _model.textController3 ??= TextEditingController();
     _model.textFieldFocusNode3 ??= FocusNode();
 
-    _model.textController4 ??= TextEditingController();
-    _model.textFieldFocusNode4 ??= FocusNode();
-
     animationsMap.addAll({
       'textOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
@@ -105,164 +102,13 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                                   ),
                         ).animateOnPageLoad(
                             animationsMap['textOnPageLoadAnimation']!),
+
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 50.0, 0.0, 0.0),
+                              0.0, 24.0, 0.0, 0.0),
                           child: TextFormField(
                             controller: _model.textController1,
                             focusNode: _model.textFieldFocusNode1,
-                            autofocus: false,
-                            textCapitalization: TextCapitalization.sentences,
-                            textInputAction: TextInputAction.next,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Tên của bạn',
-                              labelStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    fontSize: 13.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                  ),
-                              hintText: 'Tên của bạn',
-                              hintStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    fontSize: 16.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                  ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color:
-                                      FlutterFlowTheme.of(context).borderColor,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                            ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: false,
-                                ),
-                            cursorColor:
-                                FlutterFlowTheme.of(context).primaryText,
-                            validator: _model.textController1Validator
-                                .asValidator(context),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 24.0, 0.0, 0.0),
-                          child: TextFormField(
-                            controller: _model.textController2,
-                            focusNode: _model.textFieldFocusNode2,
-                            autofocus: false,
-                            textCapitalization: TextCapitalization.sentences,
-                            textInputAction: TextInputAction.next,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Họ của bạn',
-                              labelStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    fontSize: 13.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                  ),
-                              hintText: 'Họ của bạn',
-                              hintStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    fontSize: 16.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                  ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color:
-                                      FlutterFlowTheme.of(context).borderColor,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                            ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: false,
-                                ),
-                            cursorColor:
-                                FlutterFlowTheme.of(context).primaryText,
-                            validator: _model.textController2Validator
-                                .asValidator(context),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 24.0, 0.0, 0.0),
-                          child: TextFormField(
-                            controller: _model.textController3,
-                            focusNode: _model.textFieldFocusNode3,
                             autofocus: false,
                             textInputAction: TextInputAction.next,
                             obscureText: false,
@@ -329,7 +175,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                             keyboardType: TextInputType.emailAddress,
                             cursorColor:
                                 FlutterFlowTheme.of(context).primaryText,
-                            validator: _model.textController3Validator
+                            validator: _model.textController1Validator
                                 .asValidator(context),
                           ),
                         ),
@@ -337,8 +183,8 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 24.0, 0.0, 0.0),
                           child: TextFormField(
-                            controller: _model.textController4,
-                            focusNode: _model.textFieldFocusNode4,
+                            controller: _model.textController2,
+                            focusNode: _model.textFieldFocusNode2,
                             autofocus: false,
                             textInputAction: TextInputAction.unspecified,
                             obscureText: !_model.passwordVisibility,
@@ -419,8 +265,97 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                                 ),
                             cursorColor:
                                 FlutterFlowTheme.of(context).primaryText,
-                            validator: _model.textController4Validator
+                            validator: _model.textController2Validator
                                 .asValidator(context),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 24.0, 0.0, 0.0),
+                          child: TextFormField(
+                            controller: _model.textController3,
+                            focusNode: _model.textFieldFocusNode3,
+                            autofocus: false,
+                            textInputAction: TextInputAction.unspecified,
+                            obscureText: !_model.passwordVisibility,
+                            decoration: InputDecoration(
+                              labelText: 'Mật khẩu xác nhận',
+                              labelStyle: FlutterFlowTheme.of(context)
+                                  .labelMedium
+                                  .override(
+                                fontFamily: 'figtree',
+                                color: FlutterFlowTheme.of(context).grey,
+                                fontSize: 13.0,
+                                letterSpacing: 0.0,
+                                useGoogleFonts: false,
+                              ),
+                              hintText: 'Mật khẩu xác nhận',
+                              hintStyle: FlutterFlowTheme.of(context)
+                                  .labelMedium
+                                  .override(
+                                fontFamily: 'figtree',
+                                color: FlutterFlowTheme.of(context).grey,
+                                fontSize: 16.0,
+                                letterSpacing: 0.0,
+                                useGoogleFonts: false,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color:
+                                  FlutterFlowTheme.of(context).borderColor,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color:
+                                  FlutterFlowTheme.of(context).primaryText,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: FlutterFlowTheme.of(context).error,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: FlutterFlowTheme.of(context).error,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              suffixIcon: InkWell(
+                                onTap: () => safeSetState(
+                                      () => _model.passwordVisibility =
+                                  !_model.passwordVisibility,
+                                ),
+                                focusNode: FocusNode(skipTraversal: true),
+                                child: Icon(
+                                  _model.passwordVisibility
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  color:
+                                  FlutterFlowTheme.of(context).primaryText,
+                                  size: 24.0,
+                                ),
+                              ),
+                            ),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                              fontFamily: 'figtree',
+                              fontSize: 16.0,
+                              letterSpacing: 0.0,
+                              useGoogleFonts: false,
+                            ),
+                            cursorColor:
+                            FlutterFlowTheme.of(context).primaryText,
+                            validator: _model.textController3Validator,
                           ),
                         ),
                         Padding(
