@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:diet_plan_app/components/food_screen_widget.dart';
+import 'package:diet_plan_app/log_in_flow/profile_enter_screen/profile_enter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -240,6 +241,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'weight_Enter_screen',
           path: '/weightEnterScreen',
           builder: (context, params) => const WeightEnterScreenWidget(),
+        ),
+        FFRoute(
+          name: 'profile_enter_screen',
+          path: '/profileEnterScreen',
+          builder: (context, params) => const ProfileEnterWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
