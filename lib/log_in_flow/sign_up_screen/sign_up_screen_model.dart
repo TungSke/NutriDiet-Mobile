@@ -12,54 +12,47 @@ class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
   final formKey = GlobalKey<FormState>();
   // State field(s) for TextField widget.
   bool isLoading = false;
+
   FocusNode? textFieldFocusNode1;
   TextEditingController? textController1;
   String? Function(BuildContext, String?)? textController1Validator;
   String? _textController1Validator(BuildContext context, String? val) {
     if (val == null || val.isEmpty) {
-      return 'Please enter valid first name';
+      return 'Yêu cầu nhập địa chỉ email hợp lệ';
     }
 
+    if (!RegExp(kTextValidatorEmailRegex).hasMatch(val)) {
+      return 'Yêu cầu nhập địa chỉ email hợp lệ';
+    }
     return null;
   }
 
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode2;
   TextEditingController? textController2;
+  late bool passwordVisibility;
   String? Function(BuildContext, String?)? textController2Validator;
   String? _textController2Validator(BuildContext context, String? val) {
     if (val == null || val.isEmpty) {
-      return 'Plese enter vaild last name';
+      return 'Yêu cầu nhập mật khẩu hợp lệ';
     }
 
     return null;
   }
 
-  // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode3;
   TextEditingController? textController3;
-  String? Function(BuildContext, String?)? textController3Validator;
-  String? _textController3Validator(BuildContext context, String? val) {
+
+// Thêm validator cho mật khẩu xác nhận
+  String? Function(String?)? textController3Validator;
+
+  String? _textController3Validator(String? val) {
     if (val == null || val.isEmpty) {
-      return 'Please enter valid email address';
+      return 'Vui lòng nhập lại mật khẩu';
     }
-
-    if (!RegExp(kTextValidatorEmailRegex).hasMatch(val)) {
-      return 'Please enter valid email address';
+    if (val != textController2?.text) {
+      return 'Mật khẩu xác nhận không khớp';
     }
-    return null;
-  }
-
-  // State field(s) for TextField widget.
-  FocusNode? textFieldFocusNode4;
-  TextEditingController? textController4;
-  late bool passwordVisibility;
-  String? Function(BuildContext, String?)? textController4Validator;
-  String? _textController4Validator(BuildContext context, String? val) {
-    if (val == null || val.isEmpty) {
-      return 'Please enter valid password';
-    }
-
     return null;
   }
 
@@ -70,14 +63,12 @@ class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
     isLoading = true;
     try {
       final response = await _userService.register(
-        textController3!.text, // Email
-        textController4!.text, // Password
+        textController1!.text, // Email
+        textController2!.text, // Password
       );
 
       if (response.statusCode == 200) {
-        FFAppState().firstname = textController1!.text;
-        FFAppState().lastname = textController2!.text;
-        FFAppState().email = textController3!.text;
+        FFAppState().email = textController1!.text;
         context.push("/verificationScreen");
       } else {
         final Map<String, dynamic> responseBody = json.decode(response.body);
@@ -105,10 +96,9 @@ class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
   @override
   void initState(BuildContext context) {
     textController1Validator = _textController1Validator;
+    passwordVisibility = false;
     textController2Validator = _textController2Validator;
     textController3Validator = _textController3Validator;
-    passwordVisibility = false;
-    textController4Validator = _textController4Validator;
   }
 
   @override
@@ -121,8 +111,5 @@ class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
 
     textFieldFocusNode3?.dispose();
     textController3?.dispose();
-
-    textFieldFocusNode4?.dispose();
-    textController4?.dispose();
   }
 }
