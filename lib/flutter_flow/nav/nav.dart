@@ -59,6 +59,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const LoginScreenWidget(),
         ),
         FFRoute(
+          name: 'login_intro_screen',
+          path: '/loginIntroScreen',
+          builder: (context, params) => const LoginIntroScreenWidget(),
+        ),
+        FFRoute(
           name: 'Sign_up_screen',
           path: '/signUpScreen',
           builder: (context, params) => const SignUpScreenWidget(),

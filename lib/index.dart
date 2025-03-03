@@ -25,6 +25,8 @@ export '/log_in_flow/frequency_exercise_screen/frequency_exercise_screen_widget.
     show FrequencyExerciseScreenWidget;
 export '/log_in_flow/hight_enter_screen/hight_enter_screen_widget.dart'
     show HightEnterScreenWidget;
+export '/log_in_flow/login_intro_screen/login_intro_screen_widget.dart'
+    show LoginIntroScreenWidget;
 export '/log_in_flow/login_screen/login_screen_widget.dart'
     show LoginScreenWidget;
 export '/log_in_flow/reset_password_screen/reset_password_screen_widget.dart'
