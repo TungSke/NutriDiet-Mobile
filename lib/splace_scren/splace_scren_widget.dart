@@ -36,9 +36,10 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       await Future.delayed(const Duration(milliseconds: 3000));
       if (FFAppState().isintro == true) {
-        context.goNamed('bottom_navbar_screen');
+        // context.goNamed('bottom_navbar_screen');
+        context.goNamed('login_intro_screen');
       } else {
-        context.goNamed('onbodying_screen');
+        context.goNamed('bottom_navbar_screen');
       }
     });
 

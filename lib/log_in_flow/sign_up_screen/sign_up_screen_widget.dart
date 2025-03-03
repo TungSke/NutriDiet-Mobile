@@ -1,10 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'sign_up_screen_model.dart';
+
 export 'sign_up_screen_model.dart';
 
 class SignUpScreenWidget extends StatefulWidget {
@@ -79,8 +81,8 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                   key: _model.formKey,
                   autovalidateMode: AutovalidateMode.always,
                   child: Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        16.0, 0.0, 16.0, 0.0),
                     child: ListView(
                       padding: const EdgeInsets.fromLTRB(
                         0,
@@ -91,7 +93,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                       scrollDirection: Axis.vertical,
                       children: [
                         Text(
-                          'Sign up',
+                          'Đăng ký',
                           maxLines: 1,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
@@ -114,7 +116,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                             textInputAction: TextInputAction.next,
                             obscureText: false,
                             decoration: InputDecoration(
-                              labelText: 'First name',
+                              labelText: 'Tên của bạn',
                               labelStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -124,7 +126,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                                     letterSpacing: 0.0,
                                     useGoogleFonts: false,
                                   ),
-                              hintText: 'First name',
+                              hintText: 'Tên của bạn',
                               hintStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -190,7 +192,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                             textInputAction: TextInputAction.next,
                             obscureText: false,
                             decoration: InputDecoration(
-                              labelText: 'Last name',
+                              labelText: 'Họ của bạn',
                               labelStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -200,7 +202,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                                     letterSpacing: 0.0,
                                     useGoogleFonts: false,
                                   ),
-                              hintText: 'Last name',
+                              hintText: 'Họ của bạn',
                               hintStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -265,7 +267,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                             textInputAction: TextInputAction.next,
                             obscureText: false,
                             decoration: InputDecoration(
-                              labelText: 'Email address',
+                              labelText: 'Địa chỉ Email',
                               labelStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -275,7 +277,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                                     letterSpacing: 0.0,
                                     useGoogleFonts: false,
                                   ),
-                              hintText: 'Email address',
+                              hintText: 'Địa chỉ Email',
                               hintStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -341,7 +343,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                             textInputAction: TextInputAction.unspecified,
                             obscureText: !_model.passwordVisibility,
                             decoration: InputDecoration(
-                              labelText: 'Password',
+                              labelText: 'Mật khẩu',
                               labelStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -351,7 +353,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                                     letterSpacing: 0.0,
                                     useGoogleFonts: false,
                                   ),
-                              hintText: 'Password',
+                              hintText: 'Mật khẩu',
                               hintStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -434,9 +436,9 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                               //context.safePop();
 
                               await _model.handleSignUp(context);
-
                             },
-                            text: _model.isLoading ? 'Signing up...' : 'Sign up',
+                            text:
+                                _model.isLoading ? 'Signing up...' : 'Sign up',
                             options: FFButtonOptions(
                               width: double.infinity,
                               height: 54.0,
@@ -471,7 +473,8 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 24.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 24.0),
                 child: InkWell(
                   splashColor: Colors.transparent,
                   focusColor: Colors.transparent,
@@ -485,7 +488,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Don’t have an account? ',
+                          text: 'Bạn đã tài khoản? ',
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     fontFamily: 'figtree',
@@ -497,7 +500,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                                   ),
                         ),
                         TextSpan(
-                          text: 'Log in ',
+                          text: 'Đăng nhập',
                           style: TextStyle(
                             color: FlutterFlowTheme.of(context).primary,
                             fontWeight: FontWeight.w500,

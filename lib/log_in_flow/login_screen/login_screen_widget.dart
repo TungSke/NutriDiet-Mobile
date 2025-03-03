@@ -1,12 +1,13 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'login_screen_model.dart';
+
 export 'login_screen_model.dart';
 
 class LoginScreenWidget extends StatefulWidget {
@@ -75,8 +76,8 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                   key: _model.formKey,
                   autovalidateMode: AutovalidateMode.always,
                   child: Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        16.0, 0.0, 16.0, 0.0),
                     child: ListView(
                       padding: const EdgeInsets.fromLTRB(
                         0,
@@ -87,7 +88,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                       scrollDirection: Axis.vertical,
                       children: [
                         Text(
-                          'Log in',
+                          'Đăng nhập',
                           textAlign: TextAlign.center,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
@@ -97,8 +98,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                     fontWeight: FontWeight.bold,
                                     useGoogleFonts: false,
                                   ),
-                        )
-                            .animateOnPageLoad(
+                        ).animateOnPageLoad(
                             animationsMap['textOnPageLoadAnimation']!),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
@@ -280,7 +280,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                 context.pushNamed('forget_screen');
                               },
                               child: Text(
-                                'Forgot password?',
+                                'Quên mật khẩu?',
                                 maxLines: 1,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -312,7 +312,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                               safeSetState(() {});
                               // context.goNamed('Whats_your_goal');
                             },
-                            text: 'Log in',
+                            text: 'Đăng nhập',
                             options: FFButtonOptions(
                               width: double.infinity,
                               height: 54.0,
@@ -355,7 +355,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                               ),
                             ),
                             const Text(
-                              "Or log in with",
+                              "Hoặc đăng nhập với",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -375,20 +375,18 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
 
                         const SizedBox(height: 20),
 
-
                         const SizedBox(height: 20),
 
                         // Nút đăng nhập bằng Google
                         SizedBox(
-                          width: double.infinity,
-                          height: 50, // Đảm bảo chiều cao đồng đều
-                          child: SignInButton(
-                            Buttons.google,
-                            onPressed: () async {
-                              await _model.loginGoogle(context);
-                            },
-                          )
-                        ),
+                            width: double.infinity,
+                            height: 50, // Đảm bảo chiều cao đồng đều
+                            child: SignInButton(
+                              Buttons.google,
+                              onPressed: () async {
+                                await _model.loginGoogle(context);
+                              },
+                            )),
 
                         const SizedBox(height: 10),
 
@@ -401,7 +399,8 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                             onPressed: () async {
                               await _model.loginFaceBook(context);
                             },
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
                           ),
                         ),
                       ],
@@ -410,7 +409,8 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 24.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 24.0),
                 child: InkWell(
                   splashColor: Colors.transparent,
                   focusColor: Colors.transparent,
@@ -424,7 +424,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Don’t have an account? ',
+                          text: 'Bạn chưa có tài khoản? ',
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     fontFamily: 'figtree',
@@ -436,7 +436,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                   ),
                         ),
                         TextSpan(
-                          text: 'Sign up',
+                          text: 'Đăng ký',
                           style: TextStyle(
                             color: FlutterFlowTheme.of(context).primary,
                             fontWeight: FontWeight.w500,
