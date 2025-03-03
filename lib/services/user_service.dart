@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
@@ -83,4 +85,36 @@ class UserService {
     final response = await _apiService.get("/api/user/whoami", token: token);
     return response;
   }
+
+  Future<http.Response> updateUser({
+    required String fullName,
+    required int? age,
+    required String gender,
+    required String? location,
+  }) async {
+    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("Access token not found.");
+    }
+
+    // 🖨 In ra request body trước khi gửi
+    final Map<String, dynamic> body = {
+      "fullName": fullName,
+      "age": age,
+      "gender": gender,
+      "location": location,
+    };
+    print("Request body: ${jsonEncode(body)}");
+
+    final response = await _apiService.put(
+      "/api/user",
+      token: token,
+      body: body, // Đảm bảo body đúng format JSON
+    );
+
+    return response;
+  }
+
 }

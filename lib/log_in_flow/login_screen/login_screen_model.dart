@@ -83,6 +83,15 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
           // Chuyển hướng sau khi hiển thị thông báo
           await Future.delayed(Duration(seconds: 1));
 
+            final String? name = userDataJson["name"];
+            final String? gender = userDataJson["gender"];
+            final String? age = userDataJson["age"];
+            final String? address = userDataJson["address"];
+            if(name == null || name.isEmpty || gender == null || gender.isEmpty ||
+                age == null || age.isEmpty || address == null || address.isEmpty){
+              context.push("/profileEnterScreen");
+          }
+          else
           context.push("/bottomNavbarScreen");
         }
       } else {

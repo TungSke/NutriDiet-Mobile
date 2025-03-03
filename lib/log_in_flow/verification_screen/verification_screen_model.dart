@@ -43,7 +43,7 @@ class VerificationScreenModel
           duration: Duration(seconds: 2),
         ),
       );
-      context.push("/homeScreen");
+      context.push("/loginScreen");
     } else {
       final Map<String, dynamic> responseBody = json.decode(response.body);
       String errorMessage = responseBody["message"] ?? "Verification failed.";
