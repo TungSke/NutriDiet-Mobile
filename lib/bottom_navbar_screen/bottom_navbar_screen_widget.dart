@@ -24,6 +24,12 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
   late BottomNavbarScreenModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  void changePage(int index) {
+    setState(() {
+      _model.bottomadd = index;
+      _model.pageViewController?.jumpToPage(index);
+    });
+  }
 
   @override
   void initState() {
