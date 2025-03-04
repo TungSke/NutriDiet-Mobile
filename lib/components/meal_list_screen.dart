@@ -8,7 +8,7 @@ class MealListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(16.0, 40, 16, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: const [
@@ -16,18 +16,22 @@ class MealListScreen extends StatelessWidget {
             title: "Bữa sáng",
             description: "Recommended portion: 25% of daily consumption",
           ),
+          SizedBox(height: 8),
           MealCard(
             title: "Bữa trưa",
             description: "Recommended portion: 30% of daily consumption",
           ),
+          SizedBox(height: 8),
           MealCard(
             title: "Bữa chiều",
             description: "Recommended portion: 10% of daily consumption",
           ),
+          SizedBox(height: 8),
           MealCard(
             title: "Bữa tối",
             description: "Recommended portion: 20% of daily consumption",
           ),
+          SizedBox(height: 8),
           MealCard(
             title: "Bữa phụ",
             description: "Recommended portion: 15% of daily consumption",
@@ -51,7 +55,7 @@ class MealCard extends StatelessWidget {
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
