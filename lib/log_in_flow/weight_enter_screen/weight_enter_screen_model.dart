@@ -46,11 +46,32 @@ class WeightEnterScreenModel extends FlutterFlowModel<WeightEnterScreenWidget> {
       showSnackbar(context, 'Cân nặng không hợp lệ, vui lòng nhập số dương.');
       return;
     }
-
     try {
+      // 🔹 Gọi API lấy thông tin sức khỏe
+      final healthProfileResponse = await UserService().getHealthProfile();
+      print("🔹 Response từ API health-profile: ${healthProfileResponse.body}");
+
+      int? height;
+      if (healthProfileResponse.statusCode == 200) {
+        final Map<String, dynamic> healthProfile =
+            jsonDecode(healthProfileResponse.body);
+        print("🔹 Dữ liệu healthProfile: $healthProfile");
+
+        height = healthProfile['data']['height'] != null
+            ? int.tryParse(healthProfile['data']['height'].toString())
+            : null;
+      }
+
+      // 🔹 Kiểm tra nếu height vẫn bị null
+      if (height == null) {
+        showSnackbar(
+            context, '⚠️ Không thể lấy chiều cao, vui lòng thử lại sau.');
+        return;
+      }
+
       final response = await UserService().updateHealthProfile(
-        height: null,
-        weight: newWeight, // ✅ Chuyển sang int
+        height: height,
+        weight: newWeight,
         activityLevel: null,
         aisuggestion: null,
         allergies: [],
@@ -58,7 +79,7 @@ class WeightEnterScreenModel extends FlutterFlowModel<WeightEnterScreenWidget> {
       );
 
       if (response.statusCode == 200) {
-        FFAppState().kgvalue = newWeight.toString(); // Lưu lại dưới dạng String
+        FFAppState().kgvalue = newWeight.toString();
         FFAppState().update(() {});
         showSnackbar(context, 'Cập nhật cân nặng thành công!');
       } else {
@@ -66,7 +87,7 @@ class WeightEnterScreenModel extends FlutterFlowModel<WeightEnterScreenWidget> {
         showSnackbar(context, 'Cập nhật thất bại: $error');
       }
     } catch (e) {
-      showSnackbar(context, 'Lỗi: $e');
+      showSnackbar(context, ' Lỗi: $e');
     }
   }
 }

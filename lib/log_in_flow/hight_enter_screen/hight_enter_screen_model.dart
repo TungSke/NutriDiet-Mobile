@@ -50,7 +50,7 @@ class HightEnterScreenModel extends FlutterFlowModel<HightEnterScreenWidget> {
     try {
       final response = await UserService().updateHealthProfile(
         height: newHeight, // ✅ Chuyển sang int
-        weight: null,
+
         activityLevel: null,
         aisuggestion: null,
         allergies: [],

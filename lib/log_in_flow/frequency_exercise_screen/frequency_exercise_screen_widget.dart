@@ -941,7 +941,8 @@ class _FrequencyExerciseScreenWidgetState
                     const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    context.pushNamed('health_indicator_screen');
+                    // context.pushNamed('health_indicator_screen');
+                    context.pushNamed('Select_allergy_screen');
                   },
                   text: 'Tiếp tục',
                   options: FFButtonOptions(

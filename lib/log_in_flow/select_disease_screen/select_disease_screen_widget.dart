@@ -142,7 +142,8 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                     FFButtonWidget(
                       onPressed: () async {
                         print("Selected Disease IDs: $selectedDiseaseIds");
-                        context.pushNamed('Which_diet_do_you_prefer');
+                        // context.pushNamed('Which_diet_do_you_prefer');
+                        context.pushNamed('Whats_your_goal');
                       },
                       text: 'Bỏ qua',
                       options: FFButtonOptions(
