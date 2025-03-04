@@ -66,7 +66,7 @@ class _LoginIntroScreenWidgetState extends State<LoginIntroScreenWidget>
               child: GestureDetector(
                 onTap: () {
                   context.pushNamed(
-                      "onbodying_screen"); // Chuyển đến màn hình chính
+                      "bottom_navbar_screen"); // Chuyển đến màn hình chính
                 },
                 child: Text(
                   "Bỏ qua >",

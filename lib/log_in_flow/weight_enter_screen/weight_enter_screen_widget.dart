@@ -55,72 +55,78 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      TextFormField(
-                        controller: _model.kgTextController,
-                        focusNode: _model.kgFocusNode,
-                        onChanged: (_) => EasyDebounce.debounce(
-                          '_model.kgTextController',
-                          const Duration(milliseconds: 2000),
-                          () async {
-                            FFAppState().cmvalue = _model.kgTextController.text;
-                            FFAppState().update(() {});
+                  child: Form(
+                    key: _model.formKey, // Thêm formKey
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        TextFormField(
+                          controller: _model.kgTextController,
+                          focusNode: _model.kgFocusNode,
+                          onChanged: (_) => EasyDebounce.debounce(
+                            '_model.kgTextController',
+                            const Duration(milliseconds: 2000),
+                            () async {
+                              FFAppState().kgvalue =
+                                  _model.kgTextController.text;
+                              FFAppState().update(() {});
+                            },
+                          ),
+                          autofocus: false,
+                          textInputAction: TextInputAction.next,
+                          obscureText: false,
+                          decoration: InputDecoration(
+                            labelText: 'Nhập cân nặng (kg)',
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).grey,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).primary,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            contentPadding: const EdgeInsets.all(16.0),
+                          ),
+                          style: FlutterFlowTheme.of(context).bodyMedium,
+                          keyboardType: TextInputType.number,
+                          cursorColor: FlutterFlowTheme.of(context).primary,
+                          validator: _model.kgTextControllerValidator
+                              ?.asValidator(context),
+                        ),
+                        const SizedBox(height: 20.0),
+                        FFButtonWidget(
+                          onPressed: () async {
+                            if (_model.formKey.currentState?.validate() ??
+                                false) {
+                              await _model.updateWeight(context);
+                              context.pushNamed('Whats_your_goal');
+                            }
                           },
-                        ),
-                        autofocus: false,
-                        textInputAction: TextInputAction.next,
-                        obscureText: false,
-                        decoration: InputDecoration(
-                          labelText: 'Nhập cân nặng (kg)',
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FlutterFlowTheme.of(context).grey,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
+                          text: 'Tiếp tục',
+                          options: FFButtonOptions(
+                            width: double.infinity,
+                            height: 54.0,
+                            color: FlutterFlowTheme.of(context).primary,
+                            textStyle: FlutterFlowTheme.of(context)
+                                .titleSmall
+                                .override(
+                                  fontFamily: 'figtree',
+                                  color: Colors.white,
+                                  fontSize: 18.0,
+                                  useGoogleFonts: false,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            borderRadius: BorderRadius.circular(16.0),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FlutterFlowTheme.of(context).primary,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          contentPadding: const EdgeInsets.all(16.0),
                         ),
-                        style: FlutterFlowTheme.of(context).bodyMedium,
-                        keyboardType: TextInputType.number,
-                        cursorColor: FlutterFlowTheme.of(context).primary,
-                        validator: _model.kgTextControllerValidator
-                            .asValidator(context),
-                      ),
-                      const SizedBox(height: 20.0),
-                      FFButtonWidget(
-                        onPressed: () async {
-                          if (_model.formKey.currentState != null) {
-                            _model.formKey.currentState!.validate();
-                          }
-                          context.pushNamed('Whats_your_goal');
-                        },
-                        text: 'Tiếp tục',
-                        options: FFButtonOptions(
-                          width: double.infinity,
-                          height: 54.0,
-                          color: FlutterFlowTheme.of(context).primary,
-                          textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.override(
-                                    fontFamily: 'figtree',
-                                    color: Colors.white,
-                                    fontSize: 18.0,
-                                    useGoogleFonts: false,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
