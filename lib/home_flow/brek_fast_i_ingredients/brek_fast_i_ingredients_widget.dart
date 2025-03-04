@@ -8,36 +8,40 @@ import 'brek_fast_i_ingredients_model.dart';
 export 'brek_fast_i_ingredients_model.dart';
 
 class BrekFastIIngredientsWidget extends StatefulWidget {
-  const BrekFastIIngredientsWidget({super.key});
+  final int foodId;
+  const BrekFastIIngredientsWidget({super.key, required this.foodId});
 
   @override
   State<BrekFastIIngredientsWidget> createState() =>
       _BrekFastIIngredientsWidgetState();
 }
 
-class _BrekFastIIngredientsWidgetState
-    extends State<BrekFastIIngredientsWidget> {
+class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget> {
   late BrekFastIIngredientsModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  void initState() {
+  void initState(){
     super.initState();
     _model = createModel(context, () => BrekFastIIngredientsModel());
+    _model.loadFood(widget.foodId).then((_) {
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
-
+    if(_model.food == null){
+        return const Center(child: CircularProgressIndicator());
+    }
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -53,9 +57,7 @@ class _BrekFastIIngredientsWidgetState
               decoration: BoxDecoration(
                 image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: Image.asset(
-                    'assets/images/detail-fast.png',
-                  ).image,
+                  image: Image.network(_model.food?["imageUrl"]).image,
                 ),
               ),
               child: Align(
@@ -153,7 +155,7 @@ class _BrekFastIIngredientsWidgetState
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
               child: Text(
-                'Healthy breakfast with toas egg',
+                _model.food?["foodName"],
                 maxLines: 1,
                 style: FlutterFlowTheme.of(context).bodyMedium.override(
                       fontFamily: 'figtree',
@@ -165,16 +167,17 @@ class _BrekFastIIngredientsWidgetState
                     ),
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 24.0),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Expanded(
-                    child: custom_widgets.Readmore(
-                      width: double.infinity,
-                      height: 72.0,
-                    ),
+                    // child: custom_widgets.Readmore(
+                    //   width: double.infinity,
+                    //   height: 72.0,
+                    // ),
+                    child: Text(_model.food!["description"] ?? "Không có mô tả"),
                   ),
                 ],
               ),
@@ -200,7 +203,7 @@ class _BrekFastIIngredientsWidgetState
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             Text(
-                              'Ingredients',
+                              'Thành phần món',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(

@@ -115,10 +115,18 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: '/breskfastScreen',
           builder: (context, params) => const BreskfastScreenWidget(),
         ),
+        // FFRoute(
+        //   name: 'brek_fast_iIngredients',
+        //   path: '/brekFastIIngredients',
+        //   builder: (context, params) => const BrekFastIIngredientsWidget(),
+        // ),
         FFRoute(
           name: 'brek_fast_iIngredients',
-          path: '/brekFastIIngredients',
-          builder: (context, params) => const BrekFastIIngredientsWidget(),
+          path: '/breakfast-ingredients/:foodId',
+          builder: (context, params) {
+            final foodId = params.getParam('foodId', ParamType.int) ?? 'unknown';
+            return BrekFastIIngredientsWidget(foodId: foodId);
+          },
         ),
         FFRoute(
           name: 'Search_result_screen',

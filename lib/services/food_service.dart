@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'api_service.dart';
 import 'models/food.dart';
+import 'package:http/http.dart' as http;
 
 class FoodService {
   final ApiService _apiService = ApiService();
@@ -11,9 +12,6 @@ class FoodService {
     try {
       final response = await _apiService
           .get("api/food?pageIndex=$pageIndex&pageSize=$pageSize");
-
-      print("API Response Status: ${response.statusCode}");
-      print("API Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body)['data'] as List<dynamic>;
@@ -28,5 +26,10 @@ class FoodService {
       print("Error fetching allergies: $e");
       return [];
     }
+  }
+
+  Future<http.Response> getFoodById({required int foodId}) async {
+      final response = await _apiService.get("api/food/$foodId");
+      return response;
   }
 }

@@ -60,7 +60,11 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
 
               return GestureDetector(
                 onTap: () {
-                  context.pushNamed('brek_fast_iIngredients');
+                  int foodId = food.foodId;
+                  context.pushNamed(
+                    'brek_fast_iIngredients',
+                    pathParameters: {'foodId': foodId.toString()},
+                  );
                 },
                 child: Container(
                   width: double.infinity,
