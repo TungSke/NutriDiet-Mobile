@@ -129,6 +129,14 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
         await setDataAfterLogin(accessToken, refreshToken);
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Login success!"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
         final userData = await _userService.whoAmI();
         if (userData.statusCode != 200) {
           throw Exception("Failed to fetch user data: ${userData.statusCode}");
@@ -141,7 +149,20 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
         }
 
         FFAppState().email = email;
-        context.pushNamed("splace_scren");
+
+        // Chuyển hướng sau khi hiển thị thông báo
+        await Future.delayed(Duration(seconds: 1));
+
+        final String? name = userDataJson["name"];
+        final String? gender = userDataJson["gender"];
+        final String? age = userDataJson["age"];
+        final String? address = userDataJson["address"];
+        if(name == null || name.isEmpty || gender == null || gender.isEmpty ||
+            age == null || age.isEmpty || address == null || address.isEmpty){
+          context.push("/profileEnterScreen");
+        }
+        else
+          context.push("/bottomNavbarScreen");
       } else {
         print("Google Login failed: ${response.statusCode} - ${response.body}");
       }
