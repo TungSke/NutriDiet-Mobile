@@ -39,7 +39,7 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
         // context.goNamed('bottom_navbar_screen');
         context.goNamed('login_intro_screen');
       } else {
-        context.goNamed('bottom_navbar_screen');
+        context.goNamed('login_intro_screen');
       }
     });
 
