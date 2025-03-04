@@ -60,7 +60,7 @@ class HealthIndicatorScreenWidget extends StatelessWidget {
                             flex: 2, // Chia theo tỷ lệ 1
                             child: ClipOval(
                               child: Image.asset(
-                                'images/healthIndicator.png', // Hình ảnh món ăn
+                                'assets/images/healthIndicator.png', // Hình ảnh món ăn
                                 height: 100, // Giữ tỉ lệ ảnh tròn đẹp
                                 width: 100,
                                 fit: BoxFit.cover,
@@ -98,7 +98,8 @@ class HealthIndicatorScreenWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 2),
+                    border: Border.all(
+                        color: FlutterFlowTheme.of(context).primary, width: 2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -107,7 +108,7 @@ class HealthIndicatorScreenWidget extends StatelessWidget {
                     style: GoogleFonts.roboto(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green),
+                        color: FlutterFlowTheme.of(context).primary),
                   ),
                 ),
 
