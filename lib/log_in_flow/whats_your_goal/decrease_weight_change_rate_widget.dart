@@ -75,7 +75,7 @@ class _DecreaseWeightChangeRateScreenWidgetState
                           print('Người dùng chọn: $selectedKgPerWeek kg/tuần');
 
                           // Chuyển sang trang tiếp theo
-                          context.pushNamed('Select_allergy_screen');
+                          context.pushNamed('health_indicator_screen');
                         },
                         text: 'Xác nhận',
                         options: FFButtonOptions(

@@ -113,7 +113,7 @@ class UserService {
     final response = await _apiService.put(
       "/api/user",
       token: token,
-      body: body, // Đảm bảo body đúng format JSON
+      body: body,
     );
 
     return response;
@@ -158,13 +158,37 @@ class UserService {
     return http.Response.fromStream(response);
   }
 
+  Future<http.Response> getHealthProfile() async {
+    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+    }
+
+    try {
+      final response =
+          await _apiService.get("/api/health-profile", token: token);
+
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        print('Lỗi lấy health profile: ${response.body}');
+        throw Exception('Lỗi lấy health profile: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Lỗi kết nối API: $e');
+      throw Exception("Không thể kết nối đến server.");
+    }
+  }
+
   Future<http.Response> updateHealthProfile({
     String? fullName,
     int? age,
     String? gender,
     String? location,
-    required int? height,
-    required int? weight,
+    int? height,
+    int? weight,
     required String? activityLevel,
     required String? aisuggestion,
     required List<String> allergies,
@@ -177,78 +201,79 @@ class UserService {
       throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
     }
 
-    // 🔹 Nếu thiếu thông tin, gọi API lấy hồ sơ từ whoAmI
-    if (fullName == null ||
-        fullName.isEmpty ||
-        age == null ||
-        gender == null ||
-        location == null) {
-      final currentProfileResponse = await _apiService.get(
-        "/api/user/whoami",
-        token: token,
+    try {
+      // 🔹 Nếu thiếu thông tin từ user, gọi API /whoami để lấy
+      if (fullName == null ||
+          age == null ||
+          gender == null ||
+          location == null) {
+        final userResponse = await whoAmI();
+        if (userResponse.statusCode == 200) {
+          final Map<String, dynamic> userData = jsonDecode(userResponse.body);
+          fullName ??= userData['name'];
+          age ??= int.tryParse(userData['age']?.toString() ?? '0');
+          gender ??=
+              userData['gender'] == "not specified" ? null : userData['gender'];
+          location ??= userData['address'];
+        }
+      }
+
+      // 🔹 Nếu thiếu height hoặc weight, gọi API /health-profile để lấy
+      if (height == null || weight == null) {
+        final healthProfileResponse = await getHealthProfile();
+        if (healthProfileResponse.statusCode == 200) {
+          final Map<String, dynamic> healthProfile =
+              jsonDecode(healthProfileResponse.body);
+          height ??= healthProfile['height'] != null
+              ? int.tryParse(healthProfile['height'].toString())
+              : null;
+          weight ??= healthProfile['weight'] != null
+              ? int.tryParse(healthProfile['weight'].toString())
+              : null;
+        }
+      }
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("${_apiService.baseUrl}/api/health-profile"),
       );
 
-      if (currentProfileResponse.statusCode != 200) {
-        throw Exception("❌ Không thể lấy thông tin hồ sơ.");
+      request.headers['Authorization'] = 'Bearer $token';
+
+      if (fullName != null) request.fields['FullName'] = fullName;
+      if (age != null) request.fields['Age'] = age.toString();
+      if (gender != null) request.fields['Gender'] = gender;
+      if (location != null) request.fields['Location'] = location;
+      if (height != null) request.fields['Height'] = height.toString();
+      if (weight != null) request.fields['Weight'] = weight.toString();
+      if (activityLevel != null)
+        request.fields['ActivityLevel'] = activityLevel;
+      if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
+
+      for (var i = 0; i < allergies.length; i++) {
+        request.fields['AllergyNames[$i]'] = allergies[i];
+      }
+      for (var i = 0; i < diseases.length; i++) {
+        request.fields['DiseaseNames[$i]'] = diseases[i];
       }
 
-      final Map<String, dynamic> currentProfile =
-          jsonDecode(currentProfileResponse.body);
+      print(
+          "🔹 Sending updateHealthProfile request: ${jsonEncode(request.fields)}");
 
-      // ✅ Gán giá trị nếu chưa được truyền vào
-      fullName ??= currentProfile['name']; // API trả về 'name'
-      location ??= currentProfile['address']; // API trả về 'address'
-      gender ??= currentProfile['gender'];
-      age ??= int.tryParse(
-          currentProfile['age']?.toString() ?? '0'); // Chuyển age sang int
+      final response = await request.send();
+      final httpResponse = await http.Response.fromStream(response);
 
-      if (fullName == null || fullName.isEmpty) {
-        throw Exception("⚠️ Tên không hợp lệ, vui lòng cập nhật hồ sơ trước.");
+      print("🔹 Response status: ${httpResponse.statusCode}");
+      print("🔹 Response body: ${httpResponse.body}");
+
+      if (httpResponse.statusCode != 200) {
+        throw Exception("Cập nhật hồ sơ thất bại: ${httpResponse.body}");
       }
+
+      return httpResponse;
+    } catch (e) {
+      print("Lỗi khi cập nhật hồ sơ sức khỏe: $e");
+      throw Exception("Không thể cập nhật hồ sơ sức khỏe.");
     }
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse("${_apiService.baseUrl}/api/health-profile"),
-    );
-
-    request.headers['Authorization'] = 'Bearer $token';
-
-    request.fields['FullName'] = fullName;
-    if (age != null) request.fields['Age'] = age.toString();
-    if (gender != null) request.fields['Gender'] = gender;
-    if (location != null) request.fields['Location'] = location;
-
-    // 🔥 Đảm bảo `height` và `weight` được gửi đúng dạng số
-    if (height != null) request.fields['Height'] = height.toString();
-    if (weight != null) request.fields['Weight'] = weight.toString();
-
-    if (activityLevel != null) request.fields['ActivityLevel'] = activityLevel;
-    if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
-
-    for (var i = 0; i < allergies.length; i++) {
-      request.fields['AllergyNames[$i]'] = allergies[i];
-    }
-    for (var i = 0; i < diseases.length; i++) {
-      request.fields['DiseaseNames[$i]'] = diseases[i];
-    }
-
-    // 🔍 Log request để debug
-    print("🔹 Sending updateHealthProfile request:");
-    print("Headers: ${request.headers}");
-    print("Fields: ${jsonEncode(request.fields)}");
-
-    final response = await request.send();
-    final httpResponse = await http.Response.fromStream(response);
-
-    // 🔥 Log response để debug
-    print("🔹 Response status: ${httpResponse.statusCode}");
-    print("🔹 Response body: ${httpResponse.body}");
-
-    if (httpResponse.statusCode != 200) {
-      throw Exception("❌ Cập nhật hồ sơ thất bại: ${httpResponse.body}");
-    }
-
-    return httpResponse;
   }
 }

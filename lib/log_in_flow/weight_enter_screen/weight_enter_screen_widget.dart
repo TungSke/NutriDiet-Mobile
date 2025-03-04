@@ -105,7 +105,8 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                             if (_model.formKey.currentState?.validate() ??
                                 false) {
                               await _model.updateWeight(context);
-                              context.pushNamed('Whats_your_goal');
+                              // context.pushNamed('Whats_your_goal');
+                              context.pushNamed('frequency_exercise_screen');
                             }
                           },
                           text: 'Tiếp tục',
