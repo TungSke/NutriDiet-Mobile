@@ -44,16 +44,14 @@ class _LoginIntroScreenWidgetState extends State<LoginIntroScreenWidget>
           children: [
             // Ảnh nền với hiệu ứng mờ
             Positioned.fill(
-              bottom: 190,
               child: Stack(
                 children: [
                   ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                    child: Image.asset(
-                      'assets/images/bg.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                      imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: Image.asset(
+                        'assets/images/bg1.png',
+                        fit: BoxFit.contain,
+                      )),
                   Container(
                     color: Colors.black.withOpacity(0.3),
                   ),
