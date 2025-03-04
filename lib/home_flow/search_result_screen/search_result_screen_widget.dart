@@ -80,62 +80,6 @@ class _SearchResultScreenWidgetState extends State<SearchResultScreenWidget> {
                           child: const FoodListComponentWidget(),
                         ),
                       ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel2,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel3,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel4,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel5,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
                     ].divide(const SizedBox(height: 16.0)),
                   ),
                 ),
