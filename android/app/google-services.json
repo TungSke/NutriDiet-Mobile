@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "552250045512",
+    "project_id": "nutridiet-83fa5",
+    "storage_bucket": "nutridiet-83fa5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552250045512:android:06e8a08129c2ccfa66147d",
+        "android_client_info": {
+          "package_name": "com.example.diet_plan_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "552250045512-3gv32a8him5420p1tiah04h1bk91nu6b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.diet_plan_app",
+            "certificate_hash": "29fac4269f2d53cd872a180634e25360d380f214"
+          }
+        },
+        {
+          "client_id": "552250045512-rs7lu7romcuu89pi24n2u7f6safm4okv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRqCSSVpEh2dL2I2aLrLSOta-tV1YHBdY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552250045512-rs7lu7romcuu89pi24n2u7f6safm4okv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
