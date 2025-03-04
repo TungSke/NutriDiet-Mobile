@@ -1,8 +1,9 @@
 // ignore_for_file: unnecessary_getters_setters, unused_element
 
 import 'package:flutter/material.dart';
-import '/backend/schema/structs/index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '/backend/schema/structs/index.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 
 class FFAppState extends ChangeNotifier {
@@ -20,11 +21,12 @@ class FFAppState extends ChangeNotifier {
 
   Future initializePersistedState() async {
     prefs = await SharedPreferences.getInstance();
-    _safeInit(() {
-      _isLogin = prefs.getBool('ff_isLogin') ?? _isLogin;
-    });
+
     _safeInit(() {
       _isintro = prefs.getBool('ff_isintro') ?? _isintro;
+    });
+    _safeInit(() {
+      _isLogin = prefs.getBool('ff_isLogin') ?? _isLogin;
     });
     _safeInit(() {
       _bottomindex = prefs.getInt('ff_bottomindex') ?? _bottomindex;
