@@ -200,7 +200,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                 Padding(
                   padding: const EdgeInsets.all(15),
                   child: Image.asset(
-                    "/images/main_bg.png",
+                    "assets/images/main_bg.png",
                     fit: BoxFit.cover,
                   ),
                 ),
