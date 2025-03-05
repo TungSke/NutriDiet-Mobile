@@ -202,7 +202,6 @@ class UserService {
     }
 
     try {
-      // 🔹 Nếu thiếu thông tin từ user, gọi API /whoami để lấy
       if (fullName == null ||
           age == null ||
           gender == null ||
