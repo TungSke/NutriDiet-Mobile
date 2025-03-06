@@ -258,83 +258,83 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          _model.bottomadd = 2;
-                          safeSetState(() {});
-                          await _model.pageViewController?.animateToPage(
-                            2,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.ease,
-                          );
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Builder(
-                              builder: (context) {
-                                if (_model.bottomadd == 2) {
-                                  return Container(
-                                    width: 59.0,
-                                    height: 32.0,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          FlutterFlowTheme.of(context).bottom,
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
-                                    alignment:
-                                        const AlignmentDirectional(0.0, 0.0),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(0.0),
-                                      child: SvgPicture.asset(
-                                        'assets/images/BALCK-FILL-RECIPE-BOTTOM.svg',
-                                        width: 24.0,
-                                        height: 24.0,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(0.0),
-                                    child: SvgPicture.asset(
-                                      'assets/images/GREY-RECPIT-BOTTOM.svg',
-                                      width: 24.0,
-                                      height: 24.0,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                            Text(
-                              'Công thức',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: _model.bottomadd == 2
-                                        ? FlutterFlowTheme.of(context)
-                                            .primaryText
-                                        : FlutterFlowTheme.of(context).grey,
-                                    fontSize: 13.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                    lineHeight: 1.5,
-                                  ),
-                            ),
-                          ].divide(SizedBox(
-                              height: _model.bottomadd == 2 ? 4.0 : 8.0)),
-                        ),
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: InkWell(
+                    //     splashColor: Colors.transparent,
+                    //     focusColor: Colors.transparent,
+                    //     hoverColor: Colors.transparent,
+                    //     highlightColor: Colors.transparent,
+                    //     onTap: () async {
+                    //       _model.bottomadd = 2;
+                    //       safeSetState(() {});
+                    //       await _model.pageViewController?.animateToPage(
+                    //         2,
+                    //         duration: const Duration(milliseconds: 500),
+                    //         curve: Curves.ease,
+                    //       );
+                    //     },
+                    //     child: Column(
+                    //       mainAxisSize: MainAxisSize.max,
+                    //       mainAxisAlignment: MainAxisAlignment.start,
+                    //       crossAxisAlignment: CrossAxisAlignment.center,
+                    //       children: [
+                    //         Builder(
+                    //           builder: (context) {
+                    //             if (_model.bottomadd == 2) {
+                    //               return Container(
+                    //                 width: 59.0,
+                    //                 height: 32.0,
+                    //                 decoration: BoxDecoration(
+                    //                   color:
+                    //                       FlutterFlowTheme.of(context).bottom,
+                    //                   borderRadius: BorderRadius.circular(30.0),
+                    //                 ),
+                    //                 alignment:
+                    //                     const AlignmentDirectional(0.0, 0.0),
+                    //                 child: ClipRRect(
+                    //                   borderRadius: BorderRadius.circular(0.0),
+                    //                   child: SvgPicture.asset(
+                    //                     'assets/images/BALCK-FILL-RECIPE-BOTTOM.svg',
+                    //                     width: 24.0,
+                    //                     height: 24.0,
+                    //                     fit: BoxFit.contain,
+                    //                   ),
+                    //                 ),
+                    //               );
+                    //             } else {
+                    //               return ClipRRect(
+                    //                 borderRadius: BorderRadius.circular(0.0),
+                    //                 child: SvgPicture.asset(
+                    //                   'assets/images/GREY-RECPIT-BOTTOM.svg',
+                    //                   width: 24.0,
+                    //                   height: 24.0,
+                    //                   fit: BoxFit.contain,
+                    //                 ),
+                    //               );
+                    //             }
+                    //           },
+                    //         ),
+                    //         Text(
+                    //           'Công thức',
+                    //           style: FlutterFlowTheme.of(context)
+                    //               .bodyMedium
+                    //               .override(
+                    //                 fontFamily: 'figtree',
+                    //                 color: _model.bottomadd == 2
+                    //                     ? FlutterFlowTheme.of(context)
+                    //                         .primaryText
+                    //                     : FlutterFlowTheme.of(context).grey,
+                    //                 fontSize: 13.0,
+                    //                 letterSpacing: 0.0,
+                    //                 useGoogleFonts: false,
+                    //                 lineHeight: 1.5,
+                    //               ),
+                    //         ),
+                    //       ].divide(SizedBox(
+                    //           height: _model.bottomadd == 2 ? 4.0 : 8.0)),
+                    //     ),
+                    //   ),
+                    // ),
                     Expanded(
                       child: InkWell(
                         splashColor: Colors.transparent,

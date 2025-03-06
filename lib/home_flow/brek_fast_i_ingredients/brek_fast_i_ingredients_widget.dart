@@ -152,12 +152,30 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
-              child: Text(
-                _model.food?["foodName"],
-                maxLines: 1,
-                style: FlutterFlowTheme.of(context).bodyMedium.override(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
+                  child: Text(
+                    _model.food?["foodName"],
+                    maxLines: 1,
+                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                          fontFamily: 'figtree',
+                          fontSize: 22.0,
+                          letterSpacing: 0.0,
+                          fontWeight: FontWeight.bold,
+                          useGoogleFonts: false,
+                          lineHeight: 1.5,
+                        ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
+                  child: Text(
+                    _model.food?["servingSize"],
+                    maxLines: 1,
+                    style: FlutterFlowTheme.of(context).bodyMedium.override(
                       fontFamily: 'figtree',
                       fontSize: 22.0,
                       letterSpacing: 0.0,
@@ -165,7 +183,9 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                       useGoogleFonts: false,
                       lineHeight: 1.5,
                     ),
-              ),
+                  ),
+                ),
+              ],
             ),
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 24.0),
@@ -297,21 +317,12 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  child: Image.asset(
-                                    'assets/images/RI--1.png',
-                                    width: 60.0,
-                                    height: 60.0,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.fromSTEB(
                                         16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Salt & Pepper',
+                                      'Calories',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
@@ -326,7 +337,7 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                   ),
                                 ),
                                 Text(
-                                  '5',
+                                  _model.food!["calories"].toString(),
                                   maxLines: 1,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -359,21 +370,12 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  child: Image.asset(
-                                    'assets/images/RI--2.png',
-                                    width: 60.0,
-                                    height: 60.0,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.fromSTEB(
                                         16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Olive Oil',
+                                      'Protein',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
@@ -388,7 +390,7 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                   ),
                                 ),
                                 Text(
-                                  '350g',
+                                  _model.food!["protein"].toString(),
                                   maxLines: 1,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -421,21 +423,12 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  child: Image.asset(
-                                    'assets/images/RI--3.png',
-                                    width: 60.0,
-                                    height: 60.0,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.fromSTEB(
                                         16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'All-Purpose Flour',
+                                      'carbs',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
@@ -450,7 +443,7 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                   ),
                                 ),
                                 Text(
-                                  '500g',
+                                  _model.food!["carbs"].toString(),
                                   maxLines: 1,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -483,21 +476,12 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  child: Image.asset(
-                                    'assets/images/indrentent--4.png',
-                                    width: 60.0,
-                                    height: 60.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.fromSTEB(
                                         16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Baking Powder',
+                                      'fat',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
@@ -512,7 +496,7 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                   ),
                                 ),
                                 Text(
-                                  '750g',
+                                  _model.food!["fat"].toString(),
                                   maxLines: 1,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -545,21 +529,12 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  child: Image.asset(
-                                    'assets/images/ingrednrt--5.png',
-                                    width: 60.0,
-                                    height: 60.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.fromSTEB(
                                         16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Baking Soda',
+                                      'glucid',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
@@ -574,7 +549,7 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                   ),
                                 ),
                                 Text(
-                                  '350g',
+                                  _model.food!["glucid"].toString(),
                                   maxLines: 1,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -593,6 +568,59 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                           ),
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            20.0, 0.0, 20.0, 0.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).lightGrey,
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                4.0, 4.0, 16.0, 4.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'fiber',
+                                      maxLines: 1,
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  _model.food!["fiber"].toString(),
+                                  maxLines: 1,
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                    fontFamily: 'figtree',
+                                    color:
+                                    FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
                     ],
                   );
                 } else {
