@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../flutter_flow/flutter_flow_theme.dart';
+import '../meal_plan_detail/meal_plan_detail_widget.dart';
 
 class SampleMealPlanWidget extends StatefulWidget {
   const SampleMealPlanWidget({super.key});
@@ -12,10 +13,13 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
   String searchQuery = "";
   String? selectedFilter;
 
+  final String activeMealPlan = "Thực đơn Keto"; // Thực đơn đang được áp dụng
+  final String activeDate = "01/03/2025"; // Ngày áp dụng thực đơn
+
   final List<Map<String, dynamic>> sampleMealPlans = [
-    {"name": "Thực đơn Keto", "goal": "Giảm cân", "days": 7},
-    {"name": "Thực đơn Protein", "goal": "Tăng cơ", "days": 14},
-    {"name": "Thực đơn Low-Carb", "goal": "Giữ dáng", "days": 10},
+    {"name": "Thực đơn Keto", "goal": "Giảm cân", "days": 7, "createby": "Admin"},
+    {"name": "Thực đơn Protein", "goal": "Tăng cơ", "days": 14, "createby": "Admin"},
+    {"name": "Thực đơn Low-Carb", "goal": "Giữ dáng", "days": 10, "createby": "Admin"},
   ];
 
   @override
@@ -130,16 +134,49 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
   }
 
   Widget _buildMealPlanItem(Map<String, dynamic> mealPlan) {
+    bool isActive = mealPlan["name"] == activeMealPlan; // Kiểm tra thực đơn có đang áp dụng không
+
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: FlutterFlowTheme.of(context).secondaryBackground,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(mealPlan["name"], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        subtitle: Text("${mealPlan["goal"]} - Số ngày: ${mealPlan["days"]}", style: const TextStyle(fontSize: 14, color: Colors.grey)),
-        onTap: () {},
+      color: isActive ? Colors.green[100] : FlutterFlowTheme.of(context).secondaryBackground,
+      child: Stack(
+        children: [
+          ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            title: Text(
+              mealPlan["name"],
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              "${mealPlan["goal"]} - Số ngày: ${mealPlan["days"]}",
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MealPlanDetailWidget(
+                    mealPlanName: mealPlan["name"],
+                    goal: mealPlan["goal"],
+                    days: mealPlan["days"],
+                    createdBy: mealPlan["createby"],
+                  ),
+                ),
+              );
+            },
+          ),
+          if (isActive)
+            Positioned(
+              bottom: 8,
+              right: 16,
+              child: Text(
+                "Thực đơn đang được áp dụng từ ngày $activeDate",
+                style: const TextStyle(fontSize: 12, color: Colors.red),
+              ),
+            ),
+        ],
       ),
     );
   }

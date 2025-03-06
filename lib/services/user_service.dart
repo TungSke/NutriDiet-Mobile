@@ -90,9 +90,9 @@ class UserService {
 
   Future<http.Response> updateUser({
     required String fullName,
-    required int? age,
+    required int age,
     required String gender,
-    required String? location,
+    required String location,
   }) async {
     final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
     final String? token = await _flutterSecureStorage.read(key: 'accessToken');

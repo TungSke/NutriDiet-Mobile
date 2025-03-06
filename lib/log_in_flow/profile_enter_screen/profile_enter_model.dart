@@ -20,9 +20,7 @@ class ProfileEnterModel {
 
     try {
       final String fullName = fullNameController.text.trim();
-      final String? location = locationController.text.isNotEmpty
-          ? locationController.text.trim()
-          : null;
+      final String location = locationController.text.trim();
       final int age = DateTime.now().year - birthDate!.year;
 
       final response = await _userService.updateUser(
