@@ -1,9 +1,11 @@
-import '/components/appbar_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:flutter/material.dart';
 import 'edit_profile_screen_model.dart';
+
 export 'edit_profile_screen_model.dart';
 
 class EditProfileScreenWidget extends StatefulWidget {
@@ -53,13 +55,90 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
           top: true,
           child: Column(
             mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              wrapWithModel(
-                model: _model.appbarModel,
-                updateCallback: () => safeSetState(() {}),
-                child: const AppbarWidget(
-                  title: 'Edit profile',
+              Container(
+                height: 79.0,
+                decoration: const BoxDecoration(),
+                child: Align(
+                  alignment: const AlignmentDirectional(0.0, 1.0),
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        20.0, 0.0, 20.0, 16.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            context.safePop();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).lightGrey,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(0.0),
+                                child: SvgPicture.asset(
+                                  'assets/images/appbar-arroew.svg',
+                                  width: 24.0,
+                                  height: 24.0,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Cập nhật hồ sơ',
+                            textAlign: TextAlign.center,
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  fontFamily: 'figtree',
+                                  fontSize: 22.0,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.bold,
+                                  useGoogleFonts: false,
+                                ),
+                          ),
+                        ),
+                        // InkWell(
+                        //   splashColor: Colors.transparent,
+                        //   focusColor: Colors.transparent,
+                        //   hoverColor: Colors.transparent,
+                        //   highlightColor: Colors.transparent,
+                        //   onTap: () async {
+                        //     context.pushNamed('edit_profile_screen');
+                        //   },
+                        //   child: Container(
+                        //     decoration: BoxDecoration(
+                        //       color: FlutterFlowTheme.of(context).lightGrey,
+                        //       shape: BoxShape.circle,
+                        //     ),
+                        //     child: Padding(
+                        //       padding: const EdgeInsets.all(8.0),
+                        //       child: ClipRRect(
+                        //         borderRadius: BorderRadius.circular(0.0),
+                        //         child: SvgPicture.asset(
+                        //           'assets/images/pen.svg',
+                        //           width: 24.0,
+                        //           height: 24.0,
+                        //           fit: BoxFit.cover,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               Expanded(
@@ -67,8 +146,8 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
                   key: _model.formKey,
                   autovalidateMode: AutovalidateMode.disabled,
                   child: Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        20.0, 0.0, 20.0, 0.0),
                     child: ListView(
                       padding: EdgeInsets.zero,
                       scrollDirection: Axis.vertical,
@@ -227,8 +306,9 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
                                   ),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
-                                contentPadding: const EdgeInsetsDirectional.fromSTEB(
-                                    16.0, 13.0, 16.0, 12.0),
+                                contentPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 13.0, 16.0, 12.0),
                               ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
@@ -314,8 +394,9 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
-                              contentPadding: const EdgeInsetsDirectional.fromSTEB(
-                                  16.0, 13.0, 16.0, 12.0),
+                              contentPadding:
+                                  const EdgeInsetsDirectional.fromSTEB(
+                                      16.0, 13.0, 16.0, 12.0),
                             ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
@@ -405,8 +486,9 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
                                 filled: true,
                                 fillColor: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                contentPadding: const EdgeInsetsDirectional.fromSTEB(
-                                    16.0, 13.0, 16.0, 12.0),
+                                contentPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 13.0, 16.0, 12.0),
                               ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
@@ -431,7 +513,8 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
                 child: FFButtonWidget(
                   onPressed: () async {
                     if (_model.formKey.currentState == null ||
@@ -444,10 +527,10 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 54.0,
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                    iconPadding:
-                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        24.0, 0.0, 24.0, 0.0),
+                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'figtree',

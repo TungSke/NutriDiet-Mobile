@@ -42,10 +42,10 @@ class WhatsYourGoalModel extends FlutterFlowModel<WhatsYourGoalWidget> {
       // 🔹 Gọi API cập nhật mức độ hoạt động
       final response = await UserService().createPersonalGoal(
         goalType: newGoalLevel,
-        targetWeight: 0,
-        notes: "12334",
-        goalDescription: "123",
-        weightChangeRate: "MaintainWeight",
+        targetWeight: null,
+        notes: null,
+        goalDescription: "",
+        weightChangeRate: null,
       );
 
       print("🔹 Status cập nhật: ${response.statusCode}");
