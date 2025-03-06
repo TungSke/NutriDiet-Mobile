@@ -80,7 +80,6 @@ class UserService {
     final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
 
     final String? token = await _flutterSecureStorage.read(key: 'accessToken');
-    print("Token hiện tại: $token");
     if (token == null || token.isEmpty) {
       throw Exception("Access token not found.");
     }
@@ -96,7 +95,6 @@ class UserService {
   }) async {
     final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
     final String? token = await _flutterSecureStorage.read(key: 'accessToken');
-    print("Token hiện tại: $token");
 
     if (token == null || token.isEmpty) {
       throw Exception("Access token not found.");

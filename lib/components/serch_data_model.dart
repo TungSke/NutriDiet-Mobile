@@ -1,6 +1,6 @@
+import 'package:diet_plan_app/components/search_empty_model.dart';
 import 'package:flutter/material.dart';
 
-import '/components/searchempty_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'foodList_component_model.dart';
 import 'serch_data_widget.dart' show SerchDataWidget;
@@ -22,14 +22,14 @@ class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
   late FoodListComponentModel foodListComponentModel1;
   // Model for comon_componet component.
 
-  late SearchemptyModel searchemptyModel;
+  late SearchEmptyModel searchemptyModel;
 
   @override
   void initState(BuildContext context) {
     foodListComponentModel1 =
         createModel(context, () => FoodListComponentModel());
 
-    searchemptyModel = createModel(context, () => SearchemptyModel());
+    searchemptyModel = createModel(context, () => SearchEmptyModel());
   }
 
   @override

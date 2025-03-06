@@ -22,12 +22,15 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _model = createModel(context, () => BrekFastIIngredientsModel());
     _model.loadFood(widget.foodId).then((_) {
       setState(() {});
     });
+
+    _model.getAllCusineType();
+    _model.getFoodRecipe(widget.foodId, context);
   }
 
   @override
@@ -39,8 +42,8 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
-    if(_model.food == null){
-        return const Center(child: CircularProgressIndicator());
+    if (_model.food == null) {
+      return const Center(child: CircularProgressIndicator());
     }
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -66,8 +69,8 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                   child: Container(
                     decoration: const BoxDecoration(),
                     child: Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          20.0, 16.0, 20.0, 0.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -156,7 +159,8 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 16.0, 20.0, 0.0),
                   child: Text(
                     _model.food?["foodName"],
                     maxLines: 1,
@@ -171,18 +175,19 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 16.0, 20.0, 0.0),
                   child: Text(
                     _model.food?["servingSize"],
                     maxLines: 1,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      fontFamily: 'figtree',
-                      fontSize: 22.0,
-                      letterSpacing: 0.0,
-                      fontWeight: FontWeight.bold,
-                      useGoogleFonts: false,
-                      lineHeight: 1.5,
-                    ),
+                          fontFamily: 'figtree',
+                          fontSize: 22.0,
+                          letterSpacing: 0.0,
+                          fontWeight: FontWeight.bold,
+                          useGoogleFonts: false,
+                          lineHeight: 1.5,
+                        ),
                   ),
                 ),
               ],
@@ -197,13 +202,15 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                     //   width: double.infinity,
                     //   height: 72.0,
                     // ),
-                    child: Text(_model.food!["description"] ?? "Không có mô tả"),
+                    child:
+                        Text(_model.food!["description"] ?? "Không có mô tả"),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -319,8 +326,9 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                               children: [
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        16.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'Calories',
                                       maxLines: 1,
@@ -372,8 +380,9 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                               children: [
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        16.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'Protein',
                                       maxLines: 1,
@@ -425,8 +434,9 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                               children: [
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        16.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'carbs',
                                       maxLines: 1,
@@ -478,8 +488,9 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                               children: [
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        16.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'fat',
                                       maxLines: 1,
@@ -531,8 +542,9 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                               children: [
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        16.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'glucid',
                                       maxLines: 1,
@@ -584,20 +596,21 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                               children: [
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        16.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'fiber',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                            fontFamily: 'figtree',
+                                            fontSize: 16.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            useGoogleFonts: false,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -607,14 +620,14 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
-                                    fontFamily: 'figtree',
-                                    color:
-                                    FlutterFlowTheme.of(context).grey,
-                                    fontSize: 16.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.normal,
-                                    useGoogleFonts: false,
-                                  ),
+                                        fontFamily: 'figtree',
+                                        color:
+                                            FlutterFlowTheme.of(context).grey,
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
                                 ),
                               ],
                             ),
@@ -624,113 +637,155 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                     ],
                   );
                 } else {
+                  if(_model.foodRecipe != null){
+                    return RichText(
+                      text: TextSpan(
+                        children: _model.parseFormattedText(),
+                        style: DefaultTextStyle.of(context).style, // Dùng style mặc định của app
+                      ),
+                    );
+                  }
                   return Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        20.0, 0.0, 20.0, 0.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          '1. What do you mean ingredients?',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 18.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.w500,
-                                    useGoogleFonts: false,
-                                    lineHeight: 1.5,
+                        Align(
+                          alignment: const AlignmentDirectional(0.0, 0.0),
+                          child: Container(
+                            width: double.infinity,
+                            height: 221.0,
+                            decoration: const BoxDecoration(),
+                            child: Align(
+                              alignment: const AlignmentDirectional(0.0, 0.0),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    20.0, 0.0, 20.0, 0.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      child: Image.asset(
+                                        'assets/images/serch-diet-empty.png',
+                                        width: 116.0,
+                                        height: 116.0,
+                                        fit: BoxFit.contain,
+                                        alignment: const Alignment(0.0, 0.0),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 16.0, 0.0, 0.0),
+                                      child: Text(
+                                        'Bạn chưa có công thức nấu ăn này',
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              fontFamily: 'figtree',
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryText,
+                                              fontSize: 22.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.bold,
+                                              useGoogleFonts: false,
+                                            ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 8.0, 0.0, 0.0),
+                                      child: Text(
+                                        'Tạo công thức của riêng bạn',
+                                        textAlign: TextAlign.center,
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              fontFamily: 'figtree',
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .grey,
+                                              fontSize: 16.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.normal,
+                                              useGoogleFonts: false,
+                                              lineHeight: 1.5,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        DropdownButton<int>(
+                          value: _model.cusinetypelist.any((c) => c["cuisineId"] == _model.selectedCuisineId)
+                              ? _model.selectedCuisineId
+                              : null,
+                          hint: const Text("Chọn loại ẩm thực"),
+                          isExpanded: true,
+                          items: _model.cusinetypelist.map((cuisine) {
+                            return DropdownMenuItem<int>(
+                              value: cuisine["cuisineId"],
+                              child: Text(cuisine["cuisineName"]),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _model.selectedCuisineId = value!;
+                            });
+                          },
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            await _model.createFoodRecipeAI(widget.foodId, context);
+                            setState(() {});
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12.0, horizontal: 20.0),
+                            decoration: BoxDecoration(
+                              color: Colors.blue, // Màu nền
+                              borderRadius:
+                                  BorderRadius.circular(10.0), // Bo góc
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 5.0,
+                                  offset: Offset(2, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (_model.isLoading)
+                                  SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                   ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 8.0, 0.0, 0.0),
-                          child: Text(
-                            'Although the full monty fry-up comes in at about 850 kcal per portion, a cooked breakfast doesn\'t need to be high-calorie.',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  color: FlutterFlowTheme.of(context).grey,
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.normal,
-                                  useGoogleFonts: false,
-                                  lineHeight: 1.5,
+                                Icon(Icons.auto_awesome, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Tạo công thức bằng AI",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 16.0, 0.0, 0.0),
-                          child: Text(
-                            '2. What are examples of ingredients?',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  fontSize: 18.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.w500,
-                                  useGoogleFonts: false,
-                                  lineHeight: 1.5,
-                                ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 8.0, 0.0, 0.0),
-                          child: Text(
-                            'Eggs provide a source of protein and fat, while toast is a source of complex carbohydrates. Together, this triple whammy offers good nutrient diversity, which is fundamental for a healthy breakfast.',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  color: FlutterFlowTheme.of(context).grey,
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.normal,
-                                  useGoogleFonts: false,
-                                  lineHeight: 1.5,
-                                ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 16.0, 0.0, 0.0),
-                          child: Text(
-                            '3. What are ingredients called?',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  fontSize: 18.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.w500,
-                                  useGoogleFonts: false,
-                                  lineHeight: 1.5,
-                                ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 8.0, 0.0, 16.0),
-                          child: Text(
-                            'The Heart Foundation currently sets no limit for healthy people when it comes to how many eggs you can eat per day.  The key is enjoying them, as part of a healthy and balanced diet. That  being said, there are some limitations to those who are more sensitive  to consuming dietary cholesterol, as outlined below.',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  color: FlutterFlowTheme.of(context).grey,
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.normal,
-                                  useGoogleFonts: false,
-                                  lineHeight: 1.5,
-                                ),
-                          ),
-                        ),
+                        )
                       ].addToStart(const SizedBox(height: 24.0)),
                     ),
                   );

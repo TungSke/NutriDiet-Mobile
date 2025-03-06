@@ -1,9 +1,9 @@
+import 'package:diet_plan_app/components/search_empty_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '/components/foodList_component_widget.dart';
-import '/components/searchempty_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -410,7 +410,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                       child: wrapWithModel(
                         model: _model.searchemptyModel,
                         updateCallback: () => safeSetState(() {}),
-                        child: const SearchemptyWidget(),
+                        child: const SearchEmptyWidget(),
                       ),
                     ),
                   );
