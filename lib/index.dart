@@ -7,6 +7,8 @@ export 'package:diet_plan_app/log_in_flow/whats_your_goal/decrease_weight_goal_w
     show DecreaseWeightGoalScreenWidget;
 export 'package:diet_plan_app/log_in_flow/whats_your_goal/increase_weight_change_rate_widget.dart'
     show IncreaseWeightChangeRateScreenWidget;
+export 'package:diet_plan_app/log_in_flow/whats_your_goal/target_weight_widget.dart'
+    show TargetWeightScreenWidget;
 
 export '/bottom_navbar_screen/bottom_navbar_screen_widget.dart'
     show BottomNavbarScreenWidget;

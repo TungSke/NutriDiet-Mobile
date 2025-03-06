@@ -42,15 +42,10 @@ class SelectAllergyModel extends ChangeNotifier {
 
     notifyListeners();
 
-    // 🔹 Chuyển ID sang tên dị ứng (loại bỏ ID)
-    List<String> selectedAllergyNames = allergies
-        .where((allergy) => selectedAllergyIds.contains(allergy.allergyId))
-        .map((allergy) => allergy.allergyName)
-        .toList();
-
-    // Gửi danh sách allergyName thay vì ID
     try {
-      await UserService().updateHealthProfile(allergies: selectedAllergyNames);
+      // 🔹 Gửi danh sách dị ứng dưới dạng `List<int>`
+      await UserService()
+          .updateHealthProfile(allergies: selectedAllergyIds.toList());
       print("✅ Cập nhật dị ứng thành công!");
     } catch (e) {
       print("❌ Lỗi cập nhật dị ứng: $e");

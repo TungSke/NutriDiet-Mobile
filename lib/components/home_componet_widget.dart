@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 import '/flutter_flow/flutter_flow_calendar.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '../services/health_service.dart';
 import 'home_componet_model.dart';
-import 'meal_list_screen.dart';
 
 export 'home_componet_model.dart';
 
@@ -30,7 +31,23 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
   @override
   void initState() {
     super.initState();
+    loadData();
     _model = createModel(context, () => HomeComponetModel());
+  }
+
+  Map<String, dynamic>? healthData;
+  Map<String, dynamic>? personalGoal;
+  bool isLoading = true;
+  String errorMessage = "";
+
+  Future<void> loadData() async {
+    final result = await HealthService.fetchHealthData();
+    setState(() {
+      healthData = result["healthData"];
+      personalGoal = result["personalGoal"];
+      errorMessage = result["errorMessage"];
+      isLoading = false;
+    });
   }
 
   @override
@@ -210,14 +227,10 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   child: Text(
                     'Calories hôm nay',
                     maxLines: 1,
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          fontFamily: 'figtree',
-                          fontSize: 20.0,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.bold,
-                          useGoogleFonts: false,
-                          lineHeight: 1.5,
-                        ),
+                    style: GoogleFonts.roboto(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black),
                   ),
                 ),
                 Stack(
@@ -229,24 +242,40 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             0.0, 0.0, 0.0, 24.0),
                         child: CircularPercentIndicator(
-                          percent: 0.5,
+                          percent: 2 / 3,
                           radius: 75.0,
                           lineWidth: 12.0,
                           animation: true,
                           animateFromLastPercent: true,
                           progressColor: FlutterFlowTheme.of(context).primary,
                           backgroundColor: const Color(0x33808080),
-                          center: Text(
-                            '1564',
-                            style: FlutterFlowTheme.of(context)
-                                .headlineSmall
-                                .override(
-                                  fontFamily: 'figtree',
-                                  fontSize: 22.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.bold,
-                                  useGoogleFonts: false,
+                          center: RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: '1200/',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: 'figtree',
+                                        color:
+                                            FlutterFlowTheme.of(context).grey,
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
                                 ),
+                                TextSpan(
+                                  text:
+                                      "${personalGoal?['dailyCalories'] ?? "N/A"}",
+                                  style: TextStyle(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -313,7 +342,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                             ),
                                       ),
                                       TextSpan(
-                                        text: '241g',
+                                        text:
+                                            "${personalGoal?['dailyCarb'] ?? "N/A"}",
                                         style: TextStyle(
                                           color: FlutterFlowTheme.of(context)
                                               .primary,
@@ -382,7 +412,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                             ),
                                       ),
                                       TextSpan(
-                                        text: '250g',
+                                        text:
+                                            "${personalGoal?['dailyProtein'] ?? "N/A"}",
                                         style: TextStyle(
                                           color: FlutterFlowTheme.of(context)
                                               .primary,
@@ -451,7 +482,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                             ),
                                       ),
                                       TextSpan(
-                                        text: '50g',
+                                        text:
+                                            "${personalGoal?['dailyFat'] ?? "N/A"}",
                                         style: TextStyle(
                                           color: FlutterFlowTheme.of(context)
                                               .primary,
@@ -494,7 +526,92 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         .addToEnd(const SizedBox(width: 20.0)),
                   ),
                 ),
-                const MealListScreen(),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 24.0, 20.0, 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Mục tiêu gần đây:',
+                        maxLines: 1,
+                        style: GoogleFonts.roboto(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                      Text(
+                        "${personalGoal?['goalType'] ?? "N/A"}",
+                        style: TextStyle(
+                          color: FlutterFlowTheme.of(context).primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Khoảng cách bên trong
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        spacing: 12,
+                        children: [
+                          Text(
+                            "Cân nặng ban đầu: ",
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          Text(
+                            "${healthData?['weight'] ?? "N/A"} kg",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        spacing: 12,
+                        children: [
+                          Text(
+                            "Cân nặng mục tiêu:",
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          Text(
+                            "${personalGoal?['targetWeight'] ?? "N/A"} kg",
+                            style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8), // Khoảng cách giữa các hàng
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Quá trình",
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: FlutterFlowTheme.of(context).primary),
+                          ),
+                          Text(
+                            "${personalGoal?['progressPercentage'] ?? "N/A"} %",
+                            style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

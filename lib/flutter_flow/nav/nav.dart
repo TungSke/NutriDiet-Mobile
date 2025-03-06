@@ -124,7 +124,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'brek_fast_iIngredients',
           path: '/breakfast-ingredients/:foodId',
           builder: (context, params) {
-            final foodId = params.getParam('foodId', ParamType.int) ?? 'unknown';
+            final foodId =
+                params.getParam('foodId', ParamType.int) ?? 'unknown';
             return BrekFastIIngredientsWidget(foodId: foodId);
           },
         ),
@@ -142,6 +143,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'edit_profile_screen',
           path: '/editProfileScreen',
           builder: (context, params) => const EditProfileScreenWidget(),
+        ),
+        FFRoute(
+          name: 'target_weight_screen',
+          path: '/targetWeightScreen',
+          builder: (context, params) => const TargetWeightScreenWidget(),
         ),
         FFRoute(
           name: 'security_screen',
