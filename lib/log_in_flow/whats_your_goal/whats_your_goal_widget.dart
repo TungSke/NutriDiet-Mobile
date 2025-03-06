@@ -163,9 +163,9 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                       // Nếu chọn "Fat loss", điều hướng sang DecreaseWeightGoalScreen
                       context.pushNamed('health_indicator_screen');
                     } else if (_model.select == 1) {
-                      context.pushNamed('decrease_weight_goal_screen');
+                      context.pushNamed('target_weight_screen');
                     } else if (_model.select == 2)
-                      context.pushNamed('increase_weight_goal_screen');
+                      context.pushNamed('target_weight_screen');
                   },
                   text: 'Tiếp tục',
                   options: FFButtonOptions(

@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../flutter_flow/flutter_flow_theme.dart';
 import '../../flutter_flow/flutter_flow_widgets.dart';
-import '../../services/user_service.dart';
+import '../../services/health_service.dart';
 
 class HealthIndicatorScreenWidget extends StatefulWidget {
   const HealthIndicatorScreenWidget({super.key});
@@ -26,25 +24,17 @@ class _HealthIndicatorScreenWidgetState
   @override
   void initState() {
     super.initState();
-    fetchData();
+    loadData();
   }
 
-  Future<void> fetchData() async {
-    try {
-      final healthResponse = await UserService().getHealthProfile();
-      final goalResponse = await UserService().getPersonalGoal();
-
-      setState(() {
-        healthData = json.decode(healthResponse.body)['data'];
-        personalGoal = json.decode(goalResponse.body)['data'];
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        errorMessage = e.toString();
-        isLoading = false;
-      });
-    }
+  Future<void> loadData() async {
+    final result = await HealthService.fetchHealthData();
+    setState(() {
+      healthData = result["healthData"];
+      personalGoal = result["personalGoal"];
+      errorMessage = result["errorMessage"];
+      isLoading = false;
+    });
   }
 
   @override
