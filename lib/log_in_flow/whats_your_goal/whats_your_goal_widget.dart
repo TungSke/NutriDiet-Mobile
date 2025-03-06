@@ -15,6 +15,24 @@ class WhatsYourGoalWidget extends StatefulWidget {
   State<WhatsYourGoalWidget> createState() => _WhatsYourGoalWidgetState();
 }
 
+final List<Map<String, String>> goalLevels = [
+  {
+    'title': 'Giữ cân',
+    'description': 'Duy trì cân nặng hiện tại của bạn.',
+    'image': 'assets/images/whta,s-2.png'
+  },
+  {
+    'title': 'Giảm cân',
+    'description': 'Giảm mỡ trong khi vẫn duy trì khối lượng cơ.',
+    'image': 'assets/images/what,s_-1.png'
+  },
+  {
+    'title': 'Tăng cân',
+    'description': 'Tăng cơ, tăng mỡ và trở nên khỏe mạnh hơn',
+    'image': 'assets/images/whats,s-3.png'
+  },
+];
+
 class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
   late WhatsYourGoalModel _model;
 
@@ -54,531 +72,84 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(
-                      20.0, 0.0, 20.0, 0.0),
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(
-                      0,
-                      16.0,
-                      0,
-                      0,
-                    ),
-                    scrollDirection: Axis.vertical,
-                    children: [
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          _model.select = 0;
-                          safeSetState(() {});
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: ListView.builder(
+                    itemCount: goalLevels.length,
+                    itemBuilder: (context, index) {
+                      final level = goalLevels[index];
+                      final isSelected = _model.select == index;
+
+                      return InkWell(
+                        onTap: () {
+                          setState(() => _model.select = index);
                         },
-                        child: Builder(
-                          builder: (context) {
-                            if (_model.select == 0) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).secondary,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  border: Border.all(
-                                    color: FlutterFlowTheme.of(context).primary,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? FlutterFlowTheme.of(context).secondary
+                                : FlutterFlowTheme.of(context).lightGrey,
+                            borderRadius: BorderRadius.circular(16.0),
+                            border: isSelected
+                                ? Border.all(
+                                    color: FlutterFlowTheme.of(context).primary)
+                                : null,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                    borderRadius: BorderRadius.circular(16.0),
+                                  ),
+                                  padding: const EdgeInsets.all(13.0),
+                                  child: Image.asset(
+                                    level['image']!,
+                                    width: 40.0,
+                                    height: 40.0,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      4.0, 4.0, 4.0, 4.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
+                                const SizedBox(width: 18.0),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Image.asset(
-                                              'assets/images/what,s_-1.png',
-                                              width: 40.0,
-                                              height: 40.0,
-                                              fit: BoxFit.contain,
+                                      Text(
+                                        level['title']!,
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .copyWith(
+                                              fontSize: 18.0,
+                                              fontWeight: FontWeight.w500,
+                                              // useGoogleFonts: false,
                                             ),
-                                          ),
-                                        ),
                                       ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Giảm cân',
-                                              style:
+                                      Text(
+                                        level['description']!,
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .copyWith(
+                                              fontSize: 16.0,
+                                              color:
                                                   FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
+                                                      .grey,
+                                              // useGoogleFonts: false,
                                             ),
-                                            Text(
-                                              'Giảm mỡ trong khi vẫn duy trì khối lượng cơ',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .grey,
-                                                        fontSize: 13.0,
-                                                        letterSpacing: 0.0,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                          ],
-                                        ),
                                       ),
-                                    ].divide(const SizedBox(width: 16.0)),
+                                    ],
                                   ),
                                 ),
-                              );
-                            } else {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).lightGrey,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      4.0, 4.0, 4.0, 4.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(0.0),
-                                            child: Image.asset(
-                                              'assets/images/what,s_-1.png',
-                                              width: 40.0,
-                                              height: 40.0,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Giảm cân',
-                                              maxLines: 1,
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                            Text(
-                                              'Giảm mỡ trong khi vẫn duy trì khối lượng cơ',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .grey,
-                                                        fontSize: 13.0,
-                                                        letterSpacing: 0.0,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ].divide(const SizedBox(width: 16.0)),
-                                  ),
-                                ),
-                              );
-                            }
-                          },
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          _model.select = 1;
-                          safeSetState(() {});
-                        },
-                        child: Builder(
-                          builder: (context) {
-                            if (_model.select == 1) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).secondary,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  border: Border.all(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      4.0, 4.0, 4.0, 4.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Image.asset(
-                                              'assets/images/whta,s-2.png',
-                                              width: 40.0,
-                                              height: 40.0,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Giữ cân',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                            Text(
-                                              'Duy trì cân nặng hiện tại của bạn',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .grey,
-                                                        fontSize: 13.0,
-                                                        letterSpacing: 0.0,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ].divide(const SizedBox(width: 16.0)),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).lightGrey,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      4.0, 4.0, 4.0, 4.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(0.0),
-                                            child: Image.asset(
-                                              'assets/images/whta,s-2.png',
-                                              width: 40.0,
-                                              height: 40.0,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Giữ cân',
-                                              maxLines: 1,
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                            Text(
-                                              'Duy trì cân nặng hiện tại của bạn',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .grey,
-                                                        fontSize: 13.0,
-                                                        letterSpacing: 0.0,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ].divide(const SizedBox(width: 16.0)),
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          _model.select = 2;
-                          safeSetState(() {});
-                        },
-                        child: Builder(
-                          builder: (context) {
-                            if (_model.select == 2) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).secondary,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  border: Border.all(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      4.0, 4.0, 4.0, 4.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Image.asset(
-                                              'assets/images/whats,s-3.png',
-                                              width: 40.0,
-                                              height: 40.0,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Tăng cân',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                            Text(
-                                              'Tăng cơ, tăng mỡ và trở nên khỏe mạnh hơn',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .grey,
-                                                        fontSize: 13.0,
-                                                        letterSpacing: 0.0,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ].divide(const SizedBox(width: 16.0)),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).lightGrey,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      4.0, 4.0, 4.0, 4.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          borderRadius:
-                                              BorderRadius.circular(16.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(0.0),
-                                            child: Image.asset(
-                                              'assets/images/whats,s-3.png',
-                                              width: 40.0,
-                                              height: 40.0,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Tăng cân',
-                                              maxLines: 1,
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                            Text(
-                                              'Tăng cơ, tăng mỡ và trở nên khỏe mạnh hơn',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .grey,
-                                                        fontSize: 13.0,
-                                                        letterSpacing: 0.0,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ].divide(const SizedBox(width: 16.0)),
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ].divide(const SizedBox(height: 16.0)),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -587,11 +158,12 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                     const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
                 child: FFButtonWidget(
                   onPressed: () async {
+                    await _model.updateGoalLevel(context);
                     if (_model.select == 0) {
                       // Nếu chọn "Fat loss", điều hướng sang DecreaseWeightGoalScreen
-                      context.pushNamed('decrease_weight_goal_screen');
+                      context.pushNamed('health_indicator_screen');
                     } else if (_model.select == 1) {
-                      context.pushNamed('Select_allergy_screen');
+                      context.pushNamed('decrease_weight_goal_screen');
                     } else if (_model.select == 2)
                       context.pushNamed('increase_weight_goal_screen');
                   },

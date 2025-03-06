@@ -39,4 +39,19 @@ class AllergyService {
     throw Exception(
         'Lỗi lấy danh sách dị ứng: ${response.statusCode}, ${response.body}');
   }
+
+  /// 🔹 **Hàm mới**: Lấy danh sách dị ứng dưới dạng `Map` để hiển thị UI
+  Future<List<Map<String, String?>>> fetchAllergyLevelsData() async {
+    try {
+      final response = await getAllAllergies(pageIndex: 1, pageSize: 20);
+      final List<Allergy> allergies = await parseAllergies(response);
+
+      return allergies.map((allergy) {
+        return {'title': allergy.allergyName, 'notes': allergy.notes};
+      }).toList();
+    } catch (e) {
+      print("Lỗi khi lấy danh sách dị ứng: $e");
+      return [];
+    }
+  }
 }
