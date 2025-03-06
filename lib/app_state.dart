@@ -55,6 +55,7 @@ class FFAppState extends ChangeNotifier {
     _safeInit(() {
       _cmvalue = prefs.getString('ff_cmvalue') ?? _cmvalue;
     });
+
     _safeInit(() {
       _feet = prefs.getString('ff_feet') ?? _feet;
     });
@@ -66,6 +67,9 @@ class FFAppState extends ChangeNotifier {
     });
     _safeInit(() {
       _lb = prefs.getString('ff_lb') ?? _lb;
+    });
+    _safeInit(() {
+      _activityLevel = prefs.getString('ff_activityLevel');
     });
     _safeInit(() {
       _kgvalue = prefs.getString('ff_kgvalue') ?? _kgvalue;
@@ -196,6 +200,14 @@ class FFAppState extends ChangeNotifier {
   set inchh(String value) {
     _inchh = value;
     prefs.setString('ff_inchh', value);
+  }
+
+  String? _activityLevel;
+  String? get activityLevel => _activityLevel;
+  set activityLevel(String? value) {
+    _activityLevel = value;
+    prefs.setString(
+        'ff_activityLevel', value ?? ''); // Lưu vào SharedPreferences
   }
 
   String _kg = '';

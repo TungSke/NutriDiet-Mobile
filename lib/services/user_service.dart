@@ -189,10 +189,10 @@ class UserService {
     String? location,
     int? height,
     int? weight,
-    required String? activityLevel,
-    required String? aisuggestion,
-    required List<String> allergies,
-    required List<String> diseases,
+    String? activityLevel,
+    String? aisuggestion,
+    List<String>? allergies,
+    List<String>? diseases,
   }) async {
     final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
     final String? token = await _flutterSecureStorage.read(key: 'accessToken');
@@ -202,10 +202,8 @@ class UserService {
     }
 
     try {
-      if (fullName == null ||
-          age == null ||
-          gender == null ||
-          location == null) {
+      // 🔹 Lấy thông tin user nếu thiếu
+      if ([fullName, age, gender, location].any((e) => e == null)) {
         final userResponse = await whoAmI();
         if (userResponse.statusCode == 200) {
           final Map<String, dynamic> userData = jsonDecode(userResponse.body);
@@ -217,21 +215,32 @@ class UserService {
         }
       }
 
-      // 🔹 Nếu thiếu height hoặc weight, gọi API /health-profile để lấy
-      if (height == null || weight == null) {
+      // 🔹 Nếu có giá trị nào bị null, lấy dữ liệu từ health-profile
+      if ([height, weight, activityLevel, aisuggestion, allergies, diseases]
+          .any((e) => e == null)) {
         final healthProfileResponse = await getHealthProfile();
         if (healthProfileResponse.statusCode == 200) {
           final Map<String, dynamic> healthProfile =
               jsonDecode(healthProfileResponse.body);
-          height ??= healthProfile['height'] != null
-              ? int.tryParse(healthProfile['height'].toString())
-              : null;
-          weight ??= healthProfile['weight'] != null
-              ? int.tryParse(healthProfile['weight'].toString())
-              : null;
+
+          height ??= int.tryParse(healthProfile['height']?.toString() ?? '');
+          weight ??= int.tryParse(healthProfile['weight']?.toString() ?? '');
+          activityLevel ??= healthProfile['activityLevel']?.toString();
+          aisuggestion ??= healthProfile['aisuggestion']?.toString();
+
+          // ✅ Chắc chắn lấy danh sách dị ứng nếu chưa có
+          allergies ??= (healthProfile['allergies'] as List?)
+                  ?.map((e) => e.toString())
+                  .toList() ??
+              [];
+          diseases ??= (healthProfile['diseases'] as List?)
+                  ?.map((e) => e.toString())
+                  .toList() ??
+              [];
         }
       }
 
+      // 🔹 Tạo request cập nhật
       var request = http.MultipartRequest(
         'POST',
         Uri.parse("${_apiService.baseUrl}/api/health-profile"),
@@ -249,13 +258,14 @@ class UserService {
         request.fields['ActivityLevel'] = activityLevel;
       if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
 
-      for (var i = 0; i < allergies.length; i++) {
-        request.fields['AllergyNames[$i]'] = allergies[i];
-      }
-      for (var i = 0; i < diseases.length; i++) {
-        request.fields['DiseaseNames[$i]'] = diseases[i];
+      // 🔹 Gửi allergies và diseases dưới dạng JSON string
+      if (allergies != null && allergies.isNotEmpty) {
+        request.fields['AllergyNames'] = jsonEncode(allergies);
       }
 
+      if (diseases != null && diseases.isNotEmpty) {
+        request.fields['DiseasesNames'] = jsonEncode(diseases);
+      }
       print(
           "🔹 Sending updateHealthProfile request: ${jsonEncode(request.fields)}");
 
@@ -271,8 +281,83 @@ class UserService {
 
       return httpResponse;
     } catch (e) {
-      print("Lỗi khi cập nhật hồ sơ sức khỏe: $e");
+      print("❌ Lỗi khi cập nhật hồ sơ sức khỏe: $e");
       throw Exception("Không thể cập nhật hồ sơ sức khỏe.");
+    }
+  }
+
+  Future<http.Response> getPersonalGoal() async {
+    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("⚠ Access token không hợp lệ, vui lòng đăng nhập lại.");
+    }
+
+    try {
+      final response =
+          await _apiService.get("/api/personal-goal", token: token);
+
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        print('Lỗi lấy personal-goal: ${response.body}');
+        throw Exception('Lỗi lấy health profile: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Lỗi kết nối API: $e');
+      throw Exception("Không thể kết nối đến server.");
+    }
+  }
+
+  Future<http.Response> createPersonalGoal({
+    String? goalType,
+    double? targetWeight,
+    String? weightChangeRate,
+    String? goalDescription,
+    String? notes,
+  }) async {
+    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+    }
+
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("${_apiService.baseUrl}/api/personal-goal"),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      if (goalType != null) request.fields['GoalType'] = goalType;
+      if (targetWeight != null)
+        request.fields['TargetWeight'] = targetWeight.toString();
+      if (weightChangeRate != null)
+        request.fields['WeightChangeRate'] = weightChangeRate;
+      if (goalDescription != null)
+        request.fields['GoalDescription'] = goalDescription;
+      if (notes != null) request.fields['Notes'] = notes;
+
+      print(
+          "🔹 Sending createPersonalGoal request: ${jsonEncode(request.fields)}");
+
+      final response = await request.send();
+      final httpResponse = await http.Response.fromStream(response);
+
+      print("🔹 Response status: ${httpResponse.statusCode}");
+      print("🔹 Response body: ${httpResponse.body}");
+
+      if (httpResponse.statusCode != 200) {
+        throw Exception("Tạo mục tiêu cá nhân thất bại: ${httpResponse.body}");
+      }
+
+      return httpResponse;
+    } catch (e) {
+      print("❌ Lỗi khi tạo mục tiêu cá nhân: $e");
+      throw Exception("Không thể tạo mục tiêu cá nhân.");
     }
   }
 }

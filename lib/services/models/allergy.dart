@@ -9,7 +9,7 @@ class Allergy {
     return Allergy(
       allergyId: json['allergyId'] as int,
       allergyName: json['allergyName'] as String,
-      notes: json['notes'] as String?,
+      notes: json['notes'] as String,
     );
   }
 

@@ -30,24 +30,31 @@ class SelectAllergyScreenWidget extends StatelessWidget {
                         child: model.isLoading
                             ? const Center(child: CircularProgressIndicator())
                             : ListView.builder(
-                                // Bỏ Scrollbar
                                 padding: const EdgeInsets.only(right: 10.0),
-                                itemCount: model.allergies.length,
+                                itemCount: model.allergyLevelsData.length,
                                 itemBuilder: (context, index) {
-                                  final allergy = model.allergies[index];
+                                  final allergy =
+                                      model.allergyLevelsData[index];
+                                  final title =
+                                      allergy['title'] ?? "Không xác định";
+                                  final notes =
+                                      allergy['notes'] ?? "Không có mô tả";
+
                                   final isSelected = model.selectedAllergyIds
-                                      .contains(allergy.allergyId);
+                                      .contains(index + 1);
+
                                   return CheckboxListTile(
                                     title: Text(
-                                      allergy.allergyName,
+                                      title,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium,
                                     ),
+                                    subtitle: Text(notes),
                                     value: isSelected,
                                     activeColor:
                                         FlutterFlowTheme.of(context).primary,
                                     onChanged: (bool? value) {
-                                      model.toggleSelection(allergy.allergyId);
+                                      model.toggleSelection(index + 1);
                                     },
                                   );
                                 },
