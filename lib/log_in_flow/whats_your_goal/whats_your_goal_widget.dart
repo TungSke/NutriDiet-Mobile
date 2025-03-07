@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '../../services/models/PersonalGoalProvider.dart';
 import 'whats_your_goal_model.dart';
 
 export 'whats_your_goal_model.dart';
@@ -81,7 +83,11 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
 
                       return InkWell(
                         onTap: () {
-                          setState(() => _model.select = index);
+                          setState(() {
+                            _model.select = index;
+                            _model.goalType =
+                                WhatsYourGoalModel.goalLevels[index];
+                          });
                         },
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -158,14 +164,21 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
                     const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    await _model.updateGoalLevel(context);
+                    final selectedGoal = _model.selectedGoalLevel;
+                    if (selectedGoal != null) {
+                      context
+                          .read<PersonalGoalModel>()
+                          .updateGoalType(selectedGoal);
+                    }
+
                     if (_model.select == 0) {
                       // Nếu chọn "Fat loss", điều hướng sang DecreaseWeightGoalScreen
                       context.pushNamed('health_indicator_screen');
                     } else if (_model.select == 1) {
                       context.pushNamed('target_weight_screen');
-                    } else if (_model.select == 2)
+                    } else if (_model.select == 2) {
                       context.pushNamed('target_weight_screen');
+                    }
                   },
                   text: 'Tiếp tục',
                   options: FFButtonOptions(

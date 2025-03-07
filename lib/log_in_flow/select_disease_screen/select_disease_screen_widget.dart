@@ -1,20 +1,35 @@
+import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'select_disease_screen_model.dart';
 
-class SelectDiseaseScreenWidget extends StatelessWidget {
+class SelectDiseaseScreenWidget extends StatefulWidget {
   const SelectDiseaseScreenWidget({super.key});
 
   @override
+  _SelectDiseaseScreenWidgetState createState() =>
+      _SelectDiseaseScreenWidgetState();
+}
+
+class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
+  late SelectDiseaseScreenModel model;
+
+  @override
+  void initState() {
+    super.initState();
+    model = SelectDiseaseScreenModel();
+    model.fetchDiseaseLevels();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SelectDiseaseModel(),
-      child: Consumer<SelectDiseaseModel>(
+    return ChangeNotifierProvider<SelectDiseaseScreenModel>(
+      create: (_) => model,
+      child: Consumer<SelectDiseaseScreenModel>(
         builder: (context, model, child) {
           return GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
@@ -29,27 +44,35 @@ class SelectDiseaseScreenWidget extends StatelessWidget {
                         padding: const EdgeInsets.all(20.0),
                         child: model.isLoading
                             ? const Center(child: CircularProgressIndicator())
-                            : ListView.builder(
+                            : ListView.separated(
                                 padding: const EdgeInsets.only(right: 10.0),
-                                itemCount: model.diseases.length,
+                                itemCount: model.diseaseLevelsData.length,
                                 itemBuilder: (context, index) {
-                                  final disease = model.diseases[index];
+                                  final disease =
+                                      model.diseaseLevelsData[index];
+                                  final diseaseId = disease['id'] as int;
+                                  final title =
+                                      disease['title'] ?? "Không xác định";
+                                  final notes =
+                                      disease['notes'] ?? "Không có mô tả";
                                   final isSelected = model.selectedDiseaseIds
-                                      .contains(disease.diseaseId);
+                                      .contains(diseaseId);
+
                                   return CheckboxListTile(
-                                    title: Text(
-                                      disease.diseaseName,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium,
-                                    ),
+                                    title: Text(title,
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium),
+                                    subtitle: Text(notes),
                                     value: isSelected,
                                     activeColor:
                                         FlutterFlowTheme.of(context).primary,
                                     onChanged: (bool? value) {
-                                      model.toggleSelection(disease.diseaseId);
+                                      model.toggleSelection(diseaseId);
                                     },
                                   );
                                 },
+                                separatorBuilder: (context, index) =>
+                                    const Divider(),
                               ),
                       ),
                     ),
@@ -64,12 +87,13 @@ class SelectDiseaseScreenWidget extends StatelessWidget {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                        "Bạn cần chọn ít nhất một loại bệnh!"),
+                                        "Bạn cần chọn ít nhất một loại bệnh hoặc bấm 'Bỏ qua'!"),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
                               } else {
-                                context.pushNamed('Which_diet_do_you_prefer');
+                                model.updateDisease(context);
+                                context.pushNamed('health_indicator_screen');
                               }
                             },
                             text: 'Tiếp tục',
@@ -86,37 +110,21 @@ class SelectDiseaseScreenWidget extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     useGoogleFonts: false,
                                   ),
-                              elevation: 0.0,
-                              borderSide: const BorderSide(
-                                  color: Colors.transparent, width: 0.0),
                               borderRadius: BorderRadius.circular(16.0),
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          FFButtonWidget(
-                            onPressed: () async {
-                              print(
-                                  "Selected Disease IDs: ${model.selectedDiseaseIds}");
-                              context.pushNamed('Whats_your_goal');
+                          const SizedBox(height: 10.0),
+                          TextButton(
+                            onPressed: () {
+                              context.pushNamed("health_indicator_screen");
                             },
-                            text: 'Bỏ qua',
-                            options: FFButtonOptions(
-                              width: double.infinity,
-                              height: 54.0,
-                              color: Colors.grey,
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .titleSmall
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: Colors.white,
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                    useGoogleFonts: false,
-                                  ),
-                              elevation: 0.0,
-                              borderSide: const BorderSide(
-                                  color: Colors.transparent, width: 0.0),
-                              borderRadius: BorderRadius.circular(16.0),
+                            child: Text(
+                              'Bỏ qua',
+                              style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primary,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
