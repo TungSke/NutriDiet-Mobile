@@ -84,6 +84,68 @@ class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWid
     return spans;
   }
 
+  void showRejectDialog(BuildContext context) {
+    TextEditingController reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.3,
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Lý do từ chối",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Expanded(
+                  child: TextField(
+                    controller: reasonController,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    decoration: InputDecoration(
+                      hintText: "Nhập lý do...",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("Hủy"),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        String reason = reasonController.text.trim();
+                        if (reason.isNotEmpty) {
+                          Navigator.pop(context, reason);
+                        }
+                      },
+                      child: Text("Gửi"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
   @override
   void initState(BuildContext context){}
 

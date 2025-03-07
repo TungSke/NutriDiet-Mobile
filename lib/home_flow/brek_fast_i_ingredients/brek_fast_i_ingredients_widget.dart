@@ -638,94 +638,54 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                     ],
                   );
                 } else {
-                  if(_model.foodRecipe != null){
-                    return RichText(
-                      text: TextSpan(
-                        children: _model.parseFormattedText(),
-                        style: DefaultTextStyle.of(context).style, // Dùng style mặc định của app
-                      ),
-                    );
-                  }
                   return Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        20.0, 0.0, 20.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Align(
-                          alignment: const AlignmentDirectional(0.0, 0.0),
-                          child: Container(
-                            width: double.infinity,
-                            height: 221.0,
-                            decoration: const BoxDecoration(),
-                            child: Align(
-                              alignment: const AlignmentDirectional(0.0, 0.0),
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    20.0, 0.0, 20.0, 0.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(0.0),
-                                      child: Image.asset(
-                                        'assets/images/serch-diet-empty.png',
-                                        width: 116.0,
-                                        height: 116.0,
-                                        fit: BoxFit.contain,
-                                        alignment: const Alignment(0.0, 0.0),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 16.0, 0.0, 0.0),
-                                      child: Text(
-                                        'Bạn chưa có công thức nấu ăn này',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'figtree',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryText,
-                                              fontSize: 22.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.bold,
-                                              useGoogleFonts: false,
-                                            ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 8.0, 0.0, 0.0),
-                                      child: Text(
-                                        'Tạo công thức của riêng bạn',
-                                        textAlign: TextAlign.center,
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'figtree',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .grey,
-                                              fontSize: 16.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.normal,
-                                              useGoogleFonts: false,
-                                              lineHeight: 1.5,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
+                        if (_model.foodRecipe != null)
+                          Column(
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  children: _model.parseFormattedText(),
+                                  style: DefaultTextStyle.of(context).style,
                                 ),
                               ),
-                            ),
+                              SizedBox(height: 16),
+                              Text(
+                                "Bạn có muốn thử công thức khác?",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          )
+                        else
+                          Column(
+                            children: [
+                              Image.asset(
+                                'assets/images/serch-diet-empty.png',
+                                width: 116.0,
+                                height: 116.0,
+                                fit: BoxFit.contain,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Bạn chưa có công thức nấu ăn này',
+                                style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Tạo công thức của riêng bạn',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                              ),
+                            ],
                           ),
-                        ),
+
+                        SizedBox(height: 16),
+
+                        // Dropdown chọn loại ẩm thực
                         DropdownButton<int>(
                           value: _model.cusinetypelist.any((c) => c["cuisineId"] == _model.selectedCuisineId)
                               ? _model.selectedCuisineId
@@ -744,24 +704,31 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                             });
                           },
                         ),
+
+                        SizedBox(height: 16),
+
+                        // Nút từ chối công thức
+                        ElevatedButton(
+                          onPressed: () => _model.showRejectDialog(context),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: EdgeInsets.all(20)),
+                          child: Text("Từ chối công thức",style: TextStyle(color: Colors.white))
+                        ),
+
+                        SizedBox(height: 16),
+
+                        // Nút tạo công thức AI
                         GestureDetector(
                           onTap: () async {
                             await _model.createFoodRecipeAI(widget.foodId, context);
-                            setState(() {});
+                            setState(() {}); // Cập nhật UI
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12.0, horizontal: 20.0),
+                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
                             decoration: BoxDecoration(
-                              color: Colors.blue, // Màu nền
-                              borderRadius:
-                                  BorderRadius.circular(10.0), // Bo góc
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(10.0),
                               boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 5.0,
-                                  offset: Offset(2, 2),
-                                ),
+                                BoxShadow(color: Colors.black26, blurRadius: 5.0, offset: Offset(2, 2)),
                               ],
                             ),
                             child: Row(
@@ -773,11 +740,10 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                     height: 18,
                                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                   ),
-                                if (!_model.isLoading) // Hiển thị icon khi không loading
-                                  Icon(Icons.auto_awesome, color: Colors.white),
+                                if (!_model.isLoading) Icon(Icons.auto_awesome, color: Colors.white),
                                 SizedBox(width: 8),
                                 Text(
-                                  "Tạo công thức bằng AI",
+                                  _model.isLoading ? "Đang tạo..." : "Tạo công thức bằng AI",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
@@ -787,8 +753,8 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                               ],
                             ),
                           ),
-                        )
-                      ].addToStart(const SizedBox(height: 24.0)),
+                        ),
+                      ],
                     ),
                   );
                 }
