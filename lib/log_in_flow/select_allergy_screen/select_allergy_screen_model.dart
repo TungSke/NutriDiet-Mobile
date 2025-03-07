@@ -1,54 +1,107 @@
-import 'package:diet_plan_app/services/user_service.dart';
 import 'package:flutter/material.dart';
 
-import '../../services/allergy_service.dart';
-import '../../services/models/allergy.dart';
+import '/services/allergy_service.dart';
+import '/services/user_service.dart';
+import '../../components/appbar_model.dart';
+import '../../flutter_flow/flutter_flow_util.dart';
 
-class SelectAllergyModel extends ChangeNotifier {
-  final AllergyService _allergyService = AllergyService();
-  List<Allergy> allergies = [];
-  List<Map<String, String?>> allergyLevelsData = [];
-  Set<int> selectedAllergyIds = {};
+class SelectAllergyScreenModel extends ChangeNotifier {
+  List<int> selectedAllergyIds = [];
+
+  /// Dữ liệu dị ứng từ API
+  List<Map<String, dynamic>> allergyLevelsData = [];
   bool isLoading = true;
 
-  SelectAllergyModel() {
-    fetchAllergies();
+  /// Model cho AppBar
+  late AppbarModel appbarModel;
+
+  void init(BuildContext context) {
+    appbarModel = createModel(context, () => AppbarModel());
+    fetchAllergyLevels();
   }
 
-  Future<void> fetchAllergies() async {
+  @override
+  void dispose() {
+    appbarModel.dispose();
+    super.dispose();
+  }
+
+  /// 🔹 Lấy danh sách dị ứng từ API
+  Future<void> fetchAllergyLevels() async {
     try {
-      final response =
-          await _allergyService.getAllAllergies(pageIndex: 1, pageSize: 20);
-      final List<Allergy> parsedData =
-          await _allergyService.parseAllergies(response);
-      allergies = parsedData;
+      final allergyService = AllergyService();
+      final data = await allergyService.fetchAllergyLevelsData();
 
-      // 🔹 Lấy danh sách dị ứng dạng Map để hiển thị UI
-      allergyLevelsData = await _allergyService.fetchAllergyLevelsData();
+      allergyLevelsData = data.where((allergy) => allergy['id'] != -1).toList();
     } catch (e) {
-      print("Error loading allergies: $e");
-    } finally {
-      isLoading = false;
-      notifyListeners();
+      print("❌ Lỗi khi lấy danh sách dị ứng: $e");
     }
+    isLoading = false;
+    notifyListeners();
   }
 
-  void toggleSelection(int allergyId) async {
+  void toggleSelection(int allergyId) {
     if (selectedAllergyIds.contains(allergyId)) {
-      selectedAllergyIds.remove(allergyId);
+      selectedAllergyIds.removeWhere((id) => id == allergyId);
     } else {
       selectedAllergyIds.add(allergyId);
     }
-
+    print("📌 Danh sách dị ứng đã chọn: $selectedAllergyIds");
     notifyListeners();
+  }
 
+  /// 🔹 Cập nhật dị ứng lên API
+  Future<void> updateAllergy(BuildContext context) async {
     try {
-      // 🔹 Gửi danh sách dị ứng dưới dạng `List<int>`
-      await UserService()
-          .updateHealthProfile(allergies: selectedAllergyIds.toList());
-      print("✅ Cập nhật dị ứng thành công!");
+      final healthProfileResponse = await UserService().getHealthProfile();
+      if (healthProfileResponse.statusCode != 200) {
+        showSnackbar(context, 'Lỗi API: Không thể lấy thông tin sức khỏe.');
+        return;
+      }
+
+      final Map<String, dynamic> healthProfile =
+          jsonDecode(healthProfileResponse.body);
+      final profileData = healthProfile['data'];
+
+      if (profileData == null) {
+        showSnackbar(context, '⚠️ Không có dữ liệu sức khỏe hợp lệ.');
+        return;
+      }
+
+      int height = int.tryParse(profileData['height']?.toString() ?? '') ?? 0;
+      int weight = int.tryParse(profileData['weight']?.toString() ?? '') ?? 0;
+      String activityLevel = profileData['activityLevel']?.toString() ?? "";
+
+      if (height == 0 || weight == 0) {
+        showSnackbar(context, '⚠️ Không thể lấy thông tin sức khỏe.');
+        return;
+      }
+
+      List<int> allergiesToSend =
+          selectedAllergyIds.isEmpty ? [0] : selectedAllergyIds;
+      print("📌 selectedAllergyIds trước khi gửi API: $selectedAllergyIds");
+
+      final response = await UserService().updateHealthProfile(
+        height: height,
+        weight: weight,
+        activityLevel: activityLevel,
+        aisuggestion: null,
+        allergies: selectedAllergyIds,
+        diseases: [],
+      );
+
+      print("🔹 Response status code: ${response.statusCode}");
+      print("🔹 Response body: ${response.body}");
+      if (response.statusCode == 200) {
+        FFAppState().allergyIds = allergiesToSend.toString();
+        FFAppState().update(() {});
+        showSnackbar(context, 'Cập nhật dị ứng thành công!');
+      } else {
+        showSnackbar(context, 'Cập nhật thất bại: ${response.body}');
+      }
     } catch (e) {
-      print("❌ Lỗi cập nhật dị ứng: $e");
+      print("❌ Lỗi xảy ra: $e");
+      showSnackbar(context, 'Lỗi: $e');
     }
   }
 }

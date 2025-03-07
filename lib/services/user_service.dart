@@ -226,15 +226,14 @@ class UserService {
           activityLevel ??= healthProfile['activityLevel']?.toString();
           aisuggestion ??= healthProfile['aisuggestion']?.toString();
 
-          // ✅ Chắc chắn lấy danh sách dị ứng nếu chưa có
-          allergies = (healthProfile['allergies'] as List?)
-                  ?.map((e) => int.tryParse(e.toString()) ?? 0)
-                  .where((e) => e > 0) // Lọc bỏ giá trị không hợp lệ
+          allergies ??= (healthProfile['allergies'] as List?)
+                  ?.map((e) => int.tryParse(e['allergyId'].toString()) ?? 0)
+                  .where((e) => e > 0) // Lọc giá trị hợp lệ
                   .toList() ??
               [];
 
-          diseases = (healthProfile['diseases'] as List?)
-                  ?.map((e) => int.tryParse(e.toString()) ?? 0)
+          diseases ??= (healthProfile['diseases'] as List?)
+                  ?.map((e) => int.tryParse(e['diseaseId'].toString()) ?? 0)
                   .where((e) => e > 0)
                   .toList() ??
               [];
@@ -259,23 +258,21 @@ class UserService {
         request.fields['ActivityLevel'] = activityLevel;
       if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
 
-      // 🔹 Gửi allergies và diseases dưới dạng JSON string
-      // 🔹 Gửi AllergyIds từng phần tử
+      // ✅ Sửa lỗi gửi danh sách `allergies` và `diseases`
+      // ✅ Gửi đúng định dạng `multipart/form-data`
       if (allergies != null && allergies.isNotEmpty) {
         for (int i = 0; i < allergies.length; i++) {
           request.fields['AllergyIds[$i]'] = allergies[i].toString();
         }
       }
-
-// 🔹 Gửi DiseaseIds từng phần tử
       if (diseases != null && diseases.isNotEmpty) {
         for (int i = 0; i < diseases.length; i++) {
           request.fields['DiseaseIds[$i]'] = diseases[i].toString();
         }
       }
 
-      print(
-          "🔹 Sending updateHealthProfile request: ${jsonEncode(request.fields)}");
+      // 🛠 Debug log trước khi gửi request
+      print("🔹 Request updateHealthProfile: ${jsonEncode(request.fields)}");
 
       final response = await request.send();
       final httpResponse = await http.Response.fromStream(response);
@@ -289,7 +286,7 @@ class UserService {
 
       return httpResponse;
     } catch (e) {
-      print("Lỗi khi cập nhật hồ sơ sức khỏe: $e");
+      print("❌ Lỗi khi cập nhật hồ sơ sức khỏe: $e");
       throw Exception("Không thể cập nhật hồ sơ sức khỏe.");
     }
   }
