@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWidget>{
   ///  Local state fields for this page.
 
+  VoidCallback? onStateChange;
   int tabar = 0;
   Map<String, dynamic>? food;
   List<Map<String, dynamic>> cusinetypelist = [];
@@ -47,6 +48,8 @@ class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWid
       );
       return;
     }
+    isLoading = true;
+    onStateChange?.call();
 
     final response = await _foodService.createFoodRecipeAI(
       foodId: foodId,
@@ -58,6 +61,7 @@ class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWid
     foodRecipe = responseBody["data"].toString();
 
     isLoading = false;
+    onStateChange?.call();
   }
 
 

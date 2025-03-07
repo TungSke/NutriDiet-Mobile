@@ -25,6 +25,7 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
   void initState() {
     super.initState();
     _model = createModel(context, () => BrekFastIIngredientsModel());
+    _model.onStateChange = () => setState(() {});
     _model.loadFood(widget.foodId).then((_) {
       setState(() {});
     });
@@ -772,7 +773,8 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                     height: 18,
                                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                   ),
-                                Icon(Icons.auto_awesome, color: Colors.white),
+                                if (!_model.isLoading) // Hiển thị icon khi không loading
+                                  Icon(Icons.auto_awesome, color: Colors.white),
                                 SizedBox(width: 8),
                                 Text(
                                   "Tạo công thức bằng AI",
