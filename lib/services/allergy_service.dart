@@ -41,16 +41,20 @@ class AllergyService {
   }
 
   /// 🔹 **Hàm mới**: Lấy danh sách dị ứng dưới dạng `Map` để hiển thị UI
-  Future<List<Map<String, String?>>> fetchAllergyLevelsData() async {
+  Future<List<Map<String, dynamic>>> fetchAllergyLevelsData() async {
     try {
       final response = await getAllAllergies(pageIndex: 1, pageSize: 20);
       final List<Allergy> allergies = await parseAllergies(response);
 
       return allergies.map((allergy) {
-        return {'title': allergy.allergyName, 'notes': allergy.notes};
+        return {
+          'id': allergy.allergyId ?? -1,
+          'title': allergy.allergyName ?? "Không xác định",
+          'notes': allergy.notes ?? "Không có mô tả"
+        };
       }).toList();
     } catch (e) {
-      print("Lỗi khi lấy danh sách dị ứng: $e");
+      print("❌ Lỗi khi lấy danh sách dị ứng: $e");
       return [];
     }
   }

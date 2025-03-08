@@ -18,7 +18,7 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>(); // 🔹 Thêm GlobalKey
 
   int selectedKg = 0; // Giá trị mặc định
-  final List<int> kgOptions = List.generate(31, (index) => index); // 0 - 30 kg
+  final List<int> kgOptions = List.generate(100, (index) => index); // 0 - 30 kg
 
   @override
   Widget build(BuildContext context) {

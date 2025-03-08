@@ -210,6 +210,31 @@ class FFAppState extends ChangeNotifier {
         'ff_activityLevel', value ?? ''); // Lưu vào SharedPreferences
   }
 
+  String? _allergyIds;
+
+  String? get allergyIds => _allergyIds;
+
+  set allergyIds(String? value) {
+    _allergyIds = value;
+    prefs.setString('ff_allergyIds', value ?? ''); // Lưu vào SharedPreferences
+  }
+
+  String? _diseaseIds;
+
+  String? get diseaseIds => _diseaseIds;
+
+  set diseaseIds(String? value) {
+    _diseaseIds = value;
+    prefs.setString('ff_diseaseIds', value ?? ''); // Lưu vào SharedPreferences
+  }
+
+  String? _goalType;
+  String? get goalType => _goalType;
+  set goalType(String? value) {
+    _goalType = value;
+    prefs.setString('ff_goalType', value ?? ''); // Lưu vào SharedPreferences
+  }
+
   String _kg = '';
   String get kg => _kg;
   set kg(String value) {
