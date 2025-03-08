@@ -9,6 +9,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:provider/provider.dart';
 
 import 'flutter_flow/flutter_flow_util.dart';
+import 'meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => appState),
         ChangeNotifierProvider(create: (context) => PersonalGoalModel()),
+        ChangeNotifierProvider(create: (context) => SampleMealPlanModel()),
       ],
       child: const MyApp(),
     ),

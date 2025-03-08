@@ -1,4 +1,7 @@
+import 'package:diet_plan_app/meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../services/models/mealplan.dart';
 import '../../flutter_flow/flutter_flow_theme.dart';
 import '../meal_plan_detail/meal_plan_detail_widget.dart';
 
@@ -10,30 +13,22 @@ class SampleMealPlanWidget extends StatefulWidget {
 }
 
 class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
-  String searchQuery = "";
-  String? selectedFilter;
-
-  final String activeMealPlan = "Thực đơn Keto"; // Thực đơn đang được áp dụng
-  final String activeDate = "01/03/2025"; // Ngày áp dụng thực đơn
-
-  final List<Map<String, dynamic>> sampleMealPlans = [
-    {"name": "Thực đơn Keto", "goal": "Giảm cân", "days": 7, "createby": "Admin"},
-    {"name": "Thực đơn Protein", "goal": "Tăng cơ", "days": 14, "createby": "Admin"},
-    {"name": "Thực đơn Low-Carb", "goal": "Giữ dáng", "days": 10, "createby": "Admin"},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => Provider.of<SampleMealPlanModel>(context, listen: false).fetchSampleMealPlans());
+  }
 
   @override
   Widget build(BuildContext context) {
+    final model = context.watch<SampleMealPlanModel>();
     final theme = FlutterFlowTheme.of(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Center(
-          child: Text(
-            "Thực đơn mẫu",
-            style: TextStyle(color: Colors.white),
-          ),
+          child: Text("Thực đơn mẫu", style: TextStyle(color: Colors.white)),
         ),
         backgroundColor: theme.primary,
         leading: IconButton(
@@ -49,37 +44,32 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Tìm kiếm thực đơn...',
+                      hintStyle: theme.bodyMedium,
+                      prefixIcon: const Icon(Icons.search_sharp, color: Colors.grey),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.all(16),
                     ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Tìm kiếm thực đơn...',
-                        hintStyle: theme.bodyMedium,
-                        prefixIcon: const Icon(Icons.search_sharp, color: Colors.grey),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(16),
-                      ),
-                      onChanged: (value) => setState(() => searchQuery = value),
-                    ),
+                    onChanged: model.updateSearchQuery,
                   ),
                 ),
                 const SizedBox(width: 10),
                 IconButton(
                   icon: const Icon(Icons.filter_list, color: Colors.grey, size: 28),
-                  onPressed: () => _showFilterDialog(),
+                  onPressed: () => _showFilterDialog(context, model),
                 ),
               ],
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
+              child: model.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
                 padding: const EdgeInsets.only(top: 8),
-                itemCount: _filteredMealPlans().length,
-                itemBuilder: (context, index) => _buildMealPlanItem(_filteredMealPlans()[index]),
+                itemCount: model.filteredMealPlans.length,
+                itemBuilder: (context, index) => _buildMealPlanItem(context, model.filteredMealPlans[index]),
               ),
             ),
           ],
@@ -88,7 +78,7 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
     );
   }
 
-  void _showFilterDialog() {
+  void _showFilterDialog(BuildContext context, SampleMealPlanModel model) {
     showDialog(
       context: context,
       builder: (context) {
@@ -102,11 +92,9 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
                 children: ["Giảm cân", "Tăng cơ", "Giữ dáng"].map((goal) {
                   return ChoiceChip(
                     label: Text(goal),
-                    selected: selectedFilter == goal,
+                    selected: model.filteredMealPlans.any((plan) => plan.healthGoal == goal),
                     onSelected: (selected) {
-                      setState(() {
-                        selectedFilter = selected ? goal : null;
-                      });
+                      model.updateFilter(selected ? goal : null);
                       Navigator.pop(context);
                     },
                   );
@@ -125,58 +113,28 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
     );
   }
 
-  List<Map<String, dynamic>> _filteredMealPlans() {
-    return sampleMealPlans.where((plan) {
-      final matchesSearch = searchQuery.isEmpty || plan["name"].toLowerCase().contains(searchQuery.toLowerCase());
-      final matchesFilter = selectedFilter == null || plan["goal"] == selectedFilter;
-      return matchesSearch && matchesFilter;
-    }).toList();
-  }
-
-  Widget _buildMealPlanItem(Map<String, dynamic> mealPlan) {
-    bool isActive = mealPlan["name"] == activeMealPlan; // Kiểm tra thực đơn có đang áp dụng không
-
+  Widget _buildMealPlanItem(BuildContext context, MealPlan mealPlan) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: isActive ? Colors.green[100] : FlutterFlowTheme.of(context).secondaryBackground,
-      child: Stack(
-        children: [
-          ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            title: Text(
-              mealPlan["name"],
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              "${mealPlan["goal"]} - Số ngày: ${mealPlan["days"]}",
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MealPlanDetailWidget(
-                    mealPlanName: mealPlan["name"],
-                    goal: mealPlan["goal"],
-                    days: mealPlan["days"],
-                    createdBy: mealPlan["createby"],
-                  ),
-                ),
-              );
-            },
-          ),
-          if (isActive)
-            Positioned(
-              bottom: 8,
-              right: 16,
-              child: Text(
-                "Thực đơn đang được áp dụng từ ngày $activeDate",
-                style: const TextStyle(fontSize: 12, color: Colors.red),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        title: Text(mealPlan.planName ?? "Không có tên", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        subtitle: Text("${mealPlan.healthGoal ?? "Không có mục tiêu"} - Số ngày: ${mealPlan.duration ?? 0}"),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MealPlanDetailWidget(
+                mealPlanName: mealPlan.planName ?? "Không có tên",
+                goal: mealPlan.healthGoal ?? "Không có mục tiêu",
+                days: mealPlan.duration ?? 0,
+                createdBy: mealPlan.createdBy ?? "Không xác định",
               ),
             ),
-        ],
+          );
+        },
       ),
     );
   }

@@ -93,7 +93,7 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                                 );
                               } else {
                                 model.updateDisease(context);
-                                context.pushNamed('health_indicator_screen');
+                                context.pushNamed('Whats_your_goal');
                               }
                             },
                             text: 'Tiếp tục',
@@ -116,7 +116,7 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                           const SizedBox(height: 10.0),
                           TextButton(
                             onPressed: () {
-                              context.pushNamed("health_indicator_screen");
+                              context.pushNamed("Whats_your_goal");
                             },
                             child: Text(
                               'Bỏ qua',
