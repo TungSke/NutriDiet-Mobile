@@ -707,20 +707,18 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
 
                         SizedBox(height: 16),
 
-                        // Nút từ chối công thức
                         ElevatedButton(
-                          onPressed: () => _model.showRejectDialog(context),
+                          onPressed: () => _model.showRejectDialog(widget.foodId, context),
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: EdgeInsets.all(20)),
                           child: Text("Từ chối công thức",style: TextStyle(color: Colors.white))
                         ),
 
                         SizedBox(height: 16),
 
-                        // Nút tạo công thức AI
                         GestureDetector(
                           onTap: () async {
                             await _model.createFoodRecipeAI(widget.foodId, context);
-                            setState(() {}); // Cập nhật UI
+                            setState(() {});
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),

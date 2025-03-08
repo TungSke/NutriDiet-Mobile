@@ -84,7 +84,7 @@ class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWid
     return spans;
   }
 
-  void showRejectDialog(BuildContext context) {
+  void showRejectDialog(int foodId, BuildContext context) {
     TextEditingController reasonController = TextEditingController();
 
     showDialog(
@@ -127,10 +127,11 @@ class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWid
                     ),
                     SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         String reason = reasonController.text.trim();
                         if (reason.isNotEmpty) {
-                          Navigator.pop(context, reason);
+                          await _rejectRecipe(foodId, reason, context);
+                          Navigator.pop(context);
                         }
                       },
                       child: Text("Gửi"),
@@ -144,6 +145,12 @@ class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWid
       },
     );
   }
+
+  Future<void> _rejectRecipe(int foodId, String rejectionReason, BuildContext context) async {
+    await _foodService.RejectRecipeAI(foodId: foodId, rejectionReason: rejectionReason, context: context);
+    await createFoodRecipeAI(foodId, context);
+  }
+
 
 
   @override

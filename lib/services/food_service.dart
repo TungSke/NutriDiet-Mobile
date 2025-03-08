@@ -10,9 +10,11 @@ import 'package:http/http.dart' as http;
 class FoodService {
   final ApiService _apiService = ApiService();
 
-  Future<List<Food>> getAllFoods({required int pageIndex, required int pageSize}) async {
+  Future<List<Food>> getAllFoods(
+      {required int pageIndex, required int pageSize}) async {
     try {
-      final response = await _apiService.get("api/food?pageIndex=$pageIndex&pageSize=$pageSize");
+      final response = await _apiService
+          .get("api/food?pageIndex=$pageIndex&pageSize=$pageSize");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body)['data'] as List<dynamic>;
@@ -34,18 +36,31 @@ class FoodService {
     return response;
   }
 
-  Future<http.Response> getFoodRecipe({required int foodId, required BuildContext context}) async{
+  Future<http.Response> getFoodRecipe(
+      {required int foodId, required BuildContext context}) async {
     String? accessToken = await _apiService.getAccessToken(context);
-    final response = await _apiService.get("api/food/recipe/$foodId", token: accessToken);
+    final response =
+        await _apiService.get("api/food/recipe/$foodId", token: accessToken);
     return response;
   }
 
-  Future<http.Response> createFoodRecipeAI({required int foodId, required int cusineId, required BuildContext context}) async {
+  Future<http.Response> createFoodRecipeAI(
+      {required int foodId,
+      required int cusineId,
+      required BuildContext context}) async {
     String? accessToken = await _apiService.getAccessToken(context);
 
     final response = await _apiService.post("api/food/recipe/$foodId/$cusineId",
-        body: {},
-        token: accessToken);
+        body: {}, token: accessToken);
+    return response;
+  }
+
+  Future<http.Response> RejectRecipeAI(
+      {required int foodId,required String rejectionReason, required BuildContext context}) async {
+    String? accessToken = await _apiService.getAccessToken(context);
+
+    final response = await _apiService.post("/api/food/reject-recipe",
+        body: {'foodId': foodId, 'rejectionReason': rejectionReason}, token: accessToken);
     return response;
   }
 }
