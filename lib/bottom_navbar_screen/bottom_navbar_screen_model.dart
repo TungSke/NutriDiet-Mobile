@@ -1,4 +1,5 @@
-import 'package:diet_plan_app/components/food_screen_model.dart';
+
+import 'package:diet_plan_app/components/serch_data_model.dart';
 import 'package:flutter/material.dart';
 
 import '/components/home_componet_widget.dart';
@@ -27,10 +28,9 @@ class BottomNavbarScreenModel
   // Model for Home_componet component.
   late HomeComponetModel homeComponetModel;
   // Model for serch_data component.
-  // late SerchDataModel serchDataModel;
-  // // Model for recipe_compnoet component.
-  late FoodScreenModel foodScreenModel;
-  late RecipeCompnoetModel recipeCompnoetModel;
+   late SerchDataModel serchDataModel;
+  // Model for recipe_compnoet component.
+  //late RecipeCompnoetModel recipeCompnoetModel;
   // Model for profile_componet component.
   late ProfileComponetModel profileComponetModel;
   // Model for mealplan_componet component.
@@ -39,19 +39,17 @@ class BottomNavbarScreenModel
   @override
   void initState(BuildContext context) {
     homeComponetModel = createModel(context, () => HomeComponetModel());
-    foodScreenModel = createModel(context, () => FoodScreenModel());
-    recipeCompnoetModel = createModel(context, () => RecipeCompnoetModel());
+    serchDataModel = createModel(context, () => SerchDataModel());
+    //recipeCompnoetModel = createModel(context, () => RecipeCompnoetModel());
     profileComponetModel = createModel(context, () => ProfileComponetModel());
-    mymealplanComponentModel =
-        createModel(context, () => MyMealPlanComponentModel());
+    mymealplanComponentModel = createModel(context, () => MyMealPlanComponentModel());
   }
 
   @override
   void dispose() {
     homeComponetModel.dispose();
-    // serchDataModel.dispose();
-    recipeCompnoetModel.dispose();
-    foodScreenModel.dispose();
+    serchDataModel.dispose();
+    //recipeCompnoetModel.dispose();
     profileComponetModel.dispose();
     mymealplanComponentModel.dispose();
   }

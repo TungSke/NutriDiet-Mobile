@@ -103,7 +103,6 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
               focusNode: _model.textFieldFocusNode,
               onFieldSubmitted: (_) async {
                 FFAppState().addToSearchList(_model.textController.text);
-                safeSetState(() {});
                 _model.reslut = true;
                 safeSetState(() {});
               },
@@ -117,7 +116,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                       letterSpacing: 0.0,
                       useGoogleFonts: false,
                     ),
-                hintText: 'Tìm kiếm',
+                hintText: 'Nhập tên món cần tìm',
                 hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
                       fontFamily: 'figtree',
                       color: FlutterFlowTheme.of(context).grey,
@@ -172,7 +171,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
           Expanded(
             child: Builder(
               builder: (context) {
-                if ((FFAppState().searchList.isNotEmpty) == true) {
+                // if ((FFAppState().searchList) == true) {
                   return Container(
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
@@ -285,12 +284,8 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                                                           Colors.transparent,
                                                       onTap: () async {
                                                         safeSetState(() {
-                                                          _model.textController
-                                                                  ?.text =
-                                                              serchlistItem;
-                                                          _model.textController
-                                                                  ?.selection =
-                                                              TextSelection.collapsed(
+                                                          _model.textController?.text = serchlistItem;
+                                                          _model.textController?.selection = TextSelection.collapsed(
                                                                   offset: _model
                                                                       .textController!
                                                                       .text
@@ -382,13 +377,10 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                                     hoverColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () async {
-                                      context
-                                          .pushNamed('brek_fast_iIngredients');
+                                      context.pushNamed('brek_fast_iIngredients');
                                     },
-                                    child: wrapWithModel(
-                                      model: _model.foodListComponentModel1,
-                                      updateCallback: () => safeSetState(() {}),
-                                      child: const FoodListComponentWidget(),
+                                    child: FoodListComponentWidget(
+                                      searchQuery: _model.textController!.text, // Truyền trực tiếp
                                     ),
                                   ),
                                 ].divide(const SizedBox(height: 20.0)),
@@ -398,23 +390,23 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                       ],
                     ),
                   );
-                } else {
-                  return Align(
-                    alignment: const AlignmentDirectional(0.0, 0.0),
-                    child: Container(
-                      width: 376.0,
-                      height: 200.0,
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).secondaryBackground,
-                      ),
-                      child: wrapWithModel(
-                        model: _model.searchemptyModel,
-                        updateCallback: () => safeSetState(() {}),
-                        child: const SearchEmptyWidget(),
-                      ),
-                    ),
-                  );
-                }
+                // } else {
+                //   return Align(
+                //     alignment: const AlignmentDirectional(0.0, 0.0),
+                //     child: Container(
+                //       width: 376.0,
+                //       height: 200.0,
+                //       decoration: BoxDecoration(
+                //         color: FlutterFlowTheme.of(context).secondaryBackground,
+                //       ),
+                //       child: wrapWithModel(
+                //         model: _model.searchemptyModel,
+                //         updateCallback: () => safeSetState(() {}),
+                //         child: const SearchEmptyWidget(),
+                //       ),
+                //     ),
+                //   );
+                // }
               },
             ),
           ),

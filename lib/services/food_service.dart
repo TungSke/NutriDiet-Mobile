@@ -11,10 +11,10 @@ class FoodService {
   final ApiService _apiService = ApiService();
 
   Future<List<Food>> getAllFoods(
-      {required int pageIndex, required int pageSize}) async {
+      {required int pageIndex, required int pageSize, String? search}) async {
     try {
       final response = await _apiService
-          .get("api/food?pageIndex=$pageIndex&pageSize=$pageSize");
+          .get("api/food?pageIndex=$pageIndex&pageSize=$pageSize&search=$search");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body)['data'] as List<dynamic>;

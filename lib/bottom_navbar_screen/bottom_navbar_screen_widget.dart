@@ -1,4 +1,5 @@
 import 'package:diet_plan_app/components/my_mealplan_component_widget.dart';
+import 'package:diet_plan_app/components/serch_data_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -7,7 +8,6 @@ import '/components/profile_componet_widget.dart';
 import '/components/recipe_compnoet_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '../components/food_screen_widget.dart';
 import 'bottom_navbar_screen_model.dart';
 
 export 'bottom_navbar_screen_model.dart';
@@ -69,14 +69,9 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     child: const HomeComponetWidget(),
                   ),
                   wrapWithModel(
-                    model: _model.foodScreenModel,
+                    model: _model.serchDataModel,
                     updateCallback: () => safeSetState(() {}),
-                    child: const FoodScreenWidget(),
-                  ),
-                  wrapWithModel(
-                    model: _model.recipeCompnoetModel,
-                    updateCallback: () => safeSetState(() {}),
-                    child: const RecipeCompnoetWidget(),
+                    child: const SerchDataWidget(),
                   ),
                   wrapWithModel(
                     model: _model
@@ -342,10 +337,10 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          _model.bottomadd = 3; // Cập nhật vị trí index
+                          _model.bottomadd = 2; // Cập nhật vị trí index
                           safeSetState(() {});
                           await _model.pageViewController?.animateToPage(
-                            3,
+                            2,
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.ease,
                           );
@@ -357,7 +352,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                           children: [
                             Builder(
                               builder: (context) {
-                                if (_model.bottomadd == 3) {
+                                if (_model.bottomadd == 2) {
                                   return Container(
                                     width: 59.0,
                                     height: 32.0,
@@ -397,7 +392,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   .bodyMedium
                                   .override(
                                     fontFamily: 'figtree',
-                                    color: _model.bottomadd == 3
+                                    color: _model.bottomadd == 2
                                         ? FlutterFlowTheme.of(context)
                                             .primaryText
                                         : FlutterFlowTheme.of(context).grey,
@@ -408,7 +403,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   ),
                             ),
                           ].divide(SizedBox(
-                              height: _model.bottomadd == 3 ? 4.0 : 8.0)),
+                              height: _model.bottomadd == 2 ? 4.0 : 8.0)),
                         ),
                       ),
                     ),
@@ -419,10 +414,10 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          _model.bottomadd = 4;
+                          _model.bottomadd = 3;
                           safeSetState(() {});
                           await _model.pageViewController?.animateToPage(
-                            4,
+                            3,
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.ease,
                           );
@@ -434,7 +429,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                           children: [
                             Builder(
                               builder: (context) {
-                                if (_model.bottomadd == 4) {
+                                if (_model.bottomadd == 3) {
                                   return Container(
                                     width: 59.0,
                                     height: 32.0,
@@ -474,7 +469,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   .bodyMedium
                                   .override(
                                     fontFamily: 'figtree',
-                                    color: _model.bottomadd == 4
+                                    color: _model.bottomadd == 3
                                         ? FlutterFlowTheme.of(context)
                                             .primaryText
                                         : FlutterFlowTheme.of(context).grey,

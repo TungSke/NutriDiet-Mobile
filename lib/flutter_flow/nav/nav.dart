@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:diet_plan_app/components/food_screen_widget.dart';
 import 'package:diet_plan_app/log_in_flow/profile_enter_screen/profile_enter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -199,11 +198,6 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         //   path: '/selectFood',
         //   builder: (context, params) => const SelectFoodScreenWidget(),
         // ),
-        FFRoute(
-          name: 'food_screen',
-          path: '/foodScreen',
-          builder: (context, params) => const FoodScreenWidget(),
-        ),
         FFRoute(
           name: 'Select_allergy_screen',
           path: '/selectAllergyScreen',

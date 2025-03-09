@@ -10,7 +10,7 @@ class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
 
   bool reslut = false;
 
-  bool select = false;
+  bool select = true;
 
   ///  State fields for stateful widgets in this component.
 
@@ -18,17 +18,15 @@ class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
   FocusNode? textFieldFocusNode;
   TextEditingController? textController;
   String? Function(BuildContext, String?)? textControllerValidator;
+
   // Model for comon_componet component.
-  late FoodListComponentModel foodListComponentModel1;
-  // Model for comon_componet component.
+  late FoodListComponentModel foodListComponentModel;
 
   late SearchEmptyModel searchemptyModel;
 
   @override
   void initState(BuildContext context) {
-    foodListComponentModel1 =
-        createModel(context, () => FoodListComponentModel());
-
+    foodListComponentModel = createModel(context, () => FoodListComponentModel());
     searchemptyModel = createModel(context, () => SearchEmptyModel());
   }
 
@@ -36,9 +34,7 @@ class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
   void dispose() {
     textFieldFocusNode?.dispose();
     textController?.dispose();
-
-    foodListComponentModel1.dispose();
-
+    foodListComponentModel.dispose();
     searchemptyModel.dispose();
   }
 }

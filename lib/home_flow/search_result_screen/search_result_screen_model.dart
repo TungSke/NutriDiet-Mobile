@@ -17,8 +17,7 @@ class SearchResultScreenModel
   @override
   void initState(BuildContext context) {
     appbarModel = createModel(context, () => AppbarModel());
-    foodListComponentModel1 =
-        createModel(context, () => FoodListComponentModel());
+    foodListComponentModel1 = createModel(context, () => FoodListComponentModel());
   }
 
   @override

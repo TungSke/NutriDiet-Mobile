@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/components/foodList_component_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -8,7 +9,8 @@ import '../services/food_service.dart';
 import '../services/models/food.dart';
 
 class FoodListComponentWidget extends StatefulWidget {
-  const FoodListComponentWidget({super.key});
+  final String? searchQuery;
+  const FoodListComponentWidget({super.key, this.searchQuery});
 
   @override
   State<FoodListComponentWidget> createState() =>
@@ -16,28 +18,29 @@ class FoodListComponentWidget extends StatefulWidget {
 }
 
 class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
-  final FoodService _foodService = FoodService();
-  late Future<List<Food>> _foodList;
 
+  late FoodListComponentModel _model;
   @override
   void initState() {
     super.initState();
-    fetchFoods();
+    _model = createModel(context, () => FoodListComponentModel());
+    _model.fetchFoods();
   }
 
-  Future<void> fetchFoods() async {
-    try {
-      _foodList = _foodService.getAllFoods(pageIndex: 1, pageSize: 10);
-    } catch (e) {
-      print("Error fetching food data: $e");
+  @override
+  void didUpdateWidget(FoodListComponentWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchQuery != oldWidget.searchQuery) {
+      print("Search query updated: ${widget.searchQuery}");
+      _model.fetchFoods(search: widget.searchQuery.toString());
+      setState(() {});
     }
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Food>>(
-      future: _foodList,
+      future: _model.foodList,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

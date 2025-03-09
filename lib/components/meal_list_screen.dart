@@ -1,6 +1,5 @@
+import 'package:diet_plan_app/components/serch_data_widget.dart';
 import 'package:flutter/material.dart';
-
-import 'food_screen_widget.dart';
 
 class MealListScreen extends StatelessWidget {
   const MealListScreen({Key? key}) : super(key: key);
@@ -78,7 +77,7 @@ class MealCard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const FoodScreenWidget(),
+                    builder: (context) => const SerchDataWidget(),
                   ),
                 );
               },
