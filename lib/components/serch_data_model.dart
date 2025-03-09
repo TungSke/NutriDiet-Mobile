@@ -8,7 +8,7 @@ import 'serch_data_widget.dart' show SerchDataWidget;
 class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
   ///  Local state fields for this component.
 
-  bool reslut = false;
+  bool reslut = true;
 
   bool select = true;
 
