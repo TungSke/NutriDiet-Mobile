@@ -31,4 +31,53 @@ class MealPlanService{
       return [];
     }
   }
+
+  Future<MealPlan?> getMealPlanById(int mealPlanId) async {
+    try {
+      String endpoint = "api/meal-plan/$mealPlanId";
+      final response = await _apiService.get(endpoint);
+
+      print("API Response for mealPlanId $mealPlanId: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print("Parsed data: ${data['data']}");
+        return MealPlan.fromJson(data['data']);
+      }
+
+      if (response.statusCode == 404) {
+        debugPrint("Meal Plan không tồn tại.");
+        return null;
+      }
+
+      throw Exception('Lỗi lấy Meal Plan: ${response.statusCode} - ${response.body}');
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API GetMealPlanById: $e");
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getMealPlanDetailTotals(int mealPlanId) async {
+    try {
+      String endpoint = "api/meal-plan-detail/meal-plan-detail-total/$mealPlanId";
+      final response = await _apiService.get(endpoint);
+
+      print("API Response for mealPlanDetailTotals $mealPlanId: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['data']; // Trả về phần "data" chứa totalByMealType và totalByDayNumber
+      }
+
+      if (response.statusCode == 404) {
+        debugPrint("Meal Plan totals không tồn tại.");
+        return null;
+      }
+
+      throw Exception('Lỗi lấy Meal Plan Totals: ${response.statusCode} - ${response.body}');
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API GetMealPlanDetailTotals: $e");
+      return null;
+    }
+  }
 }

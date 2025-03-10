@@ -66,6 +66,8 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
             Expanded(
               child: model.isLoading
                   ? const Center(child: CircularProgressIndicator())
+                  : model.filteredMealPlans.isEmpty
+                  ? const Center(child: Text("Không có thực đơn được tìm thấy", style: TextStyle(fontSize: 16)))
                   : ListView.builder(
                 padding: const EdgeInsets.only(top: 8),
                 itemCount: model.filteredMealPlans.length,
@@ -82,32 +84,32 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text("Lọc theo mục tiêu sức khỏe"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Wrap(
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Lọc theo mục tiêu sức khỏe"),
+              content: Wrap(
                 spacing: 10,
-                children: ["Giảm cân", "Tăng cơ", "Giữ dáng"].map((goal) {
+                children: ["Giảm cân", "Tăng cân", "Healthy", "Tiểu đường"].map((goal) {
+                  final isSelected = model.selectedFilter == goal;
                   return ChoiceChip(
                     label: Text(goal),
-                    selected: model.filteredMealPlans.any((plan) => plan.healthGoal == goal),
+                    selected: isSelected,
                     onSelected: (selected) {
-                      model.updateFilter(selected ? goal : null);
-                      Navigator.pop(context);
+                      model.updateFilter(isSelected ? null : goal); // Chọn lại filter => clear filter
+                      setState(() {}); // Cập nhật UI của dialog
                     },
                   );
-                }).toList(),
+                }).toList(), 
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Đóng"),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Đóng"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -127,10 +129,7 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
             context,
             MaterialPageRoute(
               builder: (context) => MealPlanDetailWidget(
-                mealPlanName: mealPlan.planName ?? "Không có tên",
-                goal: mealPlan.healthGoal ?? "Không có mục tiêu",
-                days: mealPlan.duration ?? 0,
-                createdBy: mealPlan.createdBy ?? "Không xác định",
+                mealPlanId: mealPlan.mealPlanId,
               ),
             ),
           );

@@ -15,12 +15,11 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   String searchQuery = "";
   String? selectedFilter;
   final String activeMealPlan = "Thực đơn B";
-  final String activeDate = "01/03/2025";
 
   final List<Map<String, dynamic>> mealPlans = [
-    {"name": "Thực đơn A", "goal": "Giảm cân", "days": 3, "createby": "User"},
-    {"name": "Thực đơn B", "goal": "Tăng cơ", "days": 7, "createby": "User"},
-    {"name": "Thực đơn C", "goal": "Giữ dáng", "days": 10, "createby": "User"},
+    {"id": 1, "name": "Thực đơn A", "goal": "Giảm cân", "days": 3, "createby": "User"},
+    {"id": 2, "name": "Thực đơn B", "goal": "Tăng cơ", "days": 7, "createby": "User"},
+    {"id": 3, "name": "Thực đơn C", "goal": "Giữ dáng", "days": 10, "createby": "User"},
   ];
 
   @override
@@ -36,7 +35,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
           children: [
             Container(
               height: 119.0,
-              alignment: AlignmentDirectional(0.0, 1.0),
+              alignment: const AlignmentDirectional(0.0, 1.0),
               child: Text(
                 "Quản lý thực đơn",
                 style: theme.titleLarge.copyWith(fontSize: 22, fontWeight: FontWeight.bold),
@@ -50,7 +49,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
                     ),
                     child: TextField(
                       decoration: InputDecoration(
@@ -75,13 +74,13 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildLargeButton("Thực đơn mẫu", SampleMealPlanWidget()),
+                _buildLargeButton("Thực đơn mẫu", const SampleMealPlanWidget()),
                 FloatingActionButton(
                   backgroundColor: theme.primary,
                   onPressed: () {},
                   child: const Icon(Icons.add, color: Colors.white),
                 ),
-                _buildLargeButton("Nhận thực đơn AI", AIMealPlanWidget()),
+                _buildLargeButton("Nhận thực đơn AI", const AIMealPlanWidget()),
               ],
             ),
             const SizedBox(height: 16),
@@ -104,7 +103,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: isActive ? Colors.green[100] : Color(0xFFF5F5F5),
+      color: isActive ? Colors.green[100] : const Color(0xFFF5F5F5),
       child: Stack(
         children: [
           ListTile(
@@ -119,28 +118,26 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => MealPlanDetailWidget(
-                    mealPlanName: mealPlan["name"],
-                    goal: mealPlan["goal"],
-                    days: mealPlan["days"],
-                    createdBy: mealPlan["createby"],
+                    mealPlanId: mealPlan["id"], // Truyền mealPlanId
                   ),
                 ),
               );
             },
           ),
           if (isActive)
-            Positioned(
+            const Positioned(
               bottom: 8,
               right: 16,
               child: Text(
-                "Thực đơn đang được áp dụng từ ngày $activeDate",
-                style: const TextStyle(fontSize: 12, color: Colors.red),
+                "Thực đơn đang được áp dụng từ ngày ",
+                style: TextStyle(fontSize: 12, color: Colors.red),
               ),
             ),
         ],
       ),
     );
   }
+
   void _showFilterDialog() {
     showDialog(
       context: context,
@@ -177,13 +174,15 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       },
     );
   }
-List<Map<String, dynamic>> _filteredMealPlans() {
+
+  List<Map<String, dynamic>> _filteredMealPlans() {
     return mealPlans.where((plan) {
       final matchesSearch = searchQuery.isEmpty || plan["name"].toLowerCase().contains(searchQuery.toLowerCase());
       final matchesFilter = selectedFilter == null || plan["goal"] == selectedFilter;
       return matchesSearch && matchesFilter;
     }).toList();
   }
+
   Widget _buildLargeButton(String title, Widget targetScreen) {
     return SizedBox(
       width: 190,

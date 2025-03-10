@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../flutter_flow/flutter_flow_theme.dart';
+import '../../services/models/mealplan.dart';
+import '../../services/models/mealplandetail.dart';
+import 'meal_plan_detail_model.dart';
 
 class MealPlanDetailWidget extends StatefulWidget {
-  final String mealPlanName;
-  final String goal;
-  final int days;
-  final String createdBy;
+  final int mealPlanId; // Thêm mealPlanId để gọi API
 
   const MealPlanDetailWidget({
     super.key,
-    required this.mealPlanName,
-    required this.goal,
-    required this.days,
-    required this.createdBy,
+    required this.mealPlanId,
   });
 
   @override
@@ -22,29 +18,46 @@ class MealPlanDetailWidget extends StatefulWidget {
 }
 
 class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
+  late MealPlanDetailModel _model;
   int selectedDay = 1;
-  late int totalDays;
-
-  final List<String> meals = ["Bữa sáng", "Bữa trưa", "Bữa tối", "Bữa phụ"];
 
   @override
   void initState() {
     super.initState();
-    totalDays = widget.days;
+    _model = MealPlanDetailModel();
+    _fetchMealPlan();
+  }
+
+  Future<void> _fetchMealPlan() async {
+    await _model.fetchMealPlanById(widget.mealPlanId);
+    setState(() {});
   }
 
   void _addNewDay() {
     setState(() {
-      totalDays++;
+      // Logic thêm ngày mới có thể được xử lý trong model nếu cần
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_model.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_model.errorMessage != null || _model.mealPlan == null) {
+      return Scaffold(
+        body: Center(child: Text(_model.errorMessage ?? "Không tìm thấy kế hoạch")),
+      );
+    }
+
+    final mealPlan = _model.mealPlan!;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60), // Điều chỉnh độ cao của AppBar
+        preferredSize: const Size.fromHeight(60),
         child: AppBar(
           backgroundColor: FlutterFlowTheme.of(context).primary,
           elevation: 0,
@@ -54,7 +67,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
           ),
           centerTitle: true,
           title: Text(
-            widget.mealPlanName,
+            mealPlan.planName,
             style: GoogleFonts.montserrat(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -75,19 +88,23 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildMealPlanCard(),
+                  _buildMealPlanCard(mealPlan),
                   const SizedBox(height: 12),
                   _buildDaySelector(),
                   const SizedBox(height: 12),
                   _buildNutrientProgress(),
                   const SizedBox(height: 12),
-                  const Text("Total: 1,597 kcal", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    "Total: ${_model.getNutrientTotalsForDay(selectedDay)['calories']!.toStringAsFixed(0)} kcal",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 12),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: meals.length,
+                      itemCount: _model.getMealsForDay(selectedDay).length,
                       itemBuilder: (context, index) {
-                        return _buildMealCard(meals[index]);
+                        final meal = _model.getMealsForDay(selectedDay)[index];
+                        return _buildMealCard(meal);
                       },
                     ),
                   ),
@@ -119,16 +136,18 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: List.generate(totalDays, (index) => _buildDayButton(index + 1, "Ngày ${index + 1}"))
-                ..add(
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: IconButton(
-                      icon: Icon(Icons.add_circle, color: FlutterFlowTheme.of(context).primary, size: 40),
-                      onPressed: _addNewDay,
-                    ),
+              children: List.generate(
+                _model.getTotalDays(),
+                    (index) => _buildDayButton(index + 1, "Ngày ${index + 1}"),
+              )..add(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: IconButton(
+                    icon: Icon(Icons.add_circle, color: FlutterFlowTheme.of(context).primary, size: 40),
+                    onPressed: _addNewDay,
                   ),
                 ),
+              ),
             ),
           ),
         ),
@@ -160,7 +179,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     );
   }
 
-  Widget _buildMealPlanCard() {
+  Widget _buildMealPlanCard(MealPlan mealPlan) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 4,
@@ -172,7 +191,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(widget.mealPlanName, style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(mealPlan.planName, style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold)),
                 IconButton(
                   icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
                   onPressed: () {},
@@ -180,9 +199,9 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               ],
             ),
             const SizedBox(height: 8),
-            _buildInfoText("Mục tiêu sức khỏe", widget.goal),
-            _buildInfoText("Số ngày thực đơn", "$totalDays ngày"),
-            _buildInfoText("Tạo bởi", widget.createdBy),
+            _buildInfoText("Mục tiêu sức khỏe", mealPlan.healthGoal ?? "Không xác định"),
+            _buildInfoText("Số ngày thực đơn", "${_model.getTotalDays()} ngày"),
+            _buildInfoText("Tạo bởi", mealPlan.createdBy ?? "Không rõ"),
           ],
         ),
       ),
@@ -201,12 +220,48 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   }
 
   Widget _buildNutrientProgress() {
+    final nutrients = _model.getNutrientTotalsForDay(selectedDay);
+    final totalCalories = nutrients['calories']!;
+    final carbs = nutrients['carbs']!;
+    final protein = nutrients['protein']!;
+    final fat = nutrients['fat']!;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildProgressIndicator("Carbs", 0.59),
-        _buildProgressIndicator("Protein", 0.19),
-        _buildProgressIndicator("Fat", 0.22),
+        _buildNutrientDisplay("Carbs", carbs, "g"),
+        _buildNutrientDisplay("Protein", protein, "g"),
+        _buildNutrientDisplay("Fat", fat, "g"),
+      ],
+    );
+  }
+
+  Widget _buildNutrientDisplay(String label, double value, String unit) {
+    return Column(
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
+          ),
+          child: Center(
+            child: Text(
+              value.toStringAsFixed(0), // Hiển thị số nguyên
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: FlutterFlowTheme.of(context).primary,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "$label ($unit)",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -234,11 +289,12 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     );
   }
 
-  Widget _buildMealCard(String meal) {
+  Widget _buildMealCard(MealPlanDetail meal) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
-        title: Text(meal, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(meal.mealType ?? "Không xác định", style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(meal.foodName ?? "Chưa có món ăn"),
         trailing: CircleAvatar(
           backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
           child: Icon(Icons.add, color: FlutterFlowTheme.of(context).primary),
