@@ -1,10 +1,13 @@
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '../../components/appbar_widget.dart';
+import '../../services/models/personal_goal_provider.dart';
+import '../../services/user_service.dart'; // ✅ Import API service
 
 class IncreaseWeightChangeRateScreenWidget extends StatefulWidget {
   const IncreaseWeightChangeRateScreenWidget({super.key});
@@ -18,11 +21,59 @@ class _IncreaseWeightChangeRateScreenWidgetState
     extends State<IncreaseWeightChangeRateScreenWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  double selectedKgPerWeek = 0.25; // Giá trị mặc định
-  final List<double> kgPerWeekOptions = [0.25, 0.5, 0.75, 1.0]; // 0.25 - 1 kg
+  double selectedKgPerWeek = 0.25;
+  final List<double> kgPerWeekOptions = [0.25, 0.5];
+
+  // ✅ Hàm ánh xạ giá trị kg/tuần sang API
+  String getWeightChangeRateValue(double kgPerWeek) {
+    switch (kgPerWeek) {
+      case 0.25:
+        return "Gain025KgPerWeek";
+      case 0.5:
+        return "Gain05KgPerWeek";
+      default:
+        return "Gain025KgPerWeek";
+    }
+  }
+
+  Future<void> submitGoal(BuildContext context) async {
+    final personalGoalProvider = context.read<PersonalGoalProvider>();
+
+    print("🔹 Đang gửi dữ liệu lên API:");
+    print("   - GoalType: ${personalGoalProvider.goalType}");
+    print("   - TargetWeight: ${personalGoalProvider.targetWeight}");
+    print("   - WeightChangeRate: ${personalGoalProvider.weightChangeRate}");
+    print("   - GoalDescription: ${personalGoalProvider.goalDescription}");
+    print("   - Notes: ${personalGoalProvider.notes}");
+
+    try {
+      final response = await UserService().updatePersonalGoal(
+        goalType: personalGoalProvider.goalType!,
+        targetWeight: personalGoalProvider.targetWeight!,
+        weightChangeRate: personalGoalProvider.weightChangeRate!,
+        goalDescription:
+            personalGoalProvider.goalDescription ?? "Mục tiêu mặc định",
+        notes: personalGoalProvider.notes ?? "Không có ghi chú",
+      );
+
+      print("🔹 API Response: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        showSnackbar(context, "🎉 Gửi mục tiêu thành công!");
+        context.pushNamed('health_indicator_screen');
+      } else {
+        showSnackbar(context, "⚠️ Gửi thất bại: ${response.body}");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi gửi API: $e");
+      showSnackbar(context, "⚠️ Lỗi khi gửi mục tiêu.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final personalGoalProvider = context.watch<PersonalGoalProvider>();
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -72,10 +123,21 @@ class _IncreaseWeightChangeRateScreenWidgetState
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: FFButtonWidget(
                         onPressed: () {
-                          print('Người dùng chọn: $selectedKgPerWeek kg/tuần');
+                          final personalGoalProvider =
+                              context.read<PersonalGoalProvider>();
 
-                          // Chuyển sang trang tiếp theo
-                          context.pushNamed('health_indicator_screen');
+                          // ✅ Lưu weightChangeRate vào Provider
+                          String weightChangeRate =
+                              getWeightChangeRateValue(selectedKgPerWeek);
+                          personalGoalProvider
+                              .setWeightChangeRate(weightChangeRate);
+
+                          // ✅ Kiểm tra log trước khi gửi API
+                          print(
+                              "🔹 Xác nhận weightChangeRate: ${personalGoalProvider.weightChangeRate}");
+
+                          // ✅ Gọi API ngay sau khi chọn tốc độ tăng/giảm cân
+                          submitGoal(context);
                         },
                         text: 'Xác nhận',
                         options: FFButtonOptions(

@@ -1,6 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
 
-import 'package:diet_plan_app/services/models/PersonalGoalProvider.dart';
+import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -31,7 +31,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => appState),
-        ChangeNotifierProvider(create: (context) => PersonalGoalModel()),
+        ChangeNotifierProvider(create: (context) => PersonalGoalProvider()),
         ChangeNotifierProvider(create: (context) => SampleMealPlanModel()),
       ],
       child: const MyApp(),
