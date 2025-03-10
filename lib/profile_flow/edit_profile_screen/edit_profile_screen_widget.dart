@@ -1,12 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'edit_profile_screen_model.dart';
-
-export 'edit_profile_screen_model.dart';
 
 class EditProfileScreenWidget extends StatefulWidget {
   const EditProfileScreenWidget({super.key});
@@ -18,541 +13,308 @@ class EditProfileScreenWidget extends StatefulWidget {
 
 class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
   late EditProfileScreenModel _model;
+  bool isEdited = false;
+  String _tempSelectedValue = '';
 
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
+  @override
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => EditProfileScreenModel());
+    _model = EditProfileScreenModel();
 
-    _model.textController1 ??= TextEditingController(text: 'Jane');
-    _model.textFieldFocusNode1 ??= FocusNode();
-
-    _model.textController2 ??= TextEditingController(text: 'Cooper');
-    _model.textFieldFocusNode2 ??= FocusNode();
-
-    _model.textController3 ??=
-        TextEditingController(text: 'janecooper@gmail.com');
-    _model.textFieldFocusNode3 ??= FocusNode();
-  }
-
-  @override
-  void dispose() {
-    _model.dispose();
-
-    super.dispose();
+    Future.delayed(Duration.zero, () async {
+      await _model.fetchUserProfile();
+      setState(() {}); // 🚀 Cập nhật UI ngay sau khi fetch dữ liệu
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-        body: SafeArea(
-          top: true,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(),
+            _buildProfilePhoto(),
+            _model.isLoading ? _buildLoadingIndicator() : _buildProfileForm(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 🟢 Header với nút back mượt
+  /// 🟢 Header với nút back từ MyProfileWidget
+  Widget _buildHeader() {
+    bool canUpdate = _model.name.isNotEmpty &&
+        _model.location.isNotEmpty &&
+        _model.gender.isNotEmpty &&
+        _model.age.isNotEmpty;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () {
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            },
+            child: Icon(Icons.arrow_back, size: 28),
+          ),
+          Text(
+            'Edit Profile',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          InkWell(
+            onTap: isEdited &&
+                    canUpdate // ✅ Only allow update if all fields are filled
+                ? () async {
+                    await _model.updateUserProfile();
+
+                    setState(() {
+                      isEdited = false;
+                    });
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Cập nhật thành công!"),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    Navigator.pop(context, true);
+                  }
+                : null, // ✅ Disable button if fields are empty
+            child: Icon(
+              Icons.check,
+              color: (isEdited && canUpdate)
+                  ? Colors.green
+                  : Colors.grey, // ✅ Disable if not valid
+              size: 28,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🟢 Ảnh đại diện
+  Widget _buildProfilePhoto() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        children: [
+          CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.grey[300],
+              child: Icon(Icons.person, size: 50, color: Colors.white)),
+          TextButton(
+            onPressed: () {},
+            child: Text('Set your profile photo',
+                style: TextStyle(color: Colors.green)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🟢 Hiển thị Loading khi chưa tải dữ liệu
+  Widget _buildLoadingIndicator() {
+    return Expanded(child: Center(child: CircularProgressIndicator()));
+  }
+
+  /// 🟢 Form thông tin cá nhân
+  /// 🟢 Form to display editable user details
+  /// 🟢 Form thông tin cá nhân
+  Widget _buildProfileForm() {
+    return Expanded(
+      child: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        children: [
+          _buildEditableRow(
+            'Name',
+            _model.name,
+            (val) {
+              setState(() {
+                _model.name = val;
+                isEdited = true;
+              });
+            },
+            _model.name.isEmpty
+                ? "Tên không được để trống"
+                : null, // ✅ Show error
+          ),
+          _buildPickerRow(
+            'Gender',
+            _model.gender,
+            ['Male', 'Female'],
+            (val) {
+              setState(() {
+                _model.gender = val;
+                isEdited = true;
+              });
+            },
+          ),
+          _buildPickerRow(
+            'Age',
+            _model.age,
+            _generateAgeList(),
+            (val) {
+              setState(() {
+                _model.age = val;
+                isEdited = true;
+              });
+            },
+          ),
+          _buildEditableRow(
+            'Location',
+            _model.location,
+            (val) {
+              setState(() {
+                _model.location = val;
+                isEdited = true;
+              });
+            },
+            _model.location.isEmpty
+                ? "Địa chỉ không được để trống"
+                : null, // ✅ Show error
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🟢 Ô nhập liệu (Name, Location)
+  /// 🟢 Ô nhập liệu (Name, Location) với validation
+  Widget _buildEditableRow(String title, String value,
+      Function(String) onChanged, String? errorText) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                height: 79.0,
-                decoration: const BoxDecoration(),
-                child: Align(
-                  alignment: const AlignmentDirectional(0.0, 1.0),
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        20.0, 0.0, 20.0, 16.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            context.safePop();
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).lightGrey,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(0.0),
-                                child: SvgPicture.asset(
-                                  'assets/images/appbar-arroew.svg',
-                                  width: 24.0,
-                                  height: 24.0,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            'Cập nhật hồ sơ',
-                            textAlign: TextAlign.center,
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  fontSize: 22.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.bold,
-                                  useGoogleFonts: false,
-                                ),
-                          ),
-                        ),
-                        // InkWell(
-                        //   splashColor: Colors.transparent,
-                        //   focusColor: Colors.transparent,
-                        //   hoverColor: Colors.transparent,
-                        //   highlightColor: Colors.transparent,
-                        //   onTap: () async {
-                        //     context.pushNamed('edit_profile_screen');
-                        //   },
-                        //   child: Container(
-                        //     decoration: BoxDecoration(
-                        //       color: FlutterFlowTheme.of(context).lightGrey,
-                        //       shape: BoxShape.circle,
-                        //     ),
-                        //     child: Padding(
-                        //       padding: const EdgeInsets.all(8.0),
-                        //       child: ClipRRect(
-                        //         borderRadius: BorderRadius.circular(0.0),
-                        //         child: SvgPicture.asset(
-                        //           'assets/images/pen.svg',
-                        //           width: 24.0,
-                        //           height: 24.0,
-                        //           fit: BoxFit.cover,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                      ],
-                    ),
+              Text(title,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              SizedBox(
+                width: 150,
+                child: TextFormField(
+                  initialValue: value,
+                  textAlign: TextAlign.end,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    errorText: errorText, // ✅ Show error message
                   ),
-                ),
-              ),
-              Expanded(
-                child: Form(
-                  key: _model.formKey,
-                  autovalidateMode: AutovalidateMode.disabled,
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        20.0, 0.0, 20.0, 0.0),
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      scrollDirection: Axis.vertical,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 16.0, 0.0, 32.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Stack(
-                                alignment: const AlignmentDirectional(1.0, 1.0),
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(0.0),
-                                    child: Image.asset(
-                                      'assets/images/jamekooper_.png',
-                                      width: 80.0,
-                                      height: 80.0,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 40.0,
-                                    height: 40.0,
-                                    decoration: BoxDecoration(
-                                      color: FlutterFlowTheme.of(context)
-                                          .lightGrey,
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          blurRadius: 16.0,
-                                          color: Color(0x14000000),
-                                          offset: Offset(
-                                            0.0,
-                                            4.0,
-                                          ),
-                                        )
-                                      ],
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(0.0),
-                                      child: Image.asset(
-                                        'assets/images/Camera.png',
-                                        fit: BoxFit.none,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Jane Cooper',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'figtree',
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
-                                          useGoogleFonts: false,
-                                        ),
-                                  ),
-                                  Text(
-                                    'janecooper@gmail.com',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'figtree',
-                                          color:
-                                              FlutterFlowTheme.of(context).grey,
-                                          fontSize: 16.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.normal,
-                                          useGoogleFonts: false,
-                                        ),
-                                  ),
-                                ].divide(const SizedBox(height: 4.0)),
-                              ),
-                            ].divide(const SizedBox(width: 16.0)),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 0.0, 24.0),
-                          child: SizedBox(
-                            width: 0.5,
-                            child: TextFormField(
-                              controller: _model.textController1,
-                              focusNode: _model.textFieldFocusNode1,
-                              autofocus: false,
-                              textCapitalization: TextCapitalization.sentences,
-                              textInputAction: TextInputAction.next,
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                labelText: 'First name',
-                                labelStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 13.0,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: false,
-                                    ),
-                                hintText: 'First name',
-                                hintStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 17.0,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: false,
-                                      lineHeight: 1.2,
-                                    ),
-                                errorStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      color: FlutterFlowTheme.of(context).error,
-                                      fontSize: 13.0,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: false,
-                                      lineHeight: 1.2,
-                                    ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context)
-                                        .borderColor,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).error,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).error,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                contentPadding:
-                                    const EdgeInsetsDirectional.fromSTEB(
-                                        16.0, 13.0, 16.0, 12.0),
-                              ),
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 17.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                    lineHeight: 1.2,
-                                  ),
-                              cursorColor:
-                                  FlutterFlowTheme.of(context).primaryText,
-                              validator: _model.textController1Validator
-                                  .asValidator(context),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 0.5,
-                          child: TextFormField(
-                            controller: _model.textController2,
-                            focusNode: _model.textFieldFocusNode2,
-                            autofocus: false,
-                            textCapitalization: TextCapitalization.sentences,
-                            textInputAction: TextInputAction.done,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Last name',
-                              labelStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 13.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                  ),
-                              hintText: 'Last name',
-                              hintStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 17.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                    lineHeight: 1.2,
-                                  ),
-                              errorStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: FlutterFlowTheme.of(context).error,
-                                    fontSize: 13.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                    lineHeight: 1.2,
-                                  ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color:
-                                      FlutterFlowTheme.of(context).borderColor,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              contentPadding:
-                                  const EdgeInsetsDirectional.fromSTEB(
-                                      16.0, 13.0, 16.0, 12.0),
-                            ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  fontSize: 17.0,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: false,
-                                  lineHeight: 1.2,
-                                ),
-                            cursorColor:
-                                FlutterFlowTheme.of(context).primaryText,
-                            validator: _model.textController2Validator
-                                .asValidator(context),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 24.0, 0.0, 0.0),
-                          child: SizedBox(
-                            width: 0.5,
-                            child: TextFormField(
-                              controller: _model.textController3,
-                              focusNode: _model.textFieldFocusNode3,
-                              autofocus: false,
-                              textInputAction: TextInputAction.done,
-                              readOnly: true,
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                labelStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 13.0,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: false,
-                                    ),
-                                hintText: 'Email address',
-                                hintStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 17.0,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: false,
-                                      lineHeight: 1.2,
-                                    ),
-                                errorStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      color: const Color(0xFFFF3E3E),
-                                      fontSize: 13.0,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: false,
-                                      lineHeight: 1.2,
-                                    ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Color(0x00000000),
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context)
-                                        .borderColor,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Color(0x00000000),
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: Color(0x00000000),
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                filled: true,
-                                fillColor: FlutterFlowTheme.of(context)
-                                    .primaryBackground,
-                                contentPadding:
-                                    const EdgeInsetsDirectional.fromSTEB(
-                                        16.0, 13.0, 16.0, 12.0),
-                              ),
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 17.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                    lineHeight: 1.2,
-                                  ),
-                              keyboardType: TextInputType.emailAddress,
-                              cursorColor:
-                                  FlutterFlowTheme.of(context).primaryText,
-                              validator: _model.textController3Validator
-                                  .asValidator(context),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
-                child: FFButtonWidget(
-                  onPressed: () async {
-                    if (_model.formKey.currentState == null ||
-                        !_model.formKey.currentState!.validate()) {
-                      return;
+                  onChanged: (val) {
+                    if (val.trim().isEmpty) {
+                      val = ""; // ✅ Keep empty instead of defaulting
                     }
-                    context.safePop();
+                    onChanged(val);
                   },
-                  text: 'Save',
-                  options: FFButtonOptions(
-                    width: double.infinity,
-                    height: 54.0,
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        24.0, 0.0, 24.0, 0.0),
-                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                        0.0, 0.0, 0.0, 0.0),
-                    color: FlutterFlowTheme.of(context).primary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'figtree',
-                          color: Colors.white,
-                          fontSize: 18.0,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.bold,
-                          useGoogleFonts: false,
-                        ),
-                    elevation: 0.0,
-                    borderSide: const BorderSide(
-                      color: Colors.transparent,
-                      width: 0.0,
-                    ),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
                 ),
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  /// 🟢 Ô chọn dữ liệu bằng Bottom Picker
+  Widget _buildPickerRow(String title, String value, List<String> options,
+      Function(String) onSelected) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          InkWell(
+            onTap: () =>
+                _showCupertinoPicker(title, options, value, onSelected),
+            child: Row(
+              children: [
+                Text(value, style: TextStyle(fontSize: 16)),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🟢 Hiển thị Bottom Picker (Chỉ thay đổi khi nhấn "DONE")
+  void _showCupertinoPicker(String title, List<String> options,
+      String currentValue, Function(String) onSelected) {
+    int selectedIndex = options.indexOf(currentValue);
+    _tempSelectedValue = currentValue;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.4,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: 16),
+            Text(title,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Expanded(
+              child: CupertinoPicker(
+                scrollController:
+                    FixedExtentScrollController(initialItem: selectedIndex),
+                itemExtent: 40,
+                onSelectedItemChanged: (index) {
+                  _tempSelectedValue = options[index];
+                },
+                children: options
+                    .map((e) =>
+                        Center(child: Text(e, style: TextStyle(fontSize: 16))))
+                    .toList(),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  minimumSize: Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  onSelected(_tempSelectedValue);
+                  setState(() {
+                    isEdited = true;
+                  });
+                  Navigator.pop(context);
+                },
+                child: Text("DONE",
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  /// 🟢 Tạo danh sách tuổi từ 10 đến 100
+  List<String> _generateAgeList() {
+    return List.generate(91, (index) => '${10 + index}');
   }
 }

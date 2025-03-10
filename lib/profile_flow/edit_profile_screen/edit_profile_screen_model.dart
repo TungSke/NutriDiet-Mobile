@@ -1,60 +1,81 @@
-import '/components/appbar_widget.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import 'edit_profile_screen_widget.dart' show EditProfileScreenWidget;
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
-class EditProfileScreenModel extends FlutterFlowModel<EditProfileScreenWidget> {
-  ///  State fields for stateful widgets in this page.
+import '../../services/user_service.dart';
 
+class EditProfileScreenModel extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
-  // Model for appbar component.
-  late AppbarModel appbarModel;
-  // State field(s) for TextField widget.
-  FocusNode? textFieldFocusNode1;
-  TextEditingController? textController1;
-  String? Function(BuildContext, String?)? textController1Validator;
-  String? _textController1Validator(BuildContext context, String? val) {
-    if (val == null || val.isEmpty) {
-      return 'Please enter valid first name';
+
+  bool canUpdateProfile() {
+    return name.trim().isNotEmpty ||
+        location.trim().isNotEmpty ||
+        gender.trim().isNotEmpty ||
+        age.trim().isNotEmpty;
+  }
+
+  // User profile fields
+  String name = '';
+  String gender = '';
+  String age = '';
+  String location = ''; // ✅ Correct field for updating
+  String address = ''; // ✅ Correct field for fetching
+
+  bool isLoading = true;
+
+  EditProfileScreenModel() {
+    fetchUserProfile();
+  }
+
+  /// 🟢 Fetch user profile (uses `address`)
+  Future<void> fetchUserProfile() async {
+    try {
+      print("🔄 Fetching user profile...");
+      final response = await UserService().whoAmI();
+
+      if (response.statusCode == 200) {
+        final userData = jsonDecode(response.body);
+
+        name = userData['name'] ?? "Chưa cập nhật";
+        gender = userData['gender'] ?? "Not specified";
+        age = userData['age']?.toString() ?? "0";
+        address = userData['address'] ?? "Chưa cập nhật"; // ✅ Uses 'address'
+        location = address; // ✅ Sync 'location' with 'address'
+
+        isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      print("❌ Error fetching user profile: $e");
     }
-
-    return null;
   }
 
-  // State field(s) for TextField widget.
-  FocusNode? textFieldFocusNode2;
-  TextEditingController? textController2;
-  String? Function(BuildContext, String?)? textController2Validator;
-  String? _textController2Validator(BuildContext context, String? val) {
-    if (val == null || val.isEmpty) {
-      return 'Please enter valid  last name';
+  /// 🟢 Update user profile (uses `location`)
+  Future<void> updateUserProfile() async {
+    try {
+      print("🔄 Updating profile...");
+
+      // ✅ Ensure `location` isn't empty
+      String updatedLocation =
+          location.trim().isEmpty ? "Chưa cập nhật" : location;
+
+      final response = await UserService().updateUser(
+        fullName: name,
+        age: int.tryParse(age) ?? 0,
+        gender: gender,
+        location: updatedLocation, // ✅ Uses 'location' for update
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Update successful!');
+
+        // ✅ Fetch updated profile to keep data consistent
+        await fetchUserProfile();
+      } else {
+        print('❌ Update failed: ${response.body}');
+      }
+    } catch (e) {
+      print("❌ Error updating profile: $e");
     }
-
-    return null;
-  }
-
-  // State field(s) for TextField widget.
-  FocusNode? textFieldFocusNode3;
-  TextEditingController? textController3;
-  String? Function(BuildContext, String?)? textController3Validator;
-
-  @override
-  void initState(BuildContext context) {
-    appbarModel = createModel(context, () => AppbarModel());
-    textController1Validator = _textController1Validator;
-    textController2Validator = _textController2Validator;
-  }
-
-  @override
-  void dispose() {
-    appbarModel.dispose();
-    textFieldFocusNode1?.dispose();
-    textController1?.dispose();
-
-    textFieldFocusNode2?.dispose();
-    textController2?.dispose();
-
-    textFieldFocusNode3?.dispose();
-    textController3?.dispose();
   }
 }
