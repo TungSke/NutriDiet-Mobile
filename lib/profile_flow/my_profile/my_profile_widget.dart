@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '../edit_profile_screen/edit_profile_screen_widget.dart';
 import 'my_profile_model.dart';
 
 export 'my_profile_model.dart';
@@ -193,154 +194,32 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                               ),
                                             ),
                                           ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 10),
-                                            child: Text(_model.name,
-                                                style: GoogleFonts.roboto(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w600)),
-                                          ),
                                           SizedBox(
-                                              width: 150,
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 5),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: [
-                                                    Text("22 tuoi",
-                                                        style:
-                                                            GoogleFonts.roboto(
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                color: Colors
-                                                                    .grey)),
-                                                    Text("175 cm",
-                                                        style:
-                                                            GoogleFonts.roboto(
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                color: Colors
-                                                                    .grey)),
-                                                    Text("79 kg",
-                                                        style:
-                                                            GoogleFonts.roboto(
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                color: Colors
-                                                                    .grey)),
-                                                  ],
-                                                ),
-                                              )),
-                                          GestureDetector(
-                                              onTap: () async {
-                                                context.pushNamed(
-                                                    'edit_profile_screen');
-                                              },
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 10),
-                                                child: Text(
-                                                  "Cập nhật ",
-                                                  style: GoogleFonts.roboto(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primary,
-                                                  ),
-                                                ),
-                                              ))
+                                            width: 150,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10),
+                                              child: Column(
+                                                children: [
+                                                  Text(_model.name,
+                                                      style: GoogleFonts.roboto(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.w600)),
+                                                  Text(
+                                                      "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
+                                                      style: GoogleFonts.roboto(
+                                                          fontSize: 12,
+                                                          color: Colors.grey)),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       );
                                     }
                                   },
                                 ),
-                                // Expanded(
-                                //   child: Column(
-                                //     mainAxisSize: MainAxisSize.max,
-                                //     crossAxisAlignment:
-                                //         CrossAxisAlignment.center,
-                                //     children: [
-                                //       Text(
-                                //         _model.name,
-                                //         style: FlutterFlowTheme.of(context)
-                                //             .bodyMedium
-                                //             .override(
-                                //               fontFamily: 'figtree',
-                                //               fontSize: 18.0,
-                                //               letterSpacing: 0.0,
-                                //               fontWeight: FontWeight.w500,
-                                //               useGoogleFonts: false,
-                                //             ),
-                                //       ),
-                                //       Text(
-                                //         _model.email,
-                                //         style: FlutterFlowTheme.of(context)
-                                //             .bodyMedium
-                                //             .override(
-                                //               fontFamily: 'figtree',
-                                //               color:
-                                //                   FlutterFlowTheme.of(context)
-                                //                       .grey,
-                                //               fontSize: 16.0,
-                                //               letterSpacing: 0.0,
-                                //               fontWeight: FontWeight.normal,
-                                //               useGoogleFonts: false,
-                                //             ),
-                                //       ),
-                                //     ].divide(const SizedBox(height: 4.0)),
-                                //   ),
-                                // ),
-                                // Expanded(
-                                //   child: Column(
-                                //     mainAxisSize: MainAxisSize.max,
-                                //     crossAxisAlignment:
-                                //         CrossAxisAlignment.start,
-                                //     children: [
-                                //       Text(
-                                //         _model.gender,
-                                //         style: FlutterFlowTheme.of(context)
-                                //             .bodyMedium
-                                //             .override(
-                                //               fontFamily: 'figtree',
-                                //               color:
-                                //                   FlutterFlowTheme.of(context)
-                                //                       .grey,
-                                //               fontSize: 16.0,
-                                //               letterSpacing: 0.0,
-                                //               fontWeight: FontWeight.normal,
-                                //               useGoogleFonts: false,
-                                //             ),
-                                //       ),
-                                //       Text(
-                                //         _model.age + " tuổi",
-                                //         style: FlutterFlowTheme.of(context)
-                                //             .bodyMedium
-                                //             .override(
-                                //               fontFamily: 'figtree',
-                                //               color:
-                                //                   FlutterFlowTheme.of(context)
-                                //                       .grey,
-                                //               fontSize: 16.0,
-                                //               letterSpacing: 0.0,
-                                //               fontWeight: FontWeight.normal,
-                                //               useGoogleFonts: false,
-                                //             ),
-                                //       ),
-                                //     ].divide(const SizedBox(height: 4.0)),
-                                //   ),
-                                // ),
                               ].divide(const SizedBox(width: 16.0)),
                             ),
                           ),
@@ -350,46 +229,45 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(
                           20.0, 0.0, 20.0, 16.0),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: FlutterFlowTheme.of(context).lightGrey,
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Tên',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 18.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      useGoogleFonts: false,
-                                    ),
-                              ),
-                              Text(
-                                _model.name,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      color: FlutterFlowTheme.of(context).grey,
-                                      fontSize: 16.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
-                                      useGoogleFonts: false,
-                                    ),
-                              ),
-                            ].divide(const SizedBox(height: 4.0)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Hồ sơ cá nhân ",
+                            style: GoogleFonts.roboto(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
+                          GestureDetector(
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditProfileScreenWidget(),
+                                ),
+                              );
+
+                              if (result == true) {
+                                await _model
+                                    .fetchUserProfile(); // ✅ Fetch lại dữ liệu mới nhất
+                                setState(() {}); // ✅ Cập nhật UI ngay
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                "Cập nhật",
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
@@ -407,30 +285,65 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Số điện thoại',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 18.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      useGoogleFonts: false,
-                                    ),
-                              ),
-                              Text(
-                                _model.phoneNumber,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      color: FlutterFlowTheme.of(context).grey,
-                                      fontSize: 16.0,
-                                      letterSpacing: 0.0,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Tên',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
                                       fontWeight: FontWeight.normal,
-                                      useGoogleFonts: false,
                                     ),
+                                  ),
+                                  Text(
+                                    _model.name,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Số điện thoại',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  Text(
+                                    _model.phoneNumber,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Nơi sinh sống',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  Text(
+                                    _model.location,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
                               ),
                             ].divide(const SizedBox(height: 4.0)),
                           ),
@@ -439,7 +352,51 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                     ),
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(
-                          20.0, 0.0, 20.0, 0.0),
+                          20.0, 0.0, 20.0, 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Hồ sơ sức khỏe ",
+                            style: GoogleFonts.roboto(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditProfileScreenWidget(),
+                                ),
+                              );
+
+                              if (result == true) {
+                                await _model
+                                    .fetchUserProfile(); // ✅ Fetch lại dữ liệu mới nhất
+                                setState(() {}); // ✅ Cập nhật UI ngay
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                "Cập nhật",
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          20.0, 0.0, 20.0, 16.0),
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -452,30 +409,209 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Nơi sinh sống',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 18.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      useGoogleFonts: false,
-                                    ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Chiều cao',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                  Text(
+                                    "${_model.height} cm",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                _model.location,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'figtree',
-                                      color: FlutterFlowTheme.of(context).grey,
-                                      fontSize: 16.0,
-                                      letterSpacing: 0.0,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Cân nặng',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
                                       fontWeight: FontWeight.normal,
-                                      useGoogleFonts: false,
                                     ),
+                                  ),
+                                  Text(
+                                    "${_model.weight} kg",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Tần suất vận động ',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  Text(
+                                    _model.activityLevel,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Dị ứng',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _model.allergies.isNotEmpty
+                                      ? Text(
+                                          _model.allergies.join(', '),
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.grey),
+                                        )
+                                      : Text("Không có dị ứng"),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Bệnh nền',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _model.diseases.isNotEmpty
+                                      ? Text(
+                                          _model.diseases.join(', '),
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.grey),
+                                        )
+                                      : Text("Không có dị ứng"),
+                                ],
+                              ),
+                            ].divide(const SizedBox(height: 4.0)),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          20.0, 0.0, 20.0, 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Mục tiêu sức khỏe ",
+                            style: GoogleFonts.roboto(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditProfileScreenWidget(),
+                                ),
+                              );
+
+                              if (result == true) {
+                                await _model
+                                    .fetchUserProfile(); // ✅ Fetch lại dữ liệu mới nhất
+                                setState(() {}); // ✅ Cập nhật UI ngay
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                "Cập nhật",
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          20.0, 0.0, 20.0, 16.0),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context).lightGrey,
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Mục tiêu',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  Text(
+                                    _model.goalType,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Mục tiêu cân nặng',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                  Text(
+                                    "${_model.targetWeight} kg",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
                               ),
                             ].divide(const SizedBox(height: 4.0)),
                           ),
