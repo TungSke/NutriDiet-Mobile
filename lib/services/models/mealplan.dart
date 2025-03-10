@@ -1,4 +1,3 @@
-
 import 'mealplandetail.dart';
 
 class MealPlan {
@@ -23,8 +22,12 @@ class MealPlan {
   });
 
   factory MealPlan.fromJson(Map<String, dynamic> json) {
+    if (json['mealPlanId'] == null) {
+      throw Exception("mealPlanId cannot be null");
+    }
+    final mealPlanId = json['mealPlanId'] as int;
     return MealPlan(
-      mealPlanId: json['mealPlanId'],
+      mealPlanId: mealPlanId,
       planName: json['planName'],
       healthGoal: json['healthGoal'],
       duration: json['duration'],
@@ -32,7 +35,7 @@ class MealPlan {
       createdBy: json['createdBy'],
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
       mealPlanDetails: (json['mealPlanDetails'] as List<dynamic>?)
-          ?.map((e) => MealPlanDetail.fromJson(e))
+          ?.map((e) => MealPlanDetail.fromJson(e, mealPlanId)) // Truyền mealPlanId vào
           .toList() ??
           [],
     );

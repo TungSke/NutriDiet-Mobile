@@ -1,3 +1,4 @@
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import '../../services/mealplan_service.dart';
 import '../../services/models/mealplan.dart';
@@ -13,6 +14,8 @@ class SampleMealPlanModel extends ChangeNotifier {
 
   List<MealPlan> get mealPlans => _mealPlans;
   List<MealPlan> get filteredMealPlans => _filteredMealPlans;
+  String? get selectedFilter => _selectedFilter;
+
   bool get isLoading => _isLoading;
 
   Future<void> fetchSampleMealPlans({int pageIndex = 1, int pageSize = 10, String? search}) async {
@@ -37,16 +40,27 @@ class SampleMealPlanModel extends ChangeNotifier {
   }
 
   void updateFilter(String? filter) {
-    _selectedFilter = filter;
+    if (_selectedFilter == filter) {
+      _selectedFilter = null; // Nếu chọn lại filter cũ => clear filter
+    } else {
+      _selectedFilter = filter;
+    }
     _applyFilters();
   }
 
   void _applyFilters() {
+    String searchQueryNoDiacritics = removeDiacritics(_searchQuery.toLowerCase());
+
     _filteredMealPlans = _mealPlans.where((plan) {
-      final matchesSearch = _searchQuery.isEmpty || plan.planName.toLowerCase().contains(_searchQuery.toLowerCase());
-      final matchesFilter = _selectedFilter == null || plan.healthGoal == _selectedFilter;
+      String planNameNoDiacritics = removeDiacritics(plan.planName?.trim().toLowerCase() ?? "");
+      final matchesSearch = _searchQuery.isEmpty || planNameNoDiacritics.contains(searchQueryNoDiacritics);
+
+      final matchesFilter = _selectedFilter == null ||
+          (plan.healthGoal?.trim().toLowerCase().contains(_selectedFilter!.trim().toLowerCase()) ?? false);
+
       return matchesSearch && matchesFilter;
     }).toList();
+
     notifyListeners();
   }
 }
