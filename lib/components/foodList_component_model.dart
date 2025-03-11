@@ -13,7 +13,7 @@ class FoodListComponentModel extends FlutterFlowModel<FoodListComponentWidget> {
     search = search?.isEmpty ?? true ? "" : search;
 
     try {
-      foodList = _foodService.getAllFoods(pageIndex: 1, pageSize: 30, search: search);
+      foodList = _foodService.getAllFoods(pageIndex: 1, pageSize: 50, search: search);
       print("Fetching foods with search query: $search");
     } catch (e) {
       print("Error fetching food data: $e");
