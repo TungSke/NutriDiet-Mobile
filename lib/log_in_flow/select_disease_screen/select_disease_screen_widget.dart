@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '../../services/models/health_profile_provider.dart';
 import 'select_disease_screen_model.dart';
 
 class SelectDiseaseScreenWidget extends StatefulWidget {
@@ -38,7 +39,7 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
               body: SafeArea(
                 child: Column(
                   children: [
-                    const AppbarWidget(title: 'Bạn mắc bệnh gì?'),
+                    const AppbarWidget(title: 'Bạn bị bệnh gì?'),
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
@@ -92,8 +93,21 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                                   ),
                                 );
                               } else {
-                                model.updateDisease(context);
-                                context.pushNamed('Whats_your_goal');
+                                // Cập nhật diseases vào provider (sử dụng List<int> thay vì List<String>)
+                                context
+                                    .read<HealthProfileProvider>()
+                                    .setDiseases(model.selectedDiseaseIds);
+
+                                // Kiểm tra xem diseases đã được lưu vào provider chưa
+                                print(
+                                    "Bệnh đã lưu vào HealthProfileProvider: ${context.read<HealthProfileProvider>().diseases}");
+
+                                // Cập nhật bệnh và gửi lên API
+                                model.updateDisease(
+                                    context); // Gọi updateDisease để gửi dữ liệu lên API
+
+                                // Chuyển đến màn hình tiếp theo
+                                context.pushNamed("Whats_your_goal");
                               }
                             },
                             text: 'Tiếp tục',
@@ -113,9 +127,20 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                               borderRadius: BorderRadius.circular(16.0),
                             ),
                           ),
-                          const SizedBox(height: 10.0),
+
+                          const SizedBox(height: 10.0), // Khoảng cách giữa nút
                           TextButton(
                             onPressed: () {
+                              // Cập nhật diseases vào provider (sử dụng List<int> thay vì List<String>)
+                              context
+                                  .read<HealthProfileProvider>()
+                                  .setDiseases(model.selectedDiseaseIds);
+
+                              // Cập nhật bệnh và gửi lên API
+                              model.updateDisease(
+                                  context); // Gọi updateDisease để gửi dữ liệu lên API
+
+                              // Chuyển đến màn hình tiếp theo
                               context.pushNamed("Whats_your_goal");
                             },
                             child: Text(

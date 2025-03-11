@@ -55,7 +55,7 @@ class _DecreaseWeightChangeRateScreenWidgetState
     print("   - Notes: ${personalGoalProvider.notes}");
 
     try {
-      final response = await UserService().updatePersonalGoal(
+      final response = await UserService().createPersonalGoal(
         goalType: personalGoalProvider.goalType!,
         targetWeight: personalGoalProvider.targetWeight!,
         weightChangeRate: personalGoalProvider.weightChangeRate!,

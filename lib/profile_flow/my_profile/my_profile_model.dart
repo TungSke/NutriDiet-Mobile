@@ -22,6 +22,31 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
   List<String> diseases = []; // ✅ Bệnh nền
   String goalType = ''; // ✅ Mục tiêu sức khỏe
   String targetWeight = ''; // ✅ Cân nặng mục tiêu
+  String weightChangeRate = '';
+
+  final Map<String, String> _goalTypeMap = {
+    'LoseWeight': 'Giảm cân',
+    'Maintain': 'Giữ cân',
+    'GainWeight': 'Tăng cân',
+  };
+
+  final Map<String, String> _activityLevelMap = {
+    'Sedentary': 'Ít vận động',
+    'LightlyActive': 'Vận động nhẹ',
+    'ModeratelyActive': 'Vận động vừa phải',
+    'VeryActive': 'vận động nhiều',
+    'ExtraActive': 'Cường độ rất cao',
+  };
+
+  final Map<int, String> _weightChangeRateMap = {
+    0: 'Giữ cân',
+    250: 'Tăng 0.25kg/1 tuần',
+    500: 'Tăng 0.5kg/1 tuần',
+    -250: 'Giảm 0.25Kg/1 tuần',
+    -500: 'Giảm 0.5Kg/1 tuần',
+    -750: 'Giảm 0.75Kg/1 tuần',
+    -1000: 'Giảm 1Kg/1 tuần',
+  };
 
   @override
   void initState(BuildContext context) {
@@ -60,7 +85,7 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
 
         height = data["height"]?.toString() ?? "N/A";
         weight = data["weight"]?.toString() ?? "N/A";
-        activityLevel = data["activityLevel"] ?? "N/A";
+        activityLevel = _activityLevelMap[data["activityLevel"]] ?? "N/A";
 
         // Lấy danh sách dị ứng
         allergies = data["allergies"] != null
@@ -79,8 +104,12 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
         // Nếu có dữ liệu mục tiêu cá nhân
         if (healthData["personalGoal"] != null) {
           final personalGoal = healthData["personalGoal"];
-          goalType = personalGoal["goalType"] ?? "Chưa đặt mục tiêu";
+          goalType =
+              _goalTypeMap[personalGoal["goalType"]] ?? "Chưa đặt mục tiêu";
           targetWeight = personalGoal["targetWeight"]?.toString() ?? "N/A";
+          weightChangeRate =
+              _weightChangeRateMap[personalGoal["weightChangeRate"]] ??
+                  "Chưa cập nhật";
         }
 
         notifyListeners();

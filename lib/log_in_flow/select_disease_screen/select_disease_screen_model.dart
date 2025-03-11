@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '/services/disease_service.dart';
+import '/services/disease_service.dart'; // Thay allergy_service thành disease_service
 import '/services/user_service.dart';
 import '../../components/appbar_model.dart';
 import '../../flutter_flow/flutter_flow_util.dart';
+import '../../services/models/health_profile_provider.dart';
 
 class SelectDiseaseScreenModel extends ChangeNotifier {
-  List<int> selectedDiseaseIds = [];
+  List<int> selectedDiseaseIds = []; // Danh sách bệnh đã chọn (List<int>)
 
   /// Dữ liệu bệnh từ API
   List<Map<String, dynamic>> diseaseLevelsData = [];
@@ -17,7 +19,7 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
 
   void init(BuildContext context) {
     appbarModel = createModel(context, () => AppbarModel());
-    fetchDiseaseLevels();
+    fetchDiseaseLevels(); // Lấy danh sách bệnh
   }
 
   @override
@@ -29,7 +31,8 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
   /// 🔹 Lấy danh sách bệnh từ API
   Future<void> fetchDiseaseLevels() async {
     try {
-      final diseaseService = DiseaseService();
+      final diseaseService =
+          DiseaseService(); // Sử dụng DiseaseService thay AllergyService
       final data = await diseaseService.fetchDiseaseLevelsData();
 
       diseaseLevelsData = data.where((disease) => disease['id'] != -1).toList();
@@ -50,96 +53,52 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 🔹 Cập nhật bệnh lên API
-  /// 🔹 Cập nhật bệnh lên API
-  /// 🔹 Cập nhật bệnh lên API
-  // 🔹 Cập nhật bệnh lên API
+  /// 🔹 Cập nhật bệnh lên HealthProfileProvider và API
   Future<void> updateDisease(BuildContext context) async {
     try {
-      final healthProfileResponse = await UserService().getHealthProfile();
-      if (healthProfileResponse.statusCode != 200) {
-        showSnackbar(context, 'Lỗi API: Không thể lấy thông tin sức khỏe.');
+      // Lấy thông tin sức khỏe từ HealthProfileProvider
+      final healthProfileProvider = context.read<HealthProfileProvider>();
+
+      // Lấy height, weight, và activityLevel từ HealthProfileProvider
+      int height = healthProfileProvider.height ?? 0;
+      int weight = healthProfileProvider.weight ?? 0;
+      String aisuggestion = healthProfileProvider.aisuggestion ?? "string";
+      String activityLevel = healthProfileProvider.activityLevel ?? "";
+
+      // Kiểm tra xem có đầy đủ thông tin không
+      if (height == 0 || weight == 0 || activityLevel.isEmpty) {
+        showSnackbar(context, '⚠️ Thông tin sức khỏe chưa đầy đủ.');
         return;
       }
 
-      final Map<String, dynamic> healthProfile =
-          jsonDecode(healthProfileResponse.body);
-      final profileData = healthProfile['data'];
+      // Cập nhật danh sách bệnh vào HealthProfileProvider
+      healthProfileProvider.setDiseases(
+          selectedDiseaseIds); // Chắc chắn rằng `selectedDiseaseIds` là List<int>
 
-      if (profileData == null) {
-        showSnackbar(context, '⚠️ Không có dữ liệu sức khỏe hợp lệ.');
-        return;
-      }
+      // Lấy allergy và disease từ HealthProfileProvider
+      List<int> allergies = healthProfileProvider.allergies;
+      List<int> diseases = healthProfileProvider
+          .diseases; // Lấy diseases từ HealthProfileProvider
 
-      int height = int.tryParse(profileData['height']?.toString() ?? '') ?? 0;
-      int weight = int.tryParse(profileData['weight']?.toString() ?? '') ?? 0;
-      String activityLevel = profileData['activityLevel']?.toString() ?? "";
+      // Kiểm tra và hiển thị thông tin bệnh và dị ứng
+      print("📌 Allergies: $allergies");
+      print("📌 Diseases: $diseases");
 
-      // 🟢 Debug log - Kiểm tra dữ liệu từ API
-      print("📌 Dữ liệu allergies từ API: ${profileData['allergies']}");
-
-      List<int> allergies = [];
-      if (FFAppState().allergyIds != null) {
-        if (FFAppState().allergyIds is String) {
-          allergies = (FFAppState().allergyIds as String)
-              .split(',')
-              .map((e) => int.tryParse(e.trim()) ?? 0)
-              .where((id) => id > 0)
-              .toList();
-        } else if (FFAppState().allergyIds is List) {
-          allergies = (FFAppState().allergyIds as List)
-              .whereType<int>() // Đảm bảo chỉ lấy phần tử kiểu int
-              .toList();
-        }
-      }
-
-// 🟢 Debug: Kiểm tra allergies lấy từ FFAppState
-      print("📌 FFAppState().allergyIds sau khi xử lý: $allergies");
-
-      // ⚡️ Kiểm tra nếu lấy từ API
-      if (allergies.isEmpty && profileData['allergies'] is List) {
-        allergies = (profileData['allergies'] as List<dynamic>)
-            .map((e) {
-              if (e is Map<String, dynamic> && e.containsKey('allergyId')) {
-                print("🔹 Mapping allergy từ API: $e");
-                return e['allergyId'] as int? ?? 0;
-              }
-              return 0;
-            })
-            .where((id) => id > 0)
-            .toList();
-      }
-
-      // 🟢 Debug: Kiểm tra allergies sau khi xử lý
-      print("📌 Allergies sau khi xử lý: $allergies");
-
-      if (height == 0 || weight == 0) {
-        showSnackbar(context, '⚠️ Không thể lấy thông tin sức khỏe.');
-        return;
-      }
-
-      List<int> diseasesToSend =
-          selectedDiseaseIds.isEmpty ? [] : selectedDiseaseIds;
-      List<int> allergiesToSend = allergies.isEmpty ? [] : allergies;
-
-      // 🟢 Debug log trước khi gửi API
-      print("📌 selectedDiseaseIds trước khi gửi API: $selectedDiseaseIds");
-      print("📌 allergies trước khi gửi API: $allergiesToSend");
-
+      // Gửi thông tin lên API
       final response = await UserService().updateHealthProfile(
         height: height,
         weight: weight,
         activityLevel: activityLevel,
-        aisuggestion: null,
-        allergies: allergiesToSend,
-        diseases: diseasesToSend,
+        aisuggestion: "string",
+        allergies: allergies, // Gửi allergy
+        diseases: diseases, // Gửi disease
       );
 
       print("🔹 Response status code: ${response.statusCode}");
       print("🔹 Response body: ${response.body}");
-
       if (response.statusCode == 200) {
-        FFAppState().diseaseIds = diseasesToSend.toString();
+        FFAppState().diseaseIds =
+            diseases.toString(); // Lưu disease thay allergy
         FFAppState().update(() {});
         showSnackbar(context, 'Cập nhật bệnh thành công!');
       } else {

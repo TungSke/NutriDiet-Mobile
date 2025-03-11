@@ -1,3 +1,5 @@
+import 'package:diet_plan_app/profile_flow/edit_health_profile_screen/edit_health_profile_screen_widget.dart';
+import 'package:diet_plan_app/profile_flow/edit_personal_goal_screen/edit_personal_goal_screen_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -365,18 +367,23 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                           ),
                           GestureDetector(
                             onTap: () async {
+                              // Gọi lại API để cập nhật mục tiêu sức khỏe
+                              await _model
+                                  .fetchHealthProfile(); // Gọi lại API khi cập nhật
+                              setState(() {}); // Cập nhật UI ngay
+                              // Chuyển đến màn hình chỉnh sửa mục tiêu sức khỏe
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      EditProfileScreenWidget(),
+                                      EditHealthProfileScreenWidget(),
                                 ),
                               );
 
                               if (result == true) {
-                                await _model
-                                    .fetchUserProfile(); // ✅ Fetch lại dữ liệu mới nhất
-                                setState(() {}); // ✅ Cập nhật UI ngay
+                                // Nếu có kết quả trả về từ màn hình chỉnh sửa, gọi lại API
+                                await _model.fetchHealthProfile();
+                                setState(() {}); // Cập nhật lại UI
                               }
                             },
                             child: Padding(
@@ -531,18 +538,23 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                           ),
                           GestureDetector(
                             onTap: () async {
+                              // Gọi lại API để cập nhật mục tiêu sức khỏe
+                              await _model
+                                  .fetchHealthProfile(); // Gọi lại API khi cập nhật
+                              setState(() {}); // Cập nhật UI ngay
+                              // Chuyển đến màn hình chỉnh sửa mục tiêu sức khỏe
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      EditProfileScreenWidget(),
+                                      EditPersonalGoalScreenWidget(),
                                 ),
                               );
 
                               if (result == true) {
-                                await _model
-                                    .fetchUserProfile(); // ✅ Fetch lại dữ liệu mới nhất
-                                setState(() {}); // ✅ Cập nhật UI ngay
+                                // Nếu có kết quả trả về từ màn hình chỉnh sửa, gọi lại API
+                                await _model.fetchHealthProfile();
+                                setState(() {}); // Cập nhật lại UI
                               }
                             },
                             child: Padding(
@@ -606,6 +618,24 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                       )),
                                   Text(
                                     "${_model.targetWeight} kg",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Mức độ',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                  Text(
+                                    "${_model.weightChangeRate} kg",
                                     style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,

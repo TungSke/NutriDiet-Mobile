@@ -1,29 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'edit_profile_screen_model.dart';
+import 'edit_health_profile_screen_model.dart';
 
-class EditProfileScreenWidget extends StatefulWidget {
-  const EditProfileScreenWidget({super.key});
+class EditHealthProfileScreenWidget extends StatefulWidget {
+  const EditHealthProfileScreenWidget({super.key});
 
   @override
-  State<EditProfileScreenWidget> createState() =>
-      _EditProfileScreenWidgetState();
+  State<EditHealthProfileScreenWidget> createState() =>
+      _EditHealthProfileScreenWidgetState();
 }
 
-class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
-  late EditProfileScreenModel _model;
+class _EditHealthProfileScreenWidgetState
+    extends State<EditHealthProfileScreenWidget> {
+  late EditHealthProfileScreenModel _model;
   bool isEdited = false;
   String _tempSelectedValue = '';
 
   @override
-  @override
   void initState() {
     super.initState();
-    _model = EditProfileScreenModel();
+    _model = EditHealthProfileScreenModel();
 
     Future.delayed(Duration.zero, () async {
-      await _model.fetchUserProfile();
+      await _model.fetchHealthProfile();
       setState(() {}); // 🚀 Cập nhật UI ngay sau khi fetch dữ liệu
     });
   }
@@ -44,13 +44,10 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
     );
   }
 
-  /// 🟢 Header với nút back mượt
-  /// 🟢 Header với nút back từ MyProfileWidget
   Widget _buildHeader() {
-    bool canUpdate = _model.name.isNotEmpty &&
-        _model.location.isNotEmpty &&
-        _model.gender.isNotEmpty &&
-        _model.age.isNotEmpty;
+    bool canUpdate = _model.height != 0 &&
+        _model.weight != 0 &&
+        _model.activityLevel.isNotEmpty;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -66,33 +63,22 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
             child: Icon(Icons.arrow_back, size: 28),
           ),
           Text(
-            'Chỉnh sửa hồ sơ',
+            'Chỉnh sửa hồ sơ sức khỏe',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           InkWell(
-            onTap: isEdited &&
-                    canUpdate // ✅ Only allow update if all fields are filled
+            onTap: isEdited && canUpdate
                 ? () async {
-                    await _model.updateUserProfile();
-
+                    await _model
+                        .updateHealthProfile(context); // Pass context here
                     setState(() {
                       isEdited = false;
                     });
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Cập nhật thành công!"),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                    Navigator.pop(context, true);
                   }
-                : null, // ✅ Disable button if fields are empty
+                : null,
             child: Icon(
               Icons.check,
-              color: (isEdited && canUpdate)
-                  ? Colors.green
-                  : Colors.grey, // ✅ Disable if not valid
+              color: (isEdited && canUpdate) ? Colors.green : Colors.grey,
               size: 28,
             ),
           ),
@@ -101,131 +87,127 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
     );
   }
 
-  /// 🟢 Ảnh đại diện
   Widget _buildProfilePhoto() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
           CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.grey[300],
-              child: Icon(Icons.person, size: 50, color: Colors.white)),
+            radius: 40,
+            backgroundColor: Colors.grey[300],
+            child: Icon(Icons.person, size: 50, color: Colors.white),
+          ),
           TextButton(
             onPressed: () {},
-            child: Text('Set your profile photo',
-                style: TextStyle(color: Colors.green)),
+            child:
+                Text('Đặt ảnh đại diện', style: TextStyle(color: Colors.green)),
           ),
         ],
       ),
     );
   }
 
-  /// 🟢 Hiển thị Loading khi chưa tải dữ liệu
   Widget _buildLoadingIndicator() {
     return Expanded(child: Center(child: CircularProgressIndicator()));
   }
 
-  /// 🟢 Form thông tin cá nhân
-  /// 🟢 Form to display editable user details
-  /// 🟢 Form thông tin cá nhân
   Widget _buildProfileForm() {
     return Expanded(
       child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
-          _buildEditableRow(
-            'Name',
-            _model.name,
-            (val) {
-              setState(() {
-                _model.name = val;
-                isEdited = true;
-              });
-            },
-            _model.name.isEmpty
-                ? "Tên không được để trống"
-                : null, // ✅ Show error
-          ),
+          _buildHeightRow('Height', _model.height, (val) {
+            setState(() {
+              _model.height = int.tryParse(val) ?? 0;
+              isEdited = true;
+            });
+          }),
+          _buildWeightRow('Weight', _model.weight, (val) {
+            setState(() {
+              _model.weight = int.tryParse(val) ?? 0;
+              isEdited = true;
+            });
+          }),
           _buildPickerRow(
-            'Gender',
-            _model.gender,
-            ['Male', 'Female'],
+            'Tần suất vận động ',
+            _model.activityLevel,
+            [
+              'Ít vận động',
+              'Vận động nhẹ',
+              'Vận động vừa phải',
+              'Vận động nhiều',
+              'Cường độ rất cao'
+            ],
             (val) {
               setState(() {
-                _model.gender = val;
+                _model.activityLevel = val;
                 isEdited = true;
               });
             },
-          ),
-          _buildPickerRow(
-            'Age',
-            _model.age,
-            _generateAgeList(),
-            (val) {
-              setState(() {
-                _model.age = val;
-                isEdited = true;
-              });
-            },
-          ),
-          _buildEditableRow(
-            'Location',
-            _model.location,
-            (val) {
-              setState(() {
-                _model.location = val;
-                isEdited = true;
-              });
-            },
-            _model.location.isEmpty
-                ? "Địa chỉ không được để trống"
-                : null, // ✅ Show error
           ),
         ],
       ),
     );
   }
 
-  /// 🟢 Ô nhập liệu (Name, Location)
-  /// 🟢 Ô nhập liệu (Name, Location) với validation
-  Widget _buildEditableRow(String title, String value,
-      Function(String) onChanged, String? errorText) {
+  // 🟢 Ô nhập liệu cho chiều cao
+  Widget _buildHeightRow(String title, int value, Function(String) onChanged) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              SizedBox(
-                width: 150,
-                child: TextFormField(
-                  initialValue: value,
-                  textAlign: TextAlign.end,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    errorText: errorText, // ✅ Show error message
-                  ),
-                  onChanged: (val) {
-                    if (val.trim().isEmpty) {
-                      val = ""; // ✅ Keep empty instead of defaulting
-                    }
-                    onChanged(val);
-                  },
-                ),
+          Text(title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(
+            width: 150,
+            child: TextFormField(
+              initialValue: value.toString(),
+              textAlign: TextAlign.end,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Nhập chiều cao (cm)',
               ),
-            ],
+              onChanged: (val) {
+                onChanged(val);
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  /// 🟢 Ô chọn dữ liệu bằng Bottom Picker
+  // 🟢 Ô nhập liệu cho cân nặng
+  Widget _buildWeightRow(String title, int value, Function(String) onChanged) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(
+            width: 150,
+            child: TextFormField(
+              initialValue: value.toString(),
+              textAlign: TextAlign.end,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Nhập cân nặng (kg)',
+              ),
+              onChanged: (val) {
+                onChanged(val);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPickerRow(String title, String value, List<String> options,
       Function(String) onSelected) {
     return Padding(
@@ -251,7 +233,6 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
     );
   }
 
-  /// 🟢 Hiển thị Bottom Picker (Chỉ thay đổi khi nhấn "DONE")
   void _showCupertinoPicker(String title, List<String> options,
       String currentValue, Function(String) onSelected) {
     int selectedIndex = options.indexOf(currentValue);
@@ -313,8 +294,7 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
     );
   }
 
-  /// 🟢 Tạo danh sách tuổi từ 10 đến 100
-  List<String> _generateAgeList() {
+  List<String> _generateWeightList() {
     return List.generate(91, (index) => '${10 + index}');
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '/services/user_service.dart';
 import '../../components/appbar_model.dart';
 import '../../flutter_flow/flutter_flow_util.dart';
+import '../../services/models/health_profile_provider.dart';
 import 'frequency_exercise_screen_widget.dart';
 
 class FrequencyExerciseScreenModel
@@ -15,7 +16,6 @@ class FrequencyExerciseScreenModel
 
   /// Danh sách ánh xạ select -> ActivityLevel (bao gồm null)
   static const List<String?> activityLevels = [
-    null, // 0 - Không chọn
     'Sedentary', // 1
     'LightlyActive', // 2
     'ModeratelyActive', // 3
@@ -48,61 +48,19 @@ class FrequencyExerciseScreenModel
     }
 
     try {
-      // 🔹 Gọi API lấy thông tin sức khỏe
-      final healthProfileResponse = await UserService().getHealthProfile();
-      print("🔹 Status Code: ${healthProfileResponse.statusCode}");
-      print("🔹 Response Body: ${healthProfileResponse.body}");
+      // Cập nhật mức độ hoạt động
+      FFAppState().activityLevel = newActivityLevel;
+      FFAppState().update(() {});
 
-      if (healthProfileResponse.statusCode != 200) {
-        showSnackbar(context, 'Lỗi API: Không thể lấy thông tin sức khỏe.');
-        return;
-      }
+      // Lưu mức độ hoạt động vào provider (nếu cần)
+      Provider.of<HealthProfileProvider>(context, listen: false)
+          .setActivityLevel(newActivityLevel);
 
-      // Parse dữ liệu JSON
-      final Map<String, dynamic> healthProfile =
-          jsonDecode(healthProfileResponse.body);
-      print("🔹 Dữ liệu healthProfile: $healthProfile");
+      // In ra mức độ hoạt động đã lưu
+      print(
+          'Mức độ hoạt động đã lưu vào provider: ${Provider.of<HealthProfileProvider>(context, listen: false).activityLevel}');
 
-      final profileData = healthProfile['data'];
-      if (profileData == null) {
-        showSnackbar(context, '⚠️ Lỗi: Không có dữ liệu sức khỏe hợp lệ.');
-        return;
-      }
-
-      int? height = profileData['height'] != null
-          ? int.tryParse(profileData['height'].toString())
-          : null;
-      int? weight = profileData['weight'] != null
-          ? int.tryParse(profileData['weight'].toString())
-          : null;
-
-      // 🔹 Kiểm tra nếu height hoặc weight bị null
-      if (height == null || weight == null) {
-        showSnackbar(context,
-            '⚠️ Không thể lấy thông tin sức khỏe, vui lòng thử lại sau.');
-        return;
-      }
-
-      // 🔹 Gọi API cập nhật mức độ hoạt động
-      final response = await UserService().updateHealthProfile(
-        height: height,
-        weight: weight,
-        activityLevel: newActivityLevel,
-        aisuggestion: null,
-        allergies: [],
-        diseases: [],
-      );
-
-      print("🔹 Status cập nhật: ${response.statusCode}");
-      print("🔹 Response cập nhật: ${response.body}");
-
-      if (response.statusCode == 200) {
-        FFAppState().activityLevel = newActivityLevel;
-        FFAppState().update(() {});
-        showSnackbar(context, 'Cập nhật mức độ hoạt động thành công!');
-      } else {
-        showSnackbar(context, 'Cập nhật thất bại: ${response.body}');
-      }
+      showSnackbar(context, 'Cập nhật mức độ hoạt động thành công!');
     } catch (e) {
       print("❌ Lỗi xảy ra: $e");
       showSnackbar(context, 'Lỗi: $e');

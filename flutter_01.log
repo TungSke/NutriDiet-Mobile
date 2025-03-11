@@ -1,0 +1,102 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter --no-color run --machine --track-widget-creation --device-id=chrome --start-paused --dart-define=flutter.inspector.structuredErrors=true lib\main.dart
+
+## exception
+
+StateError: Bad state: No running isolate (inspector is not set).
+
+```
+#0      ChromeProxyService.inspector (package:dwds/src/services/chrome_proxy_service.dart:79:7)
+#1      _waitForResumeEventToRunMain.<anonymous closure> (package:dwds/src/dwds_vm_client.dart:464:30)
+#2      _rootRunUnary (dart:async/zone.dart:1430:13)
+#3      _CustomZone.runUnary (dart:async/zone.dart:1324:19)
+#4      _CustomZone.runUnaryGuarded (dart:async/zone.dart:1233:7)
+#5      _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:366:11)
+#6      _DelayedData.perform (dart:async/stream_impl.dart:542:14)
+#7      _PendingEvents.handleNext (dart:async/stream_impl.dart:647:11)
+#8      _PendingEvents.schedule.<anonymous closure> (dart:async/stream_impl.dart:618:7)
+#9      StackZoneSpecification._run (package:stack_trace/src/stack_zone_specification.dart:207:15)
+#10     StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:48)
+#11     _rootRun (dart:async/zone.dart:1406:47)
+#12     _CustomZone.run (dart:async/zone.dart:1317:19)
+#13     _CustomZone.runGuarded (dart:async/zone.dart:1225:7)
+#14     _CustomZone.bindCallbackGuarded.<anonymous closure> (dart:async/zone.dart:1265:23)
+#15     StackZoneSpecification._run (package:stack_trace/src/stack_zone_specification.dart:207:15)
+#16     StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:48)
+#17     _rootRun (dart:async/zone.dart:1414:13)
+#18     _CustomZone.run (dart:async/zone.dart:1317:19)
+#19     _CustomZone.runGuarded (dart:async/zone.dart:1225:7)
+#20     _CustomZone.bindCallbackGuarded.<anonymous closure> (dart:async/zone.dart:1265:23)
+#21     _microtaskLoop (dart:async/schedule_microtask.dart:40:21)
+#22     _startMicrotaskLoop (dart:async/schedule_microtask.dart:49:5)
+#23     _runPendingImmediateCallback (dart:isolate-patch/isolate_patch.dart:118:13)
+#24     _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:185:5)
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel stable, 3.27.3, on Microsoft Windows [Version 10.0.26100.3323], locale en-GB)
+    • Flutter version 3.27.3 on channel stable at D:\Flutter\flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision c519ee916e (7 weeks ago), 2025-01-21 10:32:23 -0800
+    • Engine revision e672b006cb
+    • Dart version 3.6.1
+    • DevTools version 2.40.2
+
+[✓] Windows Version (Installed version of Windows is version 10 or higher)
+
+[!] Android toolchain - develop for Android devices (Android SDK version 35.0.0)
+    • Android SDK at C:\Users\Admin\AppData\Local\Android\Sdk
+    ✗ cmdline-tools component is missing
+      Run `path/to/sdkmanager --install "cmdline-tools;latest"`
+      See https://developer.android.com/studio/command-line for more details.
+    ✗ Android license status unknown.
+      Run `flutter doctor --android-licenses` to accept the SDK licenses.
+      See https://flutter.dev/to/windows-android-setup for more details.
+
+[✓] Chrome - develop for the web
+    • Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[!] Visual Studio - develop Windows apps (Visual Studio Community 2022 17.12.4)
+    • Visual Studio at C:\Program Files\Microsoft Visual Studio\2022\Community
+    • Visual Studio Community 2022 version 17.12.35707.178
+    ✗ Visual Studio is missing necessary components. Please re-run the Visual Studio installer for the "Desktop development with C++" workload, and include these components:
+        MSVC v142 - VS 2019 C++ x64/x86 build tools
+         - If there are multiple build tool versions available, install the latest
+        C++ CMake tools for Windows
+        Windows 10 SDK
+
+[✓] Android Studio (version 2024.1)
+    • Android Studio at D:\Android\Android Studio
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    • Java version OpenJDK Runtime Environment (build 17.0.11+0--11852314)
+
+[✓] IntelliJ IDEA Community Edition (version 2023.2)
+    • IntelliJ at D:\IntelliJ IDEA Community Edition 2023.2.3
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+
+[✓] VS Code (version 1.98.0)
+    • VS Code at C:\Users\Admin\AppData\Local\Programs\Microsoft VS Code
+    • Flutter extension version 3.106.0
+
+[✓] Connected device (3 available)
+    • Windows (desktop) • windows • windows-x64    • Microsoft Windows [Version 10.0.26100.3323]
+    • Chrome (web)      • chrome  • web-javascript • Google Chrome 133.0.6943.142
+    • Edge (web)        • edge    • web-javascript • Microsoft Edge 133.0.3065.82
+
+[✓] Network resources
+    • All expected network resources are available.
+
+! Doctor found issues in 2 categories.
+```
