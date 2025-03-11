@@ -5,12 +5,20 @@ import '../../services/models/mealplan.dart';
 import '../../services/models/mealplandetail.dart';
 import 'meal_plan_detail_model.dart';
 
+enum MealPlanSource {
+  myMealPlan,
+  sampleMealPlan,
+  aiMealPlan,
+}
+
 class MealPlanDetailWidget extends StatefulWidget {
   final int mealPlanId;
+  final MealPlanSource source;
 
   const MealPlanDetailWidget({
     super.key,
     required this.mealPlanId,
+    required this.source,
   });
 
   @override
@@ -35,22 +43,67 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
 
   void _addNewDay() {
     setState(() {
-      // Logic thêm ngày mới có thể được xử lý trong model nếu cần
+      // Logic thêm ngày mới (chỉ cho MyMealPlan)
     });
+  }
+
+  void _copyMealPlan() {
+    debugPrint("Sao chép thực đơn ${widget.mealPlanId} về MyMealPlan");
+    Navigator.pop(context);
+  }
+
+  void _applyMealPlan() {
+    debugPrint("Áp dụng thực đơn ${widget.mealPlanId}");
+  }
+
+  void _rejectMealPlan() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String reason = '';
+        return AlertDialog(
+          backgroundColor: FlutterFlowTheme.of(context).primary,
+          title: const Text("Từ chối thực đơn", style: TextStyle(color: Colors.white)),
+          content: TextField(
+            decoration: const InputDecoration(
+              hintText: "Nhập lý do từ chối...",
+              hintStyle: TextStyle(color: Colors.white70),
+            ),
+            style: const TextStyle(color: Colors.white),
+            onChanged: (value) => reason = value,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Hủy", style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                debugPrint("Từ chối thực đơn ${widget.mealPlanId} với lý do: $reason");
+                Navigator.pop(context);
+                _fetchMealPlan(); // Giả lập tạo mới
+              },
+              child: const Text("Xác nhận", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _saveMealPlan() {
+    debugPrint("Lưu thực đơn ${widget.mealPlanId} về MyMealPlan");
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     if (_model.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_model.errorMessage != null || _model.mealPlan == null) {
-      return Scaffold(
-        body: Center(child: Text(_model.errorMessage ?? "Không tìm thấy kế hoạch")),
-      );
+      return Scaffold(body: Center(child: Text(_model.errorMessage ?? "Không tìm thấy kế hoạch")));
     }
 
     final mealPlan = _model.mealPlan!;
@@ -68,13 +121,9 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
           centerTitle: true,
           title: Text(
             mealPlan.planName,
-            style: GoogleFonts.montserrat(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            maxLines: 1, // Chỉ 1 dòng
-            overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+            style: GoogleFonts.montserrat(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
@@ -111,17 +160,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FlutterFlowTheme.of(context).primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      onPressed: () {},
-                      child: const Text("ÁP DỤNG THỰC ĐƠN", style: TextStyle(color: Colors.white)),
-                    ),
-                  ),
+                  _buildActionButtons(),
                 ],
               ),
             ),
@@ -138,18 +177,20 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: List.generate(
-                _model.getTotalDays(),
-                    (index) => _buildDayButton(index + 1, "Ngày ${index + 1}"),
-              )..add(
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: IconButton(
-                    icon: Icon(Icons.add_circle, color: FlutterFlowTheme.of(context).primary, size: 40),
-                    onPressed: _addNewDay,
-                  ),
+              children: [
+                ...List.generate(
+                  _model.getTotalDays(),
+                      (index) => _buildDayButton(index + 1, "Ngày ${index + 1}"),
                 ),
-              ),
+                if (widget.source == MealPlanSource.myMealPlan)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: IconButton(
+                      icon: Icon(Icons.add_circle, color: FlutterFlowTheme.of(context).primary, size: 40),
+                      onPressed: _addNewDay,
+                    ),
+                  ),
+              ],
             ),
           ),
         ),
@@ -193,18 +234,21 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded( // Giới hạn chiều rộng của Text
+                Expanded(
                   child: Text(
                     mealPlan.planName,
                     style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold),
-                    maxLines: 1, // Chỉ 1 dòng
-                    overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
-                  onPressed: () {},
-                ),
+                if (widget.source == MealPlanSource.myMealPlan)
+                  IconButton(
+                    icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
+                    onPressed: () {
+                      debugPrint("Chỉnh sửa thực đơn ${widget.mealPlanId}");
+                    },
+                  ),
               ],
             ),
             const SizedBox(height: 8),
@@ -221,15 +265,12 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(color: Colors.grey),
-        ),
+        Text(label, style: const TextStyle(color: Colors.grey)),
         Text(
           value,
           style: const TextStyle(fontWeight: FontWeight.bold),
-          maxLines: 1, // Chỉ 1 dòng
-          overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
       ],
@@ -243,42 +284,55 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     final protein = nutrients['protein']!;
     final fat = nutrients['fat']!;
 
+    const userGoals = {'calories': 2000.0, 'carbs': 250.0, 'protein': 100.0, 'fat': 70.0};
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildNutrientDisplay("Carbs", carbs, "g"),
-        _buildNutrientDisplay("Protein", protein, "g"),
-        _buildNutrientDisplay("Fat", fat, "g"),
+        _buildNutrientDisplay(
+          "Carbs",
+          widget.source == MealPlanSource.myMealPlan ? "$carbs/${userGoals['carbs']}" : carbs.toStringAsFixed(0),
+          "g",
+        ),
+        _buildNutrientDisplay(
+          "Protein",
+          widget.source == MealPlanSource.myMealPlan ? "$protein/${userGoals['protein']}" : protein.toStringAsFixed(0),
+          "g",
+        ),
+        _buildNutrientDisplay(
+          "Fat",
+          widget.source == MealPlanSource.myMealPlan ? "$fat/${userGoals['fat']}" : fat.toStringAsFixed(0),
+          "g",
+        ),
       ],
     );
   }
 
-  Widget _buildNutrientDisplay(String label, double value, String unit) {
+  Widget _buildNutrientDisplay(String label, String value, String unit) {
     return Column(
       children: [
         Container(
-          width: 60,
-          height: 60,
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
           ),
           child: Center(
             child: Text(
-              value.toStringAsFixed(0),
+              value,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: FlutterFlowTheme.of(context).primary,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          "$label ($unit)",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        Text("$label ($unit)", style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -290,20 +344,77 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
         title: Text(
           meal.mealType ?? "Không xác định",
           style: const TextStyle(fontWeight: FontWeight.bold),
-          maxLines: 1, // Chỉ 1 dòng
-          overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
           meal.foodName ?? "Chưa có món ăn",
-          maxLines: 1, // Chỉ 1 dòng
-          overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        trailing: CircleAvatar(
+        trailing: widget.source == MealPlanSource.myMealPlan
+            ? CircleAvatar(
           backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
           child: Icon(Icons.add, color: FlutterFlowTheme.of(context).primary),
-        ),
+        )
+            : null,
         onTap: () {},
       ),
     );
+  }
+
+  Widget _buildActionButtons() {
+    switch (widget.source) {
+      case MealPlanSource.myMealPlan:
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FlutterFlowTheme.of(context).primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: _applyMealPlan,
+            child: const Text("ÁP DỤNG THỰC ĐƠN", style: TextStyle(color: Colors.white)),
+          ),
+        );
+      case MealPlanSource.sampleMealPlan:
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FlutterFlowTheme.of(context).primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: _copyMealPlan,
+            child: const Text("SAO CHÉP THỰC ĐƠN", style: TextStyle(color: Colors.white)),
+          ),
+        );
+      case MealPlanSource.aiMealPlan:
+        return Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: _rejectMealPlan,
+                child: const Text("TỪ CHỐI THỰC ĐƠN", style: TextStyle(color: Colors.white)),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: FlutterFlowTheme.of(context).primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: _saveMealPlan,
+                child: const Text("LƯU THỰC ĐƠN", style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          ],
+        );
+    }
   }
 }

@@ -131,6 +131,7 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
             MaterialPageRoute(
               builder: (context) => MealPlanDetailWidget(
                 mealPlanId: mealPlan.mealPlanId,
+                source: MealPlanSource.sampleMealPlan,
               ),
             ),
           );
