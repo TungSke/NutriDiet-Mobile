@@ -139,17 +139,14 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                                             fontFamily: 'figtree',
                                             color: FlutterFlowTheme.of(context)
                                                 .grey,
-                                            fontSize: 16.0,
+                                            fontSize: 10.0,
                                             letterSpacing: 0.0,
                                             fontWeight: FontWeight.normal,
                                             useGoogleFonts: false,
                                           ),
                                     ),
                                   ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 4.0),
-                                    child: Text("Khẩu phần:"),
-                                  ),
+                                  Text("Khẩu phần:", style: TextStyle(fontSize: 11)),
                                   Expanded(
                                     child: Text(
                                       food.servingSize ?? 'Không rõ',
@@ -159,7 +156,7 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                                             fontFamily: 'figtree',
                                             color: FlutterFlowTheme.of(context)
                                                 .grey,
-                                            fontSize: 16.0,
+                                            fontSize: 11.0,
                                             letterSpacing: 0.0,
                                             fontWeight: FontWeight.normal,
                                             useGoogleFonts: false,

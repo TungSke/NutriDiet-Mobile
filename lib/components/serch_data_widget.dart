@@ -97,12 +97,14 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
             ),
           ),
           Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(20.0, 8.0, 20.0, 0.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(10.0, 8.0, 10.0, 0.0),
             child: TextFormField(
               controller: _model.textController,
               focusNode: _model.textFieldFocusNode,
               onFieldSubmitted: (_) async {
-                FFAppState().addToSearchList(_model.textController.text);
+                if(_model.textController.text.isNotEmpty) {
+                  FFAppState().addToSearchList(_model.textController.text);
+                }
                 _model.reslut = true;
                 safeSetState(() {});
               },
@@ -171,7 +173,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
           Expanded(
             child: Builder(
               builder: (context) {
-                // if ((FFAppState().searchList) == true) {
+                 // if ((FFAppState().searchList.isNotEmpty) == true) {
                   return Container(
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
@@ -350,7 +352,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 0.0),
+                                  10.0, 20.0, 0.0, 0.0),
                               child: ListView(
                                 padding: EdgeInsets.zero,
                                 primary: false,
