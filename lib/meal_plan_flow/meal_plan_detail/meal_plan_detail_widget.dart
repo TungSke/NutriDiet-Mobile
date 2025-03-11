@@ -6,7 +6,7 @@ import '../../services/models/mealplandetail.dart';
 import 'meal_plan_detail_model.dart';
 
 class MealPlanDetailWidget extends StatefulWidget {
-  final int mealPlanId; // Thêm mealPlanId để gọi API
+  final int mealPlanId;
 
   const MealPlanDetailWidget({
     super.key,
@@ -73,6 +73,8 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
+            maxLines: 1, // Chỉ 1 dòng
+            overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
           ),
         ),
       ),
@@ -191,7 +193,14 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(mealPlan.planName, style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold)),
+                Expanded( // Giới hạn chiều rộng của Text
+                  child: Text(
+                    mealPlan.planName,
+                    style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold),
+                    maxLines: 1, // Chỉ 1 dòng
+                    overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+                  ),
+                ),
                 IconButton(
                   icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
                   onPressed: () {},
@@ -212,8 +221,16 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey)),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.grey),
+        ),
+        Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+          maxLines: 1, // Chỉ 1 dòng
+          overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+        ),
         const SizedBox(height: 4),
       ],
     );
@@ -248,7 +265,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
           ),
           child: Center(
             child: Text(
-              value.toStringAsFixed(0), // Hiển thị số nguyên
+              value.toStringAsFixed(0),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -266,35 +283,21 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     );
   }
 
-  Widget _buildProgressIndicator(String label, double value) {
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 50,
-              height: 50,
-              child: CircularProgressIndicator(
-                value: value,
-                color: FlutterFlowTheme.of(context).primary,
-                backgroundColor: Colors.grey.shade300,
-              ),
-            ),
-            Text("${(value * 100).round()}%"),
-          ],
-        ),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-
   Widget _buildMealCard(MealPlanDetail meal) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
-        title: Text(meal.mealType ?? "Không xác định", style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(meal.foodName ?? "Chưa có món ăn"),
+        title: Text(
+          meal.mealType ?? "Không xác định",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+          maxLines: 1, // Chỉ 1 dòng
+          overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+        ),
+        subtitle: Text(
+          meal.foodName ?? "Chưa có món ăn",
+          maxLines: 1, // Chỉ 1 dòng
+          overflow: TextOverflow.ellipsis, // Hiển thị "..." nếu tràn
+        ),
         trailing: CircleAvatar(
           backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
           child: Icon(Icons.add, color: FlutterFlowTheme.of(context).primary),
