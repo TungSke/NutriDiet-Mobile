@@ -75,6 +75,30 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
     if (_updateCallback != null) _updateCallback!();
   }
 
+  Future<bool> deleteMealPlan(int mealPlanId) async {
+    try {
+      isLoading = true;
+      if (_updateCallback != null) _updateCallback!();
+
+      final success = await _mealPlanService.deleteMealPlan(mealPlanId);
+      if (success) {
+        // Xóa mealPlan khỏi danh sách cục bộ
+        mealPlans.removeWhere((mealPlan) => mealPlan.mealPlanId == mealPlanId);
+        debugPrint("Đã xóa Meal Plan $mealPlanId khỏi danh sách cục bộ");
+        isLoading = false;
+        if (_updateCallback != null) _updateCallback!();
+        return true;
+      } else {
+        throw Exception("Không thể xóa Meal Plan");
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi xóa Meal Plan: $e");
+      isLoading = false;
+      if (_updateCallback != null) _updateCallback!();
+      return false;
+    }
+  }
+
   @override
   void initState(BuildContext context) {}
 

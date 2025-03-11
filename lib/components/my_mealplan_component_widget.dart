@@ -130,7 +130,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: isActive ? Colors.green[100] : const Color(0xFFF5F5F5), // Màu xanh lá nhạt cho thực đơn đang áp dụng
+      color: isActive ? Colors.green[100] : const Color(0xFFF5F5F5),
       child: Stack(
         children: [
           ListTile(
@@ -147,7 +147,10 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MealPlanDetailWidget(mealPlanId: mealPlan.mealPlanId),
+                  builder: (context) => MealPlanDetailWidget(
+                    mealPlanId: mealPlan.mealPlanId,
+                    source: MealPlanSource.myMealPlan,
+                  ),
                 ),
               );
             },
@@ -184,7 +187,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: FlutterFlowTheme.of(context).primary, // Màu xanh giống button
+        backgroundColor: FlutterFlowTheme.of(context).primary,
         title: const Text('Xác nhận xóa', style: TextStyle(color: Colors.white)),
         content: Text(
           'Bạn có chắc muốn xóa "${mealPlan.planName}" không?',
@@ -196,9 +199,19 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
             child: const Text('Hủy', style: TextStyle(color: Colors.white)),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               debugPrint('Xóa meal plan: ${mealPlan.planName}');
-              Navigator.pop(context);
+              Navigator.pop(context); // Đóng dialog trước khi xóa
+              final success = await _model.deleteMealPlan(mealPlan.mealPlanId);
+              if (success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Xóa Meal Plan thành công')),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Lỗi khi xóa Meal Plan')),
+                );
+              }
             },
             child: const Text('Xóa', style: TextStyle(color: Colors.red)),
           ),
@@ -213,7 +226,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       builder: (context) {
         return AlertDialog(
           title: const Text("Lọc theo mục tiêu sức khỏe", style: TextStyle(color: Colors.white)),
-          backgroundColor: FlutterFlowTheme.of(context).primary, // Màu xanh giống button
+          backgroundColor: FlutterFlowTheme.of(context).primary,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -250,7 +263,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: FlutterFlowTheme.of(context).primary, // Màu xanh giống button
+        backgroundColor: FlutterFlowTheme.of(context).primary,
         title: const Text('Thêm mới thực đơn', style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -310,7 +323,22 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
           backgroundColor: FlutterFlowTheme.of(context).primary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen)),
+        onPressed: () {
+          if (title == "Nhận thực đơn AI") {
+            int aiMealPlanId = 999; // Thay bằng logic gọi API AI
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MealPlanDetailWidget(
+                  mealPlanId: aiMealPlanId,
+                  source: MealPlanSource.aiMealPlan,
+                ),
+              ),
+            );
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen));
+          }
+        },
         child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 18)),
       ),
     );
