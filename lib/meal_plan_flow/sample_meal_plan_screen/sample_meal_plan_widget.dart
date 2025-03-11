@@ -87,7 +87,8 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text("Lọc theo mục tiêu sức khỏe"),
+              backgroundColor: FlutterFlowTheme.of(context).primary, // Màu xanh giống button
+              title: const Text("Lọc theo mục tiêu sức khỏe", style: TextStyle(color: Colors.white)),
               content: Wrap(
                 spacing: 10,
                 children: ["Giảm cân", "Tăng cân", "Healthy", "Tiểu đường"].map((goal) {
@@ -105,7 +106,7 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("Đóng"),
+                  child: const Text("Đóng", style: TextStyle(color: Colors.white)),
                 ),
               ],
             );

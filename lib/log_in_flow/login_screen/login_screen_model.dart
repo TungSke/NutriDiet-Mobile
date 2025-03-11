@@ -63,7 +63,7 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Login success!"),
+              content: Text("Đăng nhập thành công!"),
               backgroundColor: Colors.green,
               duration: Duration(seconds: 2),
             ),

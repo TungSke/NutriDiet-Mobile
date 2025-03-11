@@ -6,6 +6,8 @@ class MealPlan {
   final String? healthGoal;
   final int? duration;
   final String? status;
+  final String? aiWarning;
+  final String? startAt;
   final String? createdBy;
   final DateTime? createdAt;
   final List<MealPlanDetail> mealPlanDetails;
@@ -16,6 +18,8 @@ class MealPlan {
     this.healthGoal,
     this.duration,
     this.status,
+    this.aiWarning,
+    this.startAt,
     this.createdBy,
     this.createdAt,
     required this.mealPlanDetails,
@@ -32,6 +36,8 @@ class MealPlan {
       healthGoal: json['healthGoal'],
       duration: json['duration'],
       status: json['status'],
+      aiWarning: json['aiwarning']?.toString(),
+      startAt: json['startAt'] as String?,
       createdBy: json['createdBy'],
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
       mealPlanDetails: (json['mealPlanDetails'] as List<dynamic>?)
