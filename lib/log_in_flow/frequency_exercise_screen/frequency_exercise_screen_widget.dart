@@ -18,11 +18,6 @@ class FrequencyExerciseScreenWidget extends StatefulWidget {
 
 final List<Map<String, String>> exerciseLevels = [
   {
-    'title': 'Không hoạt động',
-    'description': 'Ít hoặc không có hoạt động thể chất.',
-    'image': 'assets/images/exercise-1.png'
-  },
-  {
     'title': 'Ít vận động',
     'description': 'Công việc văn phòng, ít tập thể dục.',
     'image': 'assets/images/exercise-2.png'

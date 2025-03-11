@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/services/user_service.dart';
+import '../../services/models/health_profile_provider.dart';
 import 'hight_enter_screen_widget.dart'; // Import UserService
 
 class HightEnterScreenModel extends FlutterFlowModel<HightEnterScreenWidget> {
@@ -47,26 +48,18 @@ class HightEnterScreenModel extends FlutterFlowModel<HightEnterScreenWidget> {
       return;
     }
 
-    try {
-      final response = await UserService().updateHealthProfile(
-        height: newHeight, // ✅ Chuyển sang int
+    // Lưu chiều cao vào HealthProfileProvider dưới dạng int
+    Provider.of<HealthProfileProvider>(context, listen: false)
+        .setHeight(newHeight);
 
-        activityLevel: null,
-        aisuggestion: null,
-        allergies: [],
-        diseases: [],
-      );
+    // Log chiều cao vào console
+    print('Chiều cao đã lưu vào provider: $newHeight');
 
-      if (response.statusCode == 200) {
-        FFAppState().cmvalue = newHeight.toString(); // Lưu lại dưới dạng String
-        FFAppState().update(() {});
-        showSnackbar(context, 'Cập nhật chiều cao thành công!');
-      } else {
-        final error = response.body;
-        showSnackbar(context, 'Cập nhật thất bại: $error');
-      }
-    } catch (e) {
-      showSnackbar(context, 'Lỗi: $e');
-    }
+    // Cập nhật lại trạng thái ứng dụng (FFAppState)
+    FFAppState().cmvalue = newHeightStr;
+    FFAppState().update(() {});
+
+    // Hiển thị thông báo cho người dùng
+    showSnackbar(context, 'Cập nhật chiều cao thành công!');
   }
 }

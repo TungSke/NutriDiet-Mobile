@@ -1,5 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
 
+import 'package:diet_plan_app/services/models/health_profile_provider.dart';
 import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => appState),
         ChangeNotifierProvider(create: (context) => PersonalGoalProvider()),
+        ChangeNotifierProvider(create: (context) => HealthProfileProvider()),
         ChangeNotifierProvider(create: (context) => SampleMealPlanModel()),
       ],
       child: const MyApp(),

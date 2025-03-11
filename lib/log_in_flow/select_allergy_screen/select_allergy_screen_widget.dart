@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '../../services/models/health_profile_provider.dart';
 import 'select_allergy_screen_model.dart';
 
 class SelectAllergyScreenWidget extends StatefulWidget {
@@ -92,7 +93,16 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
                                   ),
                                 );
                               } else {
-                                model.updateAllergy(context);
+                                // Cập nhật allergies vào provider (dùng List<int>)
+                                context
+                                    .read<HealthProfileProvider>()
+                                    .setAllergies(model.selectedAllergyIds);
+
+                                // Kiểm tra xem allergies đã được lưu vào provider chưa
+                                print(
+                                    "Dị ứng đã lưu vào HealthProfileProvider: ${context.read<HealthProfileProvider>().allergies}");
+
+                                // Chuyển đến màn hình tiếp theo
                                 context.pushNamed("Select_disease_screen");
                               }
                             },
@@ -113,6 +123,7 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
                               borderRadius: BorderRadius.circular(16.0),
                             ),
                           ),
+
                           const SizedBox(height: 10.0), // Khoảng cách giữa nút
                           TextButton(
                             onPressed: () {

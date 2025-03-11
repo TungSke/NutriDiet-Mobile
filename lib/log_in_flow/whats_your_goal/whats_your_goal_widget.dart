@@ -71,7 +71,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
             "   - WeightChangeRate: ${personalGoalProvider.weightChangeRate}");
 
         // ✅ Gửi API khi bấm "Tiếp tục"
-        final updateResponse = await UserService().updatePersonalGoal(
+        final updateResponse = await UserService().createPersonalGoal(
           goalType: personalGoalProvider.goalType!,
           targetWeight: personalGoalProvider.targetWeight!,
           weightChangeRate: personalGoalProvider.weightChangeRate!,

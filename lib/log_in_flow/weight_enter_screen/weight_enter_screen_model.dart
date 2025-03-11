@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '../../services/user_service.dart';
+import '../../services/models/health_profile_provider.dart';
 import 'weight_enter_screen_widget.dart' show WeightEnterScreenWidget;
 
 class WeightEnterScreenModel extends FlutterFlowModel<WeightEnterScreenWidget> {
@@ -46,48 +47,20 @@ class WeightEnterScreenModel extends FlutterFlowModel<WeightEnterScreenWidget> {
       showSnackbar(context, 'Cân nặng không hợp lệ, vui lòng nhập số dương.');
       return;
     }
-    try {
-      // 🔹 Gọi API lấy thông tin sức khỏe
-      final healthProfileResponse = await UserService().getHealthProfile();
-      print("🔹 Response từ API health-profile: ${healthProfileResponse.body}");
 
-      int? height;
-      if (healthProfileResponse.statusCode == 200) {
-        final Map<String, dynamic> healthProfile =
-            jsonDecode(healthProfileResponse.body);
-        print("🔹 Dữ liệu healthProfile: $healthProfile");
+    // Lưu cân nặng vào HealthProfileProvider dưới dạng int
+    Provider.of<HealthProfileProvider>(context, listen: false)
+        .setWeight(newWeight);
 
-        height = healthProfile['data']['height'] != null
-            ? int.tryParse(healthProfile['data']['height'].toString())
-            : null;
-      }
+    // Log cân nặng vào console để kiểm tra
+    print(
+        'Cân nặng đã lưu vào provider: ${Provider.of<HealthProfileProvider>(context, listen: false).weight}');
 
-      // 🔹 Kiểm tra nếu height vẫn bị null
-      if (height == null) {
-        showSnackbar(
-            context, '⚠️ Không thể lấy chiều cao, vui lòng thử lại sau.');
-        return;
-      }
+    // Cập nhật lại trạng thái ứng dụng (FFAppState)
+    FFAppState().kgvalue = newWeightStr;
+    FFAppState().update(() {});
 
-      final response = await UserService().updateHealthProfile(
-        height: height,
-        weight: newWeight,
-        activityLevel: null,
-        aisuggestion: null,
-        allergies: [],
-        diseases: [],
-      );
-
-      if (response.statusCode == 200) {
-        FFAppState().kgvalue = newWeight.toString();
-        FFAppState().update(() {});
-        showSnackbar(context, 'Cập nhật cân nặng thành công!');
-      } else {
-        final error = response.body;
-        showSnackbar(context, 'Cập nhật thất bại: $error');
-      }
-    } catch (e) {
-      showSnackbar(context, ' Lỗi: $e');
-    }
+    // Hiển thị thông báo cho người dùng
+    showSnackbar(context, 'Cập nhật cân nặng thành công!');
   }
 }
