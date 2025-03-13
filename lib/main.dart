@@ -2,24 +2,28 @@
 
 import 'package:diet_plan_app/services/models/health_profile_provider.dart';
 import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:provider/provider.dart';
-
 import 'flutter_flow/flutter_flow_util.dart';
 import 'meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
-
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
-
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await setupFCM();
   if (kIsWeb) {
     await FacebookAuth.i.webAndDesktopInitialize(
       appId: "523734217385588",
@@ -40,6 +44,22 @@ void main() async {
     ),
   );
 }
+
+Future<void> setupFCM() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.denied) {
+    print("Người dùng từ chối nhận thông báo.");
+    return;
+  }
+}
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
