@@ -5,6 +5,23 @@ import 'package:flutter/material.dart';
 import '../../services/user_service.dart';
 
 class EditPersonalGoalScreenModel extends ChangeNotifier {
+  final _userService = UserService();
+  String name = '';
+  String age = '';
+  String phoneNumber = '';
+  String location = '';
+  String email = '';
+
+  int height = 0; // Chiều cao
+  int weight = 0; // Cân nặng
+  String activityLevel = ''; // Mức độ vận động
+
+  bool isLoading = true;
+
+  String userId = '';
+
+  String errorMessage = "";
+
   final Map<String, int> _weightChangeRateMap = {
     'Giữ cân': 0,
     'Tăng 0.25kg/1 tuần': 250,
@@ -44,12 +61,58 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
   int targetWeight = 0; // Cân nặng mục tiêu
   String weightChangeRate = ''; // Mức độ thay đổi cân nặng
 
-  bool isLoading = true;
   int currentWeight = 0; // Biến lưu trữ cân nặng hiện tại
 
   // Lấy dữ liệu mục tiêu cá nhân từ API
 // Lấy dữ liệu mục tiêu cá nhân từ API
   // Lấy dữ liệu mục tiêu cá nhân từ API
+  Future<void> fetchHealthProfile() async {
+    try {
+      final response = await UserService().getHealthProfile();
+
+      if (response.statusCode == 200) {
+        final healthData = jsonDecode(response.body);
+
+        // Parse height and weight as integers
+        height = healthData['data']['height'] != null
+            ? int.parse(healthData['data']['height'].toString())
+            : 0;
+        weight = healthData['data']['weight'] != null
+            ? int.parse(healthData['data']['weight'].toString())
+            : 0;
+
+        // Ánh xạ từ giá trị số về giá trị mô tả cho activityLevel
+
+        isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+    }
+  }
+
+  Future<void> fetchUserProfile() async {
+    try {
+      final response = await UserService().whoAmI();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        name = data['name'] ?? "Chưa cập nhật";
+        age = data['age']?.toString() ?? "0";
+        phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
+        location = data['address'] ?? "Chưa cập nhật";
+        email = data["email"] ?? "Chưa cập nhật";
+        userId = data['id']?.toString() ?? "";
+        isLoading = false; // Đặt trạng thái không còn loading
+
+        isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+    }
+  }
+
   Future<void> fetchPersonalGoal() async {
     try {
       // Fetch health profile first to get the current weight

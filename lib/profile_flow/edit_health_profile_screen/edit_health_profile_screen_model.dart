@@ -6,6 +6,23 @@ import '../../services/user_service.dart';
 
 class EditHealthProfileScreenModel extends ChangeNotifier {
   // Mảng ánh xạ các giá trị mô tả tới giá trị số cho activityLevel
+  final _userService = UserService();
+  String name = '';
+  String age = '';
+  String phoneNumber = '';
+  String location = '';
+  String email = '';
+
+  int height = 0; // Chiều cao
+  int weight = 0; // Cân nặng
+  String activityLevel = ''; // Mức độ vận động
+
+  bool isLoading = true;
+
+  String userId = '';
+
+  String errorMessage = "";
+
   final Map<String, String> _activityLevelMap = {
     'Ít vận động': 'Sedentary',
     'Vận động nhẹ': 'LightlyActive',
@@ -22,12 +39,27 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
     'VeryActive': 'Vận động nhiều',
     'ExtraActive': 'Cường độ rất cao',
   };
+  Future<void> fetchUserProfile() async {
+    try {
+      final response = await UserService().whoAmI();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
 
-  int height = 0; // Chiều cao
-  int weight = 0; // Cân nặng
-  String activityLevel = ''; // Mức độ vận động
+        name = data['name'] ?? "Chưa cập nhật";
+        age = data['age']?.toString() ?? "0";
+        phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
+        location = data['address'] ?? "Chưa cập nhật";
+        email = data["email"] ?? "Chưa cập nhật";
+        userId = data['id']?.toString() ?? "";
+        isLoading = false; // Đặt trạng thái không còn loading
 
-  bool isLoading = true;
+        isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+    }
+  }
 
   // Lấy dữ liệu sức khỏe từ API
   Future<void> fetchHealthProfile() async {

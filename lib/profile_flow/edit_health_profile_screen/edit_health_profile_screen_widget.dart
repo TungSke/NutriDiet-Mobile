@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'edit_health_profile_screen_model.dart';
 
@@ -24,6 +25,7 @@ class _EditHealthProfileScreenWidgetState
 
     Future.delayed(Duration.zero, () async {
       await _model.fetchHealthProfile();
+      await _model.fetchUserProfile();
       setState(() {}); // 🚀 Cập nhật UI ngay sau khi fetch dữ liệu
     });
   }
@@ -91,16 +93,37 @@ class _EditHealthProfileScreenWidgetState
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.grey[300],
-            child: Icon(Icons.person, size: 50, color: Colors.white),
+          Container(
+            padding: EdgeInsets.only(top: 30),
+            decoration: BoxDecoration(),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(0.0),
+              child: Image.asset(
+                'assets/images/jamekooper_.png',
+                width: 80.0,
+                height: 80.0,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-          TextButton(
-            onPressed: () {},
-            child:
-                Text('Đặt ảnh đại diện', style: TextStyle(color: Colors.green)),
+          SizedBox(
+            width: 150,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Column(
+                children: [
+                  Text(_model.name,
+                      style: GoogleFonts.roboto(
+                          fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text(
+                      "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
+                      style:
+                          GoogleFonts.roboto(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+            ),
           ),
         ],
       ),
