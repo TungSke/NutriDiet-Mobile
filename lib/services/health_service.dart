@@ -31,6 +31,7 @@ class HealthService {
         return double.parse(value).toStringAsFixed(2);
       }
 
+      // Tìm kiếm các chỉ số BMI và TDEE
       final bmiIndicator = healthcareIndicators.firstWhere(
         (indicator) => indicator["code"] == "BMI",
         orElse: () => null,
@@ -41,11 +42,14 @@ class HealthService {
         orElse: () => null,
       );
 
-// Cập nhật lại healthData với BMI & TDEE (làm tròn 2 chữ số)
+      // Cập nhật lại healthData với BMI & TDEE (làm tròn 2 chữ số)
       return {
         "healthData": {
           ...healthData,
+          // Cập nhật giá trị BMI, BMIType và TDEE nếu có
           "BMI": parseValue(bmiIndicator?["currentValue"]) ?? "N/A",
+          "BMIType":
+              bmiIndicator?["type"] ?? "N/A", // Bổ sung phần kiểm tra BMIType
           "TDEE": parseValue(tdeeIndicator?["currentValue"]) ?? "N/A",
         },
         "personalGoal": personalGoal,
