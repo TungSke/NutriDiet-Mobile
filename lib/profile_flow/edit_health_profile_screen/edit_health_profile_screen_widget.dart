@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 import 'edit_health_profile_screen_model.dart';
 
@@ -23,9 +25,16 @@ class _EditHealthProfileScreenWidgetState
     super.initState();
     _model = EditHealthProfileScreenModel();
 
+    // Debugging: Kiểm tra giá trị ban đầu của selectedAllergyIds
+    print('Selected Allergies at init: ${_model.selectedAllergyIds}');
+
     Future.delayed(Duration.zero, () async {
       await _model.fetchHealthProfile();
       await _model.fetchUserProfile();
+      await _model.fetchAllergyLevelsData();
+      await _model.fetchDiseaseLevelsData();
+      // Debugging: Kiểm tra giá trị sau khi fetch dữ liệu
+      print('Selected Allergies after fetch: ${_model.selectedAllergyIds}');
       setState(() {}); // 🚀 Cập nhật UI ngay sau khi fetch dữ liệu
     });
   }
@@ -47,10 +56,6 @@ class _EditHealthProfileScreenWidgetState
   }
 
   Widget _buildHeader() {
-    bool canUpdate = _model.height != 0 &&
-        _model.weight != 0 &&
-        _model.activityLevel.isNotEmpty;
-
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
@@ -69,7 +74,7 @@ class _EditHealthProfileScreenWidgetState
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           InkWell(
-            onTap: isEdited && canUpdate
+            onTap: isEdited // Điều kiện bật nút màu xanh khi có thay đổi
                 ? () async {
                     await _model
                         .updateHealthProfile(context); // Pass context here
@@ -80,13 +85,22 @@ class _EditHealthProfileScreenWidgetState
                 : null,
             child: Icon(
               Icons.check,
-              color: (isEdited && canUpdate) ? Colors.green : Colors.grey,
+              color: isEdited
+                  ? Colors.green
+                  : Colors.grey, // Nút check màu xanh khi có thay đổi
               size: 28,
             ),
           ),
         ],
       ),
     );
+  }
+
+  // Kiểm tra trạng thái "isEdited" khi có bất kỳ thay đổi nào
+  void _handleChange() {
+    setState(() {
+      isEdited = true;
+    });
   }
 
   Widget _buildProfilePhoto() {
@@ -139,13 +153,13 @@ class _EditHealthProfileScreenWidgetState
       child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
-          _buildHeightRow('Height', _model.height, (val) {
+          _buildHeightRow('Chiều cao', _model.height, (val) {
             setState(() {
               _model.height = int.tryParse(val) ?? 0;
               isEdited = true;
             });
           }),
-          _buildWeightRow('Weight', _model.weight, (val) {
+          _buildWeightRow('Cân nặng', _model.weight, (val) {
             setState(() {
               _model.weight = int.tryParse(val) ?? 0;
               isEdited = true;
@@ -168,6 +182,8 @@ class _EditHealthProfileScreenWidgetState
               });
             },
           ),
+          _buildAllergySelector(_model.allergyLevelsData),
+          _buildDiseaseSelector(_model.diseaseLevelsData),
         ],
       ),
     );
@@ -226,6 +242,154 @@ class _EditHealthProfileScreenWidgetState
               },
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAllergySelector(List<Map<String, dynamic>> allergies) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Dị ứng',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+
+          // Nút chọn multiple allergies
+          GestureDetector(
+            onTap: () async {
+              final selected = await showDialog<List<int>>(
+                context: context,
+                builder: (BuildContext context) {
+                  return MultiSelectDialog(
+                    items: allergies.map((allergy) {
+                      return MultiSelectItem<int>(
+                        int.tryParse(allergy['id'].toString()) ?? 0,
+                        allergy['title'],
+                      );
+                    }).toList(),
+                    // Đảm bảo giá trị initialValue là danh sách các ID dị ứng đã chọn
+                    initialValue: List<int>.from(_model
+                        .selectedAllergyIds), // Chuyển đổi selectedAllergyIds thành List<int>
+                  );
+                },
+              );
+
+              if (selected != null) {
+                setState(() {
+                  // Cập nhật lại selectedAllergyIds với giá trị người dùng đã chọn
+                  _model.selectedAllergyIds = selected;
+                  print('Selected Allergies: ${_model.selectedAllergyIds}');
+
+                  _model.allergies = selected.map((id) {
+                    return allergies
+                        .firstWhere((allergy) =>
+                            int.tryParse(allergy['id'].toString()) ==
+                            id)['title']
+                        .toString();
+                  }).toList();
+                  isEdited = true;
+                });
+              }
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    _model.allergies.isNotEmpty
+                        ? _model.allergies
+                            .join(', ') // Hiển thị các dị ứng đã chọn
+                        : 'Chưa chọn dị ứng', // Hiển thị khi chưa chọn dị ứng
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Spacer(),
+                  Icon(Icons.arrow_drop_down),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDiseaseSelector(List<Map<String, dynamic>> diseases) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Bệnh nền ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+
+          // Nút chọn multiple allergies
+          GestureDetector(
+            onTap: () async {
+              final selected = await showDialog<List<int>>(
+                context: context,
+                builder: (BuildContext context) {
+                  return MultiSelectDialog(
+                    items: diseases.map((disease) {
+                      return MultiSelectItem<int>(
+                        int.tryParse(disease['id'].toString()) ?? 0,
+                        disease['title'],
+                      );
+                    }).toList(),
+                    // Đảm bảo giá trị initialValue là danh sách các ID dị ứng đã chọn
+                    initialValue: List<int>.from(_model
+                        .selectedDiseaseIds), // Chuyển đổi selectedAllergyIds thành List<int>
+                  );
+                },
+              );
+
+              if (selected != null) {
+                setState(() {
+                  // Cập nhật lại selectedAllergyIds với giá trị người dùng đã chọn
+                  _model.selectedDiseaseIds = selected;
+                  print('Selected Diseases: ${_model.selectedDiseaseIds}');
+
+                  _model.diseases = selected.map((id) {
+                    return diseases
+                        .firstWhere((disease) =>
+                            int.tryParse(disease['id'].toString()) ==
+                            id)['title']
+                        .toString();
+                  }).toList();
+                  isEdited = true;
+                });
+              }
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    _model.diseases.isNotEmpty
+                        ? _model.diseases
+                            .join(', ') // Hiển thị các dị ứng đã chọn
+                        : 'Chưa chọn bệnh  ', // Hiển thị khi chưa chọn dị ứng
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Spacer(),
+                  Icon(Icons.arrow_drop_down),
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );

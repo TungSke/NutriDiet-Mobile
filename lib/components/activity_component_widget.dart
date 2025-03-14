@@ -10,6 +10,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '../services/health_service.dart';
 import '../services/user_service.dart';
 import 'activity_component_model.dart';
+import 'chart_weight_widget.dart';
 
 export 'home_componet_model.dart';
 
@@ -31,8 +32,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   String phoneNumber = '';
   String location = '';
   String email = '';
-  String height = '';
-  String weight = '';
+  int height = 0;
+  int weight = 0;
   String activityLevel = '';
   String userId = '';
   bool isLoading = true;
@@ -94,6 +95,34 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
       });
     }
   }
+
+  // Future<void> fetchHealthProfile() async {
+  //   try {
+  //     final response = await _userService.getHealthProfile();
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       setState(() {
+  //         weight = data['weight'] ?? "Chưa cập nhật";
+  //         height = data['age']?.toString() ?? "0";
+  //         phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
+  //         location = data['address'] ?? "Chưa cập nhật";
+  //         email = data["email"] ?? "Chưa cập nhật";
+  //         userId = data['id']?.toString() ?? "";
+  //         isLoading = false; // Đặt trạng thái không còn loading
+  //       });
+  //     } else {
+  //       setState(() {
+  //         errorMessage = '❌ Failed to fetch user profile';
+  //         isLoading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       errorMessage = "❌ Lỗi khi lấy thông tin người dùng: $e";
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
 
   Map<String, dynamic>? healthData;
   Map<String, dynamic>? personalGoal;
@@ -188,7 +217,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             Text(name,
                                 style: GoogleFonts.roboto(
                                     fontSize: 18, fontWeight: FontWeight.w600)),
-                            Text("• $age tuổi • $height cm • $weight kg",
+                            Text(
+                                "• $age tuổi • ${healthData?['height']} cm • ${healthData?['weight']} kg",
                                 style: GoogleFonts.roboto(
                                     fontSize: 12, color: Colors.grey)),
                           ],
@@ -274,16 +304,29 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                           ),
                         ],
                       ),
+                      WeightProgressChart(),
                     ],
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(
                       20.0, 24.0, 20.0, 16.0),
-                  child: Text(
-                    "Chỉ số hiện tại",
-                    style: GoogleFonts.roboto(
-                        fontSize: 18, fontWeight: FontWeight.bold),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Tình trạng hiện tại:",
+                        style: GoogleFonts.roboto(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        "${healthData?['BMIType']}",
+                        style: GoogleFonts.roboto(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: FlutterFlowTheme.of(context).primary),
+                      ),
+                    ],
                   ),
                 ),
                 Row(
@@ -323,6 +366,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             ),
                           ),
                         ),
+                        Text("Chỉ số cơ thể")
                       ],
                     ),
                     Column(
@@ -359,6 +403,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             ),
                           ),
                         ),
+                        Text("Năng lượng cần tiêu thụ")
                       ],
                     ),
                   ],

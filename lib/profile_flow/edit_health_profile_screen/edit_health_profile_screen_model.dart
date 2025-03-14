@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+import '../../services/allergy_service.dart';
+import '../../services/disease_service.dart';
 import '../../services/user_service.dart';
 
 class EditHealthProfileScreenModel extends ChangeNotifier {
-  // Mảng ánh xạ các giá trị mô tả tới giá trị số cho activityLevel
   final _userService = UserService();
   String name = '';
   String age = '';
@@ -16,11 +17,12 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
   int height = 0; // Chiều cao
   int weight = 0; // Cân nặng
   String activityLevel = ''; // Mức độ vận động
-
+  List<String> allergies = []; // ✅ Dị ứng
+  List<String> diseases = [];
   bool isLoading = true;
-
+  List<int> selectedAllergyIds = []; // Danh sách các dị ứng đã chọn
+  List<int> selectedDiseaseIds = [];
   String userId = '';
-
   String errorMessage = "";
 
   final Map<String, String> _activityLevelMap = {
@@ -31,7 +33,6 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
     'Cường độ rất cao': 'ExtraActive',
   };
 
-  // Mảng ánh xạ giá trị số về giá trị mô tả
   final Map<String, String> _reverseActivityLevelMap = {
     'Sedentary': 'Ít vận động',
     'LightlyActive': 'Vận động nhẹ',
@@ -39,9 +40,10 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
     'VeryActive': 'Vận động nhiều',
     'ExtraActive': 'Cường độ rất cao',
   };
+
   Future<void> fetchUserProfile() async {
     try {
-      final response = await UserService().whoAmI();
+      final response = await _userService.whoAmI();
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
@@ -51,25 +53,25 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
         location = data['address'] ?? "Chưa cập nhật";
         email = data["email"] ?? "Chưa cập nhật";
         userId = data['id']?.toString() ?? "";
-        isLoading = false; // Đặt trạng thái không còn loading
 
-        isLoading = false;
+        isLoading = false; // Đặt trạng thái không còn loading
         notifyListeners();
       }
     } catch (e) {
       print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+      isLoading = false;
+      notifyListeners();
     }
   }
 
-  // Lấy dữ liệu sức khỏe từ API
   Future<void> fetchHealthProfile() async {
     try {
-      final response = await UserService().getHealthProfile();
+      final response = await _userService.getHealthProfile();
 
       if (response.statusCode == 200) {
         final healthData = jsonDecode(response.body);
 
-        // Parse height and weight as integers
+        // Parse height and weight as integers with null check
         height = healthData['data']['height'] != null
             ? int.parse(healthData['data']['height'].toString())
             : 0;
@@ -77,76 +79,108 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
             ? int.parse(healthData['data']['weight'].toString())
             : 0;
 
-        // Ánh xạ từ giá trị số về giá trị mô tả cho activityLevel
         activityLevel =
             _reverseActivityLevelMap[healthData['data']['activityLevel']] ??
                 "Chưa cập nhật";
+
+        // Cập nhật tên dị ứng
+        allergies = healthData['data']["allergies"] != null
+            ? (healthData['data']["allergies"] as List)
+                .map((allergy) => allergy["allergyName"].toString())
+                .toList()
+            : [];
+
+        selectedAllergyIds = healthData['data']["allergies"] != null
+            ? (healthData['data']["allergies"] as List)
+                .map((allergy) => int.parse(allergy["allergyId"].toString()))
+                .toList()
+            : [];
+
+        diseases = healthData['data']["diseases"] != null
+            ? (healthData['data']["diseases"] as List)
+                .map((disease) => disease["diseaseName"].toString())
+                .toList()
+            : [];
+
+        selectedDiseaseIds = healthData['data']["diseases"] != null
+            ? (healthData['data']["diseases"] as List)
+                .map((disease) => int.parse(disease["diseaseId"].toString()))
+                .toList()
+            : [];
 
         isLoading = false;
         notifyListeners();
       }
     } catch (e) {
       print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+      isLoading = false;
+      notifyListeners();
     }
   }
 
-  // Cập nhật hồ sơ sức khỏe
+  List<Map<String, dynamic>> allergyLevelsData =
+      []; // Danh sách các dị ứng từ API
+  List<Map<String, dynamic>> diseaseLevelsData =
+      []; // Danh sách các dị ứng từ API
+
+// Hàm lấy danh sách dị ứng từ API
+  Future<void> fetchAllergyLevelsData() async {
+    try {
+      final allergyService = AllergyService();
+      final response = await allergyService.fetchAllergyLevelsData();
+      allergyLevelsData = response; // Cập nhật dữ liệu dị ứng
+      notifyListeners(); // Cập nhật UI sau khi có dữ liệu
+    } catch (e) {
+      print("❌ Lỗi khi lấy dữ liệu dị ứng: $e");
+    }
+  }
+
+  Future<void> fetchDiseaseLevelsData() async {
+    try {
+      final diseaseService = DiseaseService();
+      final response = await diseaseService.fetchDiseaseLevelsData();
+      diseaseLevelsData = response; // Cập nhật dữ liệu dị ứng
+      notifyListeners(); // Cập nhật UI sau khi có dữ liệu
+    } catch (e) {
+      print("❌ Lỗi khi lấy dữ liệu dị ứng: $e");
+    }
+  }
+
   Future<void> updateHealthProfile(BuildContext context) async {
     try {
-      // Lấy giá trị activityLevel đã ánh xạ
+      // Nếu không có dị ứng được chọn, vẫn tiếp tục cập nhật mà không gửi danh sách dị ứng
       final activityLevelInEnglish =
-          _activityLevelMap[activityLevel] ?? 'Sedentary'; // Default value
+          _activityLevelMap[activityLevel] ?? 'Sedentary';
 
-      final response = await UserService().updateHealthProfile(
-        activityLevel:
-            activityLevelInEnglish, // Gửi giá trị activityLevel đã ánh xạ
-        weight: weight, // Cân nặng đã là kiểu int
-        height: height, // Chiều cao đã là kiểu int
+      final response = await _userService.updateHealthProfile(
+        activityLevel: activityLevelInEnglish,
+        weight: weight,
+        height: height,
+        allergies: selectedAllergyIds.isEmpty
+            ? []
+            : selectedAllergyIds, // Nếu không có dị ứng thì gửi danh sách trống
+        diseases: selectedDiseaseIds.isEmpty ? [] : selectedDiseaseIds,
       );
 
       if (response.statusCode == 200) {
         print('✅ Cập nhật thành công!');
-        await fetchHealthProfile(); // Fetch dữ liệu mới sau khi cập nhật
+        await fetchHealthProfile(); // Fetch updated data
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Cập nhật thành công!"),
-            duration: Duration(seconds: 2),
-          ),
+          SnackBar(content: Text('Cập nhật thành công!')),
         );
         Navigator.pop(context, true);
-      } else if (response.statusCode == 400) {
-        // Xử lý lỗi 400 và hiển thị thông báo lỗi
+      } else {
         final responseData = jsonDecode(response.body);
         final errorMessage = responseData['message'] ?? 'Cập nhật thất bại';
-
-        // In thông báo lỗi vào console
         print('❌ Lỗi: $errorMessage');
-
-        // Hiển thị thông báo lỗi trong SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      } else {
-        // Xử lý lỗi khác
-        print('❌ Lỗi không xác định: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Có lỗi xảy ra, vui lòng thử lại!'),
-            duration: Duration(seconds: 3),
-          ),
+          SnackBar(content: Text(errorMessage)),
         );
       }
     } catch (e) {
-      // Xử lý ngoại lệ và hiển thị lỗi
       print("❌ Lỗi khi cập nhật hồ sơ sức khỏe: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Đã xảy ra lỗi, vui lòng thử lại."),
-          duration: Duration(seconds: 3),
-        ),
+        SnackBar(content: Text('Đã xảy ra lỗi, vui lòng thử lại.')),
       );
     }
   }
