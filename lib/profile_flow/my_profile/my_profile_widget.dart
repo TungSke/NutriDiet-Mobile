@@ -367,11 +367,6 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              // Gọi lại API để cập nhật mục tiêu sức khỏe
-                              await _model
-                                  .fetchHealthProfile(); // Gọi lại API khi cập nhật
-                              setState(() {}); // Cập nhật UI ngay
-                              // Chuyển đến màn hình chỉnh sửa mục tiêu sức khỏe
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -381,9 +376,8 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                               );
 
                               if (result == true) {
-                                // Nếu có kết quả trả về từ màn hình chỉnh sửa, gọi lại API
                                 await _model.fetchHealthProfile();
-                                setState(() {}); // Cập nhật lại UI
+                                setState(() {});
                               }
                             },
                             child: Padding(
@@ -493,7 +487,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                               fontWeight: FontWeight.normal,
                                               color: Colors.grey),
                                         )
-                                      : Text("Không có dị ứng"),
+                                      : Text(
+                                          "Không có dị ứng",
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.grey),
+                                        ),
                                 ],
                               ),
                               Column(
@@ -515,7 +515,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                               fontWeight: FontWeight.normal,
                                               color: Colors.grey),
                                         )
-                                      : Text("Không có dị ứng"),
+                                      : Text(
+                                          "Không có bệnh nền",
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.grey),
+                                        ),
                                 ],
                               ),
                             ].divide(const SizedBox(height: 4.0)),
