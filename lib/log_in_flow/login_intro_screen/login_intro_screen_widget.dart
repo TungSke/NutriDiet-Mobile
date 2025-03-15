@@ -47,13 +47,14 @@ class _LoginIntroScreenWidgetState extends State<LoginIntroScreenWidget>
               child: Stack(
                 children: [
                   ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                      child: Image.asset(
-                        'assets/images/bg1.png',
-                        fit: BoxFit.contain,
-                      )),
+                    imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                    child: Image.asset(
+                      'assets/images/bg1.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                   Container(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withOpacity(0.4),
                   ),
                 ],
               ),
@@ -65,72 +66,64 @@ class _LoginIntroScreenWidgetState extends State<LoginIntroScreenWidget>
               right: 16,
               child: GestureDetector(
                 onTap: () {
-                  context.pushNamed(
-                      "bottom_navbar_screen"); // Chuyển đến màn hình chính
+                  context.pushNamed("bottom_navbar_screen");
                 },
                 child: Text(
                   "Bỏ qua >",
                   style: GoogleFonts.roboto(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey,
+                    color: Colors.white70,
                   ),
                 ),
               ),
             ),
 
-            // Nội dung chính
-            Positioned.fill(
+            Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Spacer(),
-
                   // Logo + Tiêu đề
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Image.asset(
-                          'assets/images/app_launcher_icon.png',
-                          height: 60,
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "NutriDiet",
-                              style: GoogleFonts.roboto(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Your Personal Nutrition",
-                              style: GoogleFonts.roboto(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
+                  Image.asset(
+                    'assets/images/app_launcher_icon.png',
+                    height: 80,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "NutriDiet",
+                    style: GoogleFonts.roboto(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.black45,
+                          offset: Offset(2, 2),
+                        )
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Your Personal Nutrition",
+                    style: GoogleFonts.roboto(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
 
                   // Nút Đăng nhập
                   SizedBox(
-                    width: 250,
+                    width: 260,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: FlutterFlowTheme.of(context).primary,
                         padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       onPressed: () {
                         context.pushNamed("login_screen");
@@ -146,38 +139,34 @@ class _LoginIntroScreenWidgetState extends State<LoginIntroScreenWidget>
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  // Dòng chữ "Hoặc tiếp tục với"
+                  // Dòng "Hoặc tiếp tục với"
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Row(
                       children: [
-                        const Expanded(
-                          child: Divider(color: Colors.grey, thickness: 1),
-                        ),
+                        const Expanded(child: Divider(color: Colors.white60)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
                             "Hoặc tiếp tục với",
                             style: GoogleFonts.roboto(
                               fontSize: 14,
-                              color: Colors.grey,
+                              color: Colors.white70,
                             ),
                           ),
                         ),
-                        const Expanded(
-                          child: Divider(color: Colors.grey, thickness: 1),
-                        ),
+                        const Expanded(child: Divider(color: Colors.white60)),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 20),
 
-                  // Nút đăng nhập bằng Google
+                  // Nút đăng nhập Google
                   SizedBox(
-                    width: 250,
+                    width: 260,
                     height: 50,
                     child: SignInButton(
                       Buttons.google,
@@ -189,23 +178,21 @@ class _LoginIntroScreenWidgetState extends State<LoginIntroScreenWidget>
 
                   const SizedBox(height: 10),
 
-                  // Nút đăng nhập bằng Facebook
+                  // Nút đăng nhập Facebook
                   SizedBox(
-                    width: 250,
+                    width: 260,
                     height: 50,
                     child: SignInButton(
                       Buttons.facebookNew,
                       onPressed: () async {
                         await _model.loginFaceBook(context);
                       },
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
 
                   const SizedBox(height: 30),
 
-                  // Dòng chữ "Bạn chưa có tài khoản?"
+                  // Dòng "Bạn chưa có tài khoản?"
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -213,7 +200,7 @@ class _LoginIntroScreenWidgetState extends State<LoginIntroScreenWidget>
                         "Bạn chưa có tài khoản?",
                         style: GoogleFonts.roboto(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: Colors.white70,
                         ),
                       ),
                       const SizedBox(width: 4),
