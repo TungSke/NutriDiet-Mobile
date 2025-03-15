@@ -15,6 +15,7 @@ class MealLogComponentWidget extends StatelessWidget {
         builder: (context, model, child) {
           return Scaffold(
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -31,7 +32,8 @@ class MealLogComponentWidget extends StatelessWidget {
                     child: Text(
                       DateFormat('MMMM d, yyyy').format(model.selectedDate),
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontFamily: 'Figtree',
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -62,7 +64,8 @@ class MealLogComponentWidget extends StatelessWidget {
                             const Text(
                               'Calories Remaining',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontFamily: 'Figtree',
+                                fontSize: 17,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -81,7 +84,7 @@ class MealLogComponentWidget extends StatelessWidget {
                               model.remainingCalories.toString(), 
                               'Remaining', 
                               FontWeight.bold,
-                              textColor: Colors.green
+                              textColor: Colors.red
                             ),
                           ],
                         ),
@@ -137,7 +140,8 @@ class MealLogComponentWidget extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            fontSize: 24,
+            fontFamily: 'Figtree',
+            fontSize: 20,
             fontWeight: weight,
             color: textColor,
           ),
@@ -145,7 +149,8 @@ class MealLogComponentWidget extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 16,
+            fontFamily: 'Figtree',
+            fontSize: 15,
           ),
         ),
       ],
@@ -156,7 +161,8 @@ class MealLogComponentWidget extends StatelessWidget {
     return Text(
       operator,
       style: const TextStyle(
-        fontSize: 24,
+        fontFamily: 'Figtree',
+        fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
     );
@@ -169,6 +175,7 @@ class MealLogComponentWidget extends StatelessWidget {
           title: Text(
             category,
             style: const TextStyle(
+              fontFamily: 'Figtree',
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -198,6 +205,7 @@ class MealLogComponentWidget extends StatelessWidget {
                 child: Text(
                   'P',
                   style: TextStyle(
+                    fontFamily: 'Figtree',
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -208,6 +216,7 @@ class MealLogComponentWidget extends StatelessWidget {
             trailing: const Text(
               '3',
               style: TextStyle(
+                fontFamily: 'Figtree',
                 fontWeight: FontWeight.bold,
               ),
             ),

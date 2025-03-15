@@ -1,5 +1,4 @@
 import 'package:diet_plan_app/components/my_mealplan_component_widget.dart';
-import 'package:diet_plan_app/components/serch_data_widget.dart';
 import 'package:diet_plan_app/components/mealLog_component_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -76,9 +75,11 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     child: const ActivityComponentWidget(),
                   ),
                   wrapWithModel(
-                    model: _model.serchDataModel,
+                    model: _model
+                        .mealLogComponentModel, 
                     updateCallback: () => safeSetState(() {}),
-                    child: const SerchDataWidget(),
+                    child:
+                        const MealLogComponentWidget(), 
                   ),
                   wrapWithModel(
                     model: _model
@@ -92,13 +93,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     updateCallback: () => safeSetState(() {}),
                     child: const ProfileComponetWidget(),
                   ),
-                  wrapWithModel(
-                    model: _model
-                        .mealLogComponentModel, 
-                    updateCallback: () => safeSetState(() {}),
-                    child:
-                        const MealLogComponentWidget(), 
-                  ),
+                  
                 ],
               ),
             ),
@@ -150,7 +145,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
-                                        'assets/images/BLACK-HOME-FILL.svg',
+                                        'assets/images/home-fill.svg',
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -161,7 +156,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   return ClipRRect(
                                     borderRadius: BorderRadius.circular(0.0),
                                     child: SvgPicture.asset(
-                                      'assets/images/GREY-BOTTOM-HOME.svg',
+                                      'assets/images/home.svg',
                                       width: 24.0,
                                       height: 24.0,
                                       fit: BoxFit.contain,
@@ -227,7 +222,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
-                                        'assets/images/BALCK-FILL-RECIPE-BOTTOM.svg',
+                                        'assets/images/report-fill.svg',
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -238,7 +233,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   return ClipRRect(
                                     borderRadius: BorderRadius.circular(0.0),
                                     child: SvgPicture.asset(
-                                      'assets/images/GREY-RECPIT-BOTTOM.svg',
+                                      'assets/images/report.svg',
                                       width: 24.0,
                                       height: 24.0,
                                       fit: BoxFit.contain,
@@ -295,7 +290,8 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                     width: 59.0,
                                     height: 32.0,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFEDEDED),
+                                      color:
+                                          FlutterFlowTheme.of(context).bottom,
                                       borderRadius: BorderRadius.circular(30.0),
                                     ),
                                     alignment:
@@ -303,7 +299,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
-                                        'assets/images/BLACK-BOTTOM-SERCH-FILL.svg',
+                                        'assets/images/diary-fill.svg',
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -314,7 +310,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   return ClipRRect(
                                     borderRadius: BorderRadius.circular(0.0),
                                     child: SvgPicture.asset(
-                                      'assets/images/SERCH-GREY-BOTTOM.svg',
+                                      'assets/images/diary.svg',
                                       width: 24.0,
                                       height: 24.0,
                                       fit: BoxFit.contain,
@@ -324,12 +320,12 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                               },
                             ),
                             Text(
-                              'Tìm kiếm',
+                              'Nhật ký',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
                                     fontFamily: 'figtree',
-                                    color: _model.bottomadd == 2
+                                    color: _model.bottomadd == 5
                                         ? FlutterFlowTheme.of(context)
                                             .primaryText
                                         : FlutterFlowTheme.of(context).grey,
@@ -340,7 +336,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   ),
                             ),
                           ].divide(SizedBox(
-                              height: _model.bottomadd == 2 ? 4.0 : 8.0)),
+                              height: _model.bottomadd == 5 ? 4.0 : 8.0)),
                         ),
                       ),
                     ),
@@ -380,7 +376,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
-                                        'assets/images/BLACK-FILL-MEALPLAN-BOTTOM.svg', // Icon Meal Plan
+                                        'assets/images/meal-fill.svg', // Icon Meal Plan
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -391,7 +387,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   return ClipRRect(
                                     borderRadius: BorderRadius.circular(0.0),
                                     child: SvgPicture.asset(
-                                      'assets/images/GREY-MEALPLAN-BOTTOM.svg', // Icon khi không chọn
+                                      'assets/images/meal.svg', // Icon khi không chọn
                                       width: 24.0,
                                       height: 24.0,
                                       fit: BoxFit.contain,
@@ -457,7 +453,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: SvgPicture.asset(
-                                        'assets/images/BALCK-FILL-BOTTOM-PERSON.svg',
+                                        'assets/images/user-fill.svg',
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -498,83 +494,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          _model.bottomadd = 5;
-                          safeSetState(() {});
-                          await _model.pageViewController?.animateToPage(
-                            5,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.ease,
-                          );
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Builder(
-                              builder: (context) {
-                                if (_model.bottomadd == 5) {
-                                  return Container(
-                                    width: 59.0,
-                                    height: 32.0,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          FlutterFlowTheme.of(context).bottom,
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
-                                    alignment:
-                                        const AlignmentDirectional(0.0, 0.0),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(0.0),
-                                      child: SvgPicture.asset(
-                                        'assets/images/BALCK-FILL-BOTTOM-PERSON.svg',
-                                        width: 24.0,
-                                        height: 24.0,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(0.0),
-                                    child: SvgPicture.asset(
-                                      'assets/images/PROFILE-GRY-BOTTOM.svg',
-                                      width: 24.0,
-                                      height: 24.0,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                            Text(
-                              'Nhật ký',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: _model.bottomadd == 5
-                                        ? FlutterFlowTheme.of(context)
-                                            .primaryText
-                                        : FlutterFlowTheme.of(context).grey,
-                                    fontSize: 13.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                    lineHeight: 1.5,
-                                  ),
-                            ),
-                          ].divide(SizedBox(
-                              height: _model.bottomadd == 5 ? 4.0 : 8.0)),
-                        ),
-                      ),
-                    ),
+                    
                   ],
                 ),
               ),
