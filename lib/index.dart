@@ -77,3 +77,5 @@ export '/select_date_of_birth/select_date_of_birth_widget.dart'
 export '/splace_scren/splace_scren_widget.dart' show SplaceScrenWidget;
 export 'components/my_mealplan_component_widget.dart'
     show MyMealPlanScreenWidget;
+export 'components/mealLog_component_widget.dart'
+    show MealLogComponentWidget;

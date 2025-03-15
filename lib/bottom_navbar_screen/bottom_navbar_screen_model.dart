@@ -1,11 +1,13 @@
 import 'package:diet_plan_app/components/activity_component_model.dart';
 import 'package:diet_plan_app/components/serch_data_model.dart';
+import 'package:diet_plan_app/components/mealLog_component_model.dart';
 import 'package:flutter/material.dart';
 
 import '/components/home_componet_widget.dart';
 import '/components/profile_componet_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../components/my_mealplan_component_model.dart';
+import '../components/mealLog_component_model.dart';
 import 'bottom_navbar_screen_widget.dart' show BottomNavbarScreenWidget;
 
 class BottomNavbarScreenModel
@@ -28,14 +30,13 @@ class BottomNavbarScreenModel
   late HomeComponetModel homeComponetModel;
   late ActivityComponentModel activityComponentModel;
   // Model for serch_data component.
-  // Model for serch_data component.
   late SerchDataModel serchDataModel;
-  // Model for recipe_compnoet component.
-  //late RecipeCompnoetModel recipeCompnoetModel;
   // Model for profile_componet component.
   late ProfileComponetModel profileComponetModel;
   // Model for mealplan_componet component.
   late MyMealPlanComponentModel mymealplanComponentModel;
+  // Model for meal_log_component component.
+  late MealLogComponentModel mealLogComponentModel;
 
   @override
   void initState(BuildContext context) {
@@ -43,10 +44,10 @@ class BottomNavbarScreenModel
     activityComponentModel =
         createModel(context, () => ActivityComponentModel());
     serchDataModel = createModel(context, () => SerchDataModel());
-    //recipeCompnoetModel = createModel(context, () => RecipeCompnoetModel());
     profileComponetModel = createModel(context, () => ProfileComponetModel());
     mymealplanComponentModel =
         createModel(context, () => MyMealPlanComponentModel());
+    mealLogComponentModel = createModel(context, () => MealLogComponentModel());
   }
 
   @override
@@ -54,9 +55,8 @@ class BottomNavbarScreenModel
     homeComponetModel.dispose();
     activityComponentModel.dispose();
     serchDataModel.dispose();
-
-    //recipeCompnoetModel.dispose();
     profileComponetModel.dispose();
     mymealplanComponentModel.dispose();
+    mealLogComponentModel.dispose();
   }
 }
