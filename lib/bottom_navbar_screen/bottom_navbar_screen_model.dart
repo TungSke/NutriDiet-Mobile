@@ -1,5 +1,4 @@
 import 'package:diet_plan_app/components/activity_component_model.dart';
-import 'package:diet_plan_app/components/serch_data_model.dart';
 import 'package:diet_plan_app/components/mealLog_component_model.dart';
 import 'package:flutter/material.dart';
 
@@ -29,8 +28,6 @@ class BottomNavbarScreenModel
   // Model for Home_componet component.
   late HomeComponetModel homeComponetModel;
   late ActivityComponentModel activityComponentModel;
-  // Model for serch_data component.
-  late SerchDataModel serchDataModel;
   // Model for profile_componet component.
   late ProfileComponetModel profileComponetModel;
   // Model for mealplan_componet component.
@@ -43,7 +40,6 @@ class BottomNavbarScreenModel
     homeComponetModel = createModel(context, () => HomeComponetModel());
     activityComponentModel =
         createModel(context, () => ActivityComponentModel());
-    serchDataModel = createModel(context, () => SerchDataModel());
     profileComponetModel = createModel(context, () => ProfileComponetModel());
     mymealplanComponentModel =
         createModel(context, () => MyMealPlanComponentModel());
@@ -54,7 +50,6 @@ class BottomNavbarScreenModel
   void dispose() {
     homeComponetModel.dispose();
     activityComponentModel.dispose();
-    serchDataModel.dispose();
     profileComponetModel.dispose();
     mymealplanComponentModel.dispose();
     mealLogComponentModel.dispose();
