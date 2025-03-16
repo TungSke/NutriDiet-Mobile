@@ -9,98 +9,97 @@ class MealLogComponentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MealLogComponentModel(),
-      child: Consumer<MealLogComponentModel>(
-        builder: (context, model, child) {
-          return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left),
-                    onPressed: () {
-                      model.changeDate(
-                        model.selectedDate.subtract(const Duration(days: 1)),
-                      );
-                    },
-                  ),
-                  GestureDetector(
-                    onTap: () => _showDatePicker(context, model),
-                    child: Text(
-                      DateFormat('MMMM d, yyyy').format(model.selectedDate),
-                      style: const TextStyle(
-                        fontFamily: 'Figtree',
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right),
-                    onPressed: () {
-                      model.changeDate(
-                        model.selectedDate.add(const Duration(days: 1)),
-                      );
-                    },
-                  ),
-                ],
+    return ChangeNotifierProvider<MealLogComponentModel>(
+  create: (context) => MealLogComponentModel(),
+  child: Consumer<MealLogComponentModel>(
+    builder: (context, model, child) {
+      return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: () {
+                  model.changeDate(
+                    model.selectedDate.subtract(const Duration(days: 1)),
+                  );
+                },
               ),
-            ),
-            body: ListView(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              GestureDetector(
+                onTap: () => _showDatePicker(context, model),
+                child: Text(
+                  DateFormat('MMMM d, yyyy').format(model.selectedDate),
+                  style: const TextStyle(
+                    fontFamily: 'Figtree',
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: () {
+                  model.changeDate(
+                    model.selectedDate.add(const Duration(days: 1)),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        body: ListView(
+          children: [
+            Card(
+              margin: const EdgeInsets.all(12.0),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Calories Remaining',
-                              style: TextStyle(
-                                fontFamily: 'Figtree',
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Icon(Icons.more_horiz),
-                          ],
+                        const Text(
+                          'Calories Remaining',
+                          style: TextStyle(
+                            fontFamily: 'Figtree',
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildCalorieColumn(model.calorieGoal.toString(), 'Goal', FontWeight.bold),
-                            _buildOperator('-'),
-                            _buildCalorieColumn(model.foodCalories.toString(), 'Food', FontWeight.normal),
-                            _buildOperator('='),
-                            _buildCalorieColumn(
-                              model.remainingCalories.toString(), 
-                              'Remaining', 
-                              FontWeight.bold,
-                              textColor: Colors.red
-                            ),
-                          ],
+                        const Icon(Icons.more_horiz),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildCalorieColumn(model.calorieGoal.toString(), 'Goal', FontWeight.bold),
+                        _buildOperator('-'),
+                        _buildCalorieColumn(model.foodCalories.toString(), 'Food', FontWeight.normal),
+                        _buildOperator('='),
+                        _buildCalorieColumn(
+                          model.remainingCalories.toString(), 
+                          'Remaining', 
+                          FontWeight.bold,
+                          textColor: Colors.red
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-
-                // Meal Categories
-                ...model.mealCategories.map((category) => _buildMealCategory(category)),
-              ],
+              ),
             ),
-          );
-        },
-      ),
-    );
+            ...model.mealCategories.map((category) => _buildMealCategory(category)),
+          ],
+        ),
+      );
+    },
+  ),
+);
+
   }
 
   Future<void> _showDatePicker(BuildContext context, MealLogComponentModel model) async {
