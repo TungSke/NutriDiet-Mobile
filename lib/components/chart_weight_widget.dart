@@ -1,3 +1,221 @@
+// import 'dart:convert';
+//
+// import 'package:diet_plan_app/services/user_service.dart';
+// import 'package:fl_chart/fl_chart.dart';
+// import 'package:flutter/material.dart';
+// import 'package:intl/intl.dart'; // for date formatting
+//
+// import '../flutter_flow/flutter_flow_theme.dart';
+//
+// class WeightLineChart extends StatefulWidget {
+//   @override
+//   _WeightLineChartState createState() => _WeightLineChartState();
+// }
+//
+// class _WeightLineChartState extends State<WeightLineChart> {
+//   List<FlSpot> data = [];
+//   List<String> dateLabels = [];
+//   double targetWeight = 80.0;
+//   double minWeight = double.infinity;
+//   double maxWeight = double.negativeInfinity;
+//   UserService userService = UserService();
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchWeightData();
+//     fetchTargetWeight();
+//   }
+//
+//   Future<void> fetchWeightData() async {
+//     try {
+//       final response = await userService.getHealthProfileReport();
+//       if (response.statusCode == 200) {
+//         final dataJson = jsonDecode(response.body)['data'];
+//
+//         Map<String, double> latestDataMap =
+//             {}; // Lưu trữ giá trị cuối cùng mỗi ngày
+//         List<String> tempDateLabels = [];
+//
+//         // Duyệt qua các đối tượng trong mảng 'data'
+//         for (var item in dataJson) {
+//           double weight = item['value'].toDouble();
+//           String rawDate = item['date'];
+//
+//           // Lấy phần ngày từ 'date' và định dạng lại
+//           String dateKey = rawDate.split('T')[0];
+//           String formattedDate =
+//               DateFormat('dd/MM').format(DateTime.parse(dateKey));
+//
+//           // Lưu giá trị cuối cùng của ngày
+//           latestDataMap[dateKey] = weight;
+//
+//           // Lưu ngày đã định dạng
+//           if (!tempDateLabels.contains(formattedDate)) {
+//             tempDateLabels.add(formattedDate);
+//           }
+//         }
+//
+//         // In ra các giá trị đã lọc
+//         print("Latest Data Map: $latestDataMap");
+//         print("Date Labels: $tempDateLabels");
+//
+//         // Tạo danh sách điểm dữ liệu từ các giá trị mới nhất của mỗi ngày
+//         List<FlSpot> weightData = [];
+//         latestDataMap.forEach((dateKey, weight) {
+//           int index = tempDateLabels.indexOf(DateFormat('dd/MM')
+//               .format(DateTime.parse(dateKey))); // Lấy chỉ số của ngày
+//
+//           weightData.add(FlSpot(index.toDouble(),
+//               weight)); // Tạo FlSpot với giá trị cuối cùng của mỗi ngày
+//         });
+//
+//         // In ra danh sách điểm dữ liệu đã được tạo
+//         print("Weight Data (FlSpot): $weightData");
+//
+//         setState(() {
+//           data = weightData;
+//           dateLabels = tempDateLabels; // Giữ nguyên thứ tự ngày tháng
+//         });
+//
+//         // Cập nhật minY và maxY
+//         double maxWeightValue = latestDataMap.values
+//             .reduce((a, b) => a > b ? a : b); // Lấy giá trị max từ dữ liệu
+//         double minWeightValue = latestDataMap.values
+//             .reduce((a, b) => a < b ? a : b); // Lấy giá trị min từ dữ liệu
+//
+//         // Cập nhật minY và maxY
+//         if (minWeightValue < targetWeight) {
+//           minWeight = minWeightValue -
+//               5; // Nếu weight nhỏ hơn targetWeight, lấy minY = weight - 5
+//         } else {
+//           minWeight = targetWeight -
+//               5; // Nếu weight lớn hơn hoặc bằng targetWeight, lấy minY = targetWeight - 5
+//         }
+//         maxWeight = maxWeightValue + 5; // maxY = max value trong ngày + 5
+//       } else {
+//         throw Exception('Failed to load weight data');
+//       }
+//     } catch (e) {
+//       print('Error fetching data: $e');
+//     }
+//   }
+//
+//   Future<void> fetchTargetWeight() async {
+//     try {
+//       final response = await userService.getPersonalGoal();
+//       if (response.statusCode == 200) {
+//         final dataJson = jsonDecode(response.body)['data'];
+//         setState(() {
+//           targetWeight = dataJson['targetWeight']?.toDouble() ?? 80.0;
+//         });
+//       } else {
+//         throw Exception('Failed to load target weight');
+//       }
+//     } catch (e) {
+//       print('Error fetching target weight: $e');
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     if (data.isEmpty || targetWeight == 0.0) {
+//       return Center(
+//         child: CircularProgressIndicator(
+//           color: FlutterFlowTheme.of(context).primary,
+//         ),
+//       );
+//     }
+//
+//     // Tính toán minY và maxY cho trục Y
+//     double adjustedMinY = minWeight; // minY được tính theo yêu cầu
+//     double adjustedMaxY = maxWeight; // maxY được tính theo yêu cầu
+//
+//     return Padding(
+//       padding: const EdgeInsets.all(18),
+//       child: LineChart(
+//         LineChartData(
+//           gridData: FlGridData(show: true),
+//           titlesData: FlTitlesData(
+//             bottomTitles: AxisTitles(
+//               sideTitles: SideTitles(
+//                 showTitles: true,
+//                 getTitlesWidget: (value, meta) {
+//                   // Get the corresponding date for the x-axis value
+//                   String label = dateLabels[value.toInt()];
+//                   return Padding(
+//                     padding: const EdgeInsets.only(right: 8.0),
+//                     child: Text(
+//                       label,
+//                       style: TextStyle(color: Colors.black),
+//                     ),
+//                   );
+//                 },
+//                 reservedSize: 40, // Ensure enough space between labels
+//                 interval: 1, // Ensure labels don't overlap
+//               ),
+//             ),
+//             topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+//             rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+//             leftTitles: AxisTitles(
+//               sideTitles: SideTitles(
+//                 showTitles: true,
+//                 getTitlesWidget: (value, meta) {
+//                   return Padding(
+//                     padding: const EdgeInsets.only(right: 8.0),
+//                     child: Text(
+//                       value.toStringAsFixed(0),
+//                       style: TextStyle(
+//                         color: Colors.black,
+//                         fontSize: 12, // Smaller font size to avoid overflow
+//                       ),
+//                     ),
+//                   );
+//                 },
+//                 reservedSize: 32,
+//               ),
+//             ),
+//           ),
+//           borderData: FlBorderData(
+//             show: true,
+//             border: Border(
+//               top: BorderSide.none,
+//               right: BorderSide.none,
+//               bottom: BorderSide(color: Colors.grey, width: 1),
+//               left: BorderSide(color: Colors.grey, width: 1),
+//             ),
+//           ),
+//           minX: 0, // Always start from 0 for x-axis
+//           maxX: (dateLabels.length - 1)
+//               .toDouble(), // Adjust maxX based on the number of date labels
+//           minY: adjustedMinY,
+//           maxY: adjustedMaxY,
+//           lineBarsData: [
+//             LineChartBarData(
+//               spots: data,
+//               isCurved: true,
+//               color: Colors.blue,
+//               dotData: FlDotData(show: true),
+//             ),
+//             LineChartBarData(
+//               spots: [
+//                 for (int i = 0; i < dateLabels.length; i++)
+//                   FlSpot(i.toDouble(), targetWeight),
+//               ],
+//               isCurved: false,
+//               color: Colors.green,
+//               barWidth: 1,
+//               isStrokeCapRound: true,
+//               dashArray: [8, 4],
+//               dotData: FlDotData(show: false),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'dart:convert';
 
 import 'package:diet_plan_app/services/user_service.dart';
@@ -14,7 +232,7 @@ class WeightLineChart extends StatefulWidget {
 
 class _WeightLineChartState extends State<WeightLineChart> {
   List<FlSpot> data = [];
-  List<String> dateLabels = [];
+  List<String> dateLabels = []; // Danh sách các ngày 2, 9, 16, 23, 30
   double targetWeight = 80.0;
   double minWeight = double.infinity;
   double maxWeight = double.negativeInfinity;
@@ -23,8 +241,24 @@ class _WeightLineChartState extends State<WeightLineChart> {
   @override
   void initState() {
     super.initState();
+    _generateMonthDays(); // Tạo danh sách các ngày từ 1 đến 31
     fetchWeightData();
     fetchTargetWeight();
+  }
+
+  // Tạo danh sách các ngày từ 1 đến 31 của tháng hiện tại
+  void _generateMonthDays() {
+    final currentDate = DateTime.now();
+    final month = currentDate.month;
+    final year = currentDate.year;
+
+    dateLabels = [];
+    for (int i = 1; i <= 31; i++) {
+      // Tạo ngày từ 1 đến 31 của tháng hiện tại
+      String formattedDate =
+          DateFormat('dd/MM').format(DateTime(year, month, i));
+      dateLabels.add(formattedDate);
+    }
   }
 
   Future<void> fetchWeightData() async {
@@ -33,45 +267,65 @@ class _WeightLineChartState extends State<WeightLineChart> {
       if (response.statusCode == 200) {
         final dataJson = jsonDecode(response.body)['data'];
 
-        Map<String, List<double>> latestDataMap = {};
+        Map<String, double> latestDataMap =
+            {}; // Lưu trữ giá trị cuối cùng mỗi ngày
         List<String> tempDateLabels = [];
 
+        // Duyệt qua các đối tượng trong mảng 'data'
         for (var item in dataJson) {
           double weight = item['value'].toDouble();
           String rawDate = item['date'];
 
-          String dateKey = rawDate.split('T')[0]; // Extract date part
-          String formattedDate = DateFormat('dd/MM')
-              .format(DateTime.parse(dateKey)); // Format date to dd/MM
+          // Lấy phần ngày từ 'date' và định dạng lại
+          String dateKey = rawDate.split('T')[0];
+          String formattedDate =
+              DateFormat('dd/MM').format(DateTime.parse(dateKey));
 
-          if (!latestDataMap.containsKey(dateKey)) {
-            latestDataMap[dateKey] = [];
-            tempDateLabels.add(formattedDate); // Store formatted date
+          // Lưu giá trị cuối cùng của ngày
+          latestDataMap[dateKey] = weight;
+
+          // Lưu ngày đã định dạng
+          if (!tempDateLabels.contains(formattedDate)) {
+            tempDateLabels.add(formattedDate);
           }
-
-          latestDataMap[dateKey]!.add(weight);
         }
 
+        // In ra các giá trị đã lọc
+        print("Latest Data Map: $latestDataMap");
+        print("Date Labels: $tempDateLabels");
+
+        // Tạo danh sách điểm dữ liệu từ các giá trị mới nhất của mỗi ngày
         List<FlSpot> weightData = [];
-        latestDataMap.forEach((dateKey, weights) {
-          // Use index from dateLabels for the x value
-          int index = tempDateLabels.indexOf(DateFormat('dd/MM')
-              .format(DateTime.parse(dateKey))); // Get the correct index
+        latestDataMap.forEach((dateKey, weight) {
+          int index = dateLabels.indexOf(DateFormat('dd/MM')
+              .format(DateTime.parse(dateKey))); // Lấy chỉ số của ngày
 
-          for (double weight in weights) {
-            if (weight < minWeight) minWeight = weight;
-            if (weight > maxWeight) maxWeight = weight;
-
-            weightData
-                .add(FlSpot(index.toDouble(), weight)); // Use index for x value
-          }
+          weightData.add(FlSpot(index.toDouble(),
+              weight)); // Tạo FlSpot với giá trị cuối cùng của mỗi ngày
         });
+
+        // In ra danh sách điểm dữ liệu đã được tạo
+        print("Weight Data (FlSpot): $weightData");
 
         setState(() {
           data = weightData;
-          dateLabels =
-              tempDateLabels.toSet().toList(); // Use formatted date labels
         });
+
+        // Cập nhật minY và maxY
+        double maxWeightValue = latestDataMap.values
+            .reduce((a, b) => a > b ? a : b); // Lấy giá trị max từ dữ liệu
+        double minWeightValue = latestDataMap.values
+            .reduce((a, b) => a < b ? a : b); // Lấy giá trị min từ dữ liệu
+
+        // Cập nhật minY và maxY
+        if (minWeightValue < targetWeight) {
+          minWeight = minWeightValue -
+              5; // Nếu weight nhỏ hơn targetWeight, lấy minY = weight - 5
+        } else {
+          minWeight = targetWeight -
+              5; // Nếu weight lớn hơn hoặc bằng targetWeight, lấy minY = targetWeight - 5
+        }
+        maxWeight = maxWeightValue + 5; // maxY = max value trong ngày + 5
       } else {
         throw Exception('Failed to load weight data');
       }
@@ -87,8 +341,6 @@ class _WeightLineChartState extends State<WeightLineChart> {
         final dataJson = jsonDecode(response.body)['data'];
         setState(() {
           targetWeight = dataJson['targetWeight']?.toDouble() ?? 80.0;
-          if (targetWeight < minWeight) minWeight = targetWeight;
-          if (targetWeight > maxWeight) maxWeight = targetWeight;
         });
       } else {
         throw Exception('Failed to load target weight');
@@ -108,9 +360,9 @@ class _WeightLineChartState extends State<WeightLineChart> {
       );
     }
 
-    // Adjust minY and maxY for weight range
-    double adjustedMinY = minWeight - 5;
-    double adjustedMaxY = maxWeight + 5;
+    // Tính toán minY và maxY cho trục Y
+    double adjustedMinY = minWeight; // minY được tính theo yêu cầu
+    double adjustedMaxY = maxWeight; // maxY được tính theo yêu cầu
 
     return Padding(
       padding: const EdgeInsets.all(18),
@@ -122,14 +374,22 @@ class _WeightLineChartState extends State<WeightLineChart> {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  // Get the corresponding date for the x-axis value
+                  // Chỉ hiển thị nhãn cho ngày 2, 9, 16, 23, 30
                   String label = dateLabels[value.toInt()];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Text(label, style: TextStyle(color: Colors.black)),
-                  );
+                  // Kiểm tra nếu là một trong các ngày cần hiển thị
+                  if (['02', '09', '16', '23'].contains(label.split('/')[0])) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                        label,
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    );
+                  }
+                  return Container(); // Ẩn nhãn cho các ngày khác
                 },
-                reservedSize: 32,
+                reservedSize: 40, // Đảm bảo đủ khoảng trống giữa các nhãn
+                interval: 1, // Đảm bảo các nhãn không bị chồng lên nhau
               ),
             ),
             topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -162,9 +422,9 @@ class _WeightLineChartState extends State<WeightLineChart> {
               left: BorderSide(color: Colors.grey, width: 1),
             ),
           ),
-          minX: 0, // Always start from 0 for x-axis
+          minX: 0, // Trục X luôn bắt đầu từ 0
           maxX: (dateLabels.length - 1)
-              .toDouble(), // Adjust maxX based on the number of date labels
+              .toDouble(), // Điều chỉnh maxX dựa trên số lượng ngày trong tháng
           minY: adjustedMinY,
           maxY: adjustedMaxY,
           lineBarsData: [
@@ -172,8 +432,6 @@ class _WeightLineChartState extends State<WeightLineChart> {
               spots: data,
               isCurved: true,
               color: Colors.blue,
-              belowBarData:
-                  BarAreaData(show: true, color: Colors.blue.withOpacity(0.3)),
               dotData: FlDotData(show: true),
             ),
             LineChartBarData(
