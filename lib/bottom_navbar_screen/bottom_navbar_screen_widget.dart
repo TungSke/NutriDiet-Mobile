@@ -1,5 +1,5 @@
-import 'package:diet_plan_app/components/my_mealplan_component_widget.dart';
 import 'package:diet_plan_app/components/mealLog_component_widget.dart';
+import 'package:diet_plan_app/components/my_mealplan_component_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -9,7 +9,6 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../components/activity_component_widget.dart';
 import 'bottom_navbar_screen_model.dart';
-
 
 export 'bottom_navbar_screen_model.dart';
 
@@ -75,11 +74,9 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     child: const ActivityComponentWidget(),
                   ),
                   wrapWithModel(
-                    model: _model
-                        .mealLogComponentModel, 
+                    model: _model.mealLogComponentModel,
                     updateCallback: () => safeSetState(() {}),
-                    child:
-                        const MealLogComponentWidget(), 
+                    child: const MealLogComponentWidget(),
                   ),
                   wrapWithModel(
                     model: _model
@@ -93,7 +90,6 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     updateCallback: () => safeSetState(() {}),
                     child: const ProfileComponetWidget(),
                   ),
-                  
                 ],
               ),
             ),
@@ -494,7 +490,6 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                         ),
                       ),
                     ),
-                    
                   ],
                 ),
               ),

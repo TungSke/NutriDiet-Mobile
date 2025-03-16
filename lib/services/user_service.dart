@@ -46,7 +46,8 @@ class UserService {
     return response;
   }
 
-  Future<http.Response> login(String email, String password, String? fcmToken) async {
+  Future<http.Response> login(
+      String email, String password, String? fcmToken) async {
     final response = await _apiService.post(
       "api/user/login",
       body: {'email': email, 'password': password, 'fcmToken': fcmToken},
@@ -117,6 +118,31 @@ class UserService {
     );
 
     return response;
+  }
+
+  Future<http.Response> getHealthProfileReport() async {
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+    }
+
+    try {
+      final response = await _apiService
+          .get("/api/health-profile/reports?field=Weight", token: token);
+
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        print('Lỗi lấy health profile report: ${response.body}');
+        throw Exception(
+            'Lỗi lấy health profile report: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Lỗi kết nối API: $e');
+      throw Exception("Không thể kết nối đến server.");
+    }
   }
 
   Future<http.Response> getHealthProfile() async {

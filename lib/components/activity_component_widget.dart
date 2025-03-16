@@ -24,7 +24,19 @@ class ActivityComponentWidget extends StatefulWidget {
 
 class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   late ActivityComponentModel _model;
+  bool animateText = false;
+  final Map<String, String> _goalTypeMap = {
+    'Giữ cân': 'Maintain',
+    'Tăng cân': 'GainWeight',
+    'Giảm cân': 'LoseWeight'
+  };
 
+  // Mảng ánh xạ giá trị số về giá trị mô tả
+  final Map<String, String> _reverseGoalTypeMap = {
+    'Maintain': 'Giữ cân',
+    'GainWeight': 'Tăng cân',
+    'LoseWeight': 'Giảm cân'
+  };
   // Khai báo _userService
   final _userService = UserService();
   String name = '';
@@ -163,28 +175,67 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
         mainAxisSize: MainAxisSize.max,
         children: [
           Container(
-            height: 119.0,
-            decoration: const BoxDecoration(),
-            child: Align(
-              alignment: const AlignmentDirectional(0.0, 1.0),
-              child: Padding(
-                padding:
-                    const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
-                child: Text(
-                  'Hoạt động',
-                  maxLines: 1,
-                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        fontFamily: 'figtree',
-                        fontSize: 22.0,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.bold,
-                        useGoogleFonts: false,
-                        lineHeight: 1.5,
-                      ),
-                ).animateOnPageLoad(animationsMap['textOnPageLoadAnimation']!),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).primary,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(16.0),
+                  bottomRight: Radius.circular(16.0),
+                  topLeft: Radius.circular(0.0),
+                  topRight: Radius.circular(0.0),
+                ),
               ),
-            ),
-          ),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(
+                    20.0, 63.0, 20.0, 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 16.0),
+                      child: Text(
+                        'Hoạt động',
+                        maxLines: 1,
+                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                              fontFamily: 'figtree',
+                              fontSize: 22.0,
+                              color: Colors.white,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.bold,
+                              useGoogleFonts: false,
+                              lineHeight: 1.5,
+                            ),
+                      ).animateOnPageLoad(
+                          animationsMap['textOnPageLoadAnimation']!),
+                    ),
+                  ],
+                ),
+              )),
+          // Container(
+          //   height: 119.0,
+          //   decoration: const BoxDecoration(),
+          //   child:
+          //   Align(
+          //     alignment: const AlignmentDirectional(0.0, 1.0),
+          //     child: Padding(
+          //       padding:
+          //           const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+          //       child: Text(
+          //         'Hoạt động',
+          //         maxLines: 1,
+          //         style: FlutterFlowTheme.of(context).bodyMedium.override(
+          //               fontFamily: 'figtree',
+          //               fontSize: 22.0,
+          //               letterSpacing: 0.0,
+          //               fontWeight: FontWeight.bold,
+          //               useGoogleFonts: false,
+          //               lineHeight: 1.5,
+          //             ),
+          //       ).animateOnPageLoad(animationsMap['textOnPageLoadAnimation']!),
+          //     ),
+          //   ),
+          // ),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -239,7 +290,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        "${personalGoal?['goalType'] ?? "N/A"}",
+                        _reverseGoalTypeMap[personalGoal?['goalType']] ?? "N/A",
                         style: TextStyle(
                           color: FlutterFlowTheme.of(context).primary,
                           fontWeight: FontWeight.w600,
@@ -304,13 +355,22 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                           ),
                         ],
                       ),
-                      WeightProgressChart(),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(
-                      20.0, 24.0, 20.0, 16.0),
+                  padding: const EdgeInsets.only(right: 10),
+                  child: SingleChildScrollView(
+                    child: Container(
+                      height: 400,
+
+                      // Đặt chiều cao cố định cho biểu đồ
+                      child: WeightLineChart(),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 25),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -390,7 +450,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             backgroundColor:
                                 FlutterFlowTheme.of(context).primary,
                             center: Text(
-                              "${healthData?['TDEE'] ?? "N/A"}",
+                              "${healthData?['TDEE'] ?? ""}",
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
