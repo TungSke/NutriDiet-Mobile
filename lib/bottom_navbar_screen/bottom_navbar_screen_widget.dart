@@ -79,12 +79,9 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                     child: const MealLogComponentWidget(),
                   ),
                   wrapWithModel(
-                    model: _model
-                        .mymealplanComponentModel, // <-- Thêm model mới ở đây
+                    model: _model.mymealplanComponentModel,
                     updateCallback: () => safeSetState(() {}),
-                    child:
-                        const MyMealPlanScreenWidget(), // <-- Thêm widget mới ở đây
-                  ),
+                    child: const MyMealPlanScreenWidget(),                  ),
                   wrapWithModel(
                     model: _model.profileComponetModel,
                     updateCallback: () => safeSetState(() {}),
@@ -321,7 +318,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   .bodyMedium
                                   .override(
                                     fontFamily: 'figtree',
-                                    color: _model.bottomadd == 5
+                                    color: _model.bottomadd == 2
                                         ? FlutterFlowTheme.of(context)
                                             .primaryText
                                         : FlutterFlowTheme.of(context).grey,
@@ -332,7 +329,7 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                                   ),
                             ),
                           ].divide(SizedBox(
-                              height: _model.bottomadd == 5 ? 4.0 : 8.0)),
+                              height: _model.bottomadd == 2 ? 4.0 : 8.0)),
                         ),
                       ),
                     ),

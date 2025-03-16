@@ -224,6 +224,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
 
   Widget _buildMealPlanCard(MealPlan mealPlan) {
     return Card(
+      color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 4,
       child: Padding(

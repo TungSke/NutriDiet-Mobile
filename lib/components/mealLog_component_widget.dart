@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/flutter_flow/flutter_flow_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -12,7 +13,9 @@ class MealLogComponentWidget extends StatelessWidget {
     return Consumer<MealLogComponentModel>(
     builder: (context, model, child) {
       return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
           automaticallyImplyLeading: false,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -50,6 +53,7 @@ class MealLogComponentWidget extends StatelessWidget {
         body: ListView(
           children: [
             Card(
+              color: Colors.white,
               margin: const EdgeInsets.all(12.0),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
