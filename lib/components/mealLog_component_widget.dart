@@ -9,9 +9,7 @@ class MealLogComponentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<MealLogComponentModel>(
-  create: (context) => MealLogComponentModel(),
-  child: Consumer<MealLogComponentModel>(
+    return Consumer<MealLogComponentModel>(
     builder: (context, model, child) {
       return Scaffold(
         appBar: AppBar(
@@ -96,10 +94,7 @@ class MealLogComponentWidget extends StatelessWidget {
           ],
         ),
       );
-    },
-  ),
-);
-
+    });
   }
 
   Future<void> _showDatePicker(BuildContext context, MealLogComponentModel model) async {

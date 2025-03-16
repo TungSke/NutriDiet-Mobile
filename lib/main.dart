@@ -1,5 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
 
+import 'package:diet_plan_app/components/mealLog_component_model.dart';
 import 'package:diet_plan_app/services/models/health_profile_provider.dart';
 import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,6 +16,7 @@ import 'meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  Provider.debugCheckInvalidValueType=null;
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
@@ -39,6 +41,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PersonalGoalProvider()),
         ChangeNotifierProvider(create: (context) => HealthProfileProvider()),
         ChangeNotifierProvider(create: (context) => SampleMealPlanModel()),
+        //ChangeNotifierProvider(create: (context) => MealLogComponentModel()),
       ],
       child: const MyApp(),
     ),

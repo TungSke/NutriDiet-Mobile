@@ -62,6 +62,12 @@ class MealPlanService{
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
+    // Nếu accessToken null -> Trả về danh sách rỗng ngay lập tức
+    if (token == null) {
+      debugPrint("Access token null, trả về danh sách rỗng.");
+      return [];
+    }
+
     try {
       String endpoint = "api/meal-plan/my-mealplan?pageIndex=$pageIndex&pageSize=$pageSize";
       if (search != null && search.isNotEmpty) {
@@ -84,6 +90,7 @@ class MealPlanService{
       return [];
     }
   }
+
 
   Future<Map<String, dynamic>?> getMealPlanDetailTotals(int mealPlanId) async {
     try {

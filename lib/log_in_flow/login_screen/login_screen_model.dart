@@ -185,18 +185,21 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
       final response = await _userService.loginWithFacebook(fcmToken);
 
       if (response.statusCode == 200) {
-        print("Login with Facebook successful");
-
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Login success!"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
         final responseBody = jsonDecode(response.body);
         final String? accessToken = responseBody["data"]["accessToken"];
         final String? refreshToken = responseBody["data"]["refreshToken"];
 
-        // Kiểm tra token hợp lệ
         if (accessToken == null || refreshToken == null) {
           throw Exception("Invalid response: Missing accessToken or refreshToken");
         }
 
-        // ✅ Lưu accessToken trước khi gọi whoAmI()
         await setDataAfterLogin(accessToken, refreshToken);
 
         // ✅ Gọi whoAmI() sau khi đã lưu accessToken

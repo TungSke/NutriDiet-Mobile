@@ -1,7 +1,8 @@
+import 'package:diet_plan_app/components/mealLog_component_widget.dart';
 import 'package:flutter/material.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
-class MealLogComponentModel extends FlutterFlowModel with ChangeNotifier {
+class MealLogComponentModel extends FlutterFlowModel<MealLogComponentWidget> with ChangeNotifier {
   DateTime selectedDate = DateTime.now();
   int calorieGoal = 1300;
   int foodCalories = 259;

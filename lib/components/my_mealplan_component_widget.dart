@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/flutter_flow/flutter_flow_model.dart';
 import 'package:flutter/material.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../meal_plan_flow/ai_meal_plan_screen/ai_meal_plan_widget.dart';
@@ -20,7 +21,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   @override
   void initState() {
     super.initState();
-    _model = MyMealPlanComponentModel();
+    _model = createModel(context, () => MyMealPlanComponentModel());
     _model.setUpdateCallback(() {
       setState(() {});
     });
