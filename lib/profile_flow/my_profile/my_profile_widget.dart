@@ -312,6 +312,26 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
+                                    'Giới tính',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  Text(
+                                    _model.gender,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
                                     'Số điện thoại',
                                     style: GoogleFonts.roboto(
                                       fontSize: 14,
@@ -598,7 +618,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Mục tiêu',
+                                    'Mục tiêu (gần đây) ',
                                     style: GoogleFonts.roboto(
                                       fontSize: 14,
                                       fontWeight: FontWeight.normal,
@@ -617,7 +637,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Mục tiêu cân nặng',
+                                  Text('Mục tiêu cân nặng (gần đây)',
                                       style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -642,6 +662,24 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                       )),
                                   Text(
                                     "${_model.weightChangeRate} kg",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Hoàn thành',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                  Text(
+                                    "${_model.progressPercentage ?? ''} % ",
                                     style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,

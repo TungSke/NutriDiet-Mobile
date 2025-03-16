@@ -153,13 +153,13 @@ class _EditHealthProfileScreenWidgetState
       child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
-          _buildHeightRow('Chiều cao', _model.height, (val) {
+          _buildHeightRow('Chiều cao (cm)', _model.height, (val) {
             setState(() {
               _model.height = int.tryParse(val) ?? 0;
               isEdited = true;
             });
           }),
-          _buildWeightRow('Cân nặng', _model.weight, (val) {
+          _buildWeightRow('Cân nặng (kg)', _model.weight, (val) {
             setState(() {
               _model.weight = int.tryParse(val) ?? 0;
               isEdited = true;

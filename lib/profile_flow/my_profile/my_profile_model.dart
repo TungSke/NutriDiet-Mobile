@@ -12,6 +12,7 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
   String name = '';
   String age = '';
   String phoneNumber = '';
+  String gender = '';
   String location = '';
   String email = '';
   String height = '';
@@ -23,13 +24,22 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
   String goalType = ''; // ✅ Mục tiêu sức khỏe
   String targetWeight = ''; // ✅ Cân nặng mục tiêu
   String weightChangeRate = '';
-
+  int progressPercentage = 0;
   final Map<String, String> _goalTypeMap = {
     'LoseWeight': 'Giảm cân',
     'Maintain': 'Giữ cân',
     'GainWeight': 'Tăng cân',
   };
+  final Map<String, String> _genderMap = {
+    'Nam': 'Male',
+    'Nữ': 'Female',
+  };
 
+  // Mảng ánh xạ giá trị số về giá trị mô tả
+  final Map<String, String> _reverseGenderMap = {
+    'Male': 'Nam',
+    'Female': 'Nữ',
+  };
   final Map<String, String> _activityLevelMap = {
     'Sedentary': 'Ít vận động',
     'LightlyActive': 'Vận động nhẹ',
@@ -63,6 +73,7 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
         name = data['name'] ?? "Chưa cập nhật";
         age = data['age']?.toString() ?? "0";
         phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
+        gender = _reverseGenderMap[data['gender']] ?? "Chưa cập nhật";
         location = data['address'] ?? "Chưa cập nhật";
         email = data["email"] ?? "Chưa cập nhật";
         userId = data['id']?.toString() ?? "";
@@ -107,6 +118,7 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
           goalType =
               _goalTypeMap[personalGoal["goalType"]] ?? "Chưa đặt mục tiêu";
           targetWeight = personalGoal["targetWeight"]?.toString() ?? "N/A";
+          progressPercentage = personalGoal["progressPercentage"] ?? 0;
           weightChangeRate =
               _weightChangeRateMap[personalGoal["weightChangeRate"]] ??
                   "Chưa cập nhật";

@@ -14,6 +14,17 @@ class EditProfileScreenModel extends ChangeNotifier {
         age.trim().isNotEmpty;
   }
 
+  final Map<String, String> _genderMap = {
+    'Nam': 'Male',
+    'Nữ': 'Female',
+  };
+
+  // Mảng ánh xạ giá trị số về giá trị mô tả
+  final Map<String, String> _reverseGenderMap = {
+    'Male': 'Nam',
+    'Female': 'Nữ',
+  };
+
   // User profile fields
   String name = '';
   String gender = '';
@@ -37,7 +48,7 @@ class EditProfileScreenModel extends ChangeNotifier {
         final userData = jsonDecode(response.body);
 
         name = userData['name'] ?? "Chưa cập nhật";
-        gender = userData['gender'] ?? "Not specified";
+        gender = _reverseGenderMap[userData['gender']] ?? "Not specified";
         age = userData['age']?.toString() ?? "0";
         address = userData['address'] ?? "Chưa cập nhật"; // ✅ Uses 'address'
         location = address; // ✅ Sync 'location' with 'address'
@@ -54,6 +65,7 @@ class EditProfileScreenModel extends ChangeNotifier {
   Future<void> updateUserProfile() async {
     try {
       print("🔄 Updating profile...");
+      final genderInEnglish = _genderMap[gender] ?? 'Male';
 
       // ✅ Ensure `location` isn't empty
       String updatedLocation =
@@ -62,7 +74,7 @@ class EditProfileScreenModel extends ChangeNotifier {
       final response = await UserService().updateUser(
         fullName: name,
         age: int.tryParse(age) ?? 0,
-        gender: gender,
+        gender: genderInEnglish,
         location: updatedLocation, // ✅ Uses 'location' for update
       );
 

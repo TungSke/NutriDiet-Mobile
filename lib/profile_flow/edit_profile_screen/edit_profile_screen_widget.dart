@@ -135,7 +135,7 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
           _buildEditableRow(
-            'Name',
+            'Tên của bạn',
             _model.name,
             (val) {
               setState(() {
@@ -148,9 +148,9 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
                 : null, // ✅ Show error
           ),
           _buildPickerRow(
-            'Gender',
+            'Giới tính',
             _model.gender,
-            ['Male', 'Female'],
+            ['Nam', 'Nữ'],
             (val) {
               setState(() {
                 _model.gender = val;
@@ -159,7 +159,7 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
             },
           ),
           _buildPickerRow(
-            'Age',
+            'Tuổi ',
             _model.age,
             _generateAgeList(),
             (val) {
@@ -170,7 +170,7 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
             },
           ),
           _buildEditableRow(
-            'Location',
+            'Địa chỉ',
             _model.location,
             (val) {
               setState(() {
@@ -187,8 +187,6 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
     );
   }
 
-  /// 🟢 Ô nhập liệu (Name, Location)
-  /// 🟢 Ô nhập liệu (Name, Location) với validation
   Widget _buildEditableRow(String title, String value,
       Function(String) onChanged, String? errorText) {
     return Padding(

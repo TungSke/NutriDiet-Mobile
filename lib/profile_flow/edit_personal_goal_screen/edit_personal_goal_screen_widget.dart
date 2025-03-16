@@ -154,7 +154,7 @@ class _EditPersonalGoalScreenWidgetState
           ),
           // Nếu goalType là "Giữ cân", ẩn các trường targetWeight và weightChangeRate
           if (_model.goalType != 'Giữ cân') ...[
-            _buildTargetWeightRow('Mục tiêu cân nặng', _model.targetWeight,
+            _buildTargetWeightRow('Mục tiêu cân nặng (kg)', _model.targetWeight,
                 (val) {
               setState(() {
                 _model.targetWeight = int.tryParse(val) ?? 0;
