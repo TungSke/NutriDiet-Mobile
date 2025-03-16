@@ -18,7 +18,15 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.diet_plan_app",
-            "certificate_hash": "29fac4269f2d53cd872a180634e25360d380f214"
+            "certificate_hash": "cfa47e0d1a8125397d100b7db0af67819f844c77"
+          }
+        },
+        {
+          "client_id": "552250045512-ueem5rpu3tf4s3i69fd235ct95a6d0nu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.diet_plan_app",
+            "certificate_hash": "cfee68cba226117e41f4490f9862d47347d24ca3"
           }
         },
         {
@@ -37,6 +45,13 @@
             {
               "client_id": "552250045512-rs7lu7romcuu89pi24n2u7f6safm4okv.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "552250045512-js8ek4nhk9u5d52jih8177digc0nabh7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.dietPlanApp"
+              }
             }
           ]
         }

@@ -60,17 +60,18 @@ class UserService {
         scopes: ['email'],
       );
 
+      await googleSignIn.signOut();
       final GoogleSignInAccount? signInAccount = await googleSignIn.signIn();
       if (signInAccount == null) {
         throw Exception("Đăng nhập Google đã bị hủy");
       }
       final GoogleSignInAuthentication googleAuth =
           await signInAccount.authentication;
-
       final response = await _apiService.post(
           "api/user/login-with-google?idToken=${googleAuth.idToken}&fcmToken=$fcmToken",
           body: {});
-
+      
+      //print("response: ${response.body}");
       return response;
     } catch (e) {
       throw Exception("Google login failed: $e");
