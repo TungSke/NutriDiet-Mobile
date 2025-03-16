@@ -2,7 +2,7 @@ import 'package:diet_plan_app/components/serch_data_widget.dart';
 import 'package:flutter/material.dart';
 
 class MealListScreen extends StatelessWidget {
-  const MealListScreen({Key? key}) : super(key: key);
+  const MealListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +45,7 @@ class MealCard extends StatelessWidget {
   final String title;
   final String description;
 
-  const MealCard({Key? key, required this.title, required this.description})
-      : super(key: key);
+  const MealCard({super.key, required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {

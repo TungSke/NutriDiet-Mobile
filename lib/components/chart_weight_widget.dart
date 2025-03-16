@@ -9,6 +9,8 @@ class WeightProgressChart extends StatelessWidget {
     FlSpot(3, 144.3),
   ];
 
+  WeightProgressChart({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(

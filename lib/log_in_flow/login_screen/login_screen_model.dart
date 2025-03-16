@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:diet_plan_app/services/user_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -97,8 +96,9 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
                 age == null || age.isEmpty || address == null || address.isEmpty){
               context.push("/profileEnterScreen");
           }
-          else
-          context.push("/bottomNavbarScreen");
+          else {
+              context.push("/bottomNavbarScreen");
+            }
         }
       } else {
         final responseBody = jsonDecode(response.body);
@@ -168,13 +168,14 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
             age == null || age.isEmpty || address == null || address.isEmpty){
           context.push("/profileEnterScreen");
         }
-        else
+        else {
           context.push("/bottomNavbarScreen");
+        }
       } else {
         print("Google Login failed: ${response.statusCode} - ${response.body}");
       }
     }catch (e) {
-      showErrorMessage(context, "Error during login Google: ${e}");
+      showErrorMessage(context, "Error during login Google: $e");
     }
   }
 
@@ -214,7 +215,7 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
         }
 
         FFAppState().email = email;
-        context.pushNamed("splace_scren");
+        context.push("/bottomNavbarScreen");
       } else {
         print("Login failed: ${response.statusCode} - ${response.body}");
       }

@@ -5,8 +5,7 @@ import '../services/allergy_service.dart'; // If you're using provider to manage
 class AllergySelector extends StatefulWidget {
   final List<String> selectedAllergies;
 
-  const AllergySelector({Key? key, required this.selectedAllergies})
-      : super(key: key);
+  const AllergySelector({super.key, required this.selectedAllergies});
 
   @override
   _AllergySelectorState createState() => _AllergySelectorState();

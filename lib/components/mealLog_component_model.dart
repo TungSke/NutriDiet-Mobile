@@ -34,8 +34,4 @@ class MealLogComponentModel extends FlutterFlowModel with ChangeNotifier {
   @override
   void initState(BuildContext context) {}
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

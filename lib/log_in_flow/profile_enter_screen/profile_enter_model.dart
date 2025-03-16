@@ -31,7 +31,7 @@ class ProfileEnterModel {
       );
 
       if (response.statusCode == 200) {
-        context.push("/hightEnterScreen");;
+        context.push("/hightEnterScreen");
       } else {
         _showErrorDialog(context, "Cập nhật thông tin thất bại, vui lòng thử lại.");
       }

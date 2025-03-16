@@ -56,7 +56,7 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
     String searchQueryNoDiacritics = removeDiacritics(searchQuery.toLowerCase());
 
     final filtered = mealPlans.where((plan) {
-      String planNameNoDiacritics = removeDiacritics(plan.planName?.trim().toLowerCase() ?? "");
+      String planNameNoDiacritics = removeDiacritics(plan.planName.trim().toLowerCase() ?? "");
       final matchesSearch = searchQuery.isEmpty || planNameNoDiacritics.contains(searchQueryNoDiacritics);
       final matchesFilter = selectedFilter == null ||
           (plan.healthGoal?.trim().toLowerCase() == selectedFilter?.trim().toLowerCase());

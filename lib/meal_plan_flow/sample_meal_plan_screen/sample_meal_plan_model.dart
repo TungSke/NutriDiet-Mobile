@@ -52,7 +52,7 @@ class SampleMealPlanModel extends ChangeNotifier {
     String searchQueryNoDiacritics = removeDiacritics(_searchQuery.toLowerCase());
 
     _filteredMealPlans = _mealPlans.where((plan) {
-      String planNameNoDiacritics = removeDiacritics(plan.planName?.trim().toLowerCase() ?? "");
+      String planNameNoDiacritics = removeDiacritics(plan.planName.trim().toLowerCase() ?? "");
       final matchesSearch = _searchQuery.isEmpty || planNameNoDiacritics.contains(searchQueryNoDiacritics);
 
       final matchesFilter = _selectedFilter == null ||

@@ -78,9 +78,9 @@ class UserService {
   }
 
   Future<http.Response> whoAmI() async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
 
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
     if (token == null || token.isEmpty) {
       throw Exception("Access token not found.");
     }
@@ -94,8 +94,8 @@ class UserService {
     required String gender,
     required String location,
   }) async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     if (token == null || token.isEmpty) {
       throw Exception("Access token not found.");
@@ -119,8 +119,8 @@ class UserService {
   }
 
   Future<http.Response> getHealthProfile() async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     if (token == null || token.isEmpty) {
       throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
@@ -150,8 +150,8 @@ class UserService {
     List<int>? allergies,
     List<int>? diseases,
   }) async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     if (token == null || token.isEmpty) {
       throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
@@ -197,8 +197,9 @@ class UserService {
 
       if (height != null) request.fields['Height'] = height.toString();
       if (weight != null) request.fields['Weight'] = weight.toString();
-      if (activityLevel != null)
+      if (activityLevel != null) {
         request.fields['ActivityLevel'] = activityLevel;
+      }
       if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
 
       // ✅ Sửa lỗi gửi danh sách `allergies` và `diseases`
@@ -241,8 +242,8 @@ class UserService {
     String goalDescription = "Mục tiêu mặc định",
     String notes = "Không có ghi chú",
   }) async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     if (token == null || token.isEmpty) {
       throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
@@ -304,8 +305,8 @@ class UserService {
     String notes = "Không có ghi chú",
     required BuildContext context, // Thêm context vào tham số
   }) async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     if (token == null || token.isEmpty) {
       print("❌ Access token không hợp lệ, vui lòng đăng nhập lại.");
@@ -397,8 +398,8 @@ class UserService {
   }
 
   Future<http.Response> getPersonalGoal() async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     if (token == null || token.isEmpty) {
       throw Exception("⚠ Access token không hợp lệ, vui lòng đăng nhập lại.");

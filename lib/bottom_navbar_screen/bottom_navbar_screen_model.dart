@@ -6,7 +6,6 @@ import '/components/home_componet_widget.dart';
 import '/components/profile_componet_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../components/my_mealplan_component_model.dart';
-import '../components/mealLog_component_model.dart';
 import 'bottom_navbar_screen_widget.dart' show BottomNavbarScreenWidget;
 
 class BottomNavbarScreenModel

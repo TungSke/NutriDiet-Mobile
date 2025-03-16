@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 // Import màn hình FoodDetail
-import '../services/food_service.dart';
 import '../services/models/food.dart';
 
 class FoodListComponentWidget extends StatefulWidget {

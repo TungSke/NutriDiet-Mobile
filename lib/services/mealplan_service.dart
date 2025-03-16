@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:diet_plan_app/services/api_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -60,8 +59,8 @@ class MealPlanService{
   }
 
   Future<List<MealPlan>> getMyMealPlan({required int pageIndex, required int pageSize, String? search}) async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     try {
       String endpoint = "api/meal-plan/my-mealplan?pageIndex=$pageIndex&pageSize=$pageSize";
@@ -110,8 +109,8 @@ class MealPlanService{
     }
   }
   Future<bool> deleteMealPlan(int mealPlanId) async {
-    final FlutterSecureStorage _flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await _flutterSecureStorage.read(key: 'accessToken');
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     try {
       String endpoint = "api/meal-plan/$mealPlanId";

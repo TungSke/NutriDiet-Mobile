@@ -16,8 +16,8 @@ class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWid
   String? foodRecipe;
   bool isLoading = false;
 
-  FoodService _foodService = FoodService();
-  CusinetypeService _cusinetypeService = CusinetypeService();
+  final FoodService _foodService = FoodService();
+  final CusinetypeService _cusinetypeService = CusinetypeService();
 
   Future<void> loadFood(int foodId) async {
     final response = await _foodService.getFoodById(foodId: foodId);
