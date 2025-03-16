@@ -38,11 +38,9 @@ class BottomNavbarScreenModel
   @override
   void initState(BuildContext context) {
     homeComponetModel = createModel(context, () => HomeComponetModel());
-    activityComponentModel =
-        createModel(context, () => ActivityComponentModel());
+    activityComponentModel = createModel(context, () => ActivityComponentModel());
     profileComponetModel = createModel(context, () => ProfileComponetModel());
-    mymealplanComponentModel =
-        createModel(context, () => MyMealPlanComponentModel());
+    mymealplanComponentModel = createModel(context, () => MyMealPlanComponentModel());
     mealLogComponentModel = createModel(context, () => MealLogComponentModel());
   }
 

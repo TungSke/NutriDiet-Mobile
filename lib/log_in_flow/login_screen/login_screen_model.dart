@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:diet_plan_app/services/user_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '/flutter_flow/flutter_flow_util.dart';
@@ -16,6 +17,7 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
   FocusNode? textFieldFocusNode1;
   TextEditingController? textController1;
   String? Function(BuildContext, String?)? textController1Validator;
+
   String? _textController1Validator(BuildContext context, String? val) {
     if (val == null || val.isEmpty) {
       return 'Please enter valid email address';
@@ -45,8 +47,12 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
       return;
     }
     try {
+      String? fcmToken = await FirebaseMessaging.instance.getToken(); // Chờ giá trị trả về
+      fcmToken ??= ""; // Nếu null, gán chuỗi rỗng
+
       final response = await _userService.login(
-          textController1!.text, textController2!.text);
+          textController1!.text, textController2!.text, fcmToken);
+
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
@@ -116,7 +122,8 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
   Future<void> loginGoogle(BuildContext context) async {
     try{
-      final response = await _userService.loginWithGoogle();
+      String? fcmToken = await FirebaseMessaging.instance.getToken();
+      final response = await _userService.loginWithGoogle(fcmToken);
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
@@ -173,7 +180,8 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
   Future<void> loginFaceBook(BuildContext context) async {
     try {
-      final response = await _userService.loginWithFacebook();
+      String? fcmToken = await FirebaseMessaging.instance.getToken();
+      final response = await _userService.loginWithFacebook(fcmToken);
 
       if (response.statusCode == 200) {
         print("Login with Facebook successful");

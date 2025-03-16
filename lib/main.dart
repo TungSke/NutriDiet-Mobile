@@ -52,11 +52,12 @@ Future<void> setupFCM() async {
     alert: true,
     badge: true,
     sound: true,
+    announcement: false
   );
 
   // Lấy và in ra FCM token
-  String? token = await messaging.getToken();
-  print("FCM Token: $token");
+  // String? token = await messaging.getToken();
+  // print("FCM Token: $token");
 
   // Lắng nghe sự kiện thay đổi token
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {

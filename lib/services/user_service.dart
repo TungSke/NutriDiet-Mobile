@@ -34,27 +34,27 @@ class UserService {
     return response;
   }
 
-  Future<http.Response> loginWithFacebook() async {
+  Future<http.Response> loginWithFacebook(String? fcmToken) async {
     final LoginResult result = await FacebookAuth.instance
         .login(); // by default we request the email and the public profile
 
     final AccessToken accessToken = result.accessToken!;
 
     final response = await _apiService.post(
-        "api/user/login-with-facebook?idToken=${accessToken.tokenString}",
+        "api/user/login-with-facebook?idToken=${accessToken.tokenString}&fcmToken=$fcmToken",
         body: {});
     return response;
   }
 
-  Future<http.Response> login(String email, String password) async {
+  Future<http.Response> login(String email, String password, String? fcmToken) async {
     final response = await _apiService.post(
       "api/user/login",
-      body: {'email': email, 'password': password},
+      body: {'email': email, 'password': password, 'fcmToken': fcmToken},
     );
     return response;
   }
 
-  Future<http.Response> loginWithGoogle() async {
+  Future<http.Response> loginWithGoogle(String? fcmToken) async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: ['email'],
@@ -68,7 +68,7 @@ class UserService {
           await signInAccount.authentication;
 
       final response = await _apiService.post(
-          "api/user/login-with-google?idToken=${googleAuth.idToken}",
+          "api/user/login-with-google?idToken=${googleAuth.idToken}&fcmToken=$fcmToken",
           body: {});
 
       return response;

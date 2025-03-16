@@ -25,7 +25,7 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
     try {
       isLoading = true;
       if (searchQuery != null) {
-        this.searchQuery = searchQuery; // Lưu lại để lọc cục bộ
+        this.searchQuery = searchQuery;
       }
 
       if (_updateCallback != null) {
