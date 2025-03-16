@@ -71,7 +71,7 @@ class UserService {
       final response = await _apiService.post(
           "api/user/login-with-google?idToken=${googleAuth.idToken}&fcmToken=$fcmToken",
           body: {});
-      
+
       //print("response: ${response.body}");
       return response;
     } catch (e) {
@@ -144,6 +144,36 @@ class UserService {
       throw Exception("Không thể kết nối đến server.");
     }
   }
+  // Future<http.Response> getHealthProfileReport() async {
+  //   final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+  //   final String? token = await flutterSecureStorage.read(key: 'accessToken');
+  //
+  //   if (token == null || token.isEmpty) {
+  //     throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+  //   }
+  //
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse(
+  //           "https://6545921dfe036a2fa954718f.mockapi.io/api/v1/student"), // Đã thay đổi thành mock API link
+  //       // headers: {
+  //       //   'Authorization':
+  //       //       'Bearer $token', // Nếu cần gửi token, sử dụng header này
+  //       // },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       return response;
+  //     } else {
+  //       print('Lỗi lấy health profile report: ${response.body}');
+  //       throw Exception(
+  //           'Lỗi lấy health profile report: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Lỗi kết nối API: $e');
+  //     throw Exception("Không thể kết nối đến server.");
+  //   }
+  // }
 
   Future<http.Response> getHealthProfile() async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
