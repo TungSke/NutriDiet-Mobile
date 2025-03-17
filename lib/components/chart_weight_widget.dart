@@ -226,6 +226,10 @@ import 'package:intl/intl.dart'; // for date formatting
 import '../flutter_flow/flutter_flow_theme.dart';
 
 class WeightLineChart extends StatefulWidget {
+  final Function? refreshChart; // Định nghĩa tham số callback
+
+  WeightLineChart({this.refreshChart});
+
   @override
   _WeightLineChartState createState() => _WeightLineChartState();
 }
@@ -237,6 +241,13 @@ class _WeightLineChartState extends State<WeightLineChart> {
   double minWeight = double.infinity;
   double maxWeight = double.negativeInfinity;
   UserService userService = UserService();
+  void refreshChart() {
+    setState(() {
+      // Gọi lại fetchWeightData khi có thay đổi dữ liệu
+      fetchWeightData();
+      fetchTargetWeight();
+    });
+  }
 
   @override
   void initState() {
@@ -267,65 +278,51 @@ class _WeightLineChartState extends State<WeightLineChart> {
       if (response.statusCode == 200) {
         final dataJson = jsonDecode(response.body)['data'];
 
-        Map<String, double> latestDataMap =
-            {}; // Lưu trữ giá trị cuối cùng mỗi ngày
+        Map<String, double> latestDataMap = {};
         List<String> tempDateLabels = [];
 
-        // Duyệt qua các đối tượng trong mảng 'data'
         for (var item in dataJson) {
           double weight = item['value'].toDouble();
           String rawDate = item['date'];
 
-          // Lấy phần ngày từ 'date' và định dạng lại
           String dateKey = rawDate.split('T')[0];
           String formattedDate =
               DateFormat('dd/MM').format(DateTime.parse(dateKey));
 
-          // Lưu giá trị cuối cùng của ngày
           latestDataMap[dateKey] = weight;
 
-          // Lưu ngày đã định dạng
           if (!tempDateLabels.contains(formattedDate)) {
             tempDateLabels.add(formattedDate);
           }
         }
 
-        // In ra các giá trị đã lọc
-        print("Latest Data Map: $latestDataMap");
-        print("Date Labels: $tempDateLabels");
-
-        // Tạo danh sách điểm dữ liệu từ các giá trị mới nhất của mỗi ngày
         List<FlSpot> weightData = [];
         latestDataMap.forEach((dateKey, weight) {
-          int index = dateLabels.indexOf(DateFormat('dd/MM')
-              .format(DateTime.parse(dateKey))); // Lấy chỉ số của ngày
-
-          weightData.add(FlSpot(index.toDouble(),
-              weight)); // Tạo FlSpot với giá trị cuối cùng của mỗi ngày
+          int index = dateLabels
+              .indexOf(DateFormat('dd/MM').format(DateTime.parse(dateKey)));
+          weightData.add(FlSpot(index.toDouble(), weight));
         });
-
-        // In ra danh sách điểm dữ liệu đã được tạo
-        print("Weight Data (FlSpot): $weightData");
 
         setState(() {
           data = weightData;
         });
 
-        // Cập nhật minY và maxY
-        double maxWeightValue = latestDataMap.values
-            .reduce((a, b) => a > b ? a : b); // Lấy giá trị max từ dữ liệu
-        double minWeightValue = latestDataMap.values
-            .reduce((a, b) => a < b ? a : b); // Lấy giá trị min từ dữ liệu
+        double maxWeightValue =
+            latestDataMap.values.reduce((a, b) => a > b ? a : b);
+        double minWeightValue =
+            latestDataMap.values.reduce((a, b) => a < b ? a : b);
 
-        // Cập nhật minY và maxY
         if (minWeightValue < targetWeight) {
-          minWeight = minWeightValue -
-              5; // Nếu weight nhỏ hơn targetWeight, lấy minY = weight - 5
+          minWeight = minWeightValue - 5;
         } else {
-          minWeight = targetWeight -
-              5; // Nếu weight lớn hơn hoặc bằng targetWeight, lấy minY = targetWeight - 5
+          minWeight = targetWeight - 5;
         }
-        maxWeight = maxWeightValue + 5; // maxY = max value trong ngày + 5
+        maxWeight = maxWeightValue + 5;
+
+        // Gọi lại hàm refresh để làm mới biểu đồ khi cập nhật dữ liệu
+        if (widget.refreshChart != null) {
+          widget.refreshChart!();
+        }
       } else {
         throw Exception('Failed to load weight data');
       }
@@ -368,28 +365,67 @@ class _WeightLineChartState extends State<WeightLineChart> {
       padding: const EdgeInsets.all(18),
       child: LineChart(
         LineChartData(
-          gridData: FlGridData(show: true),
+          gridData: FlGridData(
+            show: true,
+            verticalInterval: 1,
+            getDrawingVerticalLine: (value) {
+              // Lấy chỉ số và chuyển thành ngày tháng tương ứng
+              String label = dateLabels[value.toInt()];
+              List<String> dateParts = label.split('/');
+              String day = dateParts[0];
+
+              // Kiểm tra nếu là các ngày cần hiển thị grid lines
+              if (['02', '09', '16', '23'].contains(day)) {
+                return FlLine(
+                  color: Colors.grey,
+                  strokeWidth: 0.5,
+                );
+              }
+              return FlLine(
+                color: Colors
+                    .transparent, // Ẩn grid lines cho các ngày không phải 2, 9, 16, 23
+                strokeWidth: 0,
+              );
+            },
+          ),
+
           titlesData: FlTitlesData(
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  // Chỉ hiển thị nhãn cho ngày 2, 9, 16, 23, 30
                   String label = dateLabels[value.toInt()];
-                  // Kiểm tra nếu là một trong các ngày cần hiển thị
-                  if (['02', '09', '16', '23'].contains(label.split('/')[0])) {
+                  List<String> dateParts = label.split('/');
+                  String day = dateParts[0];
+                  String month = dateParts[1];
+                  if (['02', '09', '16', '23'].contains(day)) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                        label,
-                        style: TextStyle(color: Colors.black),
+                      child: Column(
+                        children: [
+                          Text(
+                            day,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            month,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }
-                  return Container(); // Ẩn nhãn cho các ngày khác
+                  return Container();
                 },
-                reservedSize: 40, // Đảm bảo đủ khoảng trống giữa các nhãn
-                interval: 1, // Đảm bảo các nhãn không bị chồng lên nhau
+                reservedSize: 40,
+                interval: 1,
               ),
             ),
             topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),

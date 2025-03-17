@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../../services/mealplan_service.dart';
 import '../../services/models/mealplan.dart';
@@ -51,6 +52,31 @@ class MealPlanDetailModel extends ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> applyMealPlan(int mealPlanId) async {
+    try {
+      isLoading = true;
+      errorMessage = null; // Reset errorMessage
+      notifyListeners();
+
+      final result = await _mealPlanService.applyMealPlan(mealPlanId);
+      isLoading = false;
+      if (result['success']) {
+        errorMessage = null;
+        await fetchMealPlanById(mealPlanId); // Cập nhật trạng thái từ server
+      } else {
+        errorMessage = result['errorMessage'];
+      }
+      notifyListeners();
+      return result['success'];
+    } catch (e) {
+      isLoading = false;
+      errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Hàm lấy tổng dinh dưỡng cho ngày cụ thể từ totalByDayNumber
   Map<String, double> getNutrientTotalsForDay(int dayNumber) {
     if (mealPlanTotals == null || mealPlanTotals!['totalByDayNumber'] == null) {

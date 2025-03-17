@@ -33,17 +33,11 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   void initState() {
     super.initState();
     _model = MealPlanDetailModel();
-    _model.fetchMealPlanById(widget.mealPlanId); // Gọi trực tiếp, không cần setState
-  }
-
-  void _applyMealPlan() {
-    debugPrint("Áp dụng thực đơn ${widget.mealPlanId}");
+    _model.fetchMealPlanById(widget.mealPlanId);
   }
 
   void _addNewDay() {
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   void _rejectMealPlan() {
@@ -95,11 +89,11 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
-        if (_model.errorMessage != null || _model.mealPlan == null) {
-          return Scaffold(body: Center(child: Text(_model.errorMessage ?? "Không tìm thấy kế hoạch")));
+        if (_model.mealPlan == null) { // Chỉ hiển thị lỗi nếu mealPlan null
+          return Scaffold(body: Center(child: Text("Không tìm thấy kế hoạch")));
         }
 
-        final mealPlan = _model.mealPlan!;
+        final mealPLAN = _model.mealPlan!;
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: PreferredSize(
@@ -113,7 +107,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               ),
               centerTitle: true,
               title: Text(
-                mealPlan.planName,
+                mealPLAN.planName,
                 style: GoogleFonts.montserrat(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -132,7 +126,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildMealPlanCard(mealPlan),
+                      _buildMealPlanCard(mealPLAN),
                       const SizedBox(height: 12),
                       _buildDaySelector(),
                       const SizedBox(height: 12),
@@ -335,7 +329,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
 
   Widget _buildMealCard(MealPlanDetail meal) {
     return Card(
-      color: Colors.white, // Đặt màu nền thành trắng
+      color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         title: Text(
@@ -363,17 +357,88 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   Widget _buildActionButtons() {
     switch (widget.source) {
       case MealPlanSource.myMealPlan:
+        final isActive = _model.mealPlan?.status == 'Active';
         return SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: FlutterFlowTheme.of(context).primary,
+              backgroundColor: isActive ? Colors.red : FlutterFlowTheme.of(context).primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            onPressed: _applyMealPlan,
-            child: const Text("ÁP DỤNG THỰC ĐƠN", style: TextStyle(color: Colors.white)),
+            onPressed: () async {
+              try {
+                final success = await _model.applyMealPlan(widget.mealPlanId);
+                if (!mounted) return;
+                if (success) {
+                  final isActive = _model.mealPlan?.status == 'Active';
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      backgroundColor: FlutterFlowTheme.of(context).primary,
+                      title: Text(
+                        isActive ? "Thực đơn đang được áp dụng" : "Hủy áp dụng thành công",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      content: Text(
+                        isActive ? "Thực đơn đã được áp dụng thành công." : "Thực đơn đã được hủy áp dụng thành công.",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("OK", style: TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  final errorMessage = _model.errorMessage ?? 'Lỗi khi áp dụng/hủy áp dụng thực đơn';
+                  if (errorMessage.contains("Bạn đã có một thực đơn đang được áp dụng")) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        backgroundColor: Colors.red, // Đổi màu để phân biệt với thành công
+                        title: const Text(
+                          "Thông báo",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        content: const Text(
+                          "Bạn đang có thực đơn khác được áp dụng",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("OK", style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(errorMessage),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Lỗi không xác định: $e"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: Text(
+              isActive ? "HỦY ÁP DỤNG THỰC ĐƠN" : "ÁP DỤNG THỰC ĐƠN",
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         );
+    // Các case khác giữ nguyên
       case MealPlanSource.sampleMealPlan:
         return SizedBox(
           width: double.infinity,
