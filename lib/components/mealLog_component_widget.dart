@@ -14,109 +14,112 @@ class MealLogComponentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MealLogComponentModel>(
-      builder: (context, model, child) {
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-            automaticallyImplyLeading: false,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return ChangeNotifierProvider<MealLogComponentModel>(
+      create: (context) => MealLogComponentModel(),
+      child: Consumer<MealLogComponentModel>(
+        builder: (context, model, child) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+              automaticallyImplyLeading: false,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left),
+                    onPressed: () {
+                      model.changeDate(
+                        model.selectedDate.subtract(const Duration(days: 1)),
+                      );
+                    },
+                  ),
+                  GestureDetector(
+                    onTap: () => _showDatePicker(context, model),
+                    child: Text(
+                      DateFormat('MMMM d, yyyy').format(model.selectedDate),
+                      style: const TextStyle(
+                        fontFamily: 'Figtree',
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right),
+                    onPressed: () {
+                      model.changeDate(
+                        model.selectedDate.add(const Duration(days: 1)),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            body: ListView(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  onPressed: () {
-                    model.changeDate(
-                      model.selectedDate.subtract(const Duration(days: 1)),
-                    );
-                  },
-                ),
-                GestureDetector(
-                  onTap: () => _showDatePicker(context, model),
-                  child: Text(
-                    DateFormat('MMMM d, yyyy').format(model.selectedDate),
-                    style: const TextStyle(
-                      fontFamily: 'Figtree',
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                // Card hiển thị Calories Remaining
+                Card(
+                  color: Colors.white,
+                  margin: const EdgeInsets.all(12.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Tiêu đề
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'Calories Remaining',
+                              style: TextStyle(
+                                fontFamily: 'Figtree',
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Icon(Icons.more_horiz),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Goal - Food = Remaining
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildCalorieColumn(
+                              model.calorieGoal.toString(),
+                              'Goal',
+                              FontWeight.bold,
+                            ),
+                            _buildOperator('-'),
+                            _buildCalorieColumn(
+                              model.foodCalories.toString(),
+                              'Food',
+                              FontWeight.normal,
+                            ),
+                            _buildOperator('='),
+                            _buildCalorieColumn(
+                              model.remainingCalories.toString(),
+                              'Remaining',
+                              FontWeight.bold,
+                              textColor: Colors.red,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  onPressed: () {
-                    model.changeDate(
-                      model.selectedDate.add(const Duration(days: 1)),
-                    );
-                  },
-                ),
+      
+                // Hiển thị các bữa
+                for (final category in model.mealCategories)
+                  _buildMealCategory(context, model, category),
               ],
             ),
-          ),
-          body: ListView(
-            children: [
-              // Card hiển thị Calories Remaining
-              Card(
-                color: Colors.white,
-                margin: const EdgeInsets.all(12.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Tiêu đề
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text(
-                            'Calories Remaining',
-                            style: TextStyle(
-                              fontFamily: 'Figtree',
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Icon(Icons.more_horiz),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      // Goal - Food = Remaining
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildCalorieColumn(
-                            model.calorieGoal.toString(),
-                            'Goal',
-                            FontWeight.bold,
-                          ),
-                          _buildOperator('-'),
-                          _buildCalorieColumn(
-                            model.foodCalories.toString(),
-                            'Food',
-                            FontWeight.normal,
-                          ),
-                          _buildOperator('='),
-                          _buildCalorieColumn(
-                            model.remainingCalories.toString(),
-                            'Remaining',
-                            FontWeight.bold,
-                            textColor: Colors.red,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Hiển thị các bữa
-              for (final category in model.mealCategories)
-                _buildMealCategory(context, model, category),
-            ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

@@ -15,7 +15,7 @@ import 'meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
 import 'firebase_options.dart';
 
 void main() async {
-  Provider.debugCheckInvalidValueType = null;
+  // Provider.debugCheckInvalidValueType = null;
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
