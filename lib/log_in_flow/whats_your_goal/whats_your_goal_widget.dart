@@ -79,7 +79,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
           notes: "Không có ghi chú",
         );
 
-        if (updateResponse.statusCode == 200 ||
+        if (updateResponse.statusCode == 201 ||
             updateResponse.statusCode == 204) {
           showSnackbar(context, "🎉 Gửi mục tiêu thành công!");
           context.pushNamed('health_indicator_screen');
