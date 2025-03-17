@@ -30,14 +30,19 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     'Tăng cân': 'GainWeight',
     'Giảm cân': 'LoseWeight'
   };
+  // Hàm callback để làm mới chart
+  void _refreshChart() {
+    setState(() {
+      // Logic để làm mới biểu đồ có thể nằm ở đây
+    });
+  }
 
-  // Mảng ánh xạ giá trị số về giá trị mô tả
   final Map<String, String> _reverseGoalTypeMap = {
     'Maintain': 'Giữ cân',
     'GainWeight': 'Tăng cân',
     'LoseWeight': 'Giảm cân'
   };
-  // Khai báo _userService
+
   final _userService = UserService();
   String name = '';
   String age = '';
@@ -45,11 +50,15 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   String location = '';
   String email = '';
   int height = 0;
-  int weight = 0;
+  double weight = 0.0;
   String activityLevel = '';
   String userId = '';
   bool isLoading = true;
   String errorMessage = "";
+
+  Map<String, dynamic>? healthData;
+  Map<String, dynamic>? personalGoal;
+
   final animationsMap = <String, AnimationInfo>{};
 
   @override
@@ -62,7 +71,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   void initState() {
     super.initState();
     loadData();
-    fetchUserProfile(); // Gọi API để lấy thông tin người dùng
+    fetchUserProfile();
     _model = createModel(context, () => ActivityComponentModel());
     animationsMap.addAll({
       'textOnPageLoadAnimation': AnimationInfo(
@@ -92,7 +101,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
           location = data['address'] ?? "Chưa cập nhật";
           email = data["email"] ?? "Chưa cập nhật";
           userId = data['id']?.toString() ?? "";
-          isLoading = false; // Đặt trạng thái không còn loading
+          isLoading = false;
         });
       } else {
         setState(() {
@@ -107,37 +116,6 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
       });
     }
   }
-
-  // Future<void> fetchHealthProfile() async {
-  //   try {
-  //     final response = await _userService.getHealthProfile();
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       setState(() {
-  //         weight = data['weight'] ?? "Chưa cập nhật";
-  //         height = data['age']?.toString() ?? "0";
-  //         phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
-  //         location = data['address'] ?? "Chưa cập nhật";
-  //         email = data["email"] ?? "Chưa cập nhật";
-  //         userId = data['id']?.toString() ?? "";
-  //         isLoading = false; // Đặt trạng thái không còn loading
-  //       });
-  //     } else {
-  //       setState(() {
-  //         errorMessage = '❌ Failed to fetch user profile';
-  //         isLoading = false;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       errorMessage = "❌ Lỗi khi lấy thông tin người dùng: $e";
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
-
-  Map<String, dynamic>? healthData;
-  Map<String, dynamic>? personalGoal;
 
   Future<void> loadData() async {
     final result = await HealthService.fetchHealthData();
@@ -175,71 +153,44 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
         mainAxisSize: MainAxisSize.max,
         children: [
           Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primary,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(16.0),
-                  bottomRight: Radius.circular(16.0),
-                  topLeft: Radius.circular(0.0),
-                  topRight: Radius.circular(0.0),
-                ),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: FlutterFlowTheme.of(context).primary,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16.0),
+                bottomRight: Radius.circular(16.0),
               ),
-              child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(
-                    20.0, 63.0, 20.0, 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          0.0, 0.0, 0.0, 16.0),
-                      child: Text(
-                        'Hoạt động',
-                        maxLines: 1,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'figtree',
-                              fontSize: 22.0,
-                              color: Colors.white,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.bold,
-                              useGoogleFonts: false,
-                              lineHeight: 1.5,
-                            ),
-                      ).animateOnPageLoad(
-                          animationsMap['textOnPageLoadAnimation']!),
-                    ),
-                  ],
-                ),
-              )),
-          // Container(
-          //   height: 119.0,
-          //   decoration: const BoxDecoration(),
-          //   child:
-          //   Align(
-          //     alignment: const AlignmentDirectional(0.0, 1.0),
-          //     child: Padding(
-          //       padding:
-          //           const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
-          //       child: Text(
-          //         'Hoạt động',
-          //         maxLines: 1,
-          //         style: FlutterFlowTheme.of(context).bodyMedium.override(
-          //               fontFamily: 'figtree',
-          //               fontSize: 22.0,
-          //               letterSpacing: 0.0,
-          //               fontWeight: FontWeight.bold,
-          //               useGoogleFonts: false,
-          //               lineHeight: 1.5,
-          //             ),
-          //       ).animateOnPageLoad(animationsMap['textOnPageLoadAnimation']!),
-          //     ),
-          //   ),
-          // ),
+            ),
+            child: Padding(
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 16.0),
+                    child: Text(
+                      'Hoạt động',
+                      maxLines: 1,
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            fontFamily: 'figtree',
+                            fontSize: 22.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            useGoogleFonts: false,
+                            lineHeight: 1.5,
+                          ),
+                    ).animateOnPageLoad(
+                        animationsMap['textOnPageLoadAnimation']!),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
-              scrollDirection: Axis.vertical,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -269,9 +220,10 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                 style: GoogleFonts.roboto(
                                     fontSize: 18, fontWeight: FontWeight.w600)),
                             Text(
-                                "• $age tuổi • ${healthData?['height']} cm • ${healthData?['weight']} kg",
-                                style: GoogleFonts.roboto(
-                                    fontSize: 12, color: Colors.grey)),
+                              "• $age tuổi • ${healthData?['height']} cm • ${healthData?['weight']} kg",
+                              style: GoogleFonts.roboto(
+                                  fontSize: 12, color: Colors.grey),
+                            ),
                           ],
                         ),
                       ),
@@ -306,33 +258,56 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Cân nặng ban đầu: ",
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text("Cân nặng ban đầu: ",
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.grey)),
+                                  Text(
+                                    "${healthData?['weight'] ?? "N/A"} kg",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Text("Cân nặng mục tiêu:",
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.grey)),
+                                  Text(
+                                    "${personalGoal?['targetWeight'] ?? "N/A"} kg",
+                                    style: TextStyle(
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          Text(
-                            "${healthData?['weight'] ?? "N/A"} kg",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Text(
-                            "Cân nặng mục tiêu:",
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                          Text(
-                            "${personalGoal?['targetWeight'] ?? "N/A"} kg",
-                            style: TextStyle(
-                                color: FlutterFlowTheme.of(context).primary,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
+                          FloatingActionButton(
+                            onPressed: () {
+                              _showBottomSheet(context);
+                            },
+                            backgroundColor: Colors.green,
+                            elevation: 4.0,
+                            shape: CircleBorder(),
+                            mini: true,
+                            heroTag: null,
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
                           ),
                         ],
                       ),
@@ -340,18 +315,17 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Đã hoàn thành ",
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: FlutterFlowTheme.of(context).primary),
-                          ),
+                          Text("Đã hoàn thành ",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: FlutterFlowTheme.of(context).primary)),
                           Text(
                             "${personalGoal?['progressPercentage'] ?? "N/A"}/100 %",
                             style: TextStyle(
-                                color: FlutterFlowTheme.of(context).primary,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
+                              color: FlutterFlowTheme.of(context).primary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -363,9 +337,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                   child: SingleChildScrollView(
                     child: Container(
                       height: 400,
-
-                      // Đặt chiều cao cố định cho biểu đồ
-                      child: WeightLineChart(),
+                      child: WeightLineChart(refreshChart: _refreshChart),
                     ),
                   ),
                 ),
@@ -473,6 +445,117 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showBottomSheet(BuildContext context) async {
+    double currentWeight = healthData?['weight']?.toDouble() ?? 0.0;
+    double currentHeight = healthData?['height']?.toDouble() ?? 0.0;
+    String currentActivityLevel = healthData?['activityLevel'] ?? '';
+    String currentAisuggestion = healthData?['aisuggestion'] ?? '';
+    List<int> currentAllergies = List<int>.from(
+        healthData?['allergies']?.map((e) => e['allergyId']) ?? []);
+    List<int> currentDiseases = List<int>.from(
+        healthData?['diseases']?.map((e) => e['diseaseId']) ?? []);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: StatefulBuilder(
+            builder: (context, setStateForBottomSheet) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Cập nhật cân nặng',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    '${currentWeight.toStringAsFixed(1)} kg',
+                    style: TextStyle(
+                      fontSize: 32.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          setStateForBottomSheet(() {
+                            currentWeight = (currentWeight - 0.1).toDouble();
+                            currentWeight =
+                                double.parse(currentWeight.toStringAsFixed(1));
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setStateForBottomSheet(() {
+                            currentWeight = (currentWeight + 0.1).toDouble();
+                            currentWeight =
+                                double.parse(currentWeight.toStringAsFixed(1));
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        final response = await _userService.updateHealthProfile(
+                          height: currentHeight,
+                          weight:
+                              double.parse(currentWeight.toStringAsFixed(1)),
+                          activityLevel: currentActivityLevel,
+                          aisuggestion: currentAisuggestion,
+                          allergies: currentAllergies,
+                          diseases: currentDiseases,
+                        );
+
+                        if (response.statusCode == 200) {
+                          Navigator.pop(context);
+                          setState(() {
+                            healthData?['weight'] = currentWeight;
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Cập nhật cân nặng thành công!')),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Cập nhật cân nặng thất bại!')),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('Lỗi khi cập nhật cân nặng: $e')),
+                        );
+                      }
+                    },
+                    child: Text('Lưu'),
+                  )
+                ],
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

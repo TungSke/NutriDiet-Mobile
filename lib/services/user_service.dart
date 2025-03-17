@@ -199,9 +199,101 @@ class UserService {
     }
   }
 
+  // Future<http.Response> updateHealthProfile({
+  //   int? height,
+  //   int? weight,
+  //   String? activityLevel,
+  //   String? aisuggestion,
+  //   List<int>? allergies,
+  //   List<int>? diseases,
+  // }) async {
+  //   final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+  //   final String? token = await flutterSecureStorage.read(key: 'accessToken');
+  //
+  //   if (token == null || token.isEmpty) {
+  //     throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+  //   }
+  //
+  //   try {
+  //     // 🔹 Lấy thông tin user nếu thiếu
+  //
+  //     // 🔹 Nếu có giá trị nào bị null, lấy dữ liệu từ health-profile
+  //     if ([height, weight, activityLevel, aisuggestion, allergies, diseases]
+  //         .any((e) => e == null)) {
+  //       final healthProfileResponse = await getHealthProfile();
+  //       if (healthProfileResponse.statusCode == 200) {
+  //         final Map<String, dynamic> healthProfile =
+  //             jsonDecode(healthProfileResponse.body);
+  //
+  //         height ??= int.tryParse(healthProfile['height']?.toString() ?? '');
+  //         weight ??= int.tryParse(healthProfile['weight']?.toString() ?? '');
+  //         activityLevel ??= healthProfile['activityLevel']?.toString();
+  //         aisuggestion ??= healthProfile['aisuggestion']?.toString();
+  //
+  //         allergies ??= (healthProfile['allergies'] as List?)
+  //                 ?.map((e) => int.tryParse(e['allergyId'].toString()) ?? 0)
+  //                 .where((e) => e > 0) // Lọc giá trị hợp lệ
+  //                 .toList() ??
+  //             [];
+  //
+  //         diseases ??= (healthProfile['diseases'] as List?)
+  //                 ?.map((e) => int.tryParse(e['diseaseId'].toString()) ?? 0)
+  //                 .where((e) => e > 0)
+  //                 .toList() ??
+  //             [];
+  //       }
+  //     }
+  //
+  //     // 🔹 Tạo request cập nhật
+  //     var request = http.MultipartRequest(
+  //       'POST',
+  //       Uri.parse("${_apiService.baseUrl}/api/health-profile"),
+  //     );
+  //
+  //     request.headers['Authorization'] = 'Bearer $token';
+  //
+  //     if (height != null) request.fields['Height'] = height.toString();
+  //     if (weight != null) request.fields['Weight'] = weight.toString();
+  //     if (activityLevel != null) {
+  //       request.fields['ActivityLevel'] = activityLevel;
+  //     }
+  //     if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
+  //
+  //     // ✅ Sửa lỗi gửi danh sách `allergies` và `diseases`
+  //     // ✅ Gửi đúng định dạng `multipart/form-data`
+  //     if (allergies != null && allergies.isNotEmpty) {
+  //       for (int i = 0; i < allergies.length; i++) {
+  //         request.fields['AllergyIds[$i]'] = allergies[i].toString();
+  //       }
+  //     }
+  //     if (diseases != null && diseases.isNotEmpty) {
+  //       for (int i = 0; i < diseases.length; i++) {
+  //         request.fields['DiseaseIds[$i]'] = diseases[i].toString();
+  //       }
+  //     }
+  //
+  //     // 🛠 Debug log trước khi gửi request
+  //     print("🔹 Request updateHealthProfile: ${jsonEncode(request.fields)}");
+  //
+  //     final response = await request.send();
+  //     final httpResponse = await http.Response.fromStream(response);
+  //
+  //     print("🔹 Response status: ${httpResponse.statusCode}");
+  //     print("🔹 Response body: ${httpResponse.body}");
+  //
+  //     if (httpResponse.statusCode != 200) {
+  //       throw Exception("Cập nhật hồ sơ thất bại: ${httpResponse.body}");
+  //     }
+  //
+  //     return httpResponse;
+  //   } catch (e) {
+  //     print("❌ Lỗi khi cập nhật hồ sơ sức khỏe: $e");
+  //     throw Exception("Không thể cập nhật hồ sơ sức khỏe.");
+  //   }
+  // }
   Future<http.Response> updateHealthProfile({
-    int? height,
-    int? weight,
+    double? height, // Use double instead of int
+    double? weight, // Use double instead of int
     String? activityLevel,
     String? aisuggestion,
     List<int>? allergies,
@@ -215,9 +307,7 @@ class UserService {
     }
 
     try {
-      // 🔹 Lấy thông tin user nếu thiếu
-
-      // 🔹 Nếu có giá trị nào bị null, lấy dữ liệu từ health-profile
+      // If any value is null, fetch data from health-profile
       if ([height, weight, activityLevel, aisuggestion, allergies, diseases]
           .any((e) => e == null)) {
         final healthProfileResponse = await getHealthProfile();
@@ -225,14 +315,14 @@ class UserService {
           final Map<String, dynamic> healthProfile =
               jsonDecode(healthProfileResponse.body);
 
-          height ??= int.tryParse(healthProfile['height']?.toString() ?? '');
-          weight ??= int.tryParse(healthProfile['weight']?.toString() ?? '');
+          height ??= double.tryParse(healthProfile['height']?.toString() ?? '');
+          weight ??= double.tryParse(healthProfile['weight']?.toString() ?? '');
           activityLevel ??= healthProfile['activityLevel']?.toString();
           aisuggestion ??= healthProfile['aisuggestion']?.toString();
 
           allergies ??= (healthProfile['allergies'] as List?)
                   ?.map((e) => int.tryParse(e['allergyId'].toString()) ?? 0)
-                  .where((e) => e > 0) // Lọc giá trị hợp lệ
+                  .where((e) => e > 0)
                   .toList() ??
               [];
 
@@ -244,7 +334,7 @@ class UserService {
         }
       }
 
-      // 🔹 Tạo request cập nhật
+      // Create the update request
       var request = http.MultipartRequest(
         'POST',
         Uri.parse("${_apiService.baseUrl}/api/health-profile"),
@@ -252,27 +342,27 @@ class UserService {
 
       request.headers['Authorization'] = 'Bearer $token';
 
+      // Add fields if not null
       if (height != null) request.fields['Height'] = height.toString();
       if (weight != null) request.fields['Weight'] = weight.toString();
-      if (activityLevel != null) {
+      if (activityLevel != null)
         request.fields['ActivityLevel'] = activityLevel;
-      }
       if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
 
-      // ✅ Sửa lỗi gửi danh sách `allergies` và `diseases`
-      // ✅ Gửi đúng định dạng `multipart/form-data`
+      // Add allergies and diseases if not empty
       if (allergies != null && allergies.isNotEmpty) {
         for (int i = 0; i < allergies.length; i++) {
           request.fields['AllergyIds[$i]'] = allergies[i].toString();
         }
       }
+
       if (diseases != null && diseases.isNotEmpty) {
         for (int i = 0; i < diseases.length; i++) {
           request.fields['DiseaseIds[$i]'] = diseases[i].toString();
         }
       }
 
-      // 🛠 Debug log trước khi gửi request
+      // Debug log before sending request
       print("🔹 Request updateHealthProfile: ${jsonEncode(request.fields)}");
 
       final response = await request.send();
@@ -354,9 +444,10 @@ class UserService {
     }
   }
 
+  // Cập nhật mục tiêu cá nhân
   Future<http.Response> updatePersonalGoal({
     required String goalType,
-    required int targetWeight,
+    required double targetWeight, // Sử dụng double thay vì int
     required String weightChangeRate,
     String goalDescription = "Mục tiêu mặc định",
     String notes = "Không có ghi chú",
@@ -387,7 +478,8 @@ class UserService {
 
       // Thêm dữ liệu vào Form-Data
       request.fields['GoalType'] = goalType;
-      request.fields['TargetWeight'] = targetWeight.toString();
+      request.fields['TargetWeight'] =
+          targetWeight.toString(); // Chuyển double thành String
       request.fields['WeightChangeRate'] = weightChangeRate;
 
       // Kiểm tra và gửi `GoalDescription` và `Notes`
