@@ -1,11 +1,14 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import '../../services/mealplan_service.dart';
 import '../../services/models/mealplan.dart';
 import '../../services/models/mealplandetail.dart';
 
-class MealPlanDetailModel {
+class MealPlanDetailModel extends ChangeNotifier {
   final MealPlanService _mealPlanService = MealPlanService();
   MealPlan? mealPlan;
-  Map<String, dynamic>? mealPlanTotals; // Lưu trữ dữ liệu từ API mới
+  Map<String, dynamic>? mealPlanTotals;
   bool isLoading = false;
   String? errorMessage;
 
@@ -13,15 +16,64 @@ class MealPlanDetailModel {
     try {
       isLoading = true;
       errorMessage = null;
+      notifyListeners();
 
-      // Gọi cả hai API
       mealPlan = await _mealPlanService.getMealPlanById(mealPlanId);
       mealPlanTotals = await _mealPlanService.getMealPlanDetailTotals(mealPlanId);
 
       isLoading = false;
+      notifyListeners();
     } catch (e) {
       isLoading = false;
       errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<bool> cloneSampleMealPlan(int mealPlanId) async{
+    try{
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      final success = await _mealPlanService.cloneSampleMealPlan(mealPlanId);
+      isLoading = false;
+      if(success){
+        errorMessage = null;
+      }else{
+        errorMessage = "Không thể sao chép thực đơn";
+      }
+      notifyListeners();
+      return success;
+    }catch (e){
+      isLoading = false;
+      errorMessage = "Lỗi khi sao chép: $e";
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> applyMealPlan(int mealPlanId) async {
+    try {
+      isLoading = true;
+      errorMessage = null; // Reset errorMessage
+      notifyListeners();
+
+      final result = await _mealPlanService.applyMealPlan(mealPlanId);
+      isLoading = false;
+      if (result['success']) {
+        errorMessage = null;
+        await fetchMealPlanById(mealPlanId); // Cập nhật trạng thái từ server
+      } else {
+        errorMessage = result['errorMessage'];
+      }
+      notifyListeners();
+      return result['success'];
+    } catch (e) {
+      isLoading = false;
+      errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
     }
   }
 

@@ -1,6 +1,6 @@
-import 'package:diet_plan_app/flutter_flow/flutter_flow_model.dart';
 import 'package:flutter/material.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
+import '../flutter_flow/flutter_flow_util.dart';
 import '../meal_plan_flow/ai_meal_plan_screen/ai_meal_plan_widget.dart';
 import '../meal_plan_flow/meal_plan_detail/meal_plan_detail_widget.dart';
 import '../meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_widget.dart';
@@ -21,9 +21,11 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => MyMealPlanComponentModel());
+    _model = MyMealPlanComponentModel();
     _model.setUpdateCallback(() {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
     _model.fetchMealPlans();
   }
@@ -32,6 +34,33 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   void dispose() {
     _model.dispose();
     super.dispose();
+  }
+
+  Future<void> _navigateToSampleMealPlan() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SampleMealPlanWidget()),
+    );
+    // Làm mới danh sách khi quay lại từ SampleMealPlanWidget
+    if (mounted) {
+      await _model.fetchMealPlans();
+    }
+  }
+
+  Future<void> _navigateToAIMealPlan() async {
+    int aiMealPlanId = 999; // Thay bằng logic gọi API AI
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MealPlanDetailWidget(
+          mealPlanId: aiMealPlanId,
+          source: MealPlanSource.aiMealPlan,
+        ),
+      ),
+    );
+    if (mounted) {
+      await _model.fetchMealPlans();
+    }
   }
 
   @override
@@ -87,9 +116,9 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: _buildLargeButton("Thực đơn mẫu", const SampleMealPlanWidget())),
+                Expanded(child: _buildLargeButton("Thực đơn mẫu", _navigateToSampleMealPlan)),
                 const SizedBox(width: 10),
-                Expanded(child: _buildLargeButton("Nhận thực đơn AI", const AIMealPlanWidget())),
+                Expanded(child: _buildLargeButton("Nhận thực đơn AI", _navigateToAIMealPlan)),
               ],
             ),
             const SizedBox(height: 16),
@@ -125,8 +154,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   }
 
   Widget _buildMealPlanItem(MealPlan mealPlan) {
-    debugPrint("Đang hiển thị meal plan: ${mealPlan.planName}");
-    bool isActive = mealPlan.planName == activeMealPlan;
+    debugPrint("Đang hiển thị meal plan: ${mealPlan.planName}, status: ${mealPlan.status}");
+    bool isActive = mealPlan.status == 'Active'; // Kiểm tra trạng thái "Active"
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -144,8 +173,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
               "${mealPlan.healthGoal ?? 'Không có mục tiêu'} - Số ngày: ${mealPlan.duration ?? 'Không xác định'}",
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => MealPlanDetailWidget(
@@ -154,6 +183,10 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                   ),
                 ),
               );
+              // Làm mới danh sách mealPlans khi quay lại
+              if (mounted) {
+                await _model.fetchMealPlans();
+              }
             },
             trailing: PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
@@ -171,12 +204,12 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
             ),
           ),
           if (isActive)
-            const Positioned(
+            Positioned(
               bottom: 8,
               right: 16,
               child: Text(
-                "Thực đơn đang được áp dụng từ ngày ",
-                style: TextStyle(fontSize: 12, color: Colors.red),
+                "Thực đơn đang được áp dụng từ ngày ${mealPlan.startAt != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(mealPlan.startAt!)) : 'Không xác định'}",
+                style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
             ),
         ],
@@ -185,6 +218,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   }
 
   void _showDeleteConfirmation(MealPlan mealPlan) {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -202,16 +237,18 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
           TextButton(
             onPressed: () async {
               debugPrint('Xóa meal plan: ${mealPlan.planName}');
-              Navigator.pop(context); // Đóng dialog trước khi xóa
+              Navigator.pop(context);
               final success = await _model.deleteMealPlan(mealPlan.mealPlanId);
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Xóa Meal Plan thành công')),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Lỗi khi xóa Meal Plan')),
-                );
+              if (mounted) {
+                if (success) {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(content: Text('Xóa Meal Plan thành công')),
+                  );
+                } else {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(content: Text('Lỗi khi xóa Meal Plan')),
+                  );
+                }
               }
             },
             child: const Text('Xóa', style: TextStyle(color: Colors.red)),
@@ -316,7 +353,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
     );
   }
 
-  Widget _buildLargeButton(String title, Widget targetScreen) {
+  Widget _buildLargeButton(String title, VoidCallback onPressed) {
     return SizedBox(
       height: 60,
       child: ElevatedButton(
@@ -324,22 +361,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
           backgroundColor: FlutterFlowTheme.of(context).primary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        onPressed: () {
-          if (title == "Nhận thực đơn AI") {
-            int aiMealPlanId = 999; // Thay bằng logic gọi API AI
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MealPlanDetailWidget(
-                  mealPlanId: aiMealPlanId,
-                  source: MealPlanSource.aiMealPlan,
-                ),
-              ),
-            );
-          } else {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen));
-          }
-        },
+        onPressed: onPressed,
         child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 18)),
       ),
     );
