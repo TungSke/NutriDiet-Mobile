@@ -20,9 +20,9 @@ class TargetWeightScreenWidget extends StatefulWidget {
 class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  int selectedKg = 60;
-  int currentWeight = 60;
-  List<int> kgOptions = [];
+  double selectedKg = 60.0;
+  double currentWeight = 60.0;
+  List<double> kgOptions = [];
 
   @override
   void initState() {
@@ -37,7 +37,8 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final Map<String, dynamic> healthData = responseData['data'];
 
-        int apiWeight = int.tryParse(healthData['weight'].toString()) ?? 0;
+        double apiWeight =
+            double.tryParse(healthData['weight'].toString()) ?? 0.0;
         if (apiWeight > 0) {
           setState(() {
             currentWeight = apiWeight;
@@ -55,13 +56,14 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
     final personalGoalProvider = context.read<PersonalGoalProvider>();
 
     if (personalGoalProvider.goalType == "GainWeight") {
-      kgOptions = List.generate(50, (index) => currentWeight + index);
+      kgOptions =
+          List.generate(50, (index) => currentWeight + index.toDouble());
     } else if (personalGoalProvider.goalType == "LoseWeight") {
-      kgOptions = List.generate(50, (index) => currentWeight - index)
-          .where((kg) => kg > 30)
+      kgOptions = List.generate(50, (index) => currentWeight - index.toDouble())
+          .where((kg) => kg > 30.0)
           .toList();
     } else {
-      kgOptions = List.generate(100, (index) => index + 30);
+      kgOptions = List.generate(100, (index) => index.toDouble() + 30.0);
     }
 
     selectedKg = currentWeight;
@@ -94,7 +96,7 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Cân nặng hiện tại: $currentWeight kg',
+                      'Cân nặng hiện tại: ${currentWeight.toStringAsFixed(1)} kg',
                       style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
                             fontSize: 16.0,
                             color: FlutterFlowTheme.of(context).grey,
@@ -115,12 +117,12 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
                           });
 
                           print(
-                              "🔹 Người dùng đã chọn targetWeight: $selectedKg kg");
+                              "🔹 Người dùng đã chọn targetWeight: ${selectedKg.toStringAsFixed(1)} kg");
                         },
                         children: kgOptions.map((kg) {
                           return Center(
                             child: Text(
-                              '$kg kg',
+                              '${kg.toStringAsFixed(1)} kg',
                               style: FlutterFlowTheme.of(context).bodyLarge,
                             ),
                           );
@@ -132,13 +134,11 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: FFButtonWidget(
                         onPressed: () {
-                          personalGoalProvider
-                              .setTargetWeight(selectedKg.toDouble());
+                          personalGoalProvider.setTargetWeight(selectedKg);
 
                           print(
-                              "🔹 Xác nhận targetWeight: ${personalGoalProvider.targetWeight}");
+                              "🔹 Xác nhận targetWeight: ${personalGoalProvider.targetWeight?.toStringAsFixed(1)}");
 
-                          // ✅ Điều hướng đến màn hình tiếp theo dựa vào goalType
                           if (personalGoalProvider.goalType == "GainWeight") {
                             context.pushNamed(
                                 'increase_weight_change_rate_screen');

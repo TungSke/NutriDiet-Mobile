@@ -34,7 +34,6 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
       final fetchedMealPlans = await _mealPlanService.getMyMealPlan(
         pageIndex: pageIndex,
         pageSize: pageSize,
-        // Không gửi search lên API, lấy toàn bộ danh sách
       );
 
       debugPrint("Fetched meal plans: ${fetchedMealPlans.map((m) => m.planName).toList()}");
@@ -44,7 +43,7 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
       mealPlans = [];
     } finally {
       isLoading = false;
-      if (_updateCallback != null) {
+      if (_updateCallback != null) { // Kiểm tra null trước khi gọi
         _updateCallback!();
       } else {
         debugPrint("Lỗi: _updateCallback là null");
