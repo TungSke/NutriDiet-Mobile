@@ -136,4 +136,32 @@ class MealPlanService{
       return false;
     }
   }
+  Future<bool> cloneSampleMealPlan(int mealPlanId) async {
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null) {
+      debugPrint("Access token null, không thể sao chép Meal Plan.");
+      return false;
+    }
+
+    try {
+      String endpoint = "api/meal-plan/clone?mealPlanId=$mealPlanId";
+      final response = await _apiService.postWithoutBody(endpoint, token: token);
+
+      debugPrint("API Response for cloneSampleMealPlan $mealPlanId: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        debugPrint("Sao chép Meal Plan $mealPlanId thành công");
+        return true;
+      } else {
+        final errorData = jsonDecode(response.body);
+        final errorMessage = errorData['Message'] ?? 'Lỗi không xác định từ server';
+        throw Exception('Lỗi sao chép Meal Plan: ${response.statusCode} - $errorMessage');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API CloneSampleMealPlan: $e");
+      return false;
+    }
+  }
 }

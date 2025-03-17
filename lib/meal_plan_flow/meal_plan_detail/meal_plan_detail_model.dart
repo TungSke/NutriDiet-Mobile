@@ -1,11 +1,13 @@
+import 'package:flutter/cupertino.dart';
+
 import '../../services/mealplan_service.dart';
 import '../../services/models/mealplan.dart';
 import '../../services/models/mealplandetail.dart';
 
-class MealPlanDetailModel {
+class MealPlanDetailModel extends ChangeNotifier {
   final MealPlanService _mealPlanService = MealPlanService();
   MealPlan? mealPlan;
-  Map<String, dynamic>? mealPlanTotals; // Lưu trữ dữ liệu từ API mới
+  Map<String, dynamic>? mealPlanTotals;
   bool isLoading = false;
   String? errorMessage;
 
@@ -13,18 +15,42 @@ class MealPlanDetailModel {
     try {
       isLoading = true;
       errorMessage = null;
+      notifyListeners();
 
-      // Gọi cả hai API
       mealPlan = await _mealPlanService.getMealPlanById(mealPlanId);
       mealPlanTotals = await _mealPlanService.getMealPlanDetailTotals(mealPlanId);
 
       isLoading = false;
+      notifyListeners();
     } catch (e) {
       isLoading = false;
       errorMessage = e.toString();
+      notifyListeners();
     }
   }
 
+  Future<bool> cloneSampleMealPlan(int mealPlanId) async{
+    try{
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      final success = await _mealPlanService.cloneSampleMealPlan(mealPlanId);
+      isLoading = false;
+      if(success){
+        errorMessage = null;
+      }else{
+        errorMessage = "Không thể sao chép thực đơn";
+      }
+      notifyListeners();
+      return success;
+    }catch (e){
+      isLoading = false;
+      errorMessage = "Lỗi khi sao chép: $e";
+      notifyListeners();
+      return false;
+    }
+  }
   // Hàm lấy tổng dinh dưỡng cho ngày cụ thể từ totalByDayNumber
   Map<String, double> getNutrientTotalsForDay(int dayNumber) {
     if (mealPlanTotals == null || mealPlanTotals!['totalByDayNumber'] == null) {

@@ -69,6 +69,15 @@ class ApiService {
     return response;
   }
 
+  /// Hàm POST không gửi body
+  Future<http.Response> postWithoutBody(String endpoint, {String? token}) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/$endpoint'),
+      headers: _buildHeaders(token),
+    );
+    return response;
+  }
+
   /// Hàm PUT - Cập nhật dữ liệu
   Future<http.Response> put(String endpoint, {required Map<String, dynamic> body, String? token}) async {
     final response = await http.put(

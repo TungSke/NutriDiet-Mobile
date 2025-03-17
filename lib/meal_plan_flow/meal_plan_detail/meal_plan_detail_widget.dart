@@ -33,27 +33,17 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   void initState() {
     super.initState();
     _model = MealPlanDetailModel();
-    _fetchMealPlan();
-  }
-
-  Future<void> _fetchMealPlan() async {
-    await _model.fetchMealPlanById(widget.mealPlanId);
-    setState(() {});
-  }
-
-  void _addNewDay() {
-    setState(() {
-      // Logic thêm ngày mới (chỉ cho MyMealPlan)
-    });
-  }
-
-  void _copyMealPlan() {
-    debugPrint("Sao chép thực đơn ${widget.mealPlanId} về MyMealPlan");
-    Navigator.pop(context);
+    _model.fetchMealPlanById(widget.mealPlanId); // Gọi trực tiếp, không cần setState
   }
 
   void _applyMealPlan() {
     debugPrint("Áp dụng thực đơn ${widget.mealPlanId}");
+  }
+
+  void _addNewDay() {
+    setState(() {
+
+    });
   }
 
   void _rejectMealPlan() {
@@ -81,7 +71,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               onPressed: () {
                 debugPrint("Từ chối thực đơn ${widget.mealPlanId} với lý do: $reason");
                 Navigator.pop(context);
-                _fetchMealPlan(); // Giả lập tạo mới
+                _model.fetchMealPlanById(widget.mealPlanId);
               },
               child: const Text("Xác nhận", style: TextStyle(color: Colors.white)),
             ),
@@ -98,75 +88,80 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_model.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    return ListenableBuilder(
+      listenable: _model,
+      builder: (context, child) {
+        if (_model.isLoading) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
 
-    if (_model.errorMessage != null || _model.mealPlan == null) {
-      return Scaffold(body: Center(child: Text(_model.errorMessage ?? "Không tìm thấy kế hoạch")));
-    }
+        if (_model.errorMessage != null || _model.mealPlan == null) {
+          return Scaffold(body: Center(child: Text(_model.errorMessage ?? "Không tìm thấy kế hoạch")));
+        }
 
-    final mealPlan = _model.mealPlan!;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primary,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          centerTitle: true,
-          title: Text(
-            mealPlan.planName,
-            style: GoogleFonts.montserrat(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        final mealPlan = _model.mealPlan!;
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(60),
+            child: AppBar(
+              backgroundColor: FlutterFlowTheme.of(context).primary,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildMealPlanCard(mealPlan),
-                  const SizedBox(height: 12),
-                  _buildDaySelector(),
-                  const SizedBox(height: 12),
-                  _buildNutrientProgress(),
-                  const SizedBox(height: 12),
-                  Text(
-                    "Total: ${_model.getNutrientTotalsForDay(selectedDay)['calories']!.toStringAsFixed(0)} kcal",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _model.getMealsForDay(selectedDay).length,
-                      itemBuilder: (context, index) {
-                        final meal = _model.getMealsForDay(selectedDay)[index];
-                        return _buildMealCard(meal);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildActionButtons(),
-                ],
+              centerTitle: true,
+              title: Text(
+                mealPlan.planName,
+                style: GoogleFonts.montserrat(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
-        ],
-      ),
+          body: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildMealPlanCard(mealPlan),
+                      const SizedBox(height: 12),
+                      _buildDaySelector(),
+                      const SizedBox(height: 12),
+                      _buildNutrientProgress(),
+                      const SizedBox(height: 12),
+                      Text(
+                        "Total: ${_model.getNutrientTotalsForDay(selectedDay)['calories']!.toStringAsFixed(0)} kcal",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _model.getMealsForDay(selectedDay).length,
+                          itemBuilder: (context, index) {
+                            final meal = _model.getMealsForDay(selectedDay)[index];
+                            return _buildMealCard(meal);
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildActionButtons(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -340,6 +335,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
 
   Widget _buildMealCard(MealPlanDetail meal) {
     return Card(
+      color: Colors.white, // Đặt màu nền thành trắng
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         title: Text(
@@ -386,7 +382,36 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               backgroundColor: FlutterFlowTheme.of(context).primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            onPressed: _copyMealPlan,
+            onPressed: () async {
+              final success = await _model.cloneSampleMealPlan(widget.mealPlanId);
+              if (!mounted) return;
+              if (success) {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: FlutterFlowTheme.of(context).primary,
+                    title: const Text("Sao chép thành công", style: TextStyle(color: Colors.white)),
+                    content: const Text(
+                      "Sao chép thực đơn thành công, vui lòng kiểm tra trong thực đơn của bạn.",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("OK", style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(_model.errorMessage ?? 'Lỗi khi sao chép thực đơn'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
             child: const Text("SAO CHÉP THỰC ĐƠN", style: TextStyle(color: Colors.white)),
           ),
         );

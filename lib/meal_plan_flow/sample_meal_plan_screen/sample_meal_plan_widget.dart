@@ -121,12 +121,13 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: const Color(0xFFF5F5F5),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         title: Text(mealPlan.planName ?? "Không có tên", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         subtitle: Text("${mealPlan.healthGoal ?? "Không có mục tiêu"} - Số ngày: ${mealPlan.duration ?? 0}"),
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => MealPlanDetailWidget(
@@ -135,6 +136,10 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
               ),
             ),
           );
+          // Nếu sao chép thành công, trả về true cho MyMealPlanScreenWidget
+          if (result == true && mounted) {
+            Navigator.pop(context, true);
+          }
         },
       ),
     );
