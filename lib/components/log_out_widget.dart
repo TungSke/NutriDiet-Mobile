@@ -1,3 +1,5 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -149,6 +151,8 @@ class _LogOutWidgetState extends State<LogOutWidget>
                       child: FFButtonWidget(
                         onPressed: () async {
                           FFAppState().isLogin = false;
+                          FlutterSecureStorage storage = FlutterSecureStorage();
+                          storage.deleteAll();
                           FFAppState().update(() {});
                           Navigator.pop(context);
                         },

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:diet_plan_app/components/serch_data_widget.dart';
 import 'package:diet_plan_app/log_in_flow/profile_enter_screen/profile_enter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -172,6 +173,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'help_screen',
           path: '/helpScreen',
           builder: (context, params) => const HelpScreenWidget(),
+        ),
+        FFRoute(
+          name: 'serch_data_screen',
+          path: '/serchdataScreen',
+          builder: (context, params) => const SerchDataWidget(),
         ),
         FFRoute(
           name: 'feedback_screen',
