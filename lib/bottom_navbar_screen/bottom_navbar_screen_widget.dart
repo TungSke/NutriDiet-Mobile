@@ -81,7 +81,8 @@ class _BottomNavbarScreenWidgetState extends State<BottomNavbarScreenWidget> {
                   wrapWithModel(
                     model: _model.mymealplanComponentModel,
                     updateCallback: () => safeSetState(() {}),
-                    child: const MyMealPlanScreenWidget(),                  ),
+                    child: const MyMealPlanScreenWidget(),
+                  ),
                   wrapWithModel(
                     model: _model.profileComponetModel,
                     updateCallback: () => safeSetState(() {}),

@@ -1,6 +1,5 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
 
-import 'package:diet_plan_app/components/mealLog_component_model.dart';
 import 'package:diet_plan_app/services/models/health_profile_provider.dart';
 import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -16,7 +15,7 @@ import 'meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
 import 'firebase_options.dart';
 
 void main() async {
-  Provider.debugCheckInvalidValueType=null;
+  Provider.debugCheckInvalidValueType = null;
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
@@ -52,11 +51,7 @@ Future<void> setupFCM() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-    announcement: false
-  );
+      alert: true, badge: true, sound: true, announcement: false);
 
   // Lấy và in ra FCM token
   // String? token = await messaging.getToken();
@@ -64,7 +59,7 @@ Future<void> setupFCM() async {
 
   // Lắng nghe sự kiện thay đổi token
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-  print("FCM Token mới: $newToken");
+    print("FCM Token mới: $newToken");
   });
 
   if (settings.authorizationStatus == AuthorizationStatus.denied) {
@@ -72,7 +67,6 @@ Future<void> setupFCM() async {
     return;
   }
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});

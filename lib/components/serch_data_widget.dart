@@ -101,7 +101,7 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
               controller: _model.textController,
               focusNode: _model.textFieldFocusNode,
               onFieldSubmitted: (_) async {
-                if(_model.textController.text.isNotEmpty) {
+                if (_model.textController.text.isNotEmpty) {
                   FFAppState().addToSearchList(_model.textController.text);
                 }
                 _model.reslut = true;
@@ -172,225 +172,210 @@ class _SerchDataWidgetState extends State<SerchDataWidget>
           Expanded(
             child: Builder(
               builder: (context) {
-                 // if ((FFAppState().searchList.isNotEmpty) == true) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              20.0, 0.0, 20.0, 0.0),
-                          child: ListView(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            children: [
-                              if (FFAppState().searchList.isNotEmpty)
-                                Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    if (FFAppState().searchList.isNotEmpty)
-                                      Padding(
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 16.0, 0.0, 0.0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Recent search',
-                                                style:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily: 'figtree',
-                                                          fontSize: 22.0,
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          useGoogleFonts: false,
-                                                          lineHeight: 1.5,
-                                                        ),
-                                              ),
-                                            ),
-                                            Text(
-                                              'Clear all',
+                // if ((FFAppState().searchList.isNotEmpty) == true) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            20.0, 0.0, 20.0, 0.0),
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          children: [
+                            if (FFAppState().searchList.isNotEmpty)
+                              Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  if (FFAppState().searchList.isNotEmpty)
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 16.0, 0.0, 0.0),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Tìm kiếm',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
                                                       .override(
                                                         fontFamily: 'figtree',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
-                                                        fontSize: 17.0,
+                                                        fontSize: 22.0,
                                                         letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         useGoogleFonts: false,
                                                         lineHeight: 1.5,
                                                       ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    Builder(
-                                      builder: (context) {
-                                        final serchlist =
-                                            FFAppState().searchList.toList();
-
-                                        return ListView.separated(
-                                          padding: const EdgeInsets.fromLTRB(
-                                            0,
-                                            24.0,
-                                            0,
-                                            24.0,
                                           ),
-                                          primary: false,
-                                          shrinkWrap: true,
-                                          scrollDirection: Axis.vertical,
-                                          itemCount: serchlist.length,
-                                          separatorBuilder: (_, __) =>
-                                              const SizedBox(height: 24.0),
-                                          itemBuilder:
-                                              (context, serchlistIndex) {
-                                            final serchlistItem =
-                                                serchlist[serchlistIndex];
-                                            return Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                Icon(
-                                                  Icons.search_sharp,
+                                          Text(
+                                            'Clear all',
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  fontFamily: 'figtree',
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primary,
+                                                  fontSize: 17.0,
+                                                  letterSpacing: 0.0,
+                                                  useGoogleFonts: false,
+                                                  lineHeight: 1.5,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  Builder(
+                                    builder: (context) {
+                                      final serchlist =
+                                          FFAppState().searchList.toList();
+
+                                      return ListView.separated(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          0,
+                                          24.0,
+                                          0,
+                                          24.0,
+                                        ),
+                                        primary: false,
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.vertical,
+                                        itemCount: serchlist.length,
+                                        separatorBuilder: (_, __) =>
+                                            const SizedBox(height: 24.0),
+                                        itemBuilder: (context, serchlistIndex) {
+                                          final serchlistItem =
+                                              serchlist[serchlistIndex];
+                                          return Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Icon(
+                                                Icons.search_sharp,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .grey,
+                                                size: 24.0,
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsetsDirectional
+                                                          .fromSTEB(
+                                                          16.0, 0.0, 0.0, 0.0),
+                                                  child: InkWell(
+                                                    splashColor:
+                                                        Colors.transparent,
+                                                    focusColor:
+                                                        Colors.transparent,
+                                                    hoverColor:
+                                                        Colors.transparent,
+                                                    highlightColor:
+                                                        Colors.transparent,
+                                                    onTap: () async {
+                                                      safeSetState(() {
+                                                        _model.textController
+                                                                ?.text =
+                                                            serchlistItem;
+                                                        _model.textController
+                                                                ?.selection =
+                                                            TextSelection.collapsed(
+                                                                offset: _model
+                                                                    .textController!
+                                                                    .text
+                                                                    .length);
+                                                      });
+                                                    },
+                                                    child: Text(
+                                                      serchlistItem,
+                                                      maxLines: 1,
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .bodyMedium
+                                                          .override(
+                                                            fontFamily:
+                                                                'figtree',
+                                                            fontSize: 17.0,
+                                                            letterSpacing: 0.0,
+                                                            useGoogleFonts:
+                                                                false,
+                                                            lineHeight: 1.5,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              InkWell(
+                                                splashColor: Colors.transparent,
+                                                focusColor: Colors.transparent,
+                                                hoverColor: Colors.transparent,
+                                                highlightColor:
+                                                    Colors.transparent,
+                                                onTap: () async {
+                                                  FFAppState()
+                                                      .removeFromSearchList(
+                                                          serchlistItem);
+                                                  safeSetState(() {});
+                                                },
+                                                child: Icon(
+                                                  Icons.close_sharp,
                                                   color: FlutterFlowTheme.of(
                                                           context)
                                                       .grey,
                                                   size: 24.0,
                                                 ),
-                                                Expanded(
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsetsDirectional
-                                                            .fromSTEB(16.0, 0.0,
-                                                            0.0, 0.0),
-                                                    child: InkWell(
-                                                      splashColor:
-                                                          Colors.transparent,
-                                                      focusColor:
-                                                          Colors.transparent,
-                                                      hoverColor:
-                                                          Colors.transparent,
-                                                      highlightColor:
-                                                          Colors.transparent,
-                                                      onTap: () async {
-                                                        safeSetState(() {
-                                                          _model.textController?.text = serchlistItem;
-                                                          _model.textController?.selection = TextSelection.collapsed(
-                                                                  offset: _model
-                                                                      .textController!
-                                                                      .text
-                                                                      .length);
-                                                        });
-                                                      },
-                                                      child: Text(
-                                                        serchlistItem,
-                                                        maxLines: 1,
-                                                        style: FlutterFlowTheme
-                                                                .of(context)
-                                                            .bodyMedium
-                                                            .override(
-                                                              fontFamily:
-                                                                  'figtree',
-                                                              fontSize: 17.0,
-                                                              letterSpacing:
-                                                                  0.0,
-                                                              useGoogleFonts:
-                                                                  false,
-                                                              lineHeight: 1.5,
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                InkWell(
-                                                  splashColor:
-                                                      Colors.transparent,
-                                                  focusColor:
-                                                      Colors.transparent,
-                                                  hoverColor:
-                                                      Colors.transparent,
-                                                  highlightColor:
-                                                      Colors.transparent,
-                                                  onTap: () async {
-                                                    FFAppState()
-                                                        .removeFromSearchList(
-                                                            serchlistItem);
-                                                    safeSetState(() {});
-                                                  },
-                                                  child: Icon(
-                                                    Icons.close_sharp,
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .grey,
-                                                    size: 24.0,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        if (_model.reslut == true)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  10.0, 20.0, 0.0, 0.0),
-                              child: ListView(
-                                padding: EdgeInsets.zero,
-                                primary: false,
-                                shrinkWrap: true,
-                                scrollDirection: Axis.vertical,
-                                children: [
-                                  Text(
-                                    'Result',
-                                    maxLines: 1,
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'figtree',
-                                          fontSize: 22.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.bold,
-                                          useGoogleFonts: false,
-                                          lineHeight: 1.5,
-                                        ),
-                                  ),
-                                  InkWell(
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () async {
-                                      context.pushNamed('brek_fast_iIngredients');
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
                                     },
-                                    child: FoodListComponentWidget(
-                                      searchQuery: _model.textController!.text, // Truyền trực tiếp
-                                    ),
                                   ),
-                                ].divide(const SizedBox(height: 20.0)),
+                                ],
                               ),
+                          ],
+                        ),
+                      ),
+                      if (_model.reslut == true)
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                10.0, 20.0, 0.0, 0.0),
+                            child: ListView(
+                              padding: EdgeInsets.zero,
+                              primary: false,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              children: [
+                                InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    context.pushNamed('brek_fast_iIngredients');
+                                  },
+                                  child: FoodListComponentWidget(
+                                    searchQuery: _model.textController!
+                                        .text, // Truyền trực tiếp
+                                  ),
+                                ),
+                              ].divide(const SizedBox(height: 20.0)),
                             ),
                           ),
-                      ],
-                    ),
-                  );
+                        ),
+                    ],
+                  ),
+                );
                 // } else {
                 //   return Align(
                 //     alignment: const AlignmentDirectional(0.0, 0.0),
