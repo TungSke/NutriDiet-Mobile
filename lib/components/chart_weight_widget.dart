@@ -215,7 +215,6 @@
 //     );
 //   }
 // }
-
 import 'dart:convert';
 
 import 'package:diet_plan_app/services/user_service.dart';
@@ -241,6 +240,7 @@ class _WeightLineChartState extends State<WeightLineChart> {
   double minWeight = double.infinity;
   double maxWeight = double.negativeInfinity;
   UserService userService = UserService();
+
   void refreshChart() {
     setState(() {
       // Gọi lại fetchWeightData khi có thay đổi dữ liệu
@@ -312,12 +312,14 @@ class _WeightLineChartState extends State<WeightLineChart> {
         double minWeightValue =
             latestDataMap.values.reduce((a, b) => a < b ? a : b);
 
-        if (minWeightValue < targetWeight) {
-          minWeight = minWeightValue - 5;
-        } else {
+        // Cập nhật minY và maxY theo logic mới
+        if (targetWeight < maxWeightValue) {
           minWeight = targetWeight - 5;
+          maxWeight = maxWeightValue + 5;
+        } else {
+          minWeight = minWeightValue - 5;
+          maxWeight = targetWeight + 5;
         }
-        maxWeight = maxWeightValue + 5;
 
         // Gọi lại hàm refresh để làm mới biểu đồ khi cập nhật dữ liệu
         if (widget.refreshChart != null) {
@@ -363,126 +365,131 @@ class _WeightLineChartState extends State<WeightLineChart> {
 
     return Padding(
       padding: const EdgeInsets.all(18),
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(
-            show: true,
-            verticalInterval: 1,
-            getDrawingVerticalLine: (value) {
-              // Lấy chỉ số và chuyển thành ngày tháng tương ứng
-              String label = dateLabels[value.toInt()];
-              List<String> dateParts = label.split('/');
-              String day = dateParts[0];
+      child: SizedBox(
+        height: 400, // Thêm chiều cao cho widget scroll dọc
+        child: LineChart(
+          LineChartData(
+            gridData: FlGridData(
+              show: true,
+              verticalInterval: 1,
+              getDrawingVerticalLine: (value) {
+                // Lấy chỉ số và chuyển thành ngày tháng tương ứng
+                String label = dateLabels[value.toInt()];
+                List<String> dateParts = label.split('/');
+                String day = dateParts[0];
 
-              // Kiểm tra nếu là các ngày cần hiển thị grid lines
-              if (['02', '09', '16', '23'].contains(day)) {
+                // Kiểm tra nếu là các ngày cần hiển thị grid lines
+                if (['02', '09', '16', '23'].contains(day)) {
+                  return FlLine(
+                    color: Colors.grey,
+                    strokeWidth: 0.5,
+                  );
+                }
                 return FlLine(
-                  color: Colors.grey,
-                  strokeWidth: 0.5,
+                  color: Colors
+                      .transparent, // Ẩn grid lines cho các ngày không phải 2, 9, 16, 23
+                  strokeWidth: 0,
                 );
-              }
-              return FlLine(
-                color: Colors
-                    .transparent, // Ẩn grid lines cho các ngày không phải 2, 9, 16, 23
-                strokeWidth: 0,
-              );
-            },
-          ),
-
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  String label = dateLabels[value.toInt()];
-                  List<String> dateParts = label.split('/');
-                  String day = dateParts[0];
-                  String month = dateParts[1];
-                  if (['02', '09', '16', '23'].contains(day)) {
+              },
+            ),
+            titlesData: FlTitlesData(
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    String label = dateLabels[value.toInt()];
+                    List<String> dateParts = label.split('/');
+                    String day = dateParts[0];
+                    String month = dateParts[1];
+                    if (['02', '09', '16', '23'].contains(day)) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Column(
+                          children: [
+                            Text(
+                              day,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              month,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return Container();
+                  },
+                  reservedSize: 40,
+                  interval: 1,
+                ),
+              ),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles:
+                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            day,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            month,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        value.toStringAsFixed(0),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12, // Smaller font size to avoid overflow
+                        ),
                       ),
                     );
-                  }
-                  return Container();
-                },
-                reservedSize: 40,
-                interval: 1,
+                  },
+                  reservedSize: 32,
+                ),
               ),
             ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Text(
-                      value.toStringAsFixed(0),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12, // Smaller font size to avoid overflow
-                      ),
-                    ),
-                  );
-                },
-                reservedSize: 32,
+            borderData: FlBorderData(
+              show: true,
+              border: Border(
+                top: BorderSide.none,
+                right: BorderSide.none,
+                bottom: BorderSide(color: Colors.grey, width: 1),
+                left: BorderSide(color: Colors.grey, width: 1),
               ),
             ),
+            minX: 0, // Trục X luôn bắt đầu từ 0
+            maxX: (dateLabels.length - 1)
+                .toDouble(), // Điều chỉnh maxX dựa trên số lượng ngày trong tháng
+            minY: adjustedMinY,
+            maxY: adjustedMaxY,
+            lineBarsData: [
+              // Đường cho dữ liệu cân nặng
+              LineChartBarData(
+                spots: data,
+                isCurved: true,
+                color: Colors.blue,
+                dotData: FlDotData(show: true),
+              ),
+              // Đường cho mục tiêu cân nặng
+              LineChartBarData(
+                spots: [
+                  for (int i = 0; i < dateLabels.length; i++)
+                    FlSpot(i.toDouble(), targetWeight),
+                ],
+                isCurved: false,
+                color: Colors.green,
+                barWidth: 1,
+                isStrokeCapRound: true,
+                dashArray: [8, 4],
+                dotData: FlDotData(show: false),
+              ),
+            ],
           ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              top: BorderSide.none,
-              right: BorderSide.none,
-              bottom: BorderSide(color: Colors.grey, width: 1),
-              left: BorderSide(color: Colors.grey, width: 1),
-            ),
-          ),
-          minX: 0, // Trục X luôn bắt đầu từ 0
-          maxX: (dateLabels.length - 1)
-              .toDouble(), // Điều chỉnh maxX dựa trên số lượng ngày trong tháng
-          minY: adjustedMinY,
-          maxY: adjustedMaxY,
-          lineBarsData: [
-            LineChartBarData(
-              spots: data,
-              isCurved: true,
-              color: Colors.blue,
-              dotData: FlDotData(show: true),
-            ),
-            LineChartBarData(
-              spots: [
-                for (int i = 0; i < dateLabels.length; i++)
-                  FlSpot(i.toDouble(), targetWeight),
-              ],
-              isCurved: false,
-              color: Colors.green,
-              barWidth: 1,
-              isStrokeCapRound: true,
-              dashArray: [8, 4],
-              dotData: FlDotData(show: false),
-            ),
-          ],
         ),
       ),
     );

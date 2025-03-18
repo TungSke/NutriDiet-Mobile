@@ -31,6 +31,8 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _model.fetchUserProfile();
+
+      await _model.fetchHealthProfile();
       setState(() {});
     });
   }
