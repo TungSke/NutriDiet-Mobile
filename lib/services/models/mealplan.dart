@@ -1,7 +1,7 @@
 import 'mealplandetail.dart';
 
 class MealPlan {
-  final int mealPlanId;
+  final int? mealPlanId;
   final String planName;
   final String? healthGoal;
   final int? duration;
@@ -13,7 +13,7 @@ class MealPlan {
   final List<MealPlanDetail> mealPlanDetails;
 
   MealPlan({
-    required this.mealPlanId,
+    this.mealPlanId, // Không còn required
     required this.planName,
     this.healthGoal,
     this.duration,
@@ -26,22 +26,19 @@ class MealPlan {
   });
 
   factory MealPlan.fromJson(Map<String, dynamic> json) {
-    if (json['mealPlanId'] == null) {
-      throw Exception("mealPlanId cannot be null");
-    }
-    final mealPlanId = json['mealPlanId'] as int;
+    final mealPlanId = json['mealPlanId'] as int?; // Cho phép null
     return MealPlan(
       mealPlanId: mealPlanId,
-      planName: json['planName'],
-      healthGoal: json['healthGoal'],
-      duration: json['duration'],
-      status: json['status'],
-      aiWarning: json['aiwarning']?.toString(),
+      planName: json['planName'] as String,
+      healthGoal: json['healthGoal'] as String?,
+      duration: json['duration'] as int?,
+      status: json['status'] as String?,
+      aiWarning: json['aiwarning'] as String?,
       startAt: json['startAt'] as String?,
-      createdBy: json['createdBy'],
+      createdBy: json['createdBy'] as String?,
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
       mealPlanDetails: (json['mealPlanDetails'] as List<dynamic>?)
-          ?.map((e) => MealPlanDetail.fromJson(e, mealPlanId)) // Truyền mealPlanId vào
+          ?.map((e) => MealPlanDetail.fromJson(e, mealPlanId ?? 0)) // Dùng 0 nếu null
           .toList() ??
           [],
     );

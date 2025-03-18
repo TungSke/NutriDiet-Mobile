@@ -8,7 +8,6 @@ import 'meal_plan_detail_model.dart';
 enum MealPlanSource {
   myMealPlan,
   sampleMealPlan,
-  aiMealPlan,
 }
 
 class MealPlanDetailWidget extends StatefulWidget {
@@ -40,46 +39,6 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     setState(() {});
   }
 
-  void _rejectMealPlan() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        String reason = '';
-        return AlertDialog(
-          backgroundColor: FlutterFlowTheme.of(context).primary,
-          title: const Text("Từ chối thực đơn", style: TextStyle(color: Colors.white)),
-          content: TextField(
-            decoration: const InputDecoration(
-              hintText: "Nhập lý do từ chối...",
-              hintStyle: TextStyle(color: Colors.white70),
-            ),
-            style: const TextStyle(color: Colors.white),
-            onChanged: (value) => reason = value,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Hủy", style: TextStyle(color: Colors.white)),
-            ),
-            TextButton(
-              onPressed: () {
-                debugPrint("Từ chối thực đơn ${widget.mealPlanId} với lý do: $reason");
-                Navigator.pop(context);
-                _model.fetchMealPlanById(widget.mealPlanId);
-              },
-              child: const Text("Xác nhận", style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _saveMealPlan() {
-    debugPrint("Lưu thực đơn ${widget.mealPlanId} về MyMealPlan");
-    Navigator.pop(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -89,7 +48,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
-        if (_model.mealPlan == null) { // Chỉ hiển thị lỗi nếu mealPlan null
+        if (_model.mealPlan == null) {
           return Scaffold(body: Center(child: Text("Không tìm thấy kế hoạch")));
         }
 
@@ -397,7 +356,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        backgroundColor: Colors.red, // Đổi màu để phân biệt với thành công
+                        backgroundColor: Colors.red,
                         title: const Text(
                           "Thông báo",
                           style: TextStyle(color: Colors.white),
@@ -438,7 +397,6 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             ),
           ),
         );
-    // Các case khác giữ nguyên
       case MealPlanSource.sampleMealPlan:
         return SizedBox(
           width: double.infinity,
@@ -479,32 +437,6 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             },
             child: const Text("SAO CHÉP THỰC ĐƠN", style: TextStyle(color: Colors.white)),
           ),
-        );
-      case MealPlanSource.aiMealPlan:
-        return Row(
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                onPressed: _rejectMealPlan,
-                child: const Text("TỪ CHỐI THỰC ĐƠN", style: TextStyle(color: Colors.white)),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: FlutterFlowTheme.of(context).primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                onPressed: _saveMealPlan,
-                child: const Text("LƯU THỰC ĐƠN", style: TextStyle(color: Colors.white)),
-              ),
-            ),
-          ],
         );
     }
   }

@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:diet_plan_app/services/api_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'package:http/http.dart' as http;
 import 'models/mealplan.dart';
 
 class MealPlanService{
   final ApiService _apiService = ApiService();
+  final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
 
   Future<List<MealPlan>> getSampleMealPlan({required int pageIndex, required int pageSize, String? search}) async {
     try {
@@ -15,17 +16,13 @@ class MealPlanService{
       if (search != null && search.isNotEmpty) {
         endpoint += "&search=${Uri.encodeComponent(search)}";
       }
-
       final response = await _apiService.get(endpoint);
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List<dynamic> mealPlansJson = data['data'] ?? [];
         return mealPlansJson.map((e) => MealPlan.fromJson(e)).toList();
       }
-
       if (response.statusCode == 204) return [];
-
       throw Exception('Lỗi lấy danh sách Meal Plan: ${response.statusCode} - ${response.body}');
     } catch (e) {
       return [];
@@ -50,7 +47,6 @@ class MealPlanService{
   }
 
   Future<List<MealPlan>> getMyMealPlan({required int pageIndex, required int pageSize, String? search}) async {
-    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     try {
@@ -58,9 +54,7 @@ class MealPlanService{
       if (search != null && search.isNotEmpty) {
         endpoint += "&search=${Uri.encodeComponent(search)}";
       }
-
       final response = await _apiService.get(endpoint, token: token);
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List<dynamic> mealPlansJson = data['data'] ?? [];
@@ -83,7 +77,6 @@ class MealPlanService{
         final data = jsonDecode(response.body);
         return data['data']; // Trả về phần "data" chứa totalByMealType và totalByDayNumber
       }
-
       if (response.statusCode == 404) {
         return null;
       }
@@ -92,7 +85,6 @@ class MealPlanService{
     }
   }
   Future<bool> deleteMealPlan(int mealPlanId) async {
-    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     try {
@@ -107,7 +99,6 @@ class MealPlanService{
     }
   }
   Future<bool> cloneSampleMealPlan(int mealPlanId) async {
-    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
     try {
       String endpoint = "api/meal-plan/clone?mealPlanId=$mealPlanId";
@@ -124,7 +115,6 @@ class MealPlanService{
     }
   }
   Future<Map<String, dynamic>> applyMealPlan(int mealPlanId) async {
-    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
     try {
       String endpoint = "api/meal-plan/apply-mealplan/$mealPlanId";
@@ -138,6 +128,115 @@ class MealPlanService{
       }
     } catch (e) {
       return {'success': false, 'errorMessage': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> createSuitableMealPlanByAI() async {
+    try {
+      final String? token = await flutterSecureStorage.read(key: 'accessToken');
+      if (token == null) {
+        return {
+          'success': false,
+          'mealPlan': null,
+          'message': 'No access token found'
+        };
+      }
+      const String endpoint = "api/meal-plan/suitable-meal-plan-by-AI";
+      final response = await _apiService.post(
+        endpoint,
+        body: {},
+        token: token,
+      ).timeout(const Duration(seconds: 45), onTimeout: () {
+        throw Exception("Request timed out after 30 seconds");
+      });
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        final mealPlan = MealPlan.fromJson(data['data']);
+        return {
+          'success': true,
+          'mealPlan': mealPlan,
+          'message': data['message'] ?? 'Meal plan created successfully'
+        };
+      }
+      return {
+        'success': false,
+        'mealPlan': null,
+        'message': data['message'] ?? 'Failed to create meal plan (Status: ${response.statusCode})'
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'mealPlan': null,
+        'message': 'Error creating AI meal plan: $e'
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> rejectMealPlan(String rejectReason) async {
+    try {
+      final String? token = await flutterSecureStorage.read(key: 'accessToken');
+      if (token == null) {
+        debugPrint("Error: No access token found");
+        return {
+          'success': false,
+          'mealPlan': null,
+          'message': 'No access token found'
+        };
+      }
+      const String endpoint = "api/meal-plan/reject-mealplan-AI";
+      final uri = Uri.parse('${_apiService.baseUrl}/$endpoint');
+      // Sử dụng MultipartRequest để gửi multipart/form-data
+      var request = http.MultipartRequest('PUT', uri)
+        ..headers['Authorization'] = 'Bearer $token'
+        ..fields['rejectReason'] = rejectReason;
+      final response = await http.Response.fromStream(await request.send());
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'mealPlan': data['data'] != null ? MealPlan.fromJson(data['data']) : null,
+          'message': data['message'] ?? 'Meal plan rejected successfully'
+        };
+      }
+      return {
+        'success': false,
+        'mealPlan': null,
+        'message': data['message'] ?? 'Failed to reject meal plan (Status: ${response.statusCode})'
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'mealPlan': null,
+        'message': 'Error rejecting meal plan: $e'
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> saveMealPlanAI() async {
+    try {
+      final String? token = await flutterSecureStorage.read(key: 'accessToken');
+      const String endpoint = "api/meal-plan/save-mealplan-AI";
+      final response = await _apiService.put(
+        endpoint,
+        body: {},
+        token: token,
+      );
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Meal plan saved successfully'
+        };
+      }
+      return {
+        'success': false,
+        'message': data['message'] ?? 'Failed to save meal plan'
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error saving meal plan: $e'
+      };
     }
   }
 }
