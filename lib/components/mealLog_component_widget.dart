@@ -204,6 +204,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
   }
 
   /// Hiển thị từng bữa (Breakfast, Lunch, ...)
+  /// Hiển thị từng bữa (Breakfast, Lunch, ...)
   Widget _buildMealCategory(BuildContext context, String category) {
     // Giả sử API trả về 1 mealLog cho ngày, lấy log đầu tiên nếu có
     final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
@@ -300,24 +301,64 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ),
             ),
           ),
+        // Hiển thị từng món ăn (mealLogDetail)
         for (final item in details)
-          ListTile(
-            title: Text(
-              item.foodName,
-              style: const TextStyle(
-                fontFamily: 'Figtree',
-                fontSize: 16,
+          GestureDetector(
+            onLongPress: () {
+              // Khi người dùng nhấn giữ, hiển thị popup (AlertDialog)
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Diary'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: const Text('Move to...'),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: const Text('Delete Entry'),
+                          onTap: () async {
+                            Navigator.pop(context); // Đóng dialog
+                            // Gọi hàm xóa trong model
+                            await _model.deleteMealLogDetailEntry(
+                              mealLogId: mealLog.mealLogId, // ID của MealLog
+                              detailId: item.detailId, // ID của MealLogDetail
+                            );
+                            // Hàm deleteMealLogDetailEntry sẽ fetchMealLogs() lại
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: ListTile(
+              title: Text(
+                item.foodName,
+                style: const TextStyle(
+                  fontFamily: 'Figtree',
+                  fontSize: 16,
+                ),
               ),
-            ),
-            subtitle: Text(
-              '${item.calories} cals, ${item.quantity} serving(s)${item.servingSize != null ? ', ${item.servingSize}' : ''}',
-              style: const TextStyle(
-                fontFamily: 'Figtree',
-                fontSize: 14,
-                color: Colors.grey,
+              subtitle: Text(
+                '${item.calories} cals, '
+                '${item.quantity} serving(s)'
+                '${item.servingSize != null ? ', ${item.servingSize}' : ''}',
+                style: const TextStyle(
+                  fontFamily: 'Figtree',
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),
+        // Nút ADD FOOD
         ListTile(
           title: const Text(
             'ADD FOOD',
