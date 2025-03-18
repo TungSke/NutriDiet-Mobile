@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -7,138 +6,156 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/components/mealLog_component_model.dart';
 import '../components/serch_data_widget.dart';
 import '../components/quick_add_widget.dart';
-import '../services/models/meallog.dart';
 
-class MealLogComponentWidget extends StatelessWidget {
+class MealLogComponentWidget extends StatefulWidget {
   const MealLogComponentWidget({Key? key}) : super(key: key);
 
   @override
+  State<MealLogComponentWidget> createState() => _MealLogComponentWidgetState();
+}
+
+class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
+  late MealLogComponentModel _model;
+
+  @override
+  void initState() {
+    super.initState();
+    _model = MealLogComponentModel();
+    _model.setUpdateCallback(() {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+    _model.fetchMealLogs();
+  }
+
+  @override
+  void dispose() {
+    _model.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<MealLogComponentModel>(
-      builder: (context, model, child) {
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-            automaticallyImplyLeading: false,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  onPressed: () {
-                    model.changeDate(
-                      model.selectedDate.subtract(const Duration(days: 1)),
-                    );
-                  },
-                ),
-                GestureDetector(
-                  onTap: () => _showDatePicker(context, model),
-                  child: Text(
-                    DateFormat('MMMM d, yyyy').format(model.selectedDate),
-                    style: const TextStyle(
-                      fontFamily: 'Figtree',
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  onPressed: () {
-                    model.changeDate(
-                      model.selectedDate.add(const Duration(days: 1)),
-                    );
-                  },
-                ),
-              ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_left),
+              onPressed: () {
+                _model.changeDate(
+                  _model.selectedDate.subtract(const Duration(days: 1)),
+                );
+              },
             ),
-          ),
-          body: ListView(
-            children: [
-              // Card hiển thị Calories Remaining
-              Card(
-                color: Colors.white,
-                margin: const EdgeInsets.all(12.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Tiêu đề
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text(
-                            'Calories Remaining',
-                            style: TextStyle(
-                              fontFamily: 'Figtree',
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Icon(Icons.more_horiz),
-                        ],
+            GestureDetector(
+              onTap: () => _showDatePicker(context),
+              child: Text(
+                DateFormat('MMMM d, yyyy').format(_model.selectedDate),
+                style: const TextStyle(
+                  fontFamily: 'Figtree',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              onPressed: () {
+                _model.changeDate(
+                  _model.selectedDate.add(const Duration(days: 1)),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      body: ListView(
+        children: [
+          // Card hiển thị Calories Remaining
+          Card(
+            color: Colors.white,
+            margin: const EdgeInsets.all(12.0),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Tiêu đề
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text(
+                        'Calories Remaining',
+                        style: TextStyle(
+                          fontFamily: 'Figtree',
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      // Goal - Food = Remaining
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildCalorieColumn(
-                            model.calorieGoal.toString(),
-                            'Goal',
-                            FontWeight.bold,
-                          ),
-                          _buildOperator('-'),
-                          _buildCalorieColumn(
-                            model.foodCalories.toString(),
-                            'Food',
-                            FontWeight.normal,
-                          ),
-                          _buildOperator('='),
-                          _buildCalorieColumn(
-                            model.remainingCalories.toString(),
-                            'Remaining',
-                            FontWeight.bold,
-                            textColor: Colors.red,
-                          ),
-                        ],
+                      Icon(Icons.more_horiz),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Goal - Food = Remaining
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildCalorieColumn(
+                        _model.calorieGoal.toString(),
+                        'Goal',
+                        FontWeight.bold,
+                      ),
+                      _buildOperator('-'),
+                      _buildCalorieColumn(
+                        _model.foodCalories.toString(),
+                        'Food',
+                        FontWeight.normal,
+                      ),
+                      _buildOperator('='),
+                      _buildCalorieColumn(
+                        _model.remainingCalories.toString(),
+                        'Remaining',
+                        FontWeight.bold,
+                        textColor: Colors.red,
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-
-              // Hiển thị các bữa
-              for (final category in model.mealCategories)
-                _buildMealCategory(context, model, category),
-            ],
+            ),
           ),
-        );
-      },
+          // Hiển thị các bữa
+          for (final category in _model.mealCategories)
+            _buildMealCategory(context, category),
+        ],
+      ),
     );
   }
 
-  // Chọn ngày
-  Future<void> _showDatePicker(
-      BuildContext context, MealLogComponentModel model) async {
+  // Hàm chọn ngày
+  Future<void> _showDatePicker(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: model.selectedDate,
+      initialDate: _model.selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2040),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.green, // Màu tiêu đề và ngày được chọn
-              onPrimary: Colors.white, // Màu chữ trên nút tiêu đề
-              onSurface: Colors.black, // Màu chữ ngày chưa chọn
+              primary: Colors.green,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.green, // Màu của nút OK và Cancel
+                foregroundColor: Colors.green,
               ),
             ),
           ),
@@ -146,8 +163,8 @@ class MealLogComponentWidget extends StatelessWidget {
         );
       },
     );
-    if (picked != null && picked != model.selectedDate) {
-      model.changeDate(picked); // Cập nhật model, từ đó UI mới được rebuild
+    if (picked != null && picked != _model.selectedDate) {
+      _model.changeDate(picked);
     }
   }
 
@@ -187,22 +204,16 @@ class MealLogComponentWidget extends StatelessWidget {
   }
 
   /// Hiển thị từng bữa (Breakfast, Lunch, ...)
-  /// Lọc các món ăn thuộc bữa đó, tính tổng cals, macro...
-  Widget _buildMealCategory(
-    BuildContext context,
-    MealLogComponentModel model,
-    String category,
-  ) {
-    // Giả sử API trả về 1 mealLog / ngày, ta lấy log đầu tiên (nếu có)
-    // Nếu API có thể trả về nhiều mealLog 1 ngày, bạn tự điều chỉnh
-    final mealLog = model.mealLogs.isNotEmpty ? model.mealLogs[0] : null;
+  /// Hiển thị từng bữa (Breakfast, Lunch, ...)
+  Widget _buildMealCategory(BuildContext context, String category) {
+    // Giả sử API trả về 1 mealLog cho ngày, lấy log đầu tiên nếu có
+    final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
     if (mealLog == null) {
-      // Chưa có data => vẫn hiển thị khung bữa + ADD FOOD
+      // Chưa có data, vẫn hiển thị khung bữa + ADD FOOD
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildMealHeader(category, 0),
-          // ADD FOOD
           ListTile(
             title: const Text(
               'ADD FOOD',
@@ -225,7 +236,7 @@ class MealLogComponentWidget extends StatelessWidget {
                     );
                     break;
                   case 'reminders':
-                    // ...
+                    // Xử lý khác nếu cần
                     break;
                 }
               },
@@ -243,7 +254,6 @@ class MealLogComponentWidget extends StatelessWidget {
               },
             ),
             onTap: () {
-              // Mở màn hình search
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -257,14 +267,13 @@ class MealLogComponentWidget extends StatelessWidget {
       );
     }
 
-    // Lọc các chi tiết trùng bữa
+    // Lọc các món ăn thuộc bữa
     final details = mealLog.mealLogDetails
         .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
         .toList();
 
-    // Tính tổng cals
+    // Tính tổng calories và macro
     final mealCals = details.fold(0, (sum, d) => sum + d.calories);
-    // Tính macro
     final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
     final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
@@ -279,10 +288,7 @@ class MealLogComponentWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Tiêu đề bữa (ví dụ: Breakfast) + tổng cals
         _buildMealHeader(category, mealCals),
-
-        // Nếu có món ăn, hiển thị tỉ lệ macro
         if (details.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -295,28 +301,63 @@ class MealLogComponentWidget extends StatelessWidget {
               ),
             ),
           ),
-
-        // Danh sách món ăn
+        // Hiển thị từng món ăn (mealLogDetail)
         for (final item in details)
-          ListTile(
-            title: Text(
-              item.foodName,
-              style: const TextStyle(
-                fontFamily: 'Figtree',
-                fontSize: 16,
+          GestureDetector(
+            onLongPress: () {
+              // Khi người dùng nhấn giữ, hiển thị popup (AlertDialog)
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Diary'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: const Text('Move to...'),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: const Text('Delete Entry'),
+                          onTap: () async {
+                            Navigator.pop(context); // Đóng dialog
+                            // Gọi hàm xóa trong model
+                            await _model.deleteMealLogDetailEntry(
+                              mealLogId: mealLog.mealLogId, // ID của MealLog
+                              detailId: item.detailId, // ID của MealLogDetail
+                            );
+                            // Hàm deleteMealLogDetailEntry sẽ fetchMealLogs() lại
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: ListTile(
+              title: Text(
+                item.foodName,
+                style: const TextStyle(
+                  fontFamily: 'Figtree',
+                  fontSize: 16,
+                ),
               ),
-            ),
-            subtitle: Text(
-              '${item.calories} cals, ${item.quantity} serving(s)'
-              '${item.servingSize != null ? ', ${item.servingSize}' : ''}',
-              style: const TextStyle(
-                fontFamily: 'Figtree',
-                fontSize: 14,
-                color: Colors.grey,
+              subtitle: Text(
+                '${item.calories} cals, '
+                '${item.quantity} serving(s)'
+                '${item.servingSize != null ? ', ${item.servingSize}' : ''}',
+                style: const TextStyle(
+                  fontFamily: 'Figtree',
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),
-
         // Nút ADD FOOD
         ListTile(
           title: const Text(
@@ -339,7 +380,7 @@ class MealLogComponentWidget extends StatelessWidget {
                   );
                   break;
                 case 'reminders':
-                  // ...
+                  // Xử lý khác nếu cần
                   break;
               }
             },
@@ -357,7 +398,6 @@ class MealLogComponentWidget extends StatelessWidget {
             },
           ),
           onTap: () {
-            // Khi bấm "ADD FOOD", mở Search
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -366,13 +406,12 @@ class MealLogComponentWidget extends StatelessWidget {
             );
           },
         ),
-
         const Divider(),
       ],
     );
   }
 
-  // Widget helper: tiêu đề bữa ăn + tổng cals
+  // Widget helper: tiêu đề bữa ăn + tổng calories
   Widget _buildMealHeader(String category, int mealCals) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

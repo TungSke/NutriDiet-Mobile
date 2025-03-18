@@ -33,6 +33,7 @@ class MealLog {
 }
 
 class MealLogDetail {
+  final int detailId;
   final String foodName;
   final String mealType;
   final String? servingSize;
@@ -43,6 +44,7 @@ class MealLogDetail {
   final int fat;
 
   MealLogDetail({
+    required this.detailId,
     required this.foodName,
     required this.mealType,
     this.servingSize,
@@ -55,6 +57,7 @@ class MealLogDetail {
 
   factory MealLogDetail.fromJson(Map<String, dynamic> json) {
     return MealLogDetail(
+      detailId: json['detailId'] ?? 0,
       foodName: json['foodName'] ?? '',
       mealType: json['mealType'] ?? '',
       servingSize: json['servingSize']?.toString(),

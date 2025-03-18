@@ -60,7 +60,8 @@ class ApiService {
   }
 
   /// Hàm POST - Tạo mới dữ liệu
-  Future<http.Response> post(String endpoint, {required Map<String, dynamic> body, String? token}) async {
+  Future<http.Response> post(String endpoint,
+      {required Map<String, dynamic> body, String? token}) async {
     final response = await http.post(
       Uri.parse('$baseUrl/$endpoint'),
       headers: _buildHeaders(token),
@@ -69,8 +70,26 @@ class ApiService {
     return response;
   }
 
+  // Hàm postMultipart dùng cho multipart/form-data
+  Future<http.Response> postMultipart(String endpoint,
+      {required Map<String, String> body, String? token}) async {
+    final uri = Uri.parse('$baseUrl/$endpoint');
+    var request = http.MultipartRequest('POST', uri);
+    // Set header Authorization nếu có
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    // Thêm các field vào request
+    request.fields.addAll(body);
+    // Gửi request và chuyển đổi stream về Response
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+    return response;
+  }
+
   /// Hàm PUT - Cập nhật dữ liệu
-  Future<http.Response> put(String endpoint, {required Map<String, dynamic> body, String? token}) async {
+  Future<http.Response> put(String endpoint,
+      {required Map<String, dynamic> body, String? token}) async {
     final response = await http.put(
       Uri.parse('$baseUrl/$endpoint'),
       headers: _buildHeaders(token),
@@ -101,7 +120,8 @@ class ApiService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to load data: ${response.statusCode}, ${response.body}');
+      throw Exception(
+          'Failed to load data: ${response.statusCode}, ${response.body}');
     }
   }
 }

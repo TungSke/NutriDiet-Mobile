@@ -1,18 +1,14 @@
+import 'package:diet_plan_app/components/activity_component_model.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-import 'package:provider/provider.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import '../services/health_service.dart';
+import '../flutter_flow/flutter_flow_model.dart';
+import '../flutter_flow/flutter_flow_theme.dart';
 import '../services/user_service.dart';
-import 'activity_component_model.dart';
 import 'chart_weight_widget.dart';
-
-export 'home_componet_model.dart';
 
 class ActivityComponentWidget extends StatefulWidget {
   const ActivityComponentWidget({super.key});
@@ -24,55 +20,20 @@ class ActivityComponentWidget extends StatefulWidget {
 
 class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   late ActivityComponentModel _model;
-  bool animateText = false;
-  final Map<String, String> _goalTypeMap = {
-    'Giữ cân': 'Maintain',
-    'Tăng cân': 'GainWeight',
-    'Giảm cân': 'LoseWeight'
-  };
-  // Hàm callback để làm mới chart
+  final UserService _userService = UserService();
   void _refreshChart() {
     setState(() {
-      // Logic để làm mới biểu đồ có thể nằm ở đây
+      // Gọi lại hàm làm mới biểu đồ khi có thay đổi
     });
   }
 
-  final Map<String, String> _reverseGoalTypeMap = {
-    'Maintain': 'Giữ cân',
-    'GainWeight': 'Tăng cân',
-    'LoseWeight': 'Giảm cân'
-  };
-
-  final _userService = UserService();
-  String name = '';
-  String age = '';
-  String phoneNumber = '';
-  String location = '';
-  String email = '';
-  int height = 0;
-  double weight = 0.0;
-  String activityLevel = '';
-  String userId = '';
-  bool isLoading = true;
-  String errorMessage = "";
-
-  Map<String, dynamic>? healthData;
-  Map<String, dynamic>? personalGoal;
-
   final animationsMap = <String, AnimationInfo>{};
 
-  @override
-  void setState(VoidCallback callback) {
-    super.setState(callback);
-    _model.onUpdate();
-  }
-
-  @override
   void initState() {
     super.initState();
-    loadData();
-    fetchUserProfile();
     _model = createModel(context, () => ActivityComponentModel());
+    _model.fetchUserProfile();
+    _model.fetchHealthProfile();
     animationsMap.addAll({
       'textOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
@@ -89,62 +50,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     });
   }
 
-  Future<void> fetchUserProfile() async {
-    try {
-      final response = await _userService.whoAmI();
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          name = data['name'] ?? "Chưa cập nhật";
-          age = data['age']?.toString() ?? "0";
-          phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
-          location = data['address'] ?? "Chưa cập nhật";
-          email = data["email"] ?? "Chưa cập nhật";
-          userId = data['id']?.toString() ?? "";
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          errorMessage = '❌ Failed to fetch user profile';
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        errorMessage = "❌ Lỗi khi lấy thông tin người dùng: $e";
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> loadData() async {
-    final result = await HealthService.fetchHealthData();
-    setState(() {
-      healthData = result["healthData"];
-      personalGoal = result["personalGoal"];
-      errorMessage = result["errorMessage"];
-      isLoading = false;
-    });
-  }
-
-  @override
-  void dispose() {
-    _model.maybeDispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    context.watch<FFAppState>();
-
-    if (isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: FlutterFlowTheme.of(context).primary,
-        ),
-      );
-    }
-
     return Container(
       decoration: BoxDecoration(
         color: FlutterFlowTheme.of(context).secondaryBackground,
@@ -216,11 +123,11 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         padding: const EdgeInsets.only(top: 10),
                         child: Column(
                           children: [
-                            Text(name,
+                            Text(_model.name,
                                 style: GoogleFonts.roboto(
                                     fontSize: 18, fontWeight: FontWeight.w600)),
                             Text(
-                              "• $age tuổi • ${healthData?['height']} cm • ${healthData?['weight']} kg",
+                              "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
                               style: GoogleFonts.roboto(
                                   fontSize: 12, color: Colors.grey),
                             ),
@@ -242,7 +149,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        _reverseGoalTypeMap[personalGoal?['goalType']] ?? "N/A",
+                        _model.goalType,
                         style: TextStyle(
                           color: FlutterFlowTheme.of(context).primary,
                           fontWeight: FontWeight.w600,
@@ -268,7 +175,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                       style: TextStyle(
                                           fontSize: 14, color: Colors.grey)),
                                   Text(
-                                    "${healthData?['weight'] ?? "N/A"} kg",
+                                    "${_model.weight} kg",
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
@@ -283,7 +190,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                       style: TextStyle(
                                           fontSize: 14, color: Colors.grey)),
                                   Text(
-                                    "${personalGoal?['targetWeight'] ?? "N/A"} kg",
+                                    "${_model.targetWeight} kg",
                                     style: TextStyle(
                                       color:
                                           FlutterFlowTheme.of(context).primary,
@@ -320,7 +227,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                   fontSize: 14,
                                   color: FlutterFlowTheme.of(context).primary)),
                           Text(
-                            "${personalGoal?['progressPercentage'] ?? "N/A"}/100 %",
+                            "${_model.progressPercentage}/100 %",
                             style: TextStyle(
                               color: FlutterFlowTheme.of(context).primary,
                               fontSize: 14,
@@ -337,7 +244,10 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                   child: SingleChildScrollView(
                     child: Container(
                       height: 400,
-                      child: WeightLineChart(refreshChart: _refreshChart),
+                      child: WeightLineChart(
+                        refreshChart:
+                            _refreshChart, // Truyền callback refreshChart vào đây
+                      ),
                     ),
                   ),
                 ),
@@ -352,7 +262,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        "${healthData?['BMIType']}",
+                        _model.bmiType,
                         style: GoogleFonts.roboto(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -385,7 +295,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             backgroundColor:
                                 FlutterFlowTheme.of(context).primary,
                             center: Text(
-                              "${healthData?['BMI'] ?? "N/A"}",
+                              _model.bmi,
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -422,7 +332,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             backgroundColor:
                                 FlutterFlowTheme.of(context).primary,
                             center: Text(
-                              "${healthData?['TDEE'] ?? ""}",
+                              _model.tdee,
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -449,14 +359,13 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   }
 
   void _showBottomSheet(BuildContext context) async {
-    double currentWeight = healthData?['weight']?.toDouble() ?? 0.0;
-    double currentHeight = healthData?['height']?.toDouble() ?? 0.0;
-    String currentActivityLevel = healthData?['activityLevel'] ?? '';
-    String currentAisuggestion = healthData?['aisuggestion'] ?? '';
-    List<int> currentAllergies = List<int>.from(
-        healthData?['allergies']?.map((e) => e['allergyId']) ?? []);
-    List<int> currentDiseases = List<int>.from(
-        healthData?['diseases']?.map((e) => e['diseaseId']) ?? []);
+    double currentWeight = _model.weight;
+    double currentHeight = _model.height;
+    String currentActivityLevel = _model.activityLevel;
+    List<int> currentAllergies =
+        _model.allergies; // Using the existing allergies list
+    List<int> currentDiseases =
+        _model.diseases; // Using the existing diseases list
 
     showModalBottomSheet(
       context: context,
@@ -493,7 +402,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         icon: Icon(Icons.remove),
                         onPressed: () {
                           setStateForBottomSheet(() {
-                            currentWeight = (currentWeight - 0.1).toDouble();
+                            currentWeight -= 0.1;
+                            // Làm tròn giá trị cân nặng sau khi thay đổi
                             currentWeight =
                                 double.parse(currentWeight.toStringAsFixed(1));
                           });
@@ -503,7 +413,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         icon: Icon(Icons.add),
                         onPressed: () {
                           setStateForBottomSheet(() {
-                            currentWeight = (currentWeight + 0.1).toDouble();
+                            currentWeight += 0.1;
+                            // Làm tròn giá trị cân nặng sau khi thay đổi
                             currentWeight =
                                 double.parse(currentWeight.toStringAsFixed(1));
                           });
@@ -514,42 +425,27 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
-                      try {
-                        final response = await _userService.updateHealthProfile(
-                          height: currentHeight,
-                          weight:
-                              double.parse(currentWeight.toStringAsFixed(1)),
-                          activityLevel: currentActivityLevel,
-                          aisuggestion: currentAisuggestion,
-                          allergies: currentAllergies,
-                          diseases: currentDiseases,
-                        );
+                      // Cập nhật giá trị mới cho _model
+                      _model.weight = currentWeight;
 
-                        if (response.statusCode == 200) {
-                          Navigator.pop(context);
-                          setState(() {
-                            healthData?['weight'] = currentWeight;
-                          });
+                      // Gọi updateHealthProfile và cập nhật lại trọng lượng trong _model
+                      await _model.updateHealthProfile(context);
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text('Cập nhật cân nặng thành công!')),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text('Cập nhật cân nặng thất bại!')),
-                          );
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Lỗi khi cập nhật cân nặng: $e')),
-                        );
-                      }
+                      setState(() {
+                        _model.weight =
+                            currentWeight; // Cập nhật weight trong _model
+                      });
+                      _refreshChart();
+                      // Thông báo thành công
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Cập nhật cân nặng thành công!')),
+                      );
+
+                      // Đóng bottom sheet sau khi lưu
                     },
                     child: Text('Lưu'),
-                  )
+                  ),
                 ],
               );
             },
