@@ -23,6 +23,7 @@ class MealLogComponentModel extends FlutterFlowModel {
     'Snacks',
     'Exercise'
   ];
+
   VoidCallback? _updateCallback;
 
   void setUpdateCallback(VoidCallback callback) {
@@ -40,13 +41,13 @@ class MealLogComponentModel extends FlutterFlowModel {
       final dateString = DateFormat('yyyy-MM-dd').format(selectedDate);
 
       // Gọi service để fetch Meal Logs
-      final service = MeallogService(); // Hoặc MealPlanService
+      final service = MeallogService();
       if (_updateCallback != null) {
         _updateCallback!();
       }
       mealLogs = await service.getMealLogs(logDate: dateString);
 
-      // Tính tổng calories từ các MealLog (nếu API trả về nhiều MealLog cho 1 ngày, cộng lại)
+      // Tính tổng calories từ các MealLog
       int sumCalories = 0;
       for (final log in mealLogs) {
         sumCalories += log.totalCalories;
@@ -63,6 +64,61 @@ class MealLogComponentModel extends FlutterFlowModel {
       } else {
         debugPrint("Lỗi: _updateCallback là null");
       }
+    }
+  }
+
+  /// Tạo mới Meal Log (Create)
+  Future<void> createMealLogEntry({
+    required String mealType,
+    required String servingSize,
+    required int foodId,
+    required int quantity,
+  }) async {
+    try {
+      // Format ngày để gửi lên API
+      final dateString = DateFormat('yyyy-MM-dd').format(selectedDate);
+      final service = MeallogService();
+
+      final bool success = await service.createMealLog(
+        logDate: dateString,
+        mealType: mealType,
+        servingSize: servingSize,
+        foodId: foodId,
+        quantity: quantity,
+      );
+
+      if (success) {
+        debugPrint('Tạo Meal Log thành công');
+        // Sau khi tạo thành công, fetch lại danh sách
+        await fetchMealLogs();
+      } else {
+        debugPrint('Tạo Meal Log thất bại');
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi tạo Meal Log: $e');
+    }
+  }
+
+  /// Xóa chi tiết Meal Log (Delete)
+  Future<void> deleteMealLogDetailEntry({
+    required int mealLogId,
+    required int detailId,
+  }) async {
+    try {
+      final service = MeallogService();
+      final bool success = await service.deleteMealLogDetail(
+        mealLogId: mealLogId,
+        detailId: detailId,
+      );
+
+      if (success) {
+        debugPrint('Xóa Meal Log Detail thành công');
+        await fetchMealLogs();
+      } else {
+        debugPrint('Xóa Meal Log Detail thất bại');
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi xóa Meal Log Detail: $e');
     }
   }
 
