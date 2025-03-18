@@ -1,5 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
 
+import 'package:diet_plan_app/components/mealLog_component_model.dart';
 import 'package:diet_plan_app/services/models/health_profile_provider.dart';
 import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -40,7 +41,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PersonalGoalProvider()),
         ChangeNotifierProvider(create: (context) => HealthProfileProvider()),
         ChangeNotifierProvider(create: (context) => SampleMealPlanModel()),
-        //ChangeNotifierProvider(create: (context) => MealLogComponentModel()),
+        ChangeNotifierProvider(create: (context) => MealLogComponentModel()),
       ],
       child: const MyApp(),
     ),
