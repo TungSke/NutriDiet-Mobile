@@ -41,7 +41,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PersonalGoalProvider()),
         ChangeNotifierProvider(create: (context) => HealthProfileProvider()),
         ChangeNotifierProvider(create: (context) => SampleMealPlanModel()),
-        ChangeNotifierProvider(create: (context) => MealLogComponentModel()),
+        //ChangeNotifierProvider(create: (context) => MealLogComponentModel()),
       ],
       child: const MyApp(),
     ),
