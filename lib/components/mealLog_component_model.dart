@@ -6,8 +6,7 @@ import '../services/meallog_service.dart';
 
 import 'mealLog_component_widget.dart';
 
-class MealLogComponentModel extends FlutterFlowModel
-    with ChangeNotifier {
+class MealLogComponentModel extends FlutterFlowModel with ChangeNotifier {
   DateTime selectedDate = DateTime.now();
 
   // Dữ liệu lấy từ API
