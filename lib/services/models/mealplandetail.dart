@@ -1,18 +1,18 @@
 class MealPlanDetail {
-  final int mealPlanDetailId;
+  int? mealPlanDetailId;
   final int mealPlanId;
   final int? foodId;
-  final String? foodName;
+  String? foodName;
   final double? quantity;
   final String? mealType;
   final int dayNumber;
-  final double? totalCalories;
-  final double? totalCarbs;
-  final double? totalFat;
-  final double? totalProtein;
+  double? totalCalories;
+  double? totalCarbs;
+  double? totalFat;
+  double? totalProtein;
 
   MealPlanDetail({
-    required this.mealPlanDetailId,
+    this.mealPlanDetailId,
     required this.mealPlanId,
     this.foodId,
     this.foodName,
@@ -26,16 +26,16 @@ class MealPlanDetail {
   });
 
   factory MealPlanDetail.fromJson(Map<String, dynamic> json, int mealPlanId) {
-    if (json['mealPlanDetailId'] == null || json['dayNumber'] == null) {
-      throw Exception("Required fields (mealPlanDetailId, dayNumber) cannot be null");
+    if (json['dayNumber'] == null) {
+      throw Exception("Required field (dayNumber) cannot be null");
     }
     return MealPlanDetail(
-      mealPlanDetailId: json['mealPlanDetailId'] as int,
-      mealPlanId: mealPlanId, // Sử dụng mealPlanId từ đối số
-      foodId: json['foodId'],
-      foodName: json['foodName'],
+      mealPlanDetailId: json['mealPlanDetailId'] as int?,
+      mealPlanId: mealPlanId,
+      foodId: json['foodId'] as int?,
+      foodName: json['foodName'] as String?,
       quantity: (json['quantity'] as num?)?.toDouble(),
-      mealType: json['mealType'],
+      mealType: json['mealType'] as String?,
       dayNumber: json['dayNumber'] as int,
       totalCalories: (json['totalCalories'] as num?)?.toDouble(),
       totalCarbs: (json['totalCarbs'] as num?)?.toDouble(),

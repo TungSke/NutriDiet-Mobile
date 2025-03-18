@@ -27,27 +27,41 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
       if (searchQuery != null) {
         this.searchQuery = searchQuery;
       }
+      if (_updateCallback != null) _updateCallback!();
 
-      if (_updateCallback != null) {
-        _updateCallback!();
-      }
       final fetchedMealPlans = await _mealPlanService.getMyMealPlan(
         pageIndex: pageIndex,
         pageSize: pageSize,
       );
 
-      debugPrint("Fetched meal plans: ${fetchedMealPlans.map((m) => m.planName).toList()}");
       mealPlans = fetchedMealPlans;
     } catch (e) {
-      debugPrint("Error fetching meal plans: $e");
       mealPlans = [];
     } finally {
       isLoading = false;
-      if (_updateCallback != null) { // Kiểm tra null trước khi gọi
-        _updateCallback!();
-      } else {
-        debugPrint("Lỗi: _updateCallback là null");
-      }
+      if (_updateCallback != null) _updateCallback!();
+    }
+  }
+
+  Future<Map<String, dynamic>> createSuitableMealPlanByAI() async {
+    try {
+      isLoading = true;
+      if (_updateCallback != null) _updateCallback!();
+
+      final result = await _mealPlanService.createSuitableMealPlanByAI();
+
+      isLoading = false;
+      if (_updateCallback != null) _updateCallback!();
+
+      return result;
+    } catch (e) {
+      isLoading = false;
+      if (_updateCallback != null) _updateCallback!();
+      return {
+        'success': false,
+        'mealPlan': null,
+        'message': 'Error creating AI meal plan: $e'
+      };
     }
   }
 
@@ -81,9 +95,7 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
 
       final success = await _mealPlanService.deleteMealPlan(mealPlanId);
       if (success) {
-        // Xóa mealPlan khỏi danh sách cục bộ
         mealPlans.removeWhere((mealPlan) => mealPlan.mealPlanId == mealPlanId);
-        debugPrint("Đã xóa Meal Plan $mealPlanId khỏi danh sách cục bộ");
         isLoading = false;
         if (_updateCallback != null) _updateCallback!();
         return true;
@@ -91,7 +103,6 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
         throw Exception("Không thể xóa Meal Plan");
       }
     } catch (e) {
-      debugPrint("Lỗi khi xóa Meal Plan: $e");
       isLoading = false;
       if (_updateCallback != null) _updateCallback!();
       return false;
