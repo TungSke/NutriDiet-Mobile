@@ -35,10 +35,25 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     super.dispose();
   }
 
+  // Hàm hiển thị ngày: Hôm nay / Hôm qua / Ngày mai / format tiếng Việt
+  String _getCustomDateString(DateTime date) {
+    final now = DateTime.now();
+    final difference = DateTime(date.year, date.month, date.day)
+        .difference(DateTime(now.year, now.month, now.day))
+        .inDays;
+
+    if (difference == 0) return 'Hôm nay';
+    if (difference == 1) return 'Ngày mai';
+    if (difference == -1) return 'Hôm qua';
+
+    // Các ngày khác hiển thị dạng "d MMMM, yyyy" (tiếng Việt)
+    return DateFormat('d MMMM, yyyy', 'vi').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         automaticallyImplyLeading: false,
@@ -56,7 +71,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             GestureDetector(
               onTap: () => _showDatePicker(context),
               child: Text(
-                DateFormat('MMMM d, yyyy').format(_model.selectedDate),
+                _getCustomDateString(_model.selectedDate),
                 style: const TextStyle(
                   fontFamily: 'Figtree',
                   fontSize: 15,
@@ -77,10 +92,10 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       ),
       body: ListView(
         children: [
-          // Card hiển thị Calories Remaining
+          // Card hiển thị Calories Remaining (Calo còn lại)
           Card(
-            color: Colors.white,
             margin: const EdgeInsets.all(12.0),
+            color: Colors.white,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -91,7 +106,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
                       Text(
-                        'Calories Remaining',
+                        'Calo còn lại',
                         style: TextStyle(
                           fontFamily: 'Figtree',
                           fontSize: 17,
@@ -102,27 +117,26 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // Goal - Food = Remaining
+                  // Goal - Food - Remaining
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildCalorieColumn(
                         _model.calorieGoal.toString(),
-                        'Goal',
+                        'Mục tiêu',
                         FontWeight.bold,
                       ),
                       _buildOperator('-'),
                       _buildCalorieColumn(
                         _model.foodCalories.toString(),
-                        'Food',
+                        'Thức ăn',
                         FontWeight.normal,
                       ),
                       _buildOperator('='),
                       _buildCalorieColumn(
                         _model.remainingCalories.toString(),
-                        'Remaining',
+                        'Còn lại',
                         FontWeight.bold,
-                        textColor: Colors.red,
                       ),
                     ],
                   ),
@@ -130,21 +144,34 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ),
             ),
           ),
-          // Hiển thị các bữa
-          for (final category in _model.mealCategories)
-            _buildMealCategory(context, category),
+
+          // Khoảng trống xám ngăn giữa Card Calo & các bữa
+          Container(
+            height: 8.0,
+            color: Colors.grey[200],
+          ),
+
+          // Hiển thị các bữa, mỗi bữa là 1 Card, xen kẽ khoảng trống xám
+          for (final category in _model.mealCategories) ...[
+            _buildMealCategoryCard(context, category),
+            Container(
+              height: 10.0,
+              color: Colors.grey[200],
+            ),
+          ],
         ],
       ),
     );
   }
 
-  // Hàm chọn ngày
+  // Hàm chọn ngày (locale: vi để hiển thị lịch tiếng Việt)
   Future<void> _showDatePicker(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _model.selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2040),
+      locale: const Locale('vi'),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -168,8 +195,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     }
   }
 
-  Widget _buildCalorieColumn(String value, String label, FontWeight weight,
-      {Color? textColor}) {
+  Widget _buildCalorieColumn(String value, String label, FontWeight weight) {
     return Column(
       children: [
         Text(
@@ -178,7 +204,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             fontFamily: 'Figtree',
             fontSize: 20,
             fontWeight: weight,
-            color: textColor,
           ),
         ),
         Text(
@@ -203,20 +228,58 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  /// Hiển thị từng bữa (Breakfast, Lunch, ...)
-  /// Hiển thị từng bữa (Breakfast, Lunch, ...)
-  Widget _buildMealCategory(BuildContext context, String category) {
-    // Giả sử API trả về 1 mealLog cho ngày, lấy log đầu tiên nếu có
+  String _mapCategoryToVietnamese(String category) {
+    switch (category.toLowerCase()) {
+      case 'breakfast':
+        return 'Bữa sáng';
+      case 'lunch':
+        return 'Bữa trưa';
+      case 'dinner':
+        return 'Bữa tối';
+      case 'snacks':
+        return 'Bữa phụ';
+      case 'exercise':
+        return 'Tập luyện';
+      default:
+        return category;
+    }
+  }
+
+  /// Thay vì trả về Column trực tiếp, ta trả về một Card cho mỗi bữa
+  Widget _buildMealCategoryCard(BuildContext context, String category) {
+    final vietnameseCategory = _mapCategoryToVietnamese(category);
+
     final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
+    // Tạo Card
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 0),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _buildMealCategoryContent(
+            context, mealLog, category, vietnameseCategory),
+      ),
+    );
+  }
+
+  /// Nội dung bên trong Card của bữa ăn
+  Widget _buildMealCategoryContent(
+    BuildContext context,
+    mealLog,
+    String category,
+    String vietnameseCategory,
+  ) {
+    // Nếu chưa có mealLog, hiển thị 0 + Thêm món
     if (mealLog == null) {
-      // Chưa có data, vẫn hiển thị khung bữa + ADD FOOD
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMealHeader(category, 0),
+          // Bữa này hoàn toàn chưa có log => không hiển thị tổng calo
+          _buildMealHeader(vietnameseCategory, null),
+
           ListTile(
             title: const Text(
-              'ADD FOOD',
+              'Thêm món',
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
@@ -231,7 +294,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            QuickAddWidget(mealName: category),
+                            QuickAddWidget(mealName: vietnameseCategory),
                       ),
                     );
                     break;
@@ -244,11 +307,11 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 return [
                   const PopupMenuItem<String>(
                     value: 'quick_add',
-                    child: Text('Quick Add'),
+                    child: Text('Thêm nhanh'),
                   ),
                   const PopupMenuItem<String>(
                     value: 'reminders',
-                    child: Text('Reminders'),
+                    child: Text('Nhắc nhở'),
                   ),
                 ];
               },
@@ -267,12 +330,15 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       );
     }
 
-    // Lọc các món ăn thuộc bữa
+    // Lọc các món ăn
     final details = mealLog.mealLogDetails
         .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
         .toList();
 
-    // Tính tổng calories và macro
+    // Nếu bữa này không có món => ẩn tổng calo
+    final bool hasAnyFood = details.isNotEmpty;
+
+    // Tính tổng Calories & macro
     final mealCals = details.fold(0, (sum, d) => sum + d.calories);
     final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
@@ -288,10 +354,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildMealHeader(category, mealCals),
-        if (details.isNotEmpty)
+        // Nếu bữa có món thì hiển thị mealCals, nếu không thì null
+        _buildMealHeader(vietnameseCategory, hasAnyFood ? mealCals : null),
+
+        if (hasAnyFood)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Text(
               'Carbs $carbsPercent% • Fat $fatPercent% • Protein $proteinPercent%',
               style: const TextStyle(
@@ -301,35 +369,35 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ),
             ),
           ),
-        // Hiển thị từng món ăn (mealLogDetail)
-        for (final item in details)
+
+        // Danh sách món ăn
+        for (int i = 0; i < details.length; i++) ...[
           GestureDetector(
             onLongPress: () {
-              // Khi người dùng nhấn giữ, hiển thị popup (AlertDialog)
+              // Dialog xóa món
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Diary'),
+                    title: const Text('Nhật ký'),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         ListTile(
-                          title: const Text('Move to...'),
+                          title: const Text('Chuyển đến...'),
                           onTap: () {
                             Navigator.pop(context);
+                            // TODO: Xử lý Move to...
                           },
                         ),
                         ListTile(
-                          title: const Text('Delete Entry'),
+                          title: const Text('Xóa món'),
                           onTap: () async {
-                            Navigator.pop(context); // Đóng dialog
-                            // Gọi hàm xóa trong model
+                            Navigator.pop(context);
                             await _model.deleteMealLogDetailEntry(
-                              mealLogId: mealLog.mealLogId, // ID của MealLog
-                              detailId: item.detailId, // ID của MealLogDetail
+                              mealLogId: mealLog.mealLogId,
+                              detailId: details[i].detailId,
                             );
-                            // Hàm deleteMealLogDetailEntry sẽ fetchMealLogs() lại
                           },
                         ),
                       ],
@@ -340,16 +408,16 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             },
             child: ListTile(
               title: Text(
-                item.foodName,
+                details[i].foodName,
                 style: const TextStyle(
                   fontFamily: 'Figtree',
                   fontSize: 16,
                 ),
               ),
               subtitle: Text(
-                '${item.calories} cals, '
-                '${item.quantity} serving(s)'
-                '${item.servingSize != null ? ', ${item.servingSize}' : ''}',
+                '${details[i].calories} Calories, '
+                '${details[i].quantity} serving(s)'
+                '${details[i].servingSize != null ? ', ${details[i].servingSize}' : ''}',
                 style: const TextStyle(
                   fontFamily: 'Figtree',
                   fontSize: 14,
@@ -358,10 +426,15 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ),
             ),
           ),
-        // Nút ADD FOOD
+          if (i < details.length - 1)
+            const Divider(color: Colors.black, thickness: 1),
+        ],
+        if (hasAnyFood) const Divider(color: Colors.black, thickness: 1),
+
+        // Nút "Thêm món"
         ListTile(
           title: const Text(
-            'ADD FOOD',
+            'Thêm món',
             style: TextStyle(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -375,7 +448,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QuickAddWidget(mealName: category),
+                      builder: (context) =>
+                          QuickAddWidget(mealName: vietnameseCategory),
                     ),
                   );
                   break;
@@ -388,11 +462,11 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               return [
                 const PopupMenuItem<String>(
                   value: 'quick_add',
-                  child: Text('Quick Add'),
+                  child: Text('Thêm nhanh'),
                 ),
                 const PopupMenuItem<String>(
                   value: 'reminders',
-                  child: Text('Reminders'),
+                  child: Text('Nhắc nhở'),
                 ),
               ];
             },
@@ -411,13 +485,14 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  // Widget helper: tiêu đề bữa ăn + tổng calories
-  Widget _buildMealHeader(String category, int mealCals) {
+  /// Sửa _buildMealHeader để nếu mealCals == null thì không hiển thị cals
+  Widget _buildMealHeader(String category, int? mealCals) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // Tên bữa
           Text(
             category,
             style: const TextStyle(
@@ -426,14 +501,17 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            mealCals.toString(),
-            style: const TextStyle(
-              fontFamily: 'Figtree',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          // Nếu mealCals == null => không hiển thị
+          mealCals == null
+              ? const SizedBox.shrink() // Trả về widget rỗng
+              : Text(
+                  mealCals.toString(),
+                  style: const TextStyle(
+                    fontFamily: 'Figtree',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ],
       ),
     );
