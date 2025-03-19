@@ -157,35 +157,33 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
 
   Future<void> updateHealthProfile(BuildContext context) async {
     try {
-      // Log before the API call to make sure we're entering the function
-      print('🔄 Calling updateHealthProfile...');
+      // Giữ lại allergies và diseases hiện tại từ hồ sơ sức khỏe
+      final currentAllergies = allergies.isNotEmpty ? allergies : [];
+      final currentDiseases = diseases.isNotEmpty ? diseases : [];
 
+      // Đảm bảo gửi đúng giá trị activityLevel
       final activityLevelInEnglish =
           _activityLevelMap[activityLevel] ?? 'Sedentary';
 
-      // Debug the values you're sending
-      print("Sending weight update: $weight");
-      print("Sending height update: $height");
-
+      // Gửi yêu cầu cập nhật hồ sơ sức khỏe
       final response = await _userService.updateHealthProfile(
         activityLevel: activityLevelInEnglish,
-        weight: weight, // double value
-        height: height, // double value
-        allergies: selectedAllergyIds.isEmpty ? [] : selectedAllergyIds,
-        diseases: selectedDiseaseIds.isEmpty ? [] : selectedDiseaseIds,
+        weight: weight,
+        height: height,
+        allergies: currentAllergies, // Gửi lại allergies hiện tại
+        diseases: currentDiseases, // Gửi lại diseases hiện tại
       );
 
-      // Check the response status
+      // Kiểm tra phản hồi từ API
       if (response.statusCode == 200) {
         print('✅ Cập nhật thành công!');
-        await fetchHealthProfile(); // Fetch the updated data
+        await fetchHealthProfile(); // Fetch updated data
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Cập nhật thành công!')));
-        Navigator.pop(context, true); // Close the bottom sheet
+        Navigator.pop(context, true);
       } else {
         final responseData = jsonDecode(response.body);
         final errorMessage = responseData['message'] ?? 'Cập nhật thất bại';
-        print('❌ Lỗi: $errorMessage');
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(errorMessage)));
       }

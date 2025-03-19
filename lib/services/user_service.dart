@@ -297,8 +297,8 @@ class UserService {
     double? weight, // Use double instead of int
     String? activityLevel,
     String? aisuggestion,
-    List<int>? allergies,
-    List<int>? diseases,
+    List<dynamic>? allergies,
+    List<dynamic>? diseases,
   }) async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
