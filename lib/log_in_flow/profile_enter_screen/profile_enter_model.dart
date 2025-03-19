@@ -1,7 +1,7 @@
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
+import 'package:diet_plan_app/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:diet_plan_app/services/user_service.dart';
 
 class ProfileEnterModel {
   final UserService _userService = UserService();
@@ -11,7 +11,8 @@ class ProfileEnterModel {
   final TextEditingController locationController = TextEditingController();
   DateTime? birthDate;
   String gender = "Male";
-
+  final FocusNode fullNameFocusNode = FocusNode();
+  final FocusNode locationFocusNode = FocusNode();
   Future<void> updateUserProfile(BuildContext context) async {
     if (fullNameController.text.isEmpty || birthDate == null) {
       _showErrorDialog(context, "Vui lòng nhập đầy đủ thông tin cá nhân.");
@@ -33,7 +34,8 @@ class ProfileEnterModel {
       if (response.statusCode == 200) {
         context.push("/hightEnterScreen");
       } else {
-        _showErrorDialog(context, "Cập nhật thông tin thất bại, vui lòng thử lại.");
+        _showErrorDialog(
+            context, "Cập nhật thông tin thất bại, vui lòng thử lại.");
       }
     } catch (e) {
       _showErrorDialog(context, "Đã xảy ra lỗi: \$e");

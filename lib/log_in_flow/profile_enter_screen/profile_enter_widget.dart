@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -45,13 +46,15 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        _buildTextField('Tên đầy đủ', _model.fullNameController),
+                        _buildTextField('Tên đầy đủ', _model.fullNameController,
+                            _model.fullNameFocusNode),
                         const SizedBox(height: 20.0),
                         _buildDatePicker(context),
                         const SizedBox(height: 20.0),
                         _buildGenderSelector(),
                         const SizedBox(height: 20.0),
-                        _buildTextField('Địa chỉ', _model.locationController),
+                        _buildTextField('Địa chỉ', _model.locationController,
+                            _model.locationFocusNode),
                         const SizedBox(height: 30.0),
                         FFButtonWidget(
                           onPressed: () async {
@@ -84,9 +87,27 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  // Widget _buildTextField(String label, TextEditingController controller) {
+  //   return TextFormField(
+  //     controller: controller,
+  //     validator: (value) {
+  //       if (value == null || value.trim().isEmpty) {
+  //         return '$label không được để trống';
+  //       }
+  //       return null;
+  //     },
+  //     decoration: InputDecoration(
+  //       labelText: label,
+  //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+  //       contentPadding: const EdgeInsets.all(16.0),
+  //     ),
+  //   );
+  // }
+  Widget _buildTextField(
+      String label, TextEditingController controller, FocusNode focusNode) {
     return TextFormField(
       controller: controller,
+      focusNode: focusNode,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
           return '$label không được để trống';
@@ -95,12 +116,56 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
       },
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+        labelStyle: TextStyle(
+          color: focusNode.hasFocus
+              ? FlutterFlowTheme.of(context).primary
+              : Colors.black, // Màu chữ khi focus
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+              color: FlutterFlowTheme.of(context)
+                  .primary), // Đổi màu khi focus vào
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
         contentPadding: const EdgeInsets.all(16.0),
       ),
     );
   }
 
+  // Widget _buildDatePicker(BuildContext context) {
+  //   return GestureDetector(
+  //     onTap: () async {
+  //       DateTime? pickedDate = await showDatePicker(
+  //         locale: const Locale('vi', 'VN'),
+  //         context: context,
+  //         initialDate: DateTime.now(),
+  //         firstDate: DateTime(1900),
+  //         lastDate: DateTime.now(),
+  //       );
+  //       if (pickedDate != null) {
+  //         setState(() {
+  //           _model.birthDate = pickedDate;
+  //         });
+  //       }
+  //     },
+  //     child: InputDecorator(
+  //       decoration: InputDecoration(
+  //         labelText: 'Ngày sinh',
+  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+  //         contentPadding: const EdgeInsets.all(16.0),
+  //       ),
+  //       child: Text(
+  //         _model.birthDate != null
+  //             ? DateFormat('dd/MM/yyyy').format(_model.birthDate!)
+  //             : 'Chọn ngày sinh',
+  //         style: const TextStyle(fontSize: 16.0),
+  //       ),
+  //     ),
+  //   );
+  // }
   Widget _buildDatePicker(BuildContext context) {
     return GestureDetector(
       onTap: () async {
@@ -110,6 +175,26 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
           initialDate: DateTime.now(),
           firstDate: DateTime(1900),
           lastDate: DateTime.now(),
+          builder: (BuildContext context, Widget? child) {
+            return Theme(
+              data: ThemeData.light().copyWith(
+                primaryColor: FlutterFlowTheme.of(context)
+                    .primary, // Màu sắc của nút chọn
+                buttonTheme: ButtonThemeData(
+                  textTheme: ButtonTextTheme.primary,
+                ),
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    foregroundColor: FlutterFlowTheme.of(context)
+                        .primary, // Màu chữ của nút OK
+                  ),
+                ),
+                colorScheme: ColorScheme.fromSwatch()
+                    .copyWith(primary: FlutterFlowTheme.of(context).primary),
+              ),
+              child: child!,
+            );
+          },
         );
         if (pickedDate != null) {
           setState(() {
@@ -120,7 +205,16 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: 'Ngày sinh',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+          labelStyle: TextStyle(
+            color: Colors.black, // Màu chữ khi chưa focus
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.green), // Màu viền khi focus
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
           contentPadding: const EdgeInsets.all(16.0),
         ),
         child: Text(
@@ -148,6 +242,22 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
     );
   }
 
+  // Widget _buildRadioOption(String label, String value) {
+  //   return Row(
+  //     children: [
+  //       Radio<String>(
+  //         value: value,
+  //         groupValue: _model.gender,
+  //         onChanged: (newValue) {
+  //           setState(() {
+  //             _model.gender = newValue!;
+  //           });
+  //         },
+  //       ),
+  //       Text(label),
+  //     ],
+  //   );
+  // }
   Widget _buildRadioOption(String label, String value) {
     return Row(
       children: [
@@ -159,6 +269,7 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
               _model.gender = newValue!;
             });
           },
+          activeColor: FlutterFlowTheme.of(context).primary, // Đổi màu khi chọn
         ),
         Text(label),
       ],
