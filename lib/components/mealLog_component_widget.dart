@@ -388,8 +388,41 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                         ListTile(
                           title: const Text('Chuyển đến...'),
                           onTap: () {
-                            Navigator.pop(context);
-                            // TODO: Xử lý Move to...
+                            Navigator.pop(
+                                context); // Đóng dialog hiện tại (chứa Chuyển đến / Xóa món)
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Chuyển đến...'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Liệt kê các bữa (không tính "Exercise" nếu bạn muốn)
+                                      for (final mealType in [
+                                        'Breakfast',
+                                        'Lunch',
+                                        'Dinner',
+                                        'Snacks'
+                                      ])
+                                        ListTile(
+                                          title: Text(mealType),
+                                          onTap: () async {
+                                            // Khi user chọn bữa, đóng popup
+                                            Navigator.pop(context);
+                                            // Gọi hàm transferMealLogDetailEntry
+                                            await _model
+                                                .transferMealLogDetailEntry(
+                                              detailId: details[i].detailId,
+                                              targetMealType: mealType,
+                                            );
+                                          },
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
                           },
                         ),
                         ListTile(

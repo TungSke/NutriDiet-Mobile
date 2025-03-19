@@ -156,4 +156,33 @@ class MeallogService {
       return false;
     }
   }
+
+  Future<bool> transferMealLogDetail({
+    required int detailId,
+    required String targetMealType,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Xây dựng endpoint với query parameter targetMealType
+      final String endpoint =
+          'api/meal-log/detail/transfer/$detailId?targetMealType=$targetMealType';
+
+      // Vì API không cần body nên ta truyền {}.
+      final response = await _apiService.put(endpoint, body: {}, token: token);
+      debugPrint(
+          "API transferMealLogDetail: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        throw Exception(
+            'Lỗi transferMealLogDetail: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API transferMealLogDetail: $e");
+      return false;
+    }
+  }
 }

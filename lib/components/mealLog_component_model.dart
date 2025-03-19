@@ -99,6 +99,29 @@ class MealLogComponentModel extends FlutterFlowModel {
     }
   }
 
+  Future<void> transferMealLogDetailEntry({
+    required int detailId,
+    required String targetMealType,
+  }) async {
+    try {
+      final service = MeallogService();
+      final bool success = await service.transferMealLogDetail(
+        detailId: detailId,
+        targetMealType: targetMealType,
+      );
+
+      if (success) {
+        debugPrint('Chuyển bữa thành công');
+        // Gọi lại fetchMealLogs để cập nhật giao diện
+        await fetchMealLogs();
+      } else {
+        debugPrint('Chuyển bữa thất bại');
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi chuyển bữa: $e');
+    }
+  }
+
   /// Xóa chi tiết Meal Log (Delete)
   Future<void> deleteMealLogDetailEntry({
     required int mealLogId,
