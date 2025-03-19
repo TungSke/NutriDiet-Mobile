@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/components/mealLog_list_food.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -324,9 +325,17 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const SerchDataWidget(),
+                  builder: (context) => MealLogListFoodWidget(
+                    selectedDate: _model.selectedDate,
+                    mealName: category, // ví dụ: "Lunch" hoặc "Dinner"
+                  ),
                 ),
-              );
+              ).then((result) {
+                // Sau khi thêm món xong, nếu cần refresh MealLogs thì gọi:
+                if (result == true) {
+                  _model.fetchMealLogs();
+                }
+              });
             },
           ),
           const Divider(),
@@ -388,8 +397,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                         ListTile(
                           title: const Text('Chuyển đến...'),
                           onTap: () {
-                            Navigator.pop(
-                                context); // Đóng dialog hiện tại (chứa Chuyển đến / Xóa món)
+                            Navigator.pop(context);
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
