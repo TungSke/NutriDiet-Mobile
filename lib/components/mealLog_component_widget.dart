@@ -35,7 +35,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     super.dispose();
   }
 
-  // Hàm hiển thị ngày: Hôm nay / Hôm qua / Ngày mai / format tiếng Việt
   String _getCustomDateString(DateTime date) {
     final now = DateTime.now();
     final difference = DateTime(date.year, date.month, date.day)
@@ -276,7 +275,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         children: [
           // Bữa này hoàn toàn chưa có log => không hiển thị tổng calo
           _buildMealHeader(vietnameseCategory, null),
-
           ListTile(
             title: const Text(
               'Thêm món',
@@ -293,10 +291,16 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            QuickAddWidget(mealName: vietnameseCategory),
+                        builder: (context) => QuickAddWidget(
+                          mealName: category, // Truyền tên bữa tiếng Anh gốc
+                          selectedDate: _model.selectedDate,
+                        ),
                       ),
-                    );
+                    ).then((result) {
+                      if (result == true) {
+                        _model.fetchMealLogs();
+                      }
+                    });
                     break;
                   case 'reminders':
                     // Xử lý khác nếu cần
@@ -356,7 +360,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       children: [
         // Nếu bữa có món thì hiển thị mealCals, nếu không thì null
         _buildMealHeader(vietnameseCategory, hasAnyFood ? mealCals : null),
-
         if (hasAnyFood)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -369,7 +372,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ),
             ),
           ),
-
         // Danh sách món ăn
         for (int i = 0; i < details.length; i++) ...[
           GestureDetector(
@@ -430,7 +432,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             const Divider(color: Colors.black, thickness: 1),
         ],
         if (hasAnyFood) const Divider(color: Colors.black, thickness: 1),
-
         // Nút "Thêm món"
         ListTile(
           title: const Text(
@@ -448,10 +449,16 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          QuickAddWidget(mealName: vietnameseCategory),
+                      builder: (context) => QuickAddWidget(
+                        mealName: category, // Truyền tên bữa tiếng Anh gốc
+                        selectedDate: _model.selectedDate,
+                      ),
                     ),
-                  );
+                  ).then((result) {
+                    if (result == true) {
+                      _model.fetchMealLogs();
+                    }
+                  });
                   break;
                 case 'reminders':
                   // Xử lý khác nếu cần

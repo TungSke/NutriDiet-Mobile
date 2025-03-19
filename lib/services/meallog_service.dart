@@ -1,13 +1,13 @@
 import 'dart:convert';
-
 import 'package:diet_plan_app/services/api_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-// Import file model meal_log.dart
 import 'models/meallog.dart';
 
 class MeallogService {
   final ApiService _apiService = ApiService();
+
+  // Hàm GET MealLogs (đã có)
   Future<List<MealLog>> getMealLogs({
     String? logDate,
     String? fromDate,
@@ -17,10 +17,7 @@ class MeallogService {
     final String? token = await secureStorage.read(key: 'accessToken');
 
     try {
-      // Tạo endpoint base
       String endpoint = "api/meal-log?";
-
-      // Gắn tham số logDate, fromDate, toDate nếu có
       if (logDate != null && logDate.isNotEmpty) {
         endpoint += "logDate=$logDate&";
       }
@@ -30,12 +27,11 @@ class MeallogService {
       if (toDate != null && toDate.isNotEmpty) {
         endpoint += "toDate=$toDate&";
       }
-
       if (endpoint.endsWith('&') || endpoint.endsWith('?')) {
         endpoint = endpoint.substring(0, endpoint.length - 1);
       }
-      final response = await _apiService.get(endpoint, token: token);
 
+      final response = await _apiService.get(endpoint, token: token);
       debugPrint(
           "API getMealLogs: Status ${response.statusCode}, Body: ${response.body}");
 
@@ -47,7 +43,6 @@ class MeallogService {
         debugPrint("No meal logs found (204).");
         return [];
       }
-
       throw Exception(
           'Lỗi lấy Meal Logs: ${response.statusCode} - ${response.body}');
     } catch (e) {
@@ -56,6 +51,7 @@ class MeallogService {
     }
   }
 
+  // Hàm POST tạo mới Meal Log (đã có)
   Future<bool> createMealLog({
     required String logDate,
     required String mealType,
@@ -67,7 +63,6 @@ class MeallogService {
     final String? token = await secureStorage.read(key: 'accessToken');
 
     try {
-      // Chuẩn bị dữ liệu dạng form-data dưới dạng Map<String, String>
       Map<String, String> formData = {
         'LogDate': logDate,
         'MealType': mealType,
@@ -75,8 +70,6 @@ class MeallogService {
         'FoodId': foodId.toString(),
         'Quantity': quantity.toString(),
       };
-
-      // Gọi API POST bằng postMultipart
       final response = await _apiService.postMultipart("api/meal-log",
           body: formData, token: token);
       debugPrint(
@@ -94,6 +87,7 @@ class MeallogService {
     }
   }
 
+  // Hàm DELETE Meal Log Detail (đã có)
   Future<bool> deleteMealLogDetail({
     required int mealLogId,
     required int detailId,
@@ -103,10 +97,7 @@ class MeallogService {
 
     try {
       final endpoint = 'api/meal-log/$mealLogId/detail/$detailId';
-
-      // Gọi hàm delete trong ApiService
       final response = await _apiService.delete(endpoint, token: token);
-
       debugPrint(
           "API deleteMealLogDetail: Status ${response.statusCode}, Body: ${response.body}");
 
@@ -118,6 +109,50 @@ class MeallogService {
       }
     } catch (e) {
       debugPrint("Lỗi khi gọi API deleteMealLogDetail: $e");
+      return false;
+    }
+  }
+
+  Future<bool> quickAddMeal({
+    required DateTime logDate,
+    required String mealType,
+    required int calories,
+    required int carbohydrates,
+    required int fats,
+    required int protein,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Dữ liệu form-data
+      Map<String, String> formData = {
+        'LogDate': logDate.toIso8601String(), // "2025-03-19T05:37:48.444Z"
+        'MealType': mealType, // "Breakfast", "Lunch", ...
+        'Calories': calories.toString(),
+        'Carbohydrates': carbohydrates.toString(),
+        'Fats': fats.toString(),
+        'Protein': protein.toString(),
+      };
+
+      final response = await _apiService.postMultipart(
+        "api/meal-log/quick",
+        body: formData,
+        token: token,
+      );
+
+      debugPrint(
+          "API quickAddMeal: Status ${response.statusCode}, Body: ${response.body}");
+
+      // Thành công có thể là 200 hoặc 201, tùy backend
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        throw Exception(
+            'Lỗi quickAddMeal: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API quickAddMeal: $e");
       return false;
     }
   }
