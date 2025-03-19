@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:diet_plan_app/components/activity_component_widget.dart';
+import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 
-import '../flutter_flow/flutter_flow_model.dart';
 import '../services/health_service.dart';
 import '../services/user_service.dart';
 
@@ -200,7 +198,6 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
   @override
   void initState(BuildContext context) {
     fetchUserProfile();
-
     fetchHealthProfile();
   }
 }

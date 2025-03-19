@@ -75,7 +75,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.safePop();
+                            context.push("/bottomNavbarScreen");
                           },
                           child: Container(
                             decoration: BoxDecoration(

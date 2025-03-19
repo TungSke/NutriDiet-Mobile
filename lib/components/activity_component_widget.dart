@@ -27,14 +27,6 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     });
   }
 
-  Future<void> _refreshDataAfterUpdate() async {
-    await _model.updateHealthProfile(context);
-    await _model.fetchHealthProfile(); // Fetch updated health data
-    setState(() {
-      // Update the UI after fetching new data
-    });
-  }
-
   final animationsMap = <String, AnimationInfo>{};
 
   void initState() {
