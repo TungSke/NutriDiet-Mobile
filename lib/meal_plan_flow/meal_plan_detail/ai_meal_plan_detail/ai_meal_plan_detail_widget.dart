@@ -153,83 +153,267 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Xác nhận lưu thực đơn"),
-          content: const Text("Bạn có chắc chắn muốn lưu thực đơn này không?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Hủy"),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          backgroundColor: Colors.white,
+          title: Text(
+            "Bạn có gì không hài lòng về thực đơn không?",
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: FlutterFlowTheme.of(context).primary,
             ),
-            TextButton(
+            textAlign: TextAlign.center,
+          ),
+          content: const Text(
+            "Hãy cho chúng tôi biết ý kiến của bạn!",
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey.shade300,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
               onPressed: () async {
-                Navigator.pop(context); // Đóng dialog xác nhận
-
-                BuildContext? loadingDialogContext;
-                if (mounted) {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (dialogContext) {
-                      loadingDialogContext = dialogContext;
-                      return AlertDialog(
-                        content: Row(
-                          children: const [
-                            CircularProgressIndicator(),
-                            SizedBox(width: 16),
-                            Text("Đang lưu thực đơn..."),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                }
-
-                try {
-                  final result = await _model.saveMealPlanAI();
-                  if (!mounted) {
-                    if (loadingDialogContext != null && Navigator.canPop(loadingDialogContext!)) {
-                      Navigator.pop(loadingDialogContext!);
-                    }
-                    return;
-                  }
-
-                  if (result['success']) {
-                    Navigator.pop(context); // Quay lại màn hình trước đó
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Đã lưu thực đơn thành công"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(result['message'] ?? 'Lỗi khi lưu thực đơn'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Đã xảy ra lỗi: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                } finally {
-                  if (loadingDialogContext != null && Navigator.canPop(loadingDialogContext!)) {
-                    Navigator.pop(loadingDialogContext!);
-                  }
-                }
+                Navigator.pop(context);
+                _executeSaveMealPlan(null);
               },
-              child: const Text("Đồng ý"),
+              child: const Text("Không", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: FlutterFlowTheme.of(context).primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                _showFeedbackDialog();
+              },
+              child: const Text(
+                "Có",
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
             ),
           ],
         );
       },
     );
+  }
+
+  void _showFeedbackDialog() {
+    String? selectedFeedback;
+    String? additionalDetail;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              backgroundColor: Colors.white,
+              title: Row(
+                children: [
+                  Icon(Icons.feedback, color: FlutterFlowTheme.of(context).primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Phản hồi về thực đơn",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: FlutterFlowTheme.of(context).primary,
+                    ),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          RadioListTile<String>(
+                            value: "Hài lòng với phản hồi về thực đơn",
+                            groupValue: selectedFeedback,
+                            title: Text(
+                              "Hài lòng",
+                              style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            activeColor: FlutterFlowTheme.of(context).primary,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedFeedback = value;
+                                additionalDetail = null;
+                              });
+                            },
+                          ),
+                          Divider(height: 1, color: Colors.grey.shade300),
+                          RadioListTile<String>(
+                            value: "Không hài lòng với phản hồi về thực đơn",
+                            groupValue: selectedFeedback,
+                            title: Text(
+                              "Không hài lòng",
+                              style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            activeColor: FlutterFlowTheme.of(context).primary,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedFeedback = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (selectedFeedback == "Không hài lòng với phản hồi về thực đơn") ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        "Chi tiết",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: FlutterFlowTheme.of(context).primary,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        onChanged: (value) => additionalDetail = value,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: "Nhập chi tiết phản hồi của bạn...",
+                          hintStyle: TextStyle(color: Colors.grey.shade400),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actionsAlignment: MainAxisAlignment.spaceEvenly,
+              actions: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    _saveMealPlan();
+                  },
+                  child: const Text("Đóng", style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FlutterFlowTheme.of(context).primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  onPressed: selectedFeedback == null
+                      ? null
+                      : () async {
+                    Navigator.pop(dialogContext);
+                    String finalFeedback = selectedFeedback!;
+                    if (additionalDetail != null && additionalDetail!.isNotEmpty) {
+                      finalFeedback += ", chi tiết: $additionalDetail";
+                    }
+                    _executeSaveMealPlan(finalFeedback);
+                  },
+                  child: const Text(
+                    "Gửi",
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _executeSaveMealPlan(String? feedback) async {
+    BuildContext? loadingDialogContext;
+    if (mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          loadingDialogContext = dialogContext;
+          return AlertDialog(
+            content: Row(
+              children: const [
+                CircularProgressIndicator(),
+                SizedBox(width: 16),
+                Text("Đang lưu thực đơn..."),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+    try {
+      final result = await _model.saveMealPlanAI(feedback: feedback);
+      if (!mounted) {
+        if (loadingDialogContext != null && Navigator.canPop(loadingDialogContext!)) {
+          Navigator.pop(loadingDialogContext!);
+        }
+        return;
+      }
+
+      if (result['success']) {
+        Navigator.pop(context); // Quay lại màn hình trước đó
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Đã lưu thực đơn thành công"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Lỗi khi lưu thực đơn'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Đã xảy ra lỗi: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (loadingDialogContext != null && Navigator.canPop(loadingDialogContext!)) {
+        Navigator.pop(loadingDialogContext!);
+      }
+    }
   }
 
   @override
@@ -380,7 +564,7 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
             const SizedBox(height: 8),
             _buildInfoText("Mục tiêu sức khỏe", mealPlan.healthGoal ?? "Không xác định"),
             _buildInfoText("Số ngày thực đơn", "${_model.getTotalDays()} ngày"),
-            _buildInfoText("Tạo bởi", mealPlan.createdBy! ?? " "),
+            _buildInfoText("Tạo bởi", mealPlan.createdBy ?? "Không xác định"),
           ],
         ),
       ),
