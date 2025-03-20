@@ -77,6 +77,48 @@ class MealPlanDetailModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateMealPlan(String planName, String? healthGoal) async {
+    try {
+      if (mealPlan == null || mealPlan!.mealPlanId == null) {
+        errorMessage = "Không tìm thấy MealPlan để cập nhật";
+        notifyListeners();
+        return false;
+      }
+
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      final updatedMealPlan = MealPlan(
+        mealPlanId: mealPlan!.mealPlanId,
+        planName: planName,
+        healthGoal: healthGoal,
+        mealPlanDetails: mealPlan!.mealPlanDetails, // Giữ nguyên danh sách mealPlanDetails hiện tại
+        status: mealPlan!.status,
+        duration: mealPlan!.duration,
+        startAt: mealPlan!.startAt,
+        createdBy: mealPlan!.createdBy,
+      );
+
+      final success = await _mealPlanService.updateMealPlan(updatedMealPlan);
+      if (success) {
+        // Cập nhật lại dữ liệu từ server sau khi thành công
+        await fetchMealPlanById(mealPlan!.mealPlanId!);
+      } else {
+        errorMessage = "Không thể cập nhật thực đơn";
+      }
+
+      isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      isLoading = false;
+      errorMessage = "Lỗi khi cập nhật thực đơn: $e";
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Hàm lấy tổng dinh dưỡng cho ngày cụ thể từ totalByDayNumber
   Map<String, double> getNutrientTotalsForDay(int dayNumber) {
     if (mealPlanTotals == null || mealPlanTotals!['totalByDayNumber'] == null) {

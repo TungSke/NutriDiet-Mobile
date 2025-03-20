@@ -43,6 +43,36 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
     }
   }
 
+  Future<int?> createMealPlan(String planName, String? healthGoal) async{
+    try{
+      isLoading = true;
+      if(_updateCallback!= null) _updateCallback!();
+      final newMealPlan = MealPlan(
+          planName: planName,
+          healthGoal: healthGoal,
+          mealPlanDetails: []);
+      final success = await _mealPlanService.createMealPlan(newMealPlan);
+      if(success){
+        await fetchMealPlans();
+        final createdMealPlan = mealPlans.firstWhere(
+            (meal) => meal.planName == planName && meal.healthGoal == healthGoal,
+          orElse: () => throw Exception('Không tìm thấy thực đơn vừa tạo')
+        );
+
+      return createdMealPlan.mealPlanId; // trả về mealPlanId luôn để chuyển hướng
+
+      }
+      else{
+        throw Exception("Không thể tạo Meal Plan");
+      }
+    }catch(e){
+      debugPrint('Lỗi khi tạo meal plan: $e');
+      return null;
+    }finally{
+      isLoading = false;
+      if(_updateCallback!= null) _updateCallback!();
+    }
+  }
   Future<Map<String, dynamic>> createSuitableMealPlanByAI() async {
     try {
       isLoading = true;
