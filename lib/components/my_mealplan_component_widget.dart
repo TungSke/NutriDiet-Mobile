@@ -368,7 +368,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: FlutterFlowTheme.of(context).primary,
         title: const Text('Thêm mới thực đơn', style: TextStyle(color: Colors.white)),
         content: Column(
@@ -404,14 +404,75 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Hủy', style: TextStyle(color: Colors.white)),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               if (planName.isNotEmpty && healthGoal != null) {
                 debugPrint('Thêm mới: $planName - $healthGoal');
-                Navigator.pop(context);
+
+                // Hiển thị loading trong dialog
+                BuildContext? loadingContext;
+                showDialog(
+                  context: dialogContext,
+                  barrierDismissible: false,
+                  builder: (loadingDialogContext) {
+                    loadingContext = loadingDialogContext;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
+
+                try {
+                  final mealPlanId = await _model.createMealPlan(planName, healthGoal);
+
+                  if (loadingContext != null && Navigator.canPop(loadingContext!)) {
+                    Navigator.pop(loadingContext!);
+                  }
+
+                  if (mealPlanId != null) {
+                    // Đóng dialog trước khi chuyển hướng
+                    Navigator.pop(dialogContext);
+
+                    // Chuyển hướng đến MealPlanDetailWidget
+                    if (mounted) {
+                      await Navigator.push(
+                        context, // Context của MyMealPlanScreenWidget
+                        MaterialPageRoute(
+                          builder: (context) => MealPlanDetailWidget(
+                            mealPlanId: mealPlanId,
+                            source: MealPlanSource.myMealPlan,
+                          ),
+                        ),
+                      );
+
+                    }
+                  } else {
+                    Navigator.pop(dialogContext);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Lỗi khi tạo thực đơn: mealPlanId không hợp lệ'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                } catch (e) {
+                  // Đóng loading nếu có lỗi
+                  if (loadingContext != null && Navigator.canPop(loadingContext!)) {
+                    Navigator.pop(loadingContext!);
+                  }
+                  Navigator.pop(dialogContext);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Lỗi khi tạo thực đơn: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
               }
             },
             child: const Text('Thêm', style: TextStyle(color: Colors.white)),

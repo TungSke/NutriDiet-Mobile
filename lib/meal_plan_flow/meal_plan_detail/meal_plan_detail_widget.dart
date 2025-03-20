@@ -39,6 +39,124 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     setState(() {});
   }
 
+  void _showEditMealPlanDialog() {
+    if (_model.mealPlan == null) return;
+
+    String planName = _model.mealPlan!.planName;
+    String? healthGoal = _model.mealPlan!.healthGoal;
+
+    // Danh sách các giá trị hợp lệ
+    const validHealthGoals = ['Giảm cân', 'Tăng cân', 'Duy trì cân nặng'];
+
+    // Nếu healthGoal không nằm trong danh sách hợp lệ, đặt thành null hoặc giá trị mặc định
+    if (healthGoal != null && !validHealthGoals.contains(healthGoal)) {
+      healthGoal = null; // Hoặc đặt thành validHealthGoals[0] nếu muốn giá trị mặc định
+    }
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: FlutterFlowTheme.of(context).primary,
+        title: const Text('Chỉnh sửa thực đơn', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'Tên thực đơn',
+                labelStyle: TextStyle(color: Colors.white),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+              ),
+              style: const TextStyle(color: Colors.black),
+              controller: TextEditingController(text: planName),
+              onChanged: (value) => planName = value,
+            ),
+            DropdownButtonFormField<String>(
+              value: healthGoal, // healthGoal đã được kiểm tra
+              decoration: const InputDecoration(
+                labelText: 'Mục tiêu sức khỏe',
+                labelStyle: TextStyle(color: Colors.white),
+              ),
+              dropdownColor: FlutterFlowTheme.of(context).primary,
+              style: const TextStyle(color: Colors.black),
+              items: validHealthGoals
+                  .map((goal) => DropdownMenuItem(value: goal, child: Text(goal)))
+                  .toList(),
+              onChanged: (value) => healthGoal = value,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Hủy', style: TextStyle(color: Colors.white)),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (planName.isNotEmpty && healthGoal != null) {
+                BuildContext? loadingContext;
+                showDialog(
+                  context: dialogContext,
+                  barrierDismissible: false,
+                  builder: (loadingDialogContext) {
+                    loadingContext = loadingDialogContext;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
+
+                try {
+                  final success = await _model.updateMealPlan(planName, healthGoal);
+
+                  if (loadingContext != null && Navigator.canPop(loadingContext!)) {
+                    Navigator.pop(loadingContext!);
+                  }
+
+                  Navigator.pop(dialogContext);
+
+                  if (success && mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Cập nhật thực đơn thành công'),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  } else if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(_model.errorMessage ?? 'Lỗi khi cập nhật thực đơn'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (loadingContext != null && Navigator.canPop(loadingContext!)) {
+                    Navigator.pop(loadingContext!);
+                  }
+                  Navigator.pop(dialogContext);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Lỗi khi cập nhật thực đơn: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              }
+            },
+            child: const Text('Lưu', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -195,9 +313,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                 if (widget.source == MealPlanSource.myMealPlan)
                   IconButton(
                     icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
-                    onPressed: () {
-                      debugPrint("Chỉnh sửa thực đơn ${widget.mealPlanId}");
-                    },
+                    onPressed: _showEditMealPlanDialog, // Gọi dialog chỉnh sửa
                   ),
               ],
             ),
@@ -288,7 +404,6 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   }
 
   Widget _buildMealCard(String mealType, List<MealPlanDetail> meals) {
-    // Nối các tên món ăn bằng dấu phẩy
     final foodNames = meals.map((meal) => meal.foodName ?? "Chưa có món ăn").join(", ");
 
     return Card(
@@ -319,12 +434,9 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                 ],
               ),
             ),
-
             if (widget.source == MealPlanSource.myMealPlan)
               GestureDetector(
-                onTap: () {
-
-                },
+                onTap: () {},
                 child: CircleAvatar(
                   backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
                   child: Icon(
