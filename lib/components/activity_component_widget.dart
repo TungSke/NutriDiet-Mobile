@@ -109,16 +109,25 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(0.0),
-                        child: Image.asset(
-                          'assets/images/jamekooper_.png',
-                          width: 80.0,
-                          height: 80.0,
-                          fit: BoxFit.cover,
-                        ),
+                        child: _model.avatar.isNotEmpty
+                            ? Image.network(
+                                // Nếu có avatar từ API, sử dụng Image.network
+                                _model.avatar,
+                                width: 80.0,
+                                height: 80.0,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                // Nếu không có avatar, sử dụng hình mặc định
+                                'assets/images/dummy_profile.png',
+                                width: 80.0,
+                                height: 80.0,
+                                fit: BoxFit.cover,
+                              ),
                       ),
                     ),
                     SizedBox(
-                      width: 150,
+                      width: 200,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: Column(
@@ -403,7 +412,6 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         onPressed: () {
                           setStateForBottomSheet(() {
                             currentWeight -= 0.1;
-                            // Làm tròn giá trị cân nặng sau khi thay đổi
                             currentWeight =
                                 double.parse(currentWeight.toStringAsFixed(1));
                           });
@@ -414,7 +422,6 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         onPressed: () {
                           setStateForBottomSheet(() {
                             currentWeight += 0.1;
-                            // Làm tròn giá trị cân nặng sau khi thay đổi
                             currentWeight =
                                 double.parse(currentWeight.toStringAsFixed(1));
                           });
@@ -431,11 +438,17 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                       // Gọi updateHealthProfile và cập nhật lại trọng lượng trong _model
                       await _model.updateHealthProfile(context);
 
+                      // Fetch lại dữ liệu sức khỏe sau khi cập nhật
+                      await _model.fetchHealthProfile();
+
+                      // Cập nhật lại weight trong _model
                       setState(() {
-                        _model.weight =
-                            currentWeight; // Cập nhật weight trong _model
+                        _model.weight = currentWeight;
                       });
+
+                      // Làm mới chart
                       _refreshChart();
+
                       // Thông báo thành công
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -443,6 +456,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                       );
 
                       // Đóng bottom sheet sau khi lưu
+                      Navigator.pop(context);
                     },
                     child: Text('Lưu'),
                   ),

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'edit_profile_screen_model.dart';
 
@@ -101,20 +104,38 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
     );
   }
 
-  /// 🟢 Ảnh đại diện
   Widget _buildProfilePhoto() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
           CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.grey[300],
-              child: Icon(Icons.person, size: 50, color: Colors.white)),
+            radius: 40,
+            backgroundColor: Colors.grey[300],
+            backgroundImage: _model.avatar.isNotEmpty
+                ? FileImage(File(
+                    _model.avatar)) // Sử dụng FileImage thay vì NetworkImage
+                : null,
+            child: _model.avatar.isEmpty
+                ? Icon(Icons.person, size: 50, color: Colors.white)
+                : null,
+          ),
           TextButton(
-            onPressed: () {},
-            child: Text('Set your profile photo',
-                style: TextStyle(color: Colors.green)),
+            onPressed: () async {
+              // Sử dụng ImagePicker để chọn ảnh
+              final picker = ImagePicker();
+              final pickedFile =
+                  await picker.pickImage(source: ImageSource.gallery);
+
+              if (pickedFile != null) {
+                // Cập nhật avatar và trạng thái đã thay đổi
+                setState(() {
+                  _model.avatar = pickedFile.path;
+                  isEdited = true;
+                });
+              }
+            },
+            child: Text('Chọn ảnh', style: TextStyle(color: Colors.green)),
           ),
         ],
       ),

@@ -20,6 +20,7 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
   double weight = 0.0;
   String activityLevel = '';
   String userId = '';
+  String avatar = '';
   List<int> selectedAllergyIds = []; // Danh sách các dị ứng đã chọn
   List<int> selectedDiseaseIds = [];
   List<int> allergies = []; // ✅ Dị ứng
@@ -97,6 +98,7 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
         location = data['address'] ?? "Chưa cập nhật";
         email = data["email"] ?? "Chưa cập nhật";
         userId = data['id']?.toString() ?? "";
+        avatar = data["avatar"] ?? "";
       } else {
         debugPrint('❌ Failed to fetch user profile');
       }
@@ -175,10 +177,10 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
       // Kiểm tra phản hồi từ API
       if (response.statusCode == 200) {
         print('✅ Cập nhật thành công!');
-        await fetchHealthProfile(); // Fetch updated data
+        await fetchHealthProfile();
+        await fetchTargetWeight(); // Fetch updated data
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Cập nhật thành công!')));
-        Navigator.pop(context, true);
       } else {
         final responseData = jsonDecode(response.body);
         final errorMessage = responseData['message'] ?? 'Cập nhật thất bại';

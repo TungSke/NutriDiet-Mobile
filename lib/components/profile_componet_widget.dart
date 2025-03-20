@@ -1,12 +1,14 @@
-import '/components/log_out_widget.dart';
-import '/flutter_flow/flutter_flow_animations.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import '/components/log_out_widget.dart';
+import '/flutter_flow/flutter_flow_animations.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
 import 'profile_componet_model.dart';
+
 export 'profile_componet_model.dart';
 
 class ProfileComponetWidget extends StatefulWidget {
@@ -69,7 +71,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
           Align(
             alignment: const AlignmentDirectional(0.0, 0.0),
             child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 63.0, 0.0, 16.0),
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(0.0, 63.0, 0.0, 16.0),
               child: Text(
                 'Hồ sơ',
                 maxLines: 1,
@@ -100,12 +103,21 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(0.0),
-                            child: Image.asset(
-                              'assets/images/jamekooper_.png',
-                              width: 80.0,
-                              height: 80.0,
-                              fit: BoxFit.cover,
-                            ),
+                            child: _model.avatar.isNotEmpty
+                                ? Image.network(
+                                    // Nếu có avatar từ API, sử dụng Image.network
+                                    _model.avatar,
+                                    width: 80.0,
+                                    height: 80.0,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    // Nếu không có avatar, sử dụng hình mặc định
+                                    'assets/images/dummy_profile.png',
+                                    width: 80.0,
+                                    height: 80.0,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                           Expanded(
                             child: Column(
@@ -244,8 +256,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                 ),
                 if (FFAppState().isLogin == true)
                   Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 16.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 32.0, 0.0, 16.0),
                     child: InkWell(
                       splashColor: Colors.transparent,
                       focusColor: Colors.transparent,
@@ -320,8 +332,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                 if (FFAppState().isLogin == true)
                   Builder(
                     builder: (context) => Padding(
-                      padding:
-                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 16.0),
                       child: InkWell(
                         splashColor: Colors.transparent,
                         focusColor: Colors.transparent,
@@ -361,20 +373,21 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 ),
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        12.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'Công thức của tôi',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                            fontFamily: 'figtree',
+                                            fontSize: 16.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            useGoogleFonts: false,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -396,8 +409,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                   ),
                 if (FFAppState().isLogin == true)
                   Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 16.0),
                     child: InkWell(
                       splashColor: Colors.transparent,
                       focusColor: Colors.transparent,
@@ -471,8 +484,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                   ),
                 if (FFAppState().isLogin == true)
                   Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 16.0),
                     child: InkWell(
                       splashColor: Colors.transparent,
                       focusColor: Colors.transparent,
@@ -545,7 +558,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                   child: InkWell(
                     splashColor: Colors.transparent,
                     focusColor: Colors.transparent,
@@ -560,8 +574,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                         borderRadius: BorderRadius.circular(16.0),
                       ),
                       child: Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 16.0, 8.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            8.0, 8.0, 16.0, 8.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -618,7 +632,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                   child: InkWell(
                     splashColor: Colors.transparent,
                     focusColor: Colors.transparent,
@@ -633,8 +648,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                         borderRadius: BorderRadius.circular(16.0),
                       ),
                       child: Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 16.0, 8.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            8.0, 8.0, 16.0, 8.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -693,8 +708,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                 if (FFAppState().isLogin == true)
                   Builder(
                     builder: (context) => Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 16.0),
                       child: InkWell(
                         splashColor: Colors.transparent,
                         focusColor: Colors.transparent,
@@ -750,8 +765,9 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 ),
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        12.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'Đăng xuất',
                                       maxLines: 1,

@@ -1,8 +1,11 @@
+import 'dart:convert';
+import 'package:diet_plan_app/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../services/models/meallog.dart';
 import '../services/meallog_service.dart';
+import 'package:http/http.dart' as http;
 
 class MealLogComponentModel extends FlutterFlowModel {
   DateTime selectedDate = DateTime.now();
@@ -10,8 +13,7 @@ class MealLogComponentModel extends FlutterFlowModel {
   // Dữ liệu lấy từ API
   List<MealLog> mealLogs = [];
   bool isLoading = true;
-  // Ví dụ set cứng, tuỳ bạn thay đổi logic
-  int calorieGoal = 1300;
+  int calorieGoal = 1300; // Giá trị mặc định, sẽ được cập nhật từ API
   int foodCalories = 0;
   int exerciseCalories = 0;
 
@@ -33,6 +35,30 @@ class MealLogComponentModel extends FlutterFlowModel {
   // Tính Remaining (Goal - Food + Exercise)
   int get remainingCalories => calorieGoal - foodCalories + exerciseCalories;
 
+  /// Gọi API lấy personal goal và cập nhật calorieGoal
+  Future<void> fetchPersonalGoal() async {
+    try {
+      isLoading = true;
+      final service = UserService();
+      // Gọi hàm getPersonalGoal đã được định nghĩa ở MeallogService
+      final http.Response response = await service.getPersonalGoal();
+      if (response.statusCode == 200) {
+        // Giả sử API trả về JSON với cấu trúc { "calorieGoal": number }
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final Map<String, dynamic> goalData = responseData['data'];
+        calorieGoal = goalData['dailyCalories'] ?? calorieGoal;
+        debugPrint('Fetched personal goal: $calorieGoal');
+      } else {
+        debugPrint('Lỗi khi lấy personal goal: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('Error in fetchPersonalGoal: $e');
+    } finally {
+      isLoading = false;
+      _updateCallback?.call();
+    }
+  }
+
   /// Gọi API để lấy meal log của ngày [selectedDate].
   Future<void> fetchMealLogs() async {
     try {
@@ -42,9 +68,7 @@ class MealLogComponentModel extends FlutterFlowModel {
 
       // Gọi service để fetch Meal Logs
       final service = MeallogService();
-      if (_updateCallback != null) {
-        _updateCallback!();
-      }
+      _updateCallback?.call();
       mealLogs = await service.getMealLogs(logDate: dateString);
 
       // Tính tổng calories từ các MealLog
@@ -59,11 +83,7 @@ class MealLogComponentModel extends FlutterFlowModel {
       foodCalories = 0;
     } finally {
       isLoading = false;
-      if (_updateCallback != null) {
-        _updateCallback!();
-      } else {
-        debugPrint("Lỗi: _updateCallback là null");
-      }
+      _updateCallback?.call();
     }
   }
 
@@ -75,7 +95,6 @@ class MealLogComponentModel extends FlutterFlowModel {
     required int quantity,
   }) async {
     try {
-      // Format ngày để gửi lên API
       final dateString = DateFormat('yyyy-MM-dd').format(selectedDate);
       final service = MeallogService();
 
@@ -112,7 +131,6 @@ class MealLogComponentModel extends FlutterFlowModel {
 
       if (success) {
         debugPrint('Chuyển bữa thành công');
-        // Gọi lại fetchMealLogs để cập nhật giao diện
         await fetchMealLogs();
       } else {
         debugPrint('Chuyển bữa thất bại');
@@ -149,7 +167,6 @@ class MealLogComponentModel extends FlutterFlowModel {
     selectedDate = newDate;
     mealLogs = [];
     foodCalories = 0;
-
     fetchMealLogs();
   }
 
