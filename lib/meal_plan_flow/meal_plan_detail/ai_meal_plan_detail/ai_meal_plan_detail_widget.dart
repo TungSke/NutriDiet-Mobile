@@ -293,8 +293,9 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
                         child: ListView.builder(
                           itemCount: _model.getMealsForDay(selectedDay).length,
                           itemBuilder: (context, index) {
-                            final meal = _model.getMealsForDay(selectedDay)[index];
-                            return _buildMealCard(meal);
+                            final mealType = _model.getMealsForDay(selectedDay).keys.elementAt(index);
+                            final meals = _model.getMealsForDay(selectedDay)[mealType]!;
+                            return _buildMealCard(mealType, meals);
                           },
                         ),
                       ),
@@ -379,7 +380,7 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
             const SizedBox(height: 8),
             _buildInfoText("Mục tiêu sức khỏe", mealPlan.healthGoal ?? "Không xác định"),
             _buildInfoText("Số ngày thực đơn", "${_model.getTotalDays()} ngày"),
-            _buildInfoText("Tạo bởi", "AI"),
+            _buildInfoText("Tạo bởi", mealPlan.createdBy! ?? " "),
           ],
         ),
       ),
@@ -447,23 +448,33 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
     );
   }
 
-  Widget _buildMealCard(MealPlanDetail meal) {
+  Widget _buildMealCard(String mealType, List<MealPlanDetail> meals) {
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        title: Text(
-          meal.mealType ?? "Không xác định",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              mealType,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            ...meals.map((meal) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2.0),
+              child: Text(
+                meal.foodName ?? "Chưa có món ăn",
+                style: const TextStyle(fontSize: 14),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            )).toList(),
+          ],
         ),
-        subtitle: Text(
-          meal.foodName ?? "Chưa có món ăn",
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        onTap: () {},
       ),
     );
   }

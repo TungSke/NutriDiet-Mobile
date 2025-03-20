@@ -100,8 +100,9 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                         child: ListView.builder(
                           itemCount: _model.getMealsForDay(selectedDay).length,
                           itemBuilder: (context, index) {
-                            final meal = _model.getMealsForDay(selectedDay)[index];
-                            return _buildMealCard(meal);
+                            final mealType = _model.getMealsForDay(selectedDay).keys.elementAt(index);
+                            final meals = _model.getMealsForDay(selectedDay)[mealType]!;
+                            return _buildMealCard(mealType, meals);
                           },
                         ),
                       ),
@@ -286,29 +287,54 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     );
   }
 
-  Widget _buildMealCard(MealPlanDetail meal) {
+  Widget _buildMealCard(String mealType, List<MealPlanDetail> meals) {
+    // Nối các tên món ăn bằng dấu phẩy
+    final foodNames = meals.map((meal) => meal.foodName ?? "Chưa có món ăn").join(", ");
+
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        title: Text(
-          meal.mealType ?? "Không xác định",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    mealType,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    foodNames,
+                    style: const TextStyle(fontSize: 14),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            if (widget.source == MealPlanSource.myMealPlan)
+              GestureDetector(
+                onTap: () {
+
+                },
+                child: CircleAvatar(
+                  backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
+                  child: Icon(
+                    Icons.more_horiz,
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                ),
+              ),
+          ],
         ),
-        subtitle: Text(
-          meal.foodName ?? "Chưa có món ăn",
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: widget.source == MealPlanSource.myMealPlan
-            ? CircleAvatar(
-          backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
-          child: Icon(Icons.add, color: FlutterFlowTheme.of(context).primary),
-        )
-            : null,
-        onTap: () {},
       ),
     );
   }

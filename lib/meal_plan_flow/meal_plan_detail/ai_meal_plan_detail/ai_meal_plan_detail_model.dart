@@ -169,12 +169,13 @@ class AIMealPlanDetailModel extends ChangeNotifier {
         };
       }
     }
-    for (var meal in meals) {
-      print("Meal: ${meal.mealType}, foodName: ${meal.foodName}, calories: ${meal.totalCalories}");
-      calories += meal.totalCalories ?? 0;
-      carbs += meal.totalCarbs ?? 0;
-      fat += meal.totalFat ?? 0;
-      protein += meal.totalProtein ?? 0;
+    for (var mealList in meals.values) {
+      for (var meal in mealList) {
+        calories += meal.totalCalories ?? 0;
+        carbs += meal.totalCarbs ?? 0;
+        fat += meal.totalFat ?? 0;
+        protein += meal.totalProtein ?? 0;
+      }
     }
     return {
       "calories": calories,
@@ -184,10 +185,20 @@ class AIMealPlanDetailModel extends ChangeNotifier {
     };
   }
 
-  List<MealPlanDetail> getMealsForDay(int dayNumber) {
-    if (mealPlan == null) return [];
+  Map<String, List<MealPlanDetail>> getMealsForDay(int dayNumber) {
+    if (mealPlan == null) return {};
     final meals = mealPlan!.mealPlanDetails.where((detail) => detail.dayNumber == dayNumber).toList();
-    return meals;
+
+    // group food have the same mealtype
+    Map<String, List<MealPlanDetail>> groupMeals = {};
+    for(var meal in meals){
+      final mealType = meal.mealType ?? "không xác định";
+      if(!groupMeals.containsKey(mealType)){
+        groupMeals[mealType] = [];
+      }
+      groupMeals[mealType]!.add(meal);
+    }
+    return groupMeals;
   }
 
   int getTotalDays() {

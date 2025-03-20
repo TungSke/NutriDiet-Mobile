@@ -99,9 +99,19 @@ class MealPlanDetailModel extends ChangeNotifier {
   }
 
   // Lấy danh sách bữa ăn theo ngày (giữ nguyên)
-  List<MealPlanDetail> getMealsForDay(int dayNumber) {
-    if (mealPlan == null) return [];
-    return mealPlan!.mealPlanDetails.where((detail) => detail.dayNumber == dayNumber).toList();
+  Map<String, List<MealPlanDetail>> getMealsForDay(int dayNumber) {
+    if (mealPlan == null) return {};
+
+    var meals = mealPlan!.mealPlanDetails.where((detail) => detail.dayNumber == dayNumber).toList();
+    Map<String, List<MealPlanDetail>> groupMeals = {};
+    for(var meal in meals){
+      final mealType = meal.mealType ?? "không xác định";
+      if(!groupMeals.containsKey(mealType)){
+        groupMeals[mealType] = [];
+      }
+      groupMeals[mealType]!.add(meal);
+    }
+    return groupMeals;
   }
 
   // Lấy số ngày tối đa từ totalByDayNumber
