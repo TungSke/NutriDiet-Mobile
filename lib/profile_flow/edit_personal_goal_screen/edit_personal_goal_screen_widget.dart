@@ -309,6 +309,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../flutter_flow/flutter_flow_theme.dart';
 import 'edit_personal_goal_screen_model.dart';
 
 class EditPersonalGoalScreenWidget extends StatefulWidget {
@@ -331,9 +332,10 @@ class _EditPersonalGoalScreenWidgetState
     _model = EditPersonalGoalScreenModel();
 
     Future.delayed(Duration.zero, () async {
+      await _model.fetchUserProfile();
       await _model.fetchPersonalGoal();
       await _model.fetchHealthProfile();
-      await _model.fetchUserProfile();
+
       setState(() {}); // 🚀 Cập nhật UI ngay sau khi fetch dữ liệu
     });
   }
@@ -346,7 +348,46 @@ class _EditPersonalGoalScreenWidgetState
         child: Column(
           children: [
             _buildHeader(),
-            _buildProfilePhoto(),
+            Container(
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).secondaryBackground,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(0.0),
+                child: _model.avatar.isNotEmpty
+                    ? Image.network(
+                        // Nếu có avatar từ API, sử dụng Image.network
+                        _model.avatar,
+                        width: 80.0,
+                        height: 80.0,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset(
+                        // Nếu không có avatar, sử dụng hình mặc định
+                        'assets/images/dummy_profile.png',
+                        width: 80.0,
+                        height: 80.0,
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Column(
+                  children: [
+                    Text(_model.name,
+                        style: GoogleFonts.roboto(
+                            fontSize: 18, fontWeight: FontWeight.w600)),
+                    Text(
+                        "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
+                        style: GoogleFonts.roboto(
+                            fontSize: 12, color: Colors.grey)),
+                  ],
+                ),
+              ),
+            ),
             _model.isLoading ? _buildLoadingIndicator() : _buildProfileForm(),
           ],
         ),
@@ -399,46 +440,6 @@ class _EditPersonalGoalScreenWidgetState
     );
   }
 
-  Widget _buildProfilePhoto() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.only(top: 30),
-            decoration: BoxDecoration(),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(0.0),
-              child: Image.asset(
-                'assets/images/jamekooper_.png',
-                width: 80.0,
-                height: 80.0,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 150,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Column(
-                children: [
-                  Text(_model.name,
-                      style: GoogleFonts.roboto(
-                          fontSize: 18, fontWeight: FontWeight.w600)),
-                  Text(
-                      "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
-                      style:
-                          GoogleFonts.roboto(fontSize: 12, color: Colors.grey)),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildLoadingIndicator() {
     return Expanded(child: Center(child: CircularProgressIndicator()));
   }
@@ -470,7 +471,7 @@ class _EditPersonalGoalScreenWidgetState
               });
             }),
             _buildPickerRow(
-              'Mức độ thay đổi cân nặng',
+              'Mức độ thay đổi',
               _model.weightChangeRate,
               [
                 'Giữ cân',
