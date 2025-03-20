@@ -224,7 +224,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   }
 
   Widget _buildMealPlanItem(MealPlan mealPlan) {
-    debugPrint("Đang hiển thị meal plan: ${mealPlan.planName}, status: ${mealPlan.status}");
     bool isActive = mealPlan.status == 'Active';
     return Card(
       elevation: 2,
@@ -386,7 +385,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                   borderSide: BorderSide(color: Colors.white),
                 ),
               ),
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.black),
               onChanged: (value) => planName = value,
             ),
             DropdownButtonFormField<String>(
@@ -395,7 +394,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                 labelStyle: TextStyle(color: Colors.white),
               ),
               dropdownColor: FlutterFlowTheme.of(context).primary,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.black),
               items: ['Giảm cân', 'Tăng cân', 'Duy trì cân nặng']
                   .map((goal) => DropdownMenuItem(value: goal, child: Text(goal)))
                   .toList(),
