@@ -11,8 +11,10 @@ class ProfileEnterModel {
   final TextEditingController locationController = TextEditingController();
   DateTime? birthDate;
   String gender = "Male";
+  String avatar = "";
   final FocusNode fullNameFocusNode = FocusNode();
   final FocusNode locationFocusNode = FocusNode();
+
   Future<void> updateUserProfile(BuildContext context) async {
     if (fullNameController.text.isEmpty || birthDate == null) {
       _showErrorDialog(context, "Vui lòng nhập đầy đủ thông tin cá nhân.");
@@ -29,16 +31,21 @@ class ProfileEnterModel {
         age: age,
         gender: gender,
         location: location,
+        avatar: avatar,
       );
 
+      // Kiểm tra lại mã trạng thái phản hồi để đảm bảo cập nhật thành công
       if (response.statusCode == 200) {
+        print('✅ Cập nhật thành công!'); // Thêm thông báo debug
         context.push("/hightEnterScreen");
       } else {
+        print('❌ Cập nhật không thành công. Mã lỗi: ${response.statusCode}');
         _showErrorDialog(
             context, "Cập nhật thông tin thất bại, vui lòng thử lại.");
       }
     } catch (e) {
-      _showErrorDialog(context, "Đã xảy ra lỗi: \$e");
+      print('❌ Đã xảy ra lỗi: $e'); // Thêm thông báo debug
+      _showErrorDialog(context, "Đã xảy ra lỗi: $e");
     }
   }
 

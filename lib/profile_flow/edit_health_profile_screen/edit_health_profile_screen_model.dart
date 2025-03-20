@@ -200,7 +200,7 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
   String phoneNumber = '';
   String location = '';
   String email = '';
-
+  String avatar = '';
   double height = 0.0; // Chiều cao, đổi sang double
   double weight = 0.0; // Cân nặng, đổi sang double
   String activityLevel = ''; // Mức độ vận động
@@ -240,7 +240,7 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
         location = data['address'] ?? "Chưa cập nhật";
         email = data["email"] ?? "Chưa cập nhật";
         userId = data['id']?.toString() ?? "";
-
+        avatar = data['avatar'];
         isLoading = false; // Đặt trạng thái không còn loading
         notifyListeners();
       }

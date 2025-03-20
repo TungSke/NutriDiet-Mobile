@@ -51,6 +51,8 @@ class _HealthIndicatorScreenWidgetState
     );
   }
 
+  // Create a mapping for bmiType to a description
+
   Widget buildContent() {
     if (healthData == null || healthData!['healthcareIndicators'] == null) {
       return const Center(child: Text("Không có dữ liệu."));
@@ -58,12 +60,14 @@ class _HealthIndicatorScreenWidgetState
 
     String bmi = "N/A";
     String tdee = "N/A";
+    String bmiType = "N/A";
 
     for (var indicator in healthData!['healthcareIndicators']) {
       if (indicator['code'] == 'BMI') {
         bmi = double.parse(indicator['currentValue']).toStringAsFixed(1);
+        bmiType = indicator['type'];
       } else if (indicator['code'] == 'TDEE') {
-        tdee = indicator['currentValue'].toString();
+        tdee = double.parse(indicator['currentValue']).toStringAsFixed(1);
       }
     }
 
@@ -79,9 +83,26 @@ class _HealthIndicatorScreenWidgetState
                 style: GoogleFonts.roboto(
                     fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Tình trạng:  ",
+                    style: GoogleFonts.roboto(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    )),
+                Text(bmiType,
+                    style: GoogleFonts.roboto(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: FlutterFlowTheme.of(context).primary)),
+              ],
+            ),
+
+            const SizedBox(height: 10),
             _buildIndicator("BMI", bmi, "Chỉ số BMI của bạn"),
             _buildIndicator("TDEE", tdee, "Tổng năng lượng tiêu hao mỗi ngày"),
-            const SizedBox(height: 20.0),
+
             const SizedBox(height: 20),
             // Text("Mục tiêu: ${personalGoal?['goalType'] ?? "N/A"}",
             //     style: GoogleFonts.roboto(
@@ -90,6 +111,7 @@ class _HealthIndicatorScreenWidgetState
                 "Cân nặng mục tiêu",
                 personalGoal?['targetWeight'].toString() ?? "N/A",
                 "Mục tiêu cân nặng"),
+
             _buildIndicator(
                 "Calo hàng ngày",
                 personalGoal?['dailyCalories'].toString() ?? "N/A",

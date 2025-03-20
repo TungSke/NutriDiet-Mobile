@@ -27,6 +27,7 @@ class EditProfileScreenModel extends ChangeNotifier {
 
   // User profile fields
   String name = '';
+  String avatar = '';
   String gender = '';
   String age = '';
   String location = ''; // ✅ Correct field for updating
@@ -52,7 +53,7 @@ class EditProfileScreenModel extends ChangeNotifier {
         age = userData['age']?.toString() ?? "0";
         address = userData['address'] ?? "Chưa cập nhật"; // ✅ Uses 'address'
         location = address; // ✅ Sync 'location' with 'address'
-
+        avatar = avatar;
         isLoading = false;
         notifyListeners();
       }
@@ -75,6 +76,7 @@ class EditProfileScreenModel extends ChangeNotifier {
         fullName: name,
         age: int.tryParse(age) ?? 0,
         gender: genderInEnglish,
+        avatar: avatar,
         location: updatedLocation, // ✅ Uses 'location' for update
       );
 

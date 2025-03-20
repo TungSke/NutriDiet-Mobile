@@ -6,6 +6,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class UserService {
   final ApiService _apiService = ApiService();
@@ -90,34 +91,92 @@ class UserService {
     return response;
   }
 
+  // Future<http.Response> updateUser({
+  //   required String fullName,
+  //   required int age,
+  //   required String gender,
+  //   required String location,
+  // }) async {
+  //   final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+  //   final String? token = await flutterSecureStorage.read(key: 'accessToken');
+  //
+  //   if (token == null || token.isEmpty) {
+  //     throw Exception("Access token not found.");
+  //   }
+  //
+  //   final Map<String, dynamic> body = {
+  //     "fullName": fullName,
+  //     "age": age,
+  //     "gender": gender,
+  //     "location": location,
+  //   };
+  //   print("Request body: ${jsonEncode(body)}");
+  //
+  //   final response = await _apiService.put(
+  //     "/api/user",
+  //     token: token,
+  //     body: body,
+  //   );
+  //
+  //   return response;
+  // }
   Future<http.Response> updateUser({
     required String fullName,
     required int age,
     required String gender,
     required String location,
+    required String avatar, // Sửa: avatar giờ sẽ là đường dẫn file
   }) async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
     if (token == null || token.isEmpty) {
-      throw Exception("Access token not found.");
+      throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
     }
 
-    final Map<String, dynamic> body = {
-      "fullName": fullName,
-      "age": age,
-      "gender": gender,
-      "location": location,
-    };
-    print("Request body: ${jsonEncode(body)}");
+    try {
+      var request = http.MultipartRequest(
+        'PUT',
+        Uri.parse("${_apiService.baseUrl}/api/user"),
+      );
 
-    final response = await _apiService.put(
-      "/api/user",
-      token: token,
-      body: body,
-    );
+      request.headers['Authorization'] = 'Bearer $token';
 
-    return response;
+      // ✅ Thêm các dữ liệu vào Form-Data
+      request.fields['FullName'] = fullName;
+      request.fields['Age'] = age.toString();
+      request.fields['Gender'] = gender;
+      request.fields['Location'] = location;
+
+      // ✅ Nếu có avatar, gửi nó dưới dạng file
+      if (avatar.isNotEmpty) {
+        var avatarFile = await http.MultipartFile.fromPath(
+          'Avatar',
+          avatar, // Đây là đường dẫn đến file
+          contentType: MediaType('image',
+              'png'), // Nếu là ảnh PNG, bạn có thể thay đổi theo loại ảnh bạn có
+        );
+        request.files.add(avatarFile); // Thêm avatar vào request
+      }
+
+      print("🔹 Sending update user request: ${jsonEncode(request.fields)}");
+
+      final response = await request.send();
+      final httpResponse = await http.Response.fromStream(response);
+
+      print("🔹 Response status: ${httpResponse.statusCode}");
+      print("🔹 Response body: ${httpResponse.body}");
+
+      if (httpResponse.statusCode == 200 || httpResponse.statusCode == 204) {
+        return httpResponse;
+      } else {
+        throw Exception(
+            "Cập nhật mục tiêu cá nhân thất bại: ${httpResponse.body}");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi cập nhật người dùng: $e");
+      throw Exception("Không thể cập nhật người dùng.");
+    }
   }
 
   Future<http.Response> getHealthProfileReport() async {
@@ -568,6 +627,101 @@ class UserService {
     } catch (e) {
       print('Lỗi kết nối API: $e');
       throw Exception("Không thể kết nối đến server.");
+    }
+  }
+
+  Future<http.Response> updateDailyMacronutrients({
+    required int dailyCarb,
+    required int dailyFat,
+    required int dailyProtein,
+    required BuildContext context, // Thêm context vào tham số
+  }) async {
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      print("❌ Access token không hợp lệ, vui lòng đăng nhập lại.");
+      // Hiển thị snackbar khi token không hợp lệ, và không cần ném lỗi nữa
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Access token không hợp lệ, vui lòng đăng nhập lại."),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return http.Response('', 400); // Trả về HTTP response lỗi
+    }
+
+    try {
+      var request = http.MultipartRequest(
+        'PUT', // Sử dụng PUT để cập nhật
+        Uri.parse(
+            "${_apiService.baseUrl}/api/personal-goal/daily-macronutrients"),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Thêm dữ liệu vào Form-Data
+      request.fields['DailyCarb'] = dailyCarb.toString();
+      request.fields['DailyFat'] =
+          dailyFat.toString(); // Chuyển double thành String
+      request.fields['DailyProtein'] = dailyProtein.toString();
+
+      print(
+          "🔹 Sending updateDailyMacronutrients request: ${jsonEncode(request.fields)}");
+
+      final response = await request.send();
+      final httpResponse = await http.Response.fromStream(response);
+
+      print("🔹 Response status: ${httpResponse.statusCode}");
+      print("🔹 Response body: ${httpResponse.body}");
+
+      // Kiểm tra trạng thái mã phản hồi
+      if (httpResponse.statusCode == 200 || httpResponse.statusCode == 204) {
+        // Hiển thị SnackBar thông báo thành công
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text("Cập nhật thành công!"), // Hiển thị thông báo thành công
+            backgroundColor: Colors.green, // Màu xanh cho thành công
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return httpResponse;
+      } else {
+        // Xử lý lỗi khi mã lỗi không phải là 200 hoặc 204
+        final responseBody = jsonDecode(httpResponse.body);
+        String errorMessage = responseBody["message"] ?? "Cập nhật thất bại.";
+        print("❌ Lỗi khi cập nhật mục tiêu cá nhân: $errorMessage");
+
+        // Hiển thị Snackbar với thông báo lỗi từ API
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              errorMessage,
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red, // Hiển thị thông báo lỗi từ API
+            duration: Duration(seconds: 3),
+          ),
+        );
+
+        return httpResponse; // Trả về HTTP response lỗi mà không cần ném lỗi
+      }
+    } catch (e) {
+      // In ra lỗi chi tiết nếu có
+      print("❌ Lỗi khi cập nhật dinh dưỡng: $e");
+
+      // Chỉ hiển thị thông báo lỗi mặc định nếu không có lỗi từ API
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "Đã xảy ra lỗi, vui lòng thử lại."), // Thông báo lỗi mặc định
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      return http.Response(
+          "Không thể cập nhật dinh dưỡng", 500); // Trả về HTTP response lỗi
     }
   }
 }

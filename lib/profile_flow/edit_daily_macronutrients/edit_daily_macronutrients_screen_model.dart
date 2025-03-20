@@ -195,95 +195,25 @@ import 'package:flutter/material.dart';
 
 import '../../services/user_service.dart';
 
-class EditPersonalGoalScreenModel extends ChangeNotifier {
+class EditDailyMacronutrientsScreenModel extends ChangeNotifier {
+  int dailyCalories = 0;
+  int dailyCarb = 0;
+  int dailyFat = 0;
+  int dailyProtein = 0;
+  int height = 0;
   final _userService = UserService();
   String name = '';
+  String avatar = '';
   String age = '';
   String phoneNumber = '';
   String location = '';
   String email = '';
-
-  int height = 0; // Chiều cao
-  double weight = 0.0; // Cân nặng (sử dụng double)
-  String activityLevel = ''; // Mức độ vận động
-
   bool isLoading = true;
-
   String userId = '';
-
   String errorMessage = "";
-
-  final Map<String, int> _weightChangeRateMap = {
-    'Giữ cân': 0,
-    'Tăng 0.25kg/1 tuần': 250,
-    'Tăng 0.5kg/1 tuần': 500,
-    'Giảm 0.25Kg/1 tuần': -250,
-    'Giảm 0.5Kg/1 tuần': -500,
-    'Giảm 0.75Kg/1 tuần': -750,
-    'Giảm 1Kg/1 tuần': -1000,
-  };
-
-  // Mảng ánh xạ giá trị số về giá trị mô tả
-  final Map<int, String> _reverseWeightChangeRateMap = {
-    0: 'Giữ cân',
-    250: 'Tăng 0.25kg/1 tuần',
-    500: 'Tăng 0.5kg/1 tuần',
-    -250: 'Giảm 0.25Kg/1 tuần',
-    -500: 'Giảm 0.5Kg/1 tuần',
-    -750: 'Giảm 0.75Kg/1 tuần',
-    -1000: 'Giảm 1Kg/1 tuần',
-  };
-
-  // Mảng ánh xạ goalType từ tiếng Anh sang tiếng Việt
-  final Map<String, String> _goalTypeMap = {
-    'LoseWeight': 'Giảm cân',
-    'Maintain': 'Giữ cân',
-    'GainWeight': 'Tăng cân',
-  };
-
-  // Mảng ánh xạ từ tiếng Việt sang tiếng Anh
-  final Map<String, String> _reverseGoalTypeMap = {
-    'Giảm cân': 'LoseWeight',
-    'Giữ cân': 'Maintain',
-    'Tăng cân': 'GainWeight',
-  };
-  int dailyCalories = 0;
-  int dailyCarb = 0;
-  String avatar = '';
-  int dailyFat = 0;
-  int dailyProtein = 0;
-  String goalType = ''; // Mục tiêu
-  double targetWeight = 0.0; // Cân nặng mục tiêu (thay đổi kiểu thành double)
-  String weightChangeRate = ''; // Mức độ thay đổi cân nặng
-
+  double weight = 0.0;
   double currentWeight =
       0.0; // Biến lưu trữ cân nặng hiện tại (thay đổi kiểu thành double)
-
-  // Lấy dữ liệu mục tiêu cá nhân từ API
-
-  Future<void> fetchUserProfile() async {
-    try {
-      final response = await _userService.whoAmI();
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        name = data['name'] ?? "Chưa cập nhật";
-        age = data['age']?.toString() ?? "0";
-        phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
-        location = data['address'] ?? "Chưa cập nhật";
-        email = data["email"] ?? "Chưa cập nhật";
-        userId = data['id']?.toString() ?? "";
-        avatar = data["avatar"];
-        isLoading = false; // Đặt trạng thái không còn loading
-        notifyListeners();
-      }
-    } catch (e) {
-      print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
-      isLoading = false;
-      notifyListeners();
-    }
-  }
-
   Future<void> fetchHealthProfile() async {
     try {
       final response = await UserService().getHealthProfile();
@@ -328,17 +258,11 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
       final response = await UserService().getPersonalGoal();
       if (response.statusCode == 200) {
         final personalData = jsonDecode(response.body);
-        goalType =
-            _goalTypeMap[personalData['data']['goalType']] ?? "Chưa cập nhật";
-        targetWeight = personalData['data']['targetWeight'] ??
-            0; // Đảm bảo targetWeight là double
+
         dailyCalories = personalData['data']['dailyCalories'] ?? 0;
         dailyCarb = personalData['data']['dailyCarb'] ?? 0;
         dailyFat = personalData['data']['dailyFat'] ?? 0;
         dailyProtein = personalData['data']['dailyProtein'] ?? 0;
-        weightChangeRate = _reverseWeightChangeRateMap[personalData['data']
-                ['weightChangeRate']] ??
-            "Chưa cập nhật";
 
         isLoading = false;
         notifyListeners();
@@ -348,23 +272,37 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updatePersonalGoal(BuildContext context) async {
+  Future<void> fetchUserProfile() async {
+    try {
+      final response = await _userService.whoAmI();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        name = data['name'] ?? "Chưa cập nhật";
+        age = data['age']?.toString() ?? "0";
+        phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
+        location = data['address'] ?? "Chưa cập nhật";
+        email = data["email"] ?? "Chưa cập nhật";
+        userId = data['id']?.toString() ?? "";
+        avatar = data['avatar'];
+        isLoading = false; // Đặt trạng thái không còn loading
+        notifyListeners();
+      }
+    } catch (e) {
+      print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateDailyMacronutrients(BuildContext context) async {
     try {
       // Khi chọn mục tiêu "Giữ cân", sử dụng cân nặng hiện tại
-      if (goalType == 'Giữ cân') {
-        targetWeight = currentWeight; // Gửi cân nặng hiện tại
-        weightChangeRate = 'Giữ cân';
-      }
 
-      final weightChangeRateNumber =
-          _weightChangeRateMap[weightChangeRate] ?? 0;
-      final goalTypeInEnglish = _reverseGoalTypeMap[goalType] ?? 'LoseWeight';
-
-      final response = await UserService().updatePersonalGoal(
-        goalType: goalTypeInEnglish,
-        targetWeight: targetWeight, // Sử dụng targetWeight kiểu double
-        weightChangeRate: weightChangeRateNumber.toString(),
-
+      final response = await UserService().updateDailyMacronutrients(
+        dailyCarb: dailyCarb,
+        dailyFat: dailyFat,
+        dailyProtein: dailyProtein,
         context: context,
       );
 
