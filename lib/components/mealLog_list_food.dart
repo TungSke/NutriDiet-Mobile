@@ -39,11 +39,12 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
     print("Fetching foods with search query: $query");
   }
 
+  /// Thêm món ăn vào MealLog trực tiếp (khi bấm icon `+`)
   void _addToMealLog(Food food) {
-    // Hiển thị dialog nhập số lượng
     _showQuantityDialog(food);
   }
 
+  /// Hiển thị dialog cho phép nhập số lượng
   void _showQuantityDialog(Food food) {
     final TextEditingController _quantityController =
         TextEditingController(text: "1");
@@ -71,13 +72,14 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context), // đóng dialog
             child: const Text("Hủy"),
           ),
           ElevatedButton(
             onPressed: () async {
               // Lấy số lượng nhập vào, mặc định là 1 nếu không parse được
               final int quantity = int.tryParse(_quantityController.text) ?? 1;
+
               // Gọi API createMealLog
               final bool success = await _meallogService.createMealLog(
                 logDate: widget.selectedDate.toIso8601String(),
@@ -86,7 +88,9 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                 foodId: food.foodId,
                 quantity: quantity,
               );
+
               Navigator.pop(context); // Đóng dialog
+
               if (success) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -95,7 +99,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                     ),
                   ),
                 );
-                // Đẩy về MealLogComponentWidget với kết quả true
+                // Pop màn hình SearchFood, trả về true để MealLogScreen refresh
                 Navigator.pop(context, true);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -110,6 +114,24 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
         ],
       ),
     );
+  }
+
+  /// Mở màn hình chi tiết Food (MealLogFoodDetailWidget)
+  /// Nếu ở màn hình chi tiết user thêm món thành công => trả về true
+  /// => Ta cũng pop màn hình search này về MealLogScreen.
+  Future<void> _openFoodDetail(Food food) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MealLogFoodDetailWidget(
+          foodId: food.foodId,
+        ),
+      ),
+    );
+    if (result == true) {
+      // Màn hình FoodDetail báo thành công => pop SearchFood
+      Navigator.pop(context, true);
+    }
   }
 
   @override
@@ -144,7 +166,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
               ),
             ),
           ),
-          // Hiển thị danh sách món ăn sử dụng FutureBuilder
+          // Hiển thị danh sách món ăn
           Expanded(
             child: FutureBuilder<List<Food>>(
               future: _foodFuture,
@@ -174,21 +196,16 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                         ),
                         title: Text(food.foodName),
                         subtitle: Text(
-                          '${food.calories?.toStringAsFixed(0) ?? "0"} cal • ${food.servingSize ?? "1 serving"}',
+                          '${food.calories?.toStringAsFixed(0) ?? "0"} cal • '
+                          '${food.servingSize ?? "1 serving"}',
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () => _addToMealLog(food),
                         ),
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MealLogFoodDetailWidget(
-                                foodId: food.foodId,
-                              ),
-                            ),
-                          );
+                          // Mở màn hình chi tiết
+                          _openFoodDetail(food);
                         },
                       );
                     },

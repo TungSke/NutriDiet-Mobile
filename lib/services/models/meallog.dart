@@ -5,6 +5,7 @@ class MealLog {
   final int totalProtein;
   final int totalCarbs;
   final int totalFat;
+  final int dailyCalories;
   final List<MealLogDetail> mealLogDetails;
 
   MealLog({
@@ -14,6 +15,7 @@ class MealLog {
     required this.totalProtein,
     required this.totalCarbs,
     required this.totalFat,
+    required this.dailyCalories,
     required this.mealLogDetails,
   });
 
@@ -25,6 +27,7 @@ class MealLog {
       totalProtein: json['totalProtein'] ?? 0,
       totalCarbs: json['totalCarbs'] ?? 0,
       totalFat: json['totalFat'] ?? 0,
+      dailyCalories: json['dailyCalories'] ?? 0,
       mealLogDetails: (json['mealLogDetails'] as List<dynamic>? ?? [])
           .map((e) => MealLogDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
