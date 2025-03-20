@@ -46,8 +46,14 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
       return;
     }
     try {
-      String? fcmToken = await FirebaseMessaging.instance.getToken(); // Chờ giá trị trả về
-      fcmToken ??= ""; // Nếu null, gán chuỗi rỗng
+      String? fcmToken = "";
+
+      // Kiểm tra quyền thông báo trước khi lấy token
+      NotificationSettings settings = await FirebaseMessaging.instance.requestPermission();
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        fcmToken = await FirebaseMessaging.instance.getToken();
+      }
 
       final response = await _userService.login(
           textController1!.text, textController2!.text, fcmToken);
@@ -122,7 +128,14 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
   Future<void> loginGoogle(BuildContext context) async {
     try{
-      String? fcmToken = await FirebaseMessaging.instance.getToken();
+      String? fcmToken = "";
+
+      // Kiểm tra quyền thông báo trước khi lấy token
+      NotificationSettings settings = await FirebaseMessaging.instance.requestPermission();
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        fcmToken = await FirebaseMessaging.instance.getToken();
+      }
       final response = await _userService.loginWithGoogle(fcmToken);
 
       if (response.statusCode == 200) {
@@ -181,7 +194,14 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
   Future<void> loginFaceBook(BuildContext context) async {
     try {
-      String? fcmToken = await FirebaseMessaging.instance.getToken();
+      String? fcmToken = "";
+
+      // Kiểm tra quyền thông báo trước khi lấy token
+      NotificationSettings settings = await FirebaseMessaging.instance.requestPermission();
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        fcmToken = await FirebaseMessaging.instance.getToken();
+      }
       final response = await _userService.loginWithFacebook(fcmToken);
 
       if (response.statusCode == 200) {
