@@ -124,4 +124,28 @@ class ApiService {
           'Failed to load data: ${response.statusCode}, ${response.body}');
     }
   }
+
+  Future<http.Response> postMultipartWithList(
+    String endpoint, {
+    required List<MapEntry<String, String>> fields,
+    String? token,
+  }) async {
+    final uri = Uri.parse('$baseUrl/$endpoint');
+    var request = http.MultipartRequest('POST', uri);
+
+    // Thêm header Authorization
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+
+    // Ở đây, mỗi key (kể cả 'Dates[0]', 'Dates[1]', ...) sẽ được thêm vào request.fields
+    // do request.fields là 1 Map, nếu có key trùng thì sẽ bị overwrite;
+    // NHƯNG ta đã xử lý ở trên, mỗi ngày là 1 key riêng biệt => không bị ghi đè.
+    for (final entry in fields) {
+      request.fields[entry.key] = entry.value;
+    }
+
+    final streamedResponse = await request.send();
+    return http.Response.fromStream(streamedResponse);
+  }
 }

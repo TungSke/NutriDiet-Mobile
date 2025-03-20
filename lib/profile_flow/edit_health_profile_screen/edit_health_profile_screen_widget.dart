@@ -485,12 +485,15 @@
 //     return List.generate(91, (index) => '${10 + index}');
 //   }
 // }
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 
+import '../../flutter_flow/flutter_flow_theme.dart';
 import 'edit_health_profile_screen_model.dart';
 
 class EditHealthProfileScreenWidget extends StatefulWidget {
@@ -516,8 +519,9 @@ class _EditHealthProfileScreenWidgetState
     print('Selected Allergies at init: ${_model.selectedAllergyIds}');
 
     Future.delayed(Duration.zero, () async {
-      await _model.fetchHealthProfile();
       await _model.fetchUserProfile();
+      await _model.fetchHealthProfile();
+
       await _model.fetchAllergyLevelsData();
       await _model.fetchDiseaseLevelsData();
       // Debugging: Kiểm tra giá trị sau khi fetch dữ liệu
@@ -534,7 +538,46 @@ class _EditHealthProfileScreenWidgetState
         child: Column(
           children: [
             _buildHeader(),
-            _buildProfilePhoto(),
+            Container(
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).secondaryBackground,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(0.0),
+                child: _model.avatar.isNotEmpty
+                    ? Image.network(
+                        // Nếu có avatar từ API, sử dụng Image.network
+                        _model.avatar,
+                        width: 80.0,
+                        height: 80.0,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset(
+                        // Nếu không có avatar, sử dụng hình mặc định
+                        'assets/images/dummy_profile.png',
+                        width: 80.0,
+                        height: 80.0,
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Column(
+                  children: [
+                    Text(_model.name,
+                        style: GoogleFonts.roboto(
+                            fontSize: 18, fontWeight: FontWeight.w600)),
+                    Text(
+                        "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
+                        style: GoogleFonts.roboto(
+                            fontSize: 12, color: Colors.grey)),
+                  ],
+                ),
+              ),
+            ),
             _model.isLoading ? _buildLoadingIndicator() : _buildProfileForm(),
           ],
         ),
@@ -594,37 +637,17 @@ class _EditHealthProfileScreenWidgetState
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            padding: EdgeInsets.only(top: 30),
-            decoration: BoxDecoration(),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(0.0),
-              child: Image.asset(
-                'assets/images/jamekooper_.png',
-                width: 80.0,
-                height: 80.0,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 150,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Column(
-                children: [
-                  Text(_model.name,
-                      style: GoogleFonts.roboto(
-                          fontSize: 18, fontWeight: FontWeight.w600)),
-                  Text(
-                      "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
-                      style:
-                          GoogleFonts.roboto(fontSize: 12, color: Colors.grey)),
-                ],
-              ),
-            ),
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.grey[300],
+            backgroundImage: _model.avatar.isNotEmpty
+                ? FileImage(File(
+                    _model.avatar)) // Sử dụng FileImage thay vì NetworkImage
+                : null,
+            child: _model.avatar.isEmpty
+                ? Icon(Icons.person, size: 50, color: Colors.white)
+                : null,
           ),
         ],
       ),

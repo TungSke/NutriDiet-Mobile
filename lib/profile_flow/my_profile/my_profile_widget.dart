@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/profile_flow/edit_daily_macronutrients/edit_daily_macronutrients_screen_widget.dart';
 import 'package:diet_plan_app/profile_flow/edit_health_profile_screen/edit_health_profile_screen_widget.dart';
 import 'package:diet_plan_app/profile_flow/edit_personal_goal_screen/edit_personal_goal_screen_widget.dart';
 import 'package:flutter/material.dart';
@@ -169,7 +170,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                           borderRadius:
                                               BorderRadius.circular(0.0),
                                           child: Image.asset(
-                                            'assets/images/dummy_profile.png',
+                                            'assets/images/dummy_profile.png', // Avatar mặc định
                                             width: 80.0,
                                             height: 80.0,
                                             fit: BoxFit.cover,
@@ -190,16 +191,25 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                             child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(0.0),
-                                              child: Image.asset(
-                                                'assets/images/jamekooper_.png',
-                                                width: 80.0,
-                                                height: 80.0,
-                                                fit: BoxFit.cover,
-                                              ),
+                                              child: _model.avatar.isNotEmpty
+                                                  ? Image.network(
+                                                      // Nếu có avatar từ API, sử dụng Image.network
+                                                      _model.avatar,
+                                                      width: 80.0,
+                                                      height: 80.0,
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Image.asset(
+                                                      // Nếu không có avatar, sử dụng hình mặc định
+                                                      'assets/images/dummy_profile.png',
+                                                      width: 80.0,
+                                                      height: 80.0,
+                                                      fit: BoxFit.cover,
+                                                    ),
                                             ),
                                           ),
                                           SizedBox(
-                                            width: 150,
+                                            width: 200,
                                             child: Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 10),
@@ -619,13 +629,11 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Mục tiêu (gần đây) ',
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
+                                  Text('Mục tiêu (gần đây) ',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
                                   Text(
                                     _model.goalType,
                                     style: GoogleFonts.roboto(
@@ -682,6 +690,142 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                       )),
                                   Text(
                                     "${_model.progressPercentage ?? ''} % ",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ].divide(const SizedBox(height: 4.0)),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          20.0, 0.0, 20.0, 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Dinh dưỡng cần nạp mỗi ngày ",
+                            style: GoogleFonts.roboto(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditDailyMacronutrientsScreenWidget(),
+                                ),
+                              );
+
+                              if (result == true) {
+                                await _model
+                                    .fetchHealthProfile(); // ✅ Fetch lại dữ liệu mới nhất
+                                setState(() {}); // ✅ Cập nhật UI ngay
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                "Cập nhật",
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          20.0, 0.0, 20.0, 16.0),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context).lightGrey,
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Calories',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                  Text(
+                                    "${_model.dailyCalories ?? ''}",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Fat',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                  Text(
+                                    "${_model.dailyFat ?? ''}/100% ",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Protein',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                  Text(
+                                    "${_model.dailyProtein ?? ''}/100% ",
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Carb',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                  Text(
+                                    "${_model.dailyCarb ?? ''}/100%  ",
                                     style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,

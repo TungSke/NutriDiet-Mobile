@@ -156,7 +156,6 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
-  /// Row chọn bữa ăn (Dropdown) – theo kiểu MyFitnessPal (ảnh 1)
   Widget _buildMealRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

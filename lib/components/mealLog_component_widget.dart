@@ -1,4 +1,5 @@
 import 'package:diet_plan_app/components/mealLog_list_food.dart';
+import 'package:diet_plan_app/components/mealLog_nutrition.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -7,6 +8,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/components/mealLog_component_model.dart';
 import '../components/serch_data_widget.dart';
 import '../components/quick_add_widget.dart';
+import '../components/mealLog_nutrition.dart';
 
 class MealLogComponentWidget extends StatefulWidget {
   const MealLogComponentWidget({Key? key}) : super(key: key);
@@ -28,6 +30,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       }
     });
     _model.fetchMealLogs();
+    _model.fetchPersonalGoal();
   }
 
   @override
@@ -36,6 +39,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     super.dispose();
   }
 
+  /// Hàm format ngày hiển thị
   String _getCustomDateString(DateTime date) {
     final now = DateTime.now();
     final difference = DateTime(date.year, date.month, date.day)
@@ -50,121 +54,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     return DateFormat('d MMMM, yyyy', 'vi').format(date);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: () {
-                _model.changeDate(
-                  _model.selectedDate.subtract(const Duration(days: 1)),
-                );
-              },
-            ),
-            GestureDetector(
-              onTap: () => _showDatePicker(context),
-              child: Text(
-                _getCustomDateString(_model.selectedDate),
-                style: const TextStyle(
-                  fontFamily: 'Figtree',
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.chevron_right),
-              onPressed: () {
-                _model.changeDate(
-                  _model.selectedDate.add(const Duration(days: 1)),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-      body: ListView(
-        children: [
-          // Card hiển thị Calories Remaining (Calo còn lại)
-          Card(
-            margin: const EdgeInsets.all(12.0),
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Tiêu đề
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        'Calo còn lại',
-                        style: TextStyle(
-                          fontFamily: 'Figtree',
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Icon(Icons.more_horiz),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Goal - Food - Remaining
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildCalorieColumn(
-                        _model.calorieGoal.toString(),
-                        'Mục tiêu',
-                        FontWeight.bold,
-                      ),
-                      _buildOperator('-'),
-                      _buildCalorieColumn(
-                        _model.foodCalories.toString(),
-                        'Thức ăn',
-                        FontWeight.normal,
-                      ),
-                      _buildOperator('='),
-                      _buildCalorieColumn(
-                        _model.remainingCalories.toString(),
-                        'Còn lại',
-                        FontWeight.bold,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Khoảng trống xám ngăn giữa Card Calo & các bữa
-          Container(
-            height: 8.0,
-            color: Colors.grey[200],
-          ),
-
-          // Hiển thị các bữa, mỗi bữa là 1 Card, xen kẽ khoảng trống xám
-          for (final category in _model.mealCategories) ...[
-            _buildMealCategoryCard(context, category),
-            Container(
-              height: 10.0,
-              color: Colors.grey[200],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  // Hàm chọn ngày (locale: vi để hiển thị lịch tiếng Việt)
+  /// Hàm chọn ngày (locale: vi để hiển thị lịch tiếng Việt)
   Future<void> _showDatePicker(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -195,6 +85,164 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+
+      /// AppBar hiển thị “Diary” bên trái và icon “tia chớp” bên phải
+      appBar: AppBar(
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        elevation: 0,
+        centerTitle: false,
+        title: const Text(
+          'Diary',
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'Figtree',
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.flash_on),
+            color: Colors.black,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MealLogNutritionWidget(
+                    selectedDate: _model.selectedDate,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+
+      /// Phần thân
+      body: Column(
+        children: [
+          /// Thanh chọn ngày (nằm dưới AppBar)
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left),
+                  onPressed: () {
+                    _model.changeDate(
+                      _model.selectedDate.subtract(const Duration(days: 1)),
+                    );
+                  },
+                ),
+                GestureDetector(
+                  onTap: () => _showDatePicker(context),
+                  child: Text(
+                    _getCustomDateString(_model.selectedDate),
+                    style: const TextStyle(
+                      fontFamily: 'Figtree',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right),
+                  onPressed: () {
+                    _model.changeDate(
+                      _model.selectedDate.add(const Duration(days: 1)),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          /// Nội dung còn lại (danh sách bữa, card calo...)
+          Expanded(
+            child: ListView(
+              children: [
+                // Card hiển thị Calories Remaining (Calo còn lại)
+                Card(
+                  margin: const EdgeInsets.all(12.0),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Tiêu đề
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'Calo còn lại',
+                              style: TextStyle(
+                                fontFamily: 'Figtree',
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Icon(Icons.more_horiz),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Goal - Food - Remaining
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildCalorieColumn(
+                              _model.calorieGoal.toString(),
+                              'Mục tiêu',
+                              FontWeight.bold,
+                            ),
+                            _buildOperator('-'),
+                            _buildCalorieColumn(
+                              _model.foodCalories.toString(),
+                              'Thức ăn',
+                              FontWeight.normal,
+                            ),
+                            _buildOperator('='),
+                            _buildCalorieColumn(
+                              _model.remainingCalories.toString(),
+                              'Còn lại',
+                              FontWeight.bold,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Khoảng trống xám ngăn giữa Card Calo & các bữa
+                Container(
+                  height: 8.0,
+                  color: Colors.grey[200],
+                ),
+
+                // Hiển thị các bữa, mỗi bữa là 1 Card, xen kẽ khoảng trống xám
+                for (final category in _model.mealCategories) ...[
+                  _buildMealCategoryCard(context, category),
+                  Container(
+                    height: 10.0,
+                    color: Colors.grey[200],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Xây dựng hiển thị cột Calo
   Widget _buildCalorieColumn(String value, String label, FontWeight weight) {
     return Column(
       children: [
@@ -217,6 +265,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
+  /// Dấu +, -, = ...
   Widget _buildOperator(String operator) {
     return Text(
       operator,
@@ -228,6 +277,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
+  /// Chuyển từ tiếng Anh sang tiếng Việt tên bữa
   String _mapCategoryToVietnamese(String category) {
     switch (category.toLowerCase()) {
       case 'breakfast':
@@ -245,36 +295,41 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     }
   }
 
-  /// Thay vì trả về Column trực tiếp, ta trả về một Card cho mỗi bữa
+  /// Tạo Card cho mỗi bữa
   Widget _buildMealCategoryCard(BuildContext context, String category) {
     final vietnameseCategory = _mapCategoryToVietnamese(category);
 
+    // Giả định: Mỗi ngày có 1 MealLog, ta lấy mealLogs[0].
+    // Thực tế bạn có thể cần logic khác để lấy MealLog tương ứng ngày.
     final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
-    // Tạo Card
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 0),
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _buildMealCategoryContent(
-            context, mealLog, category, vietnameseCategory),
+          context,
+          mealLog,
+          category,
+          vietnameseCategory,
+        ),
       ),
     );
   }
 
-  /// Nội dung bên trong Card của bữa ăn
+  /// Nội dung trong Card của bữa ăn
   Widget _buildMealCategoryContent(
     BuildContext context,
     mealLog,
     String category,
     String vietnameseCategory,
   ) {
-    // Nếu chưa có mealLog, hiển thị 0 + Thêm món
+    // Nếu chưa có mealLog => bữa này chưa có gì
     if (mealLog == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Bữa này hoàn toàn chưa có log => không hiển thị tổng calo
           _buildMealHeader(vietnameseCategory, null),
           ListTile(
             title: const Text(
@@ -293,7 +348,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => QuickAddWidget(
-                          mealName: category, // Truyền tên bữa tiếng Anh gốc
+                          mealName: category,
                           selectedDate: _model.selectedDate,
                         ),
                       ),
@@ -327,11 +382,10 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 MaterialPageRoute(
                   builder: (context) => MealLogListFoodWidget(
                     selectedDate: _model.selectedDate,
-                    mealName: category, // ví dụ: "Lunch" hoặc "Dinner"
+                    mealName: category,
                   ),
                 ),
               ).then((result) {
-                // Sau khi thêm món xong, nếu cần refresh MealLogs thì gọi:
                 if (result == true) {
                   _model.fetchMealLogs();
                 }
@@ -343,12 +397,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       );
     }
 
-    // Lọc các món ăn
+    // Nếu đã có mealLog, ta lọc các chi tiết thuộc bữa này
     final details = mealLog.mealLogDetails
         .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
         .toList();
 
-    // Nếu bữa này không có món => ẩn tổng calo
+    // Kiểm tra bữa này có món không
     final bool hasAnyFood = details.isNotEmpty;
 
     // Tính tổng Calories & macro
@@ -356,6 +410,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
     final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
+
     final totalMacros = mealCarbs + mealFat + mealProtein;
     final carbsPercent =
         totalMacros > 0 ? (mealCarbs / totalMacros * 100).round() : 0;
@@ -367,7 +422,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Nếu bữa có món thì hiển thị mealCals, nếu không thì null
         _buildMealHeader(vietnameseCategory, hasAnyFood ? mealCals : null),
         if (hasAnyFood)
           Padding(
@@ -381,11 +435,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ),
             ),
           ),
+
         // Danh sách món ăn
         for (int i = 0; i < details.length; i++) ...[
           GestureDetector(
             onLongPress: () {
-              // Dialog xóa món
+              // Dialog thao tác: chuyển bữa hoặc xóa món
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -406,7 +461,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      // Liệt kê các bữa (không tính "Exercise" nếu bạn muốn)
+                                      // Liệt kê các bữa
                                       for (final mealType in [
                                         'Breakfast',
                                         'Lunch',
@@ -472,7 +527,10 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           if (i < details.length - 1)
             const Divider(color: Colors.black, thickness: 1),
         ],
+
+        // Nếu có món, thêm một Divider để ngăn nút "Thêm món"
         if (hasAnyFood) const Divider(color: Colors.black, thickness: 1),
+
         // Nút "Thêm món"
         ListTile(
           title: const Text(
@@ -491,7 +549,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => QuickAddWidget(
-                        mealName: category, // Truyền tên bữa tiếng Anh gốc
+                        mealName: category,
                         selectedDate: _model.selectedDate,
                       ),
                     ),
@@ -523,9 +581,16 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const SerchDataWidget(),
+                builder: (context) => MealLogListFoodWidget(
+                  selectedDate: _model.selectedDate,
+                  mealName: category,
+                ),
               ),
-            );
+            ).then((result) {
+              if (result == true) {
+                _model.fetchMealLogs();
+              }
+            });
           },
         ),
         const Divider(),
@@ -533,14 +598,14 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  /// Sửa _buildMealHeader để nếu mealCals == null thì không hiển thị cals
+  /// Header cho mỗi bữa (hiển thị tên bữa & tổng calo bữa)
   Widget _buildMealHeader(String category, int? mealCals) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Tên bữa
+          // Tên bữa (Bữa sáng, Bữa trưa, ...)
           Text(
             category,
             style: const TextStyle(
@@ -549,9 +614,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          // Nếu mealCals == null => không hiển thị
+          // Nếu mealCals == null => ẩn, còn != null => hiển thị
           mealCals == null
-              ? const SizedBox.shrink() // Trả về widget rỗng
+              ? const SizedBox.shrink()
               : Text(
                   mealCals.toString(),
                   style: const TextStyle(

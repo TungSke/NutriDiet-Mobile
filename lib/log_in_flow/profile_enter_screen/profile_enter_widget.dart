@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '/components/appbar_widget.dart';
@@ -46,6 +49,7 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
                     key: _formKey,
                     child: Column(
                       children: [
+                        _buildProfilePhoto(),
                         _buildTextField('Tên đầy đủ', _model.fullNameController,
                             _model.fullNameFocusNode),
                         const SizedBox(height: 20.0),
@@ -166,6 +170,45 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
   //     ),
   //   );
   // }
+  // Để sử dụng File
+
+  Widget _buildProfilePhoto() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.grey[300],
+            backgroundImage: _model.avatar.isNotEmpty
+                ? FileImage(File(
+                    _model.avatar)) // Sử dụng FileImage thay vì NetworkImage
+                : null,
+            child: _model.avatar.isEmpty
+                ? Icon(Icons.person, size: 50, color: Colors.white)
+                : null,
+          ),
+          TextButton(
+            onPressed: () async {
+              // Sử dụng ImagePicker để chọn ảnh
+              final picker = ImagePicker();
+              final pickedFile =
+                  await picker.pickImage(source: ImageSource.gallery);
+
+              if (pickedFile != null) {
+                // Cập nhật avatar và trạng thái đã thay đổi
+                setState(() {
+                  _model.avatar = pickedFile.path;
+                });
+              }
+            },
+            child: Text('Chọn ảnh', style: TextStyle(color: Colors.green)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDatePicker(BuildContext context) {
     return GestureDetector(
       onTap: () async {
@@ -242,22 +285,6 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
     );
   }
 
-  // Widget _buildRadioOption(String label, String value) {
-  //   return Row(
-  //     children: [
-  //       Radio<String>(
-  //         value: value,
-  //         groupValue: _model.gender,
-  //         onChanged: (newValue) {
-  //           setState(() {
-  //             _model.gender = newValue!;
-  //           });
-  //         },
-  //       ),
-  //       Text(label),
-  //     ],
-  //   );
-  // }
   Widget _buildRadioOption(String label, String value) {
     return Row(
       children: [
