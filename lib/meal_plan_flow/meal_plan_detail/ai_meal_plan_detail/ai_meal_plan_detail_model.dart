@@ -132,13 +132,13 @@ class AIMealPlanDetailModel extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> saveMealPlanAI() async {
+  Future<Map<String, dynamic>> saveMealPlanAI({String? feedback}) async {
     try {
       isLoading = true;
       errorMessage = null;
       notifyListeners();
 
-      final result = await _mealPlanService.saveMealPlanAI();
+      final result = await _mealPlanService.saveMealPlanAI(feedback: feedback);
       if (result['success']) {}
 
       isLoading = false;

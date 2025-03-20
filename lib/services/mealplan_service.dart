@@ -214,16 +214,23 @@ class MealPlanService{
     }
   }
 
-  Future<Map<String, dynamic>> saveMealPlanAI() async {
+  Future<Map<String, dynamic>> saveMealPlanAI({String? feedback}) async {
     try {
       final String? token = await flutterSecureStorage.read(key: 'accessToken');
       const String endpoint = "api/meal-plan/save-mealplan-AI";
+
+      final Map<String, dynamic> body = {};
+      if (feedback != null && feedback.isNotEmpty) {
+        body['feedback'] = feedback;
+      }
+
       final response = await _apiService.put(
         endpoint,
-        body: {},
+        body: body,
         token: token,
       );
       final data = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
         return {
           'success': true,
