@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:diet_plan_app/components/ingredient_component.dart';
 import 'package:diet_plan_app/components/serch_data_widget.dart';
 import 'package:diet_plan_app/log_in_flow/profile_enter_screen/profile_enter_widget.dart';
 import 'package:flutter/material.dart';
@@ -199,11 +200,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: '/selectDateOfBirth',
           builder: (context, params) => const SelectDateOfBirthWidget(),
         ),
-        // FFRoute(
-        //   name: 'Select_food',
-        //   path: '/selectFood',
-        //   builder: (context, params) => const SelectFoodScreenWidget(),
-        // ),
+        FFRoute(
+          name: 'ingredient',
+          path: '/ingredient',
+          builder: (context, params) => const IngredientListScreen(),
+        ),
         FFRoute(
           name: 'Select_allergy_screen',
           path: '/selectAllergyScreen',

@@ -634,31 +634,31 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Text("Nguyên liệu:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
-                      SizedBox(height: 10),
-                      ..._model.food!["ingredients"].map<Widget>((ingredient) =>
-                          Card(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white, // Đặt màu nền trắng
-                                border: Border.all(color: Colors.black, width: 1.0,),
-                              ),
-                              child: ListTile(
-                                title: Text(
-                                  ingredient["ingredientName"],
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                trailing: Text(
-                                  "${ingredient["calories"]} kcal",
-                                  style: TextStyle(color: Colors.grey[600]),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ),
+                      // SizedBox(height: 20),
+                      // Text("Nguyên liệu:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
+                      // SizedBox(height: 10),
+                      // ..._model.food!["ingredients"].map<Widget>((ingredient) =>
+                      //     Card(
+                      //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      //       child: Container(
+                      //         decoration: BoxDecoration(
+                      //           borderRadius: BorderRadius.circular(10),
+                      //           color: Colors.white, // Đặt màu nền trắng
+                      //           border: Border.all(color: Colors.black, width: 1.0,),
+                      //         ),
+                      //         child: ListTile(
+                      //           title: Text(
+                      //             ingredient["ingredientName"],
+                      //             style: TextStyle(fontWeight: FontWeight.bold),
+                      //           ),
+                      //           trailing: Text(
+                      //             "${ingredient["calories"]} kcal",
+                      //             style: TextStyle(color: Colors.grey[600]),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      // ),
                     ],
                   );
                 } else {
