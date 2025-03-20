@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
-
+import '../services/meallog_service.dart';
 import '../services/food_service.dart';
 import '../services/models/food.dart';
 
@@ -18,15 +18,17 @@ class MealLogFoodDetailWidget extends StatefulWidget {
 
 class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   final FoodService _foodService = FoodService();
+  final MeallogService _meallogService = MeallogService();
   Food? _food;
   bool _isLoading = false;
 
-  // Ví dụ cho Meal (bữa ăn) và số lượng (servings):
-  String _selectedMeal = 'Lunch';
+  // Ví dụ cho Meal (bữa ăn) và số lượng (servings)
+  String _selectedMeal = 'Breakfast';
   int _numberOfServings = 1;
 
-  // Chọn nhiều ngày - ví dụ 7 ngày tiếp theo
+  // Danh sách 7 ngày (ví dụ) bắt đầu từ hôm nay
   late List<DateTime> _weekDays;
+  // Tập hợp các index của _weekDays được chọn
   final Set<int> _selectedDaysIndex = {};
 
   @override
@@ -65,10 +67,33 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     }
   }
 
-  void _addToMealLog() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Added to Meal Log!')),
+  // Hàm gọi API addMealToMultipleDays
+  void _addToMealLog() async {
+    List<DateTime> selectedDates;
+    if (_selectedDaysIndex.isEmpty) {
+      selectedDates = [DateTime.now()];
+    } else {
+      selectedDates =
+          _selectedDaysIndex.map((index) => _weekDays[index]).toList();
+    }
+
+    final bool success = await _meallogService.addMealToMultipleDays(
+      dates: selectedDates,
+      foodId: widget.foodId,
+      quantity: _numberOfServings.toDouble(),
+      mealType: _selectedMeal,
     );
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Added to Meal Log successfully!')),
+      );
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to add to Meal Log.')),
+      );
+    }
   }
 
   @override
@@ -86,20 +111,18 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
       );
     }
 
-    // Lấy giá trị int
+    // Lấy giá trị int của các macro nutrients
     final int calories = _food?.calories ?? 0;
     final int carbs = _food?.carbs ?? 0;
     final int fat = _food?.fat ?? 0;
     final int protein = _food?.protein ?? 0;
 
     final int totalMacro = carbs + fat + protein;
-    // Tránh chia cho 0
     final double carbsRatio = totalMacro > 0 ? (carbs / totalMacro * 100) : 0;
     final double fatRatio = totalMacro > 0 ? (fat / totalMacro * 100) : 0;
     final double proteinRatio =
         totalMacro > 0 ? (protein / totalMacro * 100) : 0;
 
-    // Dữ liệu cho pie chart (phải là double)
     final Map<String, double> macroDataMap = {
       "Carbs": carbsRatio,
       "Fat": fatRatio,
@@ -114,7 +137,7 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
           IconButton(
             icon: const Icon(Icons.check_circle, color: Colors.white),
             onPressed: () {
-              // Icon check bên phải appbar
+              // Bạn có thể thực hiện xử lý bổ sung khi nhấn icon check
             },
           ),
         ],
@@ -123,12 +146,8 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           children: [
-            // Ảnh món ăn
             _buildFoodImage(_food!),
-
             const SizedBox(height: 16),
-
-            // Row hiển thị tên món + icon check
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -142,23 +161,16 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
                 const Icon(Icons.check_circle, color: Colors.green),
               ],
             ),
-
             const SizedBox(height: 10),
             _buildMealRow(),
-
             const SizedBox(height: 10),
             _buildNumberOfServingsRow(),
-
             const SizedBox(height: 10),
             _buildServingSizeRow(_food!),
-
             const SizedBox(height: 16),
             _buildAddToMultipleDays(),
-
             const SizedBox(height: 16),
-            // Biểu đồ tròn macros
             _buildMacroPieChart(calories, carbs, fat, protein, macroDataMap),
-
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -339,6 +351,7 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   }
 
   String _formatDay(DateTime date) {
+    // Chọn định dạng hiển thị ngày (Sun, Mon, ...)
     return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.weekday % 7];
   }
 
@@ -351,7 +364,6 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   ) {
     return Column(
       children: [
-        // Biểu đồ tròn
         SizedBox(
           height: 200,
           child: Stack(
@@ -370,7 +382,6 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
                   showLegends: false,
                 ),
               ),
-              // Hiển thị tổng calo ở giữa
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -388,7 +399,6 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
           ),
         ),
         const SizedBox(height: 12),
-        // Thông tin Carbs / Fat / Protein
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -402,8 +412,8 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   }
 
   Widget _buildMacroColumn(String label, int gram, double percent) {
-    final p = percent.toStringAsFixed(0); // phần trăm
-    final g = gram.toString(); // gram
+    final p = percent.toStringAsFixed(0);
+    final g = gram.toString();
     return Column(
       children: [
         Text(

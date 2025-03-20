@@ -185,4 +185,78 @@ class MeallogService {
       return false;
     }
   }
+
+  Future<bool> addMealToMultipleDays({
+    required List<DateTime> dates,
+    required int foodId,
+    required double quantity,
+    required String mealType,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Tạo danh sách fields
+      final fields = <MapEntry<String, String>>[];
+
+      // Thay vì encode JSON, ta gán dạng "Dates[0]", "Dates[1]", ...
+      // để server parse thành List<DateTime> (nếu dùng ASP.NET)
+      for (int i = 0; i < dates.length; i++) {
+        final key = 'Dates[$i]';
+        final value = dates[i].toIso8601String();
+        fields.add(MapEntry(key, value));
+      }
+
+      // Thêm các trường khác
+      fields.add(MapEntry('FoodId', foodId.toString()));
+      fields.add(MapEntry('Quantity', quantity.toString()));
+      fields.add(MapEntry('MealType', mealType));
+
+      // Gọi hàm postMultipartWithList
+      final response = await _apiService.postMultipartWithList(
+        "api/meal-log/multiple-days",
+        fields: fields,
+        token: token,
+      );
+
+      debugPrint("API addMealToMultipleDays: "
+          "Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception(
+            'Lỗi addMealToMultipleDays: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API addMealToMultipleDays: $e");
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>> getNutritionSummary({
+    required String date, // VD: "2025-3-20"
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Xây dựng endpoint với query parameter date
+      final String endpoint = 'api/meal-log/nutrition?date=$date';
+      final response = await _apiService.get(endpoint, token: token);
+      debugPrint(
+          "API getNutritionSummary: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        return jsonResponse['data'];
+      } else {
+        throw Exception(
+            "Lỗi khi lấy nutrition summary: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      debugPrint("Lỗi trong getNutritionSummary: $e");
+      throw Exception("Lỗi trong getNutritionSummary: $e");
+    }
+  }
 }
