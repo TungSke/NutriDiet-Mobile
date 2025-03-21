@@ -68,7 +68,6 @@ class MealPlanService{
     }
   }
 
-
   Future<Map<String, dynamic>?> getMealPlanDetailTotals(int mealPlanId) async {
     try {
       String endpoint = "api/meal-plan-detail/meal-plan-detail-total/$mealPlanId";
@@ -84,6 +83,7 @@ class MealPlanService{
       return null;
     }
   }
+
   Future<bool> deleteMealPlan(int mealPlanId) async {
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
@@ -98,6 +98,7 @@ class MealPlanService{
       return false;
     }
   }
+
   Future<bool> cloneSampleMealPlan(int mealPlanId) async {
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
     try {
@@ -114,6 +115,7 @@ class MealPlanService{
       return false;
     }
   }
+
   Future<Map<String, dynamic>> applyMealPlan(int mealPlanId) async {
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
     try {
@@ -212,16 +214,23 @@ class MealPlanService{
     }
   }
 
-  Future<Map<String, dynamic>> saveMealPlanAI() async {
+  Future<Map<String, dynamic>> saveMealPlanAI({String? feedback}) async {
     try {
       final String? token = await flutterSecureStorage.read(key: 'accessToken');
       const String endpoint = "api/meal-plan/save-mealplan-AI";
+
+      final Map<String, dynamic> body = {};
+      if (feedback != null && feedback.isNotEmpty) {
+        body['feedback'] = feedback;
+      }
+
       final response = await _apiService.put(
         endpoint,
-        body: {},
+        body: body,
         token: token,
       );
       final data = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
         return {
           'success': true,
@@ -239,4 +248,71 @@ class MealPlanService{
       };
     }
   }
+
+  Future<bool> createMealPlan(MealPlan mealPlan) async{
+    try{
+      final String? token = await flutterSecureStorage.read(key:'accessToken');
+      if(token==null){
+        debugPrint("No access Token found");
+        return false;
+      }
+      const String endpoint = "api/meal-plan";
+      final Map<String, dynamic> body = {
+        'planName': mealPlan.planName,
+        'healthGoal': mealPlan.healthGoal,
+        'mealPlanDetails': mealPlan.mealPlanDetails.map((detail)=>{
+          'foodId': detail.foodId,
+          'quantity': detail.quantity,
+          'mealType': detail.mealType,
+          'dayNumber': detail.dayNumber,
+        }).toList(),
+      };
+      final response = await _apiService.post(endpoint, body: body, token: token);
+      if(response.statusCode == 200) return true;
+      else{
+        throw Exception('Lỗi khi tạo: ${response.statusCode}, ${response.body}');
+      }
+
+    }catch(e){
+      debugPrint("Lỗi khi gọi API createMealPlan: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateMealPlan(MealPlan mealPlan) async {
+    try {
+      final String? token = await flutterSecureStorage.read(key: 'accessToken');
+      if (token == null) {
+        debugPrint("No access token found");
+        return false;
+      }
+      if (mealPlan.mealPlanId == null) {
+        debugPrint('MealPlan ID is required for update');
+        return false;
+      }
+      final String endpoint = "api/meal-plan/${mealPlan.mealPlanId}";
+      final Map<String, dynamic> body = {
+        'mealPlanRequest': {
+          'planName': mealPlan.planName,
+          'healthGoal': mealPlan.healthGoal,
+          'mealPlanDetails': mealPlan.mealPlanDetails.map((detail) => {
+            'mealPlanDetailId': detail.mealPlanDetailId,
+            'foodId': detail.foodId ?? 0, // Xử lý null cho foodId
+            'quantity': detail.quantity,
+            'mealType': detail.mealType,
+            'dayNumber': detail.dayNumber,
+          }).toList(),
+        }
+      };
+      debugPrint("Endpoint: $endpoint, Body: $body"); // Log để kiểm tra
+      final response = await _apiService.put(endpoint, body: body, token: token);
+      debugPrint("Response: ${response.statusCode}, ${response.body}");
+      if (response.statusCode == 200) return true;
+      throw Exception('Lỗi khi cập nhật: ${response.statusCode}, ${response.body}');
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API updateMealPlan: $e");
+      return false;
+    }
+  }
+
 }
