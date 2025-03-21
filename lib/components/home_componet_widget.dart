@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,16 +24,23 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
   late HomeComponetModel _model;
 
   @override
-  void setState(VoidCallback callback) {
-    super.setState(callback);
-    _model.onUpdate();
-  }
-
-  @override
   void initState() {
     super.initState();
     loadData();
+
     _model = createModel(context, () => HomeComponetModel());
+    _model.setUpdateCallback(() {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+    _model.fetchMealLogs();
+  }
+
+  @override
+  void dispose() {
+    _model.dispose();
+    super.dispose();
   }
 
   Map<String, dynamic>? healthData;
@@ -48,13 +56,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
       errorMessage = result["errorMessage"];
       isLoading = false;
     });
-  }
-
-  @override
-  void dispose() {
-    _model.maybeDispose();
-
-    super.dispose();
   }
 
   @override
@@ -112,7 +113,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       ),
                       if (FFAppState().isLogin == true)
                         Text(
-                          'Jane Cooper',
+                          _model.name,
                           maxLines: 1,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
@@ -168,57 +169,66 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   padding: const EdgeInsetsDirectional.fromSTEB(
                       20.0, 16.0, 20.0, 0.0),
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).lightGrey,
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                    child: FlutterFlowCalendar(
-                      color: FlutterFlowTheme.of(context).primary,
-                      iconColor: FlutterFlowTheme.of(context).secondaryText,
-                      weekFormat: true,
-                      weekStartsMonday: true,
-                      rowHeight: 64.0,
-                      onChange: (DateTimeRange? newSelectedDate) {
-                        safeSetState(
-                            () => _model.calendarSelectedDay = newSelectedDate);
-                      },
-                      titleStyle:
-                          FlutterFlowTheme.of(context).headlineSmall.override(
-                                fontFamily: 'figtree',
-                                fontSize: 18.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                              ),
-                      dayOfWeekStyle:
-                          FlutterFlowTheme.of(context).labelLarge.override(
-                                fontFamily: 'figtree',
-                                fontSize: 13.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                              ),
-                      dateStyle:
-                          FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'figtree',
-                                fontSize: 16.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                              ),
-                      selectedDateStyle:
-                          FlutterFlowTheme.of(context).titleSmall.override(
-                                fontFamily: 'figtree',
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.normal,
-                                useGoogleFonts: false,
-                              ),
-                      inactiveDateStyle:
-                          FlutterFlowTheme.of(context).labelMedium.override(
-                                fontFamily: 'figtree',
-                                fontSize: 16.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                              ),
-                    ),
-                  ),
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).lightGrey,
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      child: FlutterFlowCalendar(
+                        color: FlutterFlowTheme.of(context).primary,
+                        iconColor: FlutterFlowTheme.of(context).secondaryText,
+                        weekFormat: true,
+                        weekStartsMonday: true,
+                        rowHeight: 64.0,
+                        onChange: (DateTimeRange? newSelectedDate) async {
+                          if (newSelectedDate != null) {
+                            setState(() {
+                              _model.selectedDate =
+                                  newSelectedDate.start; // Lưu ngày đã chọn
+                              _model.calendarSelectedDay =
+                                  newSelectedDate; // Lưu lại phạm vi ngày đã chọn
+                            });
+
+                            // Fetch lại meal logs ngay khi thay đổi ngày
+                            await _model
+                                .fetchMealLogs(); // Fetch dữ liệu cho ngày mới
+                          }
+                        },
+                        titleStyle:
+                            FlutterFlowTheme.of(context).headlineSmall.override(
+                                  fontFamily: 'figtree',
+                                  fontSize: 18.0,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: false,
+                                ),
+                        dayOfWeekStyle:
+                            FlutterFlowTheme.of(context).labelLarge.override(
+                                  fontFamily: 'figtree',
+                                  fontSize: 13.0,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: false,
+                                ),
+                        dateStyle:
+                            FlutterFlowTheme.of(context).bodyMedium.override(
+                                  fontFamily: 'figtree',
+                                  fontSize: 16.0,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: false,
+                                ),
+                        selectedDateStyle:
+                            FlutterFlowTheme.of(context).titleSmall.override(
+                                  fontFamily: 'figtree',
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.normal,
+                                  useGoogleFonts: false,
+                                ),
+                        inactiveDateStyle:
+                            FlutterFlowTheme.of(context).labelMedium.override(
+                                  fontFamily: 'figtree',
+                                  fontSize: 16.0,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: false,
+                                ),
+                      )),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(15),
@@ -248,18 +258,31 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             0.0, 0.0, 0.0, 24.0),
                         child: CircularPercentIndicator(
-                          percent: 2 / 3,
+                          percent: _model.mealLogs.isNotEmpty
+                              ? min(
+                                  (_model.mealLogs[0].totalCalories.toDouble() /
+                                      _model.mealLogs[0].dailyCalories
+                                          .toDouble()),
+                                  1.0) // Ensure that the value doesn't exceed 1.0
+                              : 0.0,
                           radius: 75.0,
                           lineWidth: 12.0,
                           animation: true,
                           animateFromLastPercent: true,
-                          progressColor: FlutterFlowTheme.of(context).primary,
+                          progressColor: (_model.mealLogs.isNotEmpty &&
+                                  _model.mealLogs[0].totalCalories >
+                                      _model.mealLogs[0].dailyCalories)
+                              ? Colors
+                                  .red // If totalCalories > dailyCalories, set color to red
+                              : FlutterFlowTheme.of(context)
+                                  .primary, // Default color
                           backgroundColor: const Color(0x33808080),
                           center: RichText(
                             text: TextSpan(
                               children: [
                                 TextSpan(
-                                  text: '1200/',
+                                  text:
+                                      '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalCalories : 0}/',
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -333,7 +356,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   text: TextSpan(
                                     children: [
                                       TextSpan(
-                                        text: '30/',
+                                        text:
+                                            '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalCarbs : 0}/',
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -403,7 +427,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   text: TextSpan(
                                     children: [
                                       TextSpan(
-                                        text: '20/',
+                                        text:
+                                            '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalProtein : 0}/',
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -473,7 +498,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   text: TextSpan(
                                     children: [
                                       TextSpan(
-                                        text: '36/',
+                                        text:
+                                            '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalFat : 0}/',
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -532,9 +558,317 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         .addToEnd(const SizedBox(width: 20.0)),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 24.0, 20.0, 16.0),
+                  child: Text(
+                    'Bữa ăn hằng ngày',
+                    maxLines: 1,
+                    style: GoogleFonts.roboto(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                for (final category in _model.mealCategories) ...[
+                  _buildMealCategoryCard(context, category),
+                  Container(
+                    height: 10.0,
+                    color: Colors.white,
+                  ),
+                ],
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  String _mapCategoryToVietnamese(String category) {
+    switch (category.toLowerCase()) {
+      case 'breakfast':
+        return 'Bữa sáng';
+      case 'lunch':
+        return 'Bữa trưa';
+      case 'dinner':
+        return 'Bữa tối';
+      case 'snacks':
+        return 'Bữa phụ';
+      case 'exercise':
+        return 'Tập luyện';
+      default:
+        return category;
+    }
+  }
+
+  Widget _buildMealCategoryCard(BuildContext context, String category) {
+    final vietnameseCategory = _mapCategoryToVietnamese(category);
+
+    final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
+
+    return Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+                child: Container(
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context)
+                    .lightGrey, // Thay màu sắc nếu cần
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Padding(
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(16, 16.0, 16, 16.0),
+                child: _buildMealCategoryContent(
+                  context,
+                  mealLog,
+                  category,
+                  vietnameseCategory,
+                ),
+              ),
+            ))
+          ]
+              .divide(const SizedBox(width: 16.0))
+              .addToStart(const SizedBox(width: 20.0))
+              .addToEnd(const SizedBox(width: 20.0)),
+        ));
+  }
+
+  Widget _buildMealCategoryContent(
+    BuildContext context,
+    mealLog,
+    String category,
+    String vietnameseCategory,
+  ) {
+    // Nếu chưa có mealLog => bữa này chưa có gì
+    if (mealLog == null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildMealHeader(vietnameseCategory, null),
+          ListTile(
+            title: const Text(
+              'Thêm món',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MealLogComponentWidget(),
+                ),
+              ).then((result) {
+                if (result == true) {
+                  _model.fetchMealLogs();
+                }
+              });
+            },
+          ),
+        ],
+      );
+    }
+
+    // Nếu đã có mealLog, ta lọc các chi tiết thuộc bữa này
+    final details = mealLog.mealLogDetails
+        .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
+        .toList();
+
+    // Kiểm tra bữa này có món không
+    final bool hasAnyFood = details.isNotEmpty;
+
+    // Tính tổng Calories & macro
+    final mealCals = details.fold(0, (sum, d) => sum + d.calories);
+    final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
+    final mealFat = details.fold(0, (sum, d) => sum + d.fat);
+    final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
+
+    final totalMacros = mealCarbs + mealFat + mealProtein;
+    final carbsPercent =
+        totalMacros > 0 ? (mealCarbs / totalMacros * 100).round() : 0;
+    final fatPercent =
+        totalMacros > 0 ? (mealFat / totalMacros * 100).round() : 0;
+    final proteinPercent =
+        totalMacros > 0 ? (mealProtein / totalMacros * 100).round() : 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildMealHeader(vietnameseCategory, hasAnyFood ? mealCals : null),
+        if (hasAnyFood)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Text(
+              'Carbs $carbsPercent% • Fat $fatPercent% • Protein $proteinPercent%',
+              style: const TextStyle(
+                fontFamily: 'Figtree',
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: LinearProgressIndicator(
+            value: 100, // Tính tỷ lệ phần trăm calo
+            backgroundColor: Colors.grey[300],
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+          ),
+        ),
+        for (int i = 0; i < details.length; i++) ...[
+          GestureDetector(
+            onLongPress: () {
+              // Dialog thao tác: chuyển bữa hoặc xóa món
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Nhật ký'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: const Text('Chuyển đến...'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Chuyển đến...'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Liệt kê các bữa
+                                      for (final mealType in [
+                                        'Breakfast',
+                                        'Lunch',
+                                        'Dinner',
+                                        'Snacks'
+                                      ])
+                                        ListTile(
+                                          title: Text(mealType),
+                                          onTap: () async {
+                                            // Khi user chọn bữa, đóng popup
+                                            Navigator.pop(context);
+                                            // Gọi hàm transferMealLogDetailEntry
+                                            await _model
+                                                .transferMealLogDetailEntry(
+                                              detailId: details[i].detailId,
+                                              targetMealType: mealType,
+                                            );
+                                          },
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 5, 16, 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 3, // Kích thước dấu chấm tròn
+                            backgroundColor: Colors.orange,
+                          ),
+                          SizedBox(width: 8.0),
+                          Row(
+                            spacing: 8,
+                            children: [
+                              Text(details[i].foodName,
+                                  style: TextStyle(fontSize: 14)),
+                              Text(
+                                "(x${details[i].quantity})",
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Text("${details[i].calories} kcal"),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        ListTile(
+          title: const Text(
+            'Thêm món',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MealLogComponentWidget(),
+              ),
+            ).then((result) {
+              if (result == true) {
+                _model.fetchMealLogs();
+              }
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  /// Header cho mỗi bữa (hiển thị tên bữa & tổng calo bữa)
+  Widget _buildMealHeader(String category, int? mealCals) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Tên bữa (Bữa sáng, Bữa trưa, ...)
+          Text(
+            category,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          // Nếu mealCals == null => ẩn, còn != null => hiển thị
+          mealCals == null
+              ? const SizedBox.shrink()
+              : Text(
+                  '${mealCals.toString()} kcal',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ],
       ),
     );
