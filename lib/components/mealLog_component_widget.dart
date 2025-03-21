@@ -6,9 +6,7 @@ import 'package:intl/intl.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/components/mealLog_component_model.dart';
-import '../components/serch_data_widget.dart';
 import '../components/quick_add_widget.dart';
-import '../components/mealLog_nutrition.dart';
 
 class MealLogComponentWidget extends StatefulWidget {
   const MealLogComponentWidget({Key? key}) : super(key: key);
