@@ -35,7 +35,6 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
       _isLoading = true;
     });
     try {
-      // Định dạng ngày theo kiểu "yyyy-M-d", ví dụ: "2025-3-20"
       final String formattedDate = DateFormat('yyyy-M-d').format(_selectedDate);
       final service = MeallogService();
       final data = await service.getNutritionSummary(date: formattedDate);
@@ -102,7 +101,6 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
 
   @override
   Widget build(BuildContext context) {
-    // Nếu đang fetch dữ liệu thì hiển thị Loading Indicator
     if (_isLoading) {
       return Scaffold(
         appBar: PreferredSize(
@@ -113,7 +111,6 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
             title: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Row chọn ngày
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -176,13 +173,23 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
     final totalCalories = _nutritionData?['totalCalories'] ?? 0;
     final netCalories = _nutritionData?['netCalories'] ?? 0;
     final goalCalories = _nutritionData?['goal'] ?? 0;
+
     // Meal breakdown: chuyển đổi danh sách thành Map<String, double>
     final List<dynamic> mealBreakdownList =
         _nutritionData?['mealBreakdown'] ?? [];
     Map<String, double> mealCaloriesMap = {};
     for (var meal in mealBreakdownList) {
-      mealCaloriesMap[meal['mealType']] = (meal['calories'] as num).toDouble();
+      // Nếu cần chuyển về chữ thường để nhất quán
+      final mealType = meal['mealType'].toString();
+      mealCaloriesMap[mealType] = (meal['calories'] as num).toDouble();
     }
+    // Nếu thiếu snack, thêm mặc định 0.0
+    if (!mealCaloriesMap.containsKey('Snack') &&
+        !mealCaloriesMap.containsKey('snack') &&
+        !mealCaloriesMap.containsKey('Snacks')) {
+      mealCaloriesMap['Snack'] = 0.0;
+    }
+
     // Macros
     final macros = _nutritionData?['macros'] ?? {};
     final double carbs =
@@ -192,9 +199,17 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
     final double protein = (macros['protein'] ?? 0) is num
         ? (macros['protein'] as num).toDouble()
         : 0;
+
     // Highest in Calories
     final List<dynamic> highestInCaloriesList =
         _nutritionData?['highestInCalories'] ?? [];
+    // Trích xuất Highest in Carbs, Fat, Protein
+    final List<dynamic> highestInCarbsList =
+        _nutritionData?['highestInCarbs'] ?? [];
+    final List<dynamic> highestInFatList =
+        _nutritionData?['highestInFat'] ?? [];
+    final List<dynamic> highestInProteinList =
+        _nutritionData?['highestInProtein'] ?? [];
 
     return Scaffold(
       appBar: PreferredSize(
@@ -205,7 +220,6 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
           title: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Thanh chọn ngày
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -263,10 +277,22 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
         controller: _tabController,
         children: [
           // Tab CALORIES: hiển thị PieChart và các thông tin calo
-          _buildCaloriesTab(totalCalories, goalCalories, netCalories,
-              mealCaloriesMap, highestInCaloriesList),
-          // Tab MACROS: hiển thị PieChart và thông tin macro
-          _buildMacrosTab(carbs, fat, protein),
+          _buildCaloriesTab(
+            totalCalories,
+            goalCalories,
+            netCalories,
+            mealCaloriesMap,
+            highestInCaloriesList,
+          ),
+          // Tab MACROS: hiển thị PieChart, thông tin macro và dữ liệu Highest in Carbs/Fat/Protein
+          _buildMacrosTab(
+            carbs,
+            fat,
+            protein,
+            highestInCarbsList,
+            highestInFatList,
+            highestInProteinList,
+          ),
         ],
       ),
     );
@@ -314,7 +340,6 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
               fontWeight: FontWeight.bold,
             ),
           ),
-          // Hiển thị danh sách Highest in Calories từ response
           ...highestInCaloriesList.map((item) {
             return ListTile(
               title: Text(item['foodName'] ?? ''),
@@ -327,7 +352,14 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
   }
 
   /// Widget hiển thị thông tin tab MACROS
-  Widget _buildMacrosTab(double carbs, double fat, double protein) {
+  Widget _buildMacrosTab(
+    double carbs,
+    double fat,
+    double protein,
+    List<dynamic> highestInCarbsList,
+    List<dynamic> highestInFatList,
+    List<dynamic> highestInProteinList,
+  ) {
     final totalMacro = carbs + fat + protein;
     final dataMap = <String, double>{
       if (carbs > 0) 'Carbohydrates': carbs,
@@ -357,33 +389,62 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
           _buildMacroInfoRow('Fat', fat, totalMacro),
           _buildMacroInfoRow('Protein', protein, totalMacro),
           const SizedBox(height: 16),
-          // Ví dụ hiển thị Highest in Carbohydrates/Fat/Protein (có thể cập nhật nếu có dữ liệu từ API)
+          // Hiển thị Highest in Carbohydrates
           const Text(
             'Highest in Carbohydrates (g)',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          ListTile(
-            title: const Text('Example Carbs Food'),
-            trailing: const Text('0'),
-          ),
+          highestInCarbsList.isNotEmpty
+              ? Column(
+                  children: highestInCarbsList.map((item) {
+                    return ListTile(
+                      title: Text(item['foodName'] ?? ''),
+                      trailing: Text((item['value'] ?? 0).toString()),
+                    );
+                  }).toList(),
+                )
+              : const ListTile(
+                  title: Text('No Data'),
+                  trailing: Text('0'),
+                ),
           const SizedBox(height: 8),
+          // Hiển thị Highest in Fat
           const Text(
             'Highest in Fat (g)',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          ListTile(
-            title: const Text('Example Fat Food'),
-            trailing: const Text('0'),
-          ),
+          highestInFatList.isNotEmpty
+              ? Column(
+                  children: highestInFatList.map((item) {
+                    return ListTile(
+                      title: Text(item['foodName'] ?? ''),
+                      trailing: Text((item['value'] ?? 0).toString()),
+                    );
+                  }).toList(),
+                )
+              : const ListTile(
+                  title: Text('No Data'),
+                  trailing: Text('0'),
+                ),
           const SizedBox(height: 8),
+          // Hiển thị Highest in Protein
           const Text(
             'Highest in Protein (g)',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          ListTile(
-            title: const Text('Example Protein Food'),
-            trailing: const Text('0'),
-          ),
+          highestInProteinList.isNotEmpty
+              ? Column(
+                  children: highestInProteinList.map((item) {
+                    return ListTile(
+                      title: Text(item['foodName'] ?? ''),
+                      trailing: Text((item['value'] ?? 0).toString()),
+                    );
+                  }).toList(),
+                )
+              : const ListTile(
+                  title: Text('No Data'),
+                  trailing: Text('0'),
+                ),
         ],
       ),
     );
