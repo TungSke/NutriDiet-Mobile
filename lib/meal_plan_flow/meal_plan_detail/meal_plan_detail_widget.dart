@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../flutter_flow/flutter_flow_theme.dart';
 import '../../services/models/mealplan.dart';
 import '../../services/models/mealplandetail.dart';
+import '../select_food_screen/select_food_widget.dart';
 import 'meal_plan_detail_model.dart';
 
 enum MealPlanSource {
@@ -433,15 +434,32 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               ),
             ),
             if (widget.source == MealPlanSource.myMealPlan)
-              GestureDetector(
-                onTap: () {},
-                child: CircleAvatar(
+              IconButton(
+                icon: CircleAvatar(
                   backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
                   child: Icon(
                     Icons.more_horiz,
                     color: FlutterFlowTheme.of(context).primary,
                   ),
                 ),
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SelectFoodWidget(
+                        mealPlanId: widget.mealPlanId,
+                        mealType: mealType,
+                        dayNumber: selectedDay,
+                        existingMeals: meals,
+                      ),
+                    ),
+                  );
+                  if (result == true && mounted) {
+                    _model.fetchMealPlanById(widget.mealPlanId);
+                  }
+                },
+                splashRadius: 24,
+                tooltip: 'Chỉnh sửa bữa ăn',
               ),
           ],
         ),
