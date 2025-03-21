@@ -290,22 +290,22 @@ class MealPlanService{
         debugPrint('MealPlan ID is required for update');
         return false;
       }
-      final String endpoint = "api/meal-plan/${mealPlan.mealPlanId}";
-      final Map<String, dynamic> body = {
-        'mealPlanRequest': {
-          'planName': mealPlan.planName,
-          'healthGoal': mealPlan.healthGoal,
-          'mealPlanDetails': mealPlan.mealPlanDetails.map((detail) => {
-            'mealPlanDetailId': detail.mealPlanDetailId,
-            'foodId': detail.foodId ?? 0, // Xử lý null cho foodId
-            'quantity': detail.quantity,
-            'mealType': detail.mealType,
-            'dayNumber': detail.dayNumber,
-          }).toList(),
-        }
-      };
-      debugPrint("Endpoint: $endpoint, Body: $body"); // Log để kiểm tra
-      final response = await _apiService.put(endpoint, body: body, token: token);
+      if (mealPlan.planName.isEmpty || mealPlan.healthGoal?.isEmpty != false) {
+        debugPrint("planName or healthGoal is empty or null");
+        return false;
+      }
+
+      String endpoint = "api/meal-plan/mobile?mealPlanId="
+          "${mealPlan.mealPlanId}&planName=${Uri.encodeComponent(mealPlan.planName)}&healthGoal=${Uri.encodeComponent(mealPlan.healthGoal!)}";
+
+      debugPrint("Endpoint: $endpoint");
+
+      final response = await _apiService.put(
+        endpoint,
+        body: {},
+        token: token,
+      );
+
       debugPrint("Response: ${response.statusCode}, ${response.body}");
       if (response.statusCode == 200) return true;
       throw Exception('Lỗi khi cập nhật: ${response.statusCode}, ${response.body}');

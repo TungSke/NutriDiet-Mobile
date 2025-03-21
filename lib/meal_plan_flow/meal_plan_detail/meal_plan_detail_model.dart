@@ -77,7 +77,7 @@ class MealPlanDetailModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateMealPlan(String planName, String? healthGoal) async {
+  Future<bool> updateMealPlan(String planName, String healthGoal) async {
     try {
       if (mealPlan == null || mealPlan!.mealPlanId == null) {
         errorMessage = "Không tìm thấy MealPlan để cập nhật";
@@ -93,17 +93,12 @@ class MealPlanDetailModel extends ChangeNotifier {
         mealPlanId: mealPlan!.mealPlanId,
         planName: planName,
         healthGoal: healthGoal,
-        mealPlanDetails: mealPlan!.mealPlanDetails, // Giữ nguyên danh sách mealPlanDetails hiện tại
-        status: mealPlan!.status,
-        duration: mealPlan!.duration,
-        startAt: mealPlan!.startAt,
-        createdBy: mealPlan!.createdBy,
+        mealPlanDetails: mealPlan!.mealPlanDetails,
       );
 
       final success = await _mealPlanService.updateMealPlan(updatedMealPlan);
       if (success) {
-        // Cập nhật lại dữ liệu từ server sau khi thành công
-        await fetchMealPlanById(mealPlan!.mealPlanId!);
+        await fetchMealPlanById(mealPlan!.mealPlanId!); // Cập nhật dữ liệu từ server
       } else {
         errorMessage = "Không thể cập nhật thực đơn";
       }
