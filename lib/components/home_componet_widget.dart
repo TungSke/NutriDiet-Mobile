@@ -35,6 +35,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
       }
     });
     _model.fetchMealLogs();
+    _model.fetchUserProfile();
   }
 
   @override
