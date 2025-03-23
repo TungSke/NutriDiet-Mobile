@@ -29,6 +29,13 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   late MealPlanDetailModel _model;
   int selectedDay = 1;
 
+  final Map<String, String> mealTypeTranslations = {
+    'Breakfast': 'Bữa sáng',
+    'Lunch': 'Bữa trưa',
+    'Dinner': 'Bữa tối',
+    'Snacks': 'Bữa phụ',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +44,15 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   }
 
   void _addNewDay() {
-    setState(() {});
+    setState(() {
+      selectedDay = _model.getTotalActiveDays() + 1; // Thêm ngày mới
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Đã thêm ngày mới thành công"),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   void _showEditMealPlanDialog() {
@@ -76,7 +91,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               onChanged: (value) => planName = value,
             ),
             DropdownButtonFormField<String>(
-              value: healthGoal, // healthGoal đã được kiểm tra
+              value: healthGoal,
               decoration: const InputDecoration(
                 labelText: 'Mục tiêu sức khỏe',
                 labelStyle: TextStyle(color: Colors.white),
@@ -158,85 +173,98 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _model,
-      builder: (context, child) {
-        if (_model.isLoading) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return WillPopScope(
+      onWillPop: () async {
+        if (_model.mealPlan != null && _model.isDayEmpty(selectedDay)) {
+          if (selectedDay > 1) {
+            setState(() {
+              selectedDay = _model.getActiveDays().lastWhere((day) => day < selectedDay, orElse: () => 1);
+            });
+          }
         }
+        return true;
+      },
+      child: ListenableBuilder(
+        listenable: _model,
+        builder: (context, child) {
+          if (_model.isLoading) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
 
-        if (_model.mealPlan == null) {
-          return Scaffold(body: Center(child: Text("Không tìm thấy kế hoạch")));
-        }
+          if (_model.mealPlan == null && _model.errorMessage != null) {
+            return Scaffold(body: Center(child: Text(_model.errorMessage!)));
+          }
 
-        final mealPLAN = _model.mealPlan!;
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(60),
-            child: AppBar(
-              backgroundColor: FlutterFlowTheme.of(context).primary,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              centerTitle: true,
-              title: Text(
-                mealPLAN.planName,
-                style: GoogleFonts.montserrat(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildMealPlanCard(mealPLAN),
-                      const SizedBox(height: 12),
-                      _buildDaySelector(),
-                      const SizedBox(height: 12),
-                      _buildNutrientProgress(),
-                      const SizedBox(height: 12),
-                      Text(
-                        "Total: ${_model.getNutrientTotalsForDay(selectedDay)['calories']!.toStringAsFixed(0)} kcal",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 12),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: _model.getMealsForDay(selectedDay).length,
-                          itemBuilder: (context, index) {
-                            final mealType = _model.getMealsForDay(selectedDay).keys.elementAt(index);
-                            final meals = _model.getMealsForDay(selectedDay)[mealType]!;
-                            return _buildMealCard(mealType, meals);
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildActionButtons(),
-                    ],
-                  ),
+          final mealPLAN = _model.mealPlan;
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(60),
+              child: AppBar(
+                backgroundColor: FlutterFlowTheme.of(context).primary,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                centerTitle: true,
+                title: Text(
+                  mealPLAN?.planName ?? "Thực đơn",
+                  style: GoogleFonts.montserrat(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ],
-          ),
-        );
-      },
+            ),
+            body: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildMealPlanCard(mealPLAN),
+                        const SizedBox(height: 12),
+                        _buildDaySelector(),
+                        const SizedBox(height: 12),
+                        _buildNutrientProgress(),
+                        const SizedBox(height: 12),
+                        Text(
+                          "Total: ${_model.getNutrientTotalsForDay(selectedDay)['calories']!.toStringAsFixed(0)} kcal",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: MealPlanDetailModel.mealTypes.length,
+                            itemBuilder: (context, index) {
+                              final mealType = MealPlanDetailModel.mealTypes[index];
+                              final meals = _model.getMealsForDay(selectedDay)[mealType] ?? [];
+                              return _buildMealCard(mealType, meals);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildActionButtons(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildDaySelector() {
+    final activeDays = _model.getActiveDays();
     return Row(
       children: [
         Expanded(
@@ -244,10 +272,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                ...List.generate(
-                  _model.getTotalDays(),
-                      (index) => _buildDayButton(index + 1, "Ngày ${index + 1}"),
-                ),
+                ...activeDays.map((day) => _buildDayButton(day, "Ngày $day")).toList(),
                 if (widget.source == MealPlanSource.myMealPlan)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -288,7 +313,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     );
   }
 
-  Widget _buildMealPlanCard(MealPlan mealPlan) {
+  Widget _buildMealPlanCard(MealPlan? mealPlan) {
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -303,23 +328,23 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               children: [
                 Expanded(
                   child: Text(
-                    mealPlan.planName,
+                    mealPlan?.planName ?? "Thực đơn",
                     style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (widget.source == MealPlanSource.myMealPlan)
+                if (widget.source == MealPlanSource.myMealPlan && mealPlan != null)
                   IconButton(
                     icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
-                    onPressed: _showEditMealPlanDialog, // Gọi dialog chỉnh sửa
+                    onPressed: _showEditMealPlanDialog,
                   ),
               ],
             ),
             const SizedBox(height: 8),
-            _buildInfoText("Mục tiêu sức khỏe", mealPlan.healthGoal ?? "Không xác định"),
-            _buildInfoText("Số ngày thực đơn", "${_model.getTotalDays()} ngày"),
-            _buildInfoText("Tạo bởi", mealPlan.createdBy ?? "Không rõ"),
+            _buildInfoText("Mục tiêu sức khỏe", mealPlan?.healthGoal ?? "Không xác định"),
+            _buildInfoText("Số ngày thực đơn", "${mealPlan?.duration ?? 0} ngày"), // Yêu cầu 1
+            _buildInfoText("Tạo bởi", mealPlan?.createdBy ?? "Không rõ"),
           ],
         ),
       ),
@@ -403,31 +428,76 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   }
 
   Widget _buildMealCard(String mealType, List<MealPlanDetail> meals) {
-    final foodNames = meals.map((meal) => meal.foodName ?? "Chưa có món ăn").join(", ");
+    final vietnameseMealType = mealTypeTranslations[mealType] ?? mealType;
+    String foodNames;
+    if (meals.isEmpty) {
+      foodNames = "Chưa có món ăn";
+    } else {
+      // Yêu cầu 2: Xử lý món ăn trùng lặp với quantity
+      final foodMap = <String, double>{};
+      for (var meal in meals) {
+        final name = meal.foodName ?? "Chưa có món ăn";
+        foodMap[name] = (foodMap[name] ?? 0) + (meal.quantity ?? 1);
+      }
+      foodNames = foodMap.entries
+          .map((entry) => entry.value > 1 ? "${entry.key} x ${entry.value.toInt()}" : entry.key)
+          .join(", ");
+    }
+    final hasMeals = meals.isNotEmpty;
 
     return Card(
       color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: hasMeals ? FlutterFlowTheme.of(context).primary : Colors.grey.shade300,
+          width: hasMeals ? 2 : 1,
+        ),
+      ),
+      elevation: hasMeals ? 4 : 1,
+      margin: const EdgeInsets.symmetric(vertical: 6),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(12.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            if (!hasMeals)
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.add_circle_outline,
+                  color: Colors.grey.shade600,
+                  size: 24,
+                ),
+              ),
+            if (!hasMeals) const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    mealType,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    vietnameseMealType,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: hasMeals ? Colors.black : Colors.grey.shade700,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     foodNames,
-                    style: const TextStyle(fontSize: 14),
-                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: hasMeals ? Colors.black87 : Colors.grey.shade500,
+                      fontStyle: hasMeals ? FontStyle.normal : FontStyle.italic,
+                    ),
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -435,12 +505,10 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             ),
             if (widget.source == MealPlanSource.myMealPlan)
               IconButton(
-                icon: CircleAvatar(
-                  backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
-                  child: Icon(
-                    Icons.more_horiz,
-                    color: FlutterFlowTheme.of(context).primary,
-                  ),
+                icon: Icon(
+                  Icons.more_horiz,
+                  color: FlutterFlowTheme.of(context).primary,
+                  size: 24,
                 ),
                 onPressed: () async {
                   final result = await Navigator.push(
@@ -455,11 +523,16 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                     ),
                   );
                   if (result == true && mounted) {
-                    _model.fetchMealPlanById(widget.mealPlanId);
+                    await _model.fetchMealPlanById(widget.mealPlanId);
+                    if (_model.isDayEmpty(selectedDay) && selectedDay > 1) {
+                      setState(() {
+                        selectedDay = _model.getActiveDays().lastWhere((day) => day < selectedDay, orElse: () => 1);
+                      });
+                    }
                   }
                 },
                 splashRadius: 24,
-                tooltip: 'Chỉnh sửa bữa ăn',
+                tooltip: 'Thêm món ăn',
               ),
           ],
         ),
