@@ -47,6 +47,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const SplaceScrenWidget(),
         ),
         FFRoute(
+          name: 'buy_premium_package',
+          path: '/buyPremiumPackage',
+          builder: (context, params) => const BuyPremiumPackageScreenWidget(),
+        ),
+        FFRoute(
           name: 'onbodying_screen',
           path: '/onbodyingScreen',
           builder: (context, params) => const OnbodyingScreenWidget(),
