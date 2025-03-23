@@ -11,14 +11,16 @@ class SelectFoodModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  Future<void> fetchFoods({String? search, int pageIndex = 1, int pageSize = 50}) async {
+  Future<void> fetchFoods(
+      {String? search, int pageIndex = 1, int pageSize = 50}) async {
     try {
       isLoading = true;
       errorMessage = null;
       notifyListeners();
 
       final query = (search == null || search.isEmpty) ? "" : search;
-      foods = await foodService.getAllFoods(pageIndex: pageIndex, pageSize: pageSize, search: query);
+      foods = await foodService.getAllFoods(
+          pageIndex: pageIndex, pageSize: pageSize, search: query);
 
       isLoading = false;
       notifyListeners();
@@ -28,7 +30,6 @@ class SelectFoodModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   // Future<bool> addFoodToMealPlan({
   //   required int mealPlanId,
