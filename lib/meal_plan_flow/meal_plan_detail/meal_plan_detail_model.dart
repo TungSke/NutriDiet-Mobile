@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../../services/mealplan_service.dart';
 import '../../services/models/mealplan.dart';
 import '../../services/models/mealplandetail.dart';
@@ -11,6 +9,8 @@ class MealPlanDetailModel extends ChangeNotifier {
   Map<String, dynamic>? mealPlanTotals;
   bool isLoading = false;
   String? errorMessage;
+
+  static const List<String> mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
 
   Future<void> fetchMealPlanById(int mealPlanId) async {
     try {
@@ -30,22 +30,22 @@ class MealPlanDetailModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> cloneSampleMealPlan(int mealPlanId) async{
-    try{
+  Future<bool> cloneSampleMealPlan(int mealPlanId) async {
+    try {
       isLoading = true;
       errorMessage = null;
       notifyListeners();
 
       final success = await _mealPlanService.cloneSampleMealPlan(mealPlanId);
       isLoading = false;
-      if(success){
+      if (success) {
         errorMessage = null;
-      }else{
+      } else {
         errorMessage = "Không thể sao chép thực đơn";
       }
       notifyListeners();
       return success;
-    }catch (e){
+    } catch (e) {
       isLoading = false;
       errorMessage = "Lỗi khi sao chép: $e";
       notifyListeners();
@@ -56,14 +56,14 @@ class MealPlanDetailModel extends ChangeNotifier {
   Future<bool> applyMealPlan(int mealPlanId) async {
     try {
       isLoading = true;
-      errorMessage = null; // Reset errorMessage
+      errorMessage = null;
       notifyListeners();
 
       final result = await _mealPlanService.applyMealPlan(mealPlanId);
       isLoading = false;
       if (result['success']) {
         errorMessage = null;
-        await fetchMealPlanById(mealPlanId); // Cập nhật trạng thái từ server
+        await fetchMealPlanById(mealPlanId);
       } else {
         errorMessage = result['errorMessage'];
       }
@@ -98,7 +98,7 @@ class MealPlanDetailModel extends ChangeNotifier {
 
       final success = await _mealPlanService.updateMealPlan(updatedMealPlan);
       if (success) {
-        await fetchMealPlanById(mealPlan!.mealPlanId!); // Cập nhật dữ liệu từ server
+        await fetchMealPlanById(mealPlan!.mealPlanId!);
       } else {
         errorMessage = "Không thể cập nhật thực đơn";
       }
@@ -114,7 +114,30 @@ class MealPlanDetailModel extends ChangeNotifier {
     }
   }
 
-  // Hàm lấy tổng dinh dưỡng cho ngày cụ thể từ totalByDayNumber
+  Future<void> addNewDay(int mealPlanId) async {
+    try {
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      if (mealPlan == null) {
+        errorMessage = "Không tìm thấy MealPlan";
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      await fetchMealPlanById(mealPlanId);
+
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      isLoading = false;
+      errorMessage = "Lỗi khi thêm ngày mới: $e";
+      notifyListeners();
+    }
+  }
+
   Map<String, double> getNutrientTotalsForDay(int dayNumber) {
     if (mealPlanTotals == null || mealPlanTotals!['totalByDayNumber'] == null) {
       return {"calories": 0, "carbs": 0, "fat": 0, "protein": 0};
@@ -135,15 +158,14 @@ class MealPlanDetailModel extends ChangeNotifier {
     };
   }
 
-  // Lấy danh sách bữa ăn theo ngày (giữ nguyên)
   Map<String, List<MealPlanDetail>> getMealsForDay(int dayNumber) {
     if (mealPlan == null) return {};
 
     var meals = mealPlan!.mealPlanDetails.where((detail) => detail.dayNumber == dayNumber).toList();
     Map<String, List<MealPlanDetail>> groupMeals = {};
-    for(var meal in meals){
+    for (var meal in meals) {
       final mealType = meal.mealType ?? "không xác định";
-      if(!groupMeals.containsKey(mealType)){
+      if (!groupMeals.containsKey(mealType)) {
         groupMeals[mealType] = [];
       }
       groupMeals[mealType]!.add(meal);
@@ -151,11 +173,30 @@ class MealPlanDetailModel extends ChangeNotifier {
     return groupMeals;
   }
 
-  // Lấy số ngày tối đa từ totalByDayNumber
+  // Lấy danh sách các ngày thực tế có món ăn
+  List<int> getActiveDays() {
+    if (mealPlan == null || mealPlan!.mealPlanDetails.isEmpty) return [1];
+    final days = mealPlan!.mealPlanDetails.map((detail) => detail.dayNumber).toSet().toList();
+    days.sort(); // Sắp xếp theo thứ tự tăng dần
+    return days;
+  }
+
   int getTotalDays() {
     if (mealPlanTotals == null || mealPlanTotals!['totalByDayNumber'] == null) return 1;
     return (mealPlanTotals!['totalByDayNumber'] as List)
         .map((day) => day['dayNumber'] as int)
         .reduce((a, b) => a > b ? a : b);
+  }
+
+  int getTotalActiveDays() {
+    if (mealPlan == null || mealPlan!.mealPlanDetails.isEmpty) return 1;
+    return mealPlan!.mealPlanDetails
+        .map((detail) => detail.dayNumber)
+        .toSet()
+        .reduce((a, b) => a > b ? a : b);
+  }
+
+  bool isDayEmpty(int dayNumber) {
+    return mealPlan?.mealPlanDetails.every((detail) => detail.dayNumber != dayNumber) ?? true;
   }
 }
