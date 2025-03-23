@@ -283,7 +283,7 @@ class _BuyPremiumPackageScreenWidgetState
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: FFButtonWidget(
                               onPressed: () {
-                                context.pushNamed('/bottom_navbar_screen');
+                                context.safePop();
                               },
                               text: 'Tiếp tục',
                               options: FFButtonOptions(

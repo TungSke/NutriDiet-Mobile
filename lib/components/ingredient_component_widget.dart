@@ -17,7 +17,6 @@ class IngredientListScreen extends StatefulWidget {
 class _IngredientListScreenState extends State<IngredientListScreen> {
   late IngredientComponentModel _model;
   final TextEditingController _searchController = TextEditingController();
-  Timer? _debounce;
 
   @override
   void initState() {
@@ -30,7 +29,6 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    _debounce?.cancel();
     _model.maybeDispose();
     super.dispose();
   }
@@ -134,7 +132,7 @@ class IngredientComponentWidget extends StatefulWidget {
 }
 
 class _IngredientComponentWidgetState extends State<IngredientComponentWidget> {
-  String _selectedPreference = 'Bình thường';
+  String _selectedPreference = 'Neutral';
 
   @override
   Widget build(BuildContext context) {
@@ -201,9 +199,9 @@ class _IngredientComponentWidgetState extends State<IngredientComponentWidget> {
                   useGoogleFonts: false,
                 ),
                 items: const [
-                  DropdownMenuItem(value: 'Thích', child: Text('Thích')),
-                  DropdownMenuItem(value: 'Bình thường', child: Text('Bình thường')),
-                  DropdownMenuItem(value: 'Ghét', child: Text('Ghét')),
+                  DropdownMenuItem(value: 'Like', child: Text('Thích')),
+                  DropdownMenuItem(value: 'Neutral', child: Text('Bình thường')),
+                  DropdownMenuItem(value: 'Dislike', child: Text('Không thích')),
                 ],
                 onChanged: (value) {
                   setState(() {
