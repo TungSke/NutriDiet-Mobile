@@ -35,11 +35,8 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
     super.dispose();
   }
 
-  void _onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 1000), () {
-      _model.searchIngredients(value);
-    });
+  void _onSearchSubmit(String value) {
+    _model.searchIngredients(value);
   }
 
   @override
@@ -98,7 +95,8 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
                   filled: true,
                   fillColor: FlutterFlowTheme.of(context).lightGrey,
                 ),
-                onChanged: _onSearchChanged,
+                onSubmitted: _onSearchSubmit,
+                textInputAction: TextInputAction.search,
               ),
             ),
             Expanded(
