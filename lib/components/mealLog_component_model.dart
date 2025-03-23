@@ -12,6 +12,7 @@ class MealLogComponentModel extends FlutterFlowModel {
 
   // Dữ liệu lấy từ API
   List<MealLog> mealLogs = [];
+  List<MealLogDetail> mealLogAis = [];
   bool isLoading = true;
   int calorieGoal = 1300; // Giá trị mặc định, sẽ được cập nhật từ API
   int foodCalories = 0;
@@ -160,6 +161,37 @@ class MealLogComponentModel extends FlutterFlowModel {
       }
     } catch (e) {
       debugPrint('Lỗi khi xóa Meal Log Detail: $e');
+    }
+  }
+
+  /// Gọi API để lấy Meal Log gợi ý từ AI
+  Future<void> fetchMealLogsAI() async {
+    try {
+      isLoading = true;
+      _updateCallback?.call();
+
+      final service = MeallogService();
+      mealLogAis = await service.getMealLogAI();
+      debugPrint('Fetched AI Meal Logs: ${mealLogs.length} logs');
+    } catch (e) {
+      debugPrint('Lỗi khi fetch Meal Logs AI: $e');
+    } finally {
+      isLoading = false;
+      _updateCallback?.call();
+    }
+  }
+
+  Future<void> sendAIChosenMealFeedback(String feedback) async {
+    try {
+      final service = MeallogService();
+      final success = await service.saveMealLogAI(feedback: feedback);
+      if (success) {
+        debugPrint('Gửi feedback MealLogAI thành công');
+      } else {
+        debugPrint('Gửi feedback MealLogAI thất bại');
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi gửi feedback MealLogAI: $e');
     }
   }
 
