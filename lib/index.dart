@@ -77,6 +77,9 @@ export '/profile_flow/setting_screen/setting_screen_widget.dart'
 export '/select_date_of_birth/select_date_of_birth_widget.dart'
     show SelectDateOfBirthWidget;
 export '/splace_scren/splace_scren_widget.dart' show SplaceScrenWidget;
+export 'components/checkout_fail_widget.dart' show CheckoutFailScreenWidget;
+export 'components/checkout_success_widget.dart'
+    show CheckoutSuccessScreenWidget;
 export 'components/mealLog_component_widget.dart' show MealLogComponentWidget;
 export 'components/my_mealplan_component_widget.dart'
     show MyMealPlanScreenWidget;

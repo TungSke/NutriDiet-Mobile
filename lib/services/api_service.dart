@@ -2,6 +2,8 @@ import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 class ApiService {
   final String baseUrl = "https://nutridietapi-be.azurewebsites.net";
@@ -87,6 +89,37 @@ class ApiService {
     return response;
   }
 
+  Future<http.Response> postMultipartWithFile(
+    String endpoint, {
+    required Map<String, String> fields,
+    required String fileFieldName,
+    required String filePath,
+    String? token,
+  }) async {
+    final uri = Uri.parse('$baseUrl/$endpoint');
+    final request = http.MultipartRequest('POST', uri);
+
+    // Nếu có token thì set vào header
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+
+    request.fields.addAll(fields);
+    final mimeType = lookupMimeType(filePath) ?? 'application/octet-stream';
+    final mimeSplit = mimeType.split('/');
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        fileFieldName,
+        filePath,
+        contentType: MediaType(mimeSplit[0], mimeSplit[1]),
+      ),
+    );
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    return response;
+  }
+
   /// Hàm PUT - Cập nhật dữ liệu
   Future<http.Response> put(String endpoint,
       {required Map<String, dynamic> body, String? token}) async {
@@ -95,6 +128,23 @@ class ApiService {
       headers: _buildHeaders(token),
       body: jsonEncode(body),
     );
+    return response;
+  }
+
+  Future<http.Response> putMultipart(
+    String endpoint, {
+    required Map<String, String> fields,
+    String? token,
+  }) async {
+    final uri = Uri.parse('$baseUrl/$endpoint');
+    var request = http.MultipartRequest('PUT', uri);
+
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    request.fields.addAll(fields);
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
     return response;
   }
 

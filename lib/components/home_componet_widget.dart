@@ -691,14 +691,12 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
     final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
     final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
-
-    final totalMacros = mealCarbs + mealFat + mealProtein;
     final carbsPercent =
-        totalMacros > 0 ? (mealCarbs / totalMacros * 100).round() : 0;
+        mealCals > 0 ? (mealCarbs * 4 / mealCals * 100).round() : 0;
     final fatPercent =
-        totalMacros > 0 ? (mealFat / totalMacros * 100).round() : 0;
+        mealCals > 0 ? (mealFat * 9 / mealCals * 100).round() : 0;
     final proteinPercent =
-        totalMacros > 0 ? (mealProtein / totalMacros * 100).round() : 0;
+        mealCals > 0 ? (mealProtein * 4 / mealCals * 100).round() : 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

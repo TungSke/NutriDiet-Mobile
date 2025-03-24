@@ -45,6 +45,7 @@ class MealLogDetail {
   final int protein;
   final int carbs;
   final int fat;
+  final String? imageUrl;
 
   MealLogDetail({
     required this.detailId,
@@ -56,6 +57,7 @@ class MealLogDetail {
     required this.protein,
     required this.carbs,
     required this.fat,
+    this.imageUrl,
   });
 
   factory MealLogDetail.fromJson(Map<String, dynamic> json) {
@@ -69,6 +71,7 @@ class MealLogDetail {
       protein: json['protein'] ?? 0,
       carbs: json['carbs'] ?? 0,
       fat: json['fat'] ?? 0,
+      imageUrl: json['imageUrl'] ?? '',
     );
   }
 }
