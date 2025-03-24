@@ -23,7 +23,7 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
     super.initState();
     _model = createModel(context, () => IngredientComponentModel());
     _model.setUpdateCallback(() => setState(() {}));
-    _model.fetchIngredients();
+    _model.fetchIngredients(context: context);
   }
 
   @override
@@ -34,7 +34,7 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
   }
 
   void _onSearchSubmit(String value) {
-    _model.searchIngredients(value);
+    _model.searchIngredients(value, context);
   }
 
   @override
@@ -111,6 +111,10 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
                   final ingredient = _model.ingredients[index];
                   return IngredientComponentWidget(
                     ingredient: ingredient,
+                    onUpdatePreference: (newPreference) async {
+                      await _model.updateIngredientPreference(
+                          ingredient['ingredientId'], newPreference, context);
+                    },
                   );
                 },
               ),
@@ -124,15 +128,35 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
 
 class IngredientComponentWidget extends StatefulWidget {
   final Map<String, dynamic> ingredient;
+  final Future<void> Function(String) onUpdatePreference;
 
-  const IngredientComponentWidget({super.key, required this.ingredient});
+  const IngredientComponentWidget({
+    super.key,
+    required this.ingredient,
+    required this.onUpdatePreference,
+  });
 
   @override
   State<IngredientComponentWidget> createState() => _IngredientComponentWidgetState();
 }
 
 class _IngredientComponentWidgetState extends State<IngredientComponentWidget> {
-  String _selectedPreference = 'Neutral';
+  late String _selectedPreference;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedPreference = widget.ingredient['preference'] ?? 'Neutral';
+  }
+
+  void _handlePreferenceChange(String newPreference) async {
+    setState(() {
+      print(_selectedPreference);
+      _selectedPreference = newPreference;
+    });
+
+    await widget.onUpdatePreference(newPreference);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,9 +228,9 @@ class _IngredientComponentWidgetState extends State<IngredientComponentWidget> {
                   DropdownMenuItem(value: 'Dislike', child: Text('Không thích')),
                 ],
                 onChanged: (value) {
-                  setState(() {
-                    _selectedPreference = value!;
-                  });
+                  if (value != null) {
+                    _handlePreferenceChange(value);
+                  }
                 },
                 underline: Container(),
               ),

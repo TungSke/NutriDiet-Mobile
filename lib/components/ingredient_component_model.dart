@@ -19,11 +19,12 @@ class IngredientComponentModel extends FlutterFlowModel<IngredientComponentWidge
     _updateCallback = callback;
   }
 
-  Future<void> fetchIngredients({String? search}) async {
+  Future<void> fetchIngredients({String? search,required BuildContext context}) async {
     try {
       _isLoading = true;
       _updateCallback?.call();
 
+      // Gọi API lấy danh sách ingredient
       final response = await _service.getAllAllergies(
         pageIndex: 1,
         pageSize: 10,
@@ -32,8 +33,28 @@ class IngredientComponentModel extends FlutterFlowModel<IngredientComponentWidge
       final responseBody = jsonDecode(response.body);
       ingredients = List<Map<String, dynamic>>.from(responseBody["data"] ?? []);
 
+      // Gọi API lấy danh sách preference
+      final preferenceResponse = await _service.getIngreDientPreference(context: context);
+      final preferenceBody = jsonDecode(preferenceResponse.body);
+      final preferences = preferenceBody['data'] ?? [];
+
+      // Áp dụng preference vào danh sách ingredients
+      for (var ingredient in ingredients) {
+        final preference = preferences.firstWhere(
+              (pref) => pref['ingredientId'] == ingredient['ingredientId'],
+          orElse: () => null,
+        );
+        ingredient['preference'] = preference != null
+            ? (preference['level'] == 1
+            ? 'Like'
+            : preference['level'] == -1
+            ? 'Dislike'
+            : 'Neutral')
+            : 'Neutral';
+      }
+
       _isLoading = false;
-      _updateCallback?.call(); // Gọi callback khi hoàn tất
+      _updateCallback?.call();
     } catch (e) {
       _isLoading = false;
       _updateCallback?.call();
@@ -41,9 +62,25 @@ class IngredientComponentModel extends FlutterFlowModel<IngredientComponentWidge
     }
   }
 
-  void searchIngredients(String query) {
+  void searchIngredients(String query, BuildContext context) {
     _searchQuery = query.trim();
-    fetchIngredients(search: _searchQuery);
+    fetchIngredients(search: _searchQuery, context: context);
+  }
+
+  Future<void> updateIngredientPreference(int ingredientId, String preference, BuildContext context) async {
+    try {
+      await _service.updateIngreDientPreference(ingredientId: ingredientId, preferenceLevel: preference, context: context);
+    } catch (e) {
+      print('Error updating ingredient preference: $e');
+    }
+  }
+
+  Future<void> getIngredientPreference(BuildContext context) async{
+    try {
+      await _service.getIngreDientPreference(context: context);
+    } catch (e) {
+      print('Error get ingredient preference: $e');
+    }
   }
 
   @override
@@ -52,7 +89,7 @@ class IngredientComponentModel extends FlutterFlowModel<IngredientComponentWidge
       start: DateTime.now().startOfDay,
       end: DateTime.now().endOfDay,
     );
-    fetchIngredients();
+    fetchIngredients(context: context);
   }
 
   @override
