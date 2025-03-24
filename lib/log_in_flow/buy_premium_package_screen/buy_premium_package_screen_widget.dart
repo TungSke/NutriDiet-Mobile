@@ -1,11 +1,11 @@
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:diet_plan_app/log_in_flow/buy_premium_package_screen/buy_premium_package_screen_model.dart';
+import 'package:diet_plan_app/log_in_flow/buy_premium_package_screen/web_view_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../flutter_flow/flutter_flow_theme.dart';
 import '../../flutter_flow/flutter_flow_widgets.dart';
-import '../../services/package_service.dart';
 
 class BuyPremiumPackageScreenWidget extends StatefulWidget {
   const BuyPremiumPackageScreenWidget({super.key});
@@ -283,25 +283,36 @@ class _BuyPremiumPackageScreenWidgetState
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: FFButtonWidget(
-                              onPressed: () async {
-                                try {
-                                  // Gọi phương thức BuyPremiumPackage với packageId là "1"
-                                  final response = await PackageService()
-                                      .BuyPremiumPackage(
-                                          packageId: "1", context: context);
-
-                                  if (response.statusCode == 200 ||
-                                      response.statusCode == 204) {
-                                    // Nếu thanh toán thành công, chuyển đến màn hình checkout success
-                                    context.push('/checkoutSuccessScreen');
-                                  } else {
-                                    context.push('/checkoutFailScreen');
-                                  }
-                                } catch (e) {
-                                  print("❌ Lỗi khi thanh toán: $e");
-                                  // Hiển thị thông báo lỗi trong SnackBar
-                                }
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => WebViewPage()));
                               },
+                              // onPressed: () async {
+                              //   try {
+                              //     // Gọi phương thức BuyPremiumPackage với packageId là "1"
+                              //     final response = await PackageService()
+                              //         .BuyPremiumPackage(
+                              //             packageId: "1", context: context);
+                              //
+                              //     if (response.statusCode == 200 ||
+                              //         response.statusCode == 204) {
+                              //       // Nếu thanh toán thành công, chuyển đến màn hình checkout success
+                              //       // context.push('/checkoutSuccessScreen');
+                              //       Navigator.push(
+                              //           context,
+                              //           MaterialPageRoute(
+                              //               builder: (context) =>
+                              //                   WebViewPage()));
+                              //     } else {
+                              //       context.push('/checkoutFailScreen');
+                              //     }
+                              //   } catch (e) {
+                              //     print("❌ Lỗi khi thanh toán: $e");
+                              //     // Hiển thị thông báo lỗi trong SnackBar
+                              //   }
+                              // },
                               text: 'Thanh toán',
                               options: FFButtonOptions(
                                 width: double.infinity,
