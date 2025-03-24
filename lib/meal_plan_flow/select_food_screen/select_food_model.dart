@@ -8,8 +8,14 @@ class SelectFoodModel extends ChangeNotifier {
   final FoodService foodService = FoodService();
   final MealPlanService _mealPlanService = MealPlanService();
   List<Food> foods = [];
+  List<MealPlanDetail> existingMeals = [];
   bool isLoading = false;
   String? errorMessage;
+
+  void setExistingMeals(List<MealPlanDetail> meals) {
+    existingMeals = meals;
+    notifyListeners();
+  }
 
   Future<void> fetchFoods({String? search, int pageIndex = 1, int pageSize = 50}) async {
     try {
@@ -29,62 +35,73 @@ class SelectFoodModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> addFoodToMealPlan({
+    required int mealPlanId,
+    required int dayNumber,
+    required String mealType,
+    required int foodId,
+    required double quantity,
+  }) async {
+    try {
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
 
-  // Future<bool> addFoodToMealPlan({
-  //   required int mealPlanId,
-  //   required int dayNumber,
-  //   required String mealType,
-  //   required int foodId,
-  //   required double quantity,
-  // }) async {
-  //   try {
-  //     isLoading = true;
-  //     errorMessage = null;
-  //     notifyListeners();
-  //
-  //     // Gọi API createMealPlanDetail (giả định, bạn sẽ implement sau)
-  //     final success = await _mealPlanService.createMealPlanDetail(
-  //       mealPlanId: mealPlanId,
-  //       dayNumber: dayNumber,
-  //       mealType: mealType,
-  //       foodId: foodId,
-  //       quantity: quantity,
-  //     );
-  //
-  //     isLoading = false;
-  //     if (!success) {
-  //       errorMessage = "Không thể thêm món ăn vào thực đơn";
-  //     }
-  //     notifyListeners();
-  //     return success;
-  //   } catch (e) {
-  //     isLoading = false;
-  //     errorMessage = "Lỗi khi thêm món ăn: $e";
-  //     notifyListeners();
-  //     return false;
-  //   }
-  // }
+      final success = await _mealPlanService.createMealPlanDetail(
+        mealPlanId: mealPlanId,
+        foodId: foodId,
+        quantity: quantity,
+        mealType: mealType,
+        dayNumber: dayNumber,
+      );
 
-  // Future<bool> removeFoodFromMealPlan(int mealPlanDetailId) async {
-  //   try {
-  //     isLoading = true;
-  //     errorMessage = null;
-  //     notifyListeners();
-  //
-  //     // Gọi API deleteMealPlanDetail (giả định, bạn sẽ implement sau)
-  //     final success = await _mealPlanService.deleteMealPlanDetail(mealPlanDetailId);
-  //
-  //     isLoading = false;
-  //     if (!success) {
-  //       errorMessage = "Không thể xóa món ăn khỏi thực đơn";
-  //     }
-  //     notifyListeners();
-  //     return success;
-  //   } catch (e) {
-  //     isLoading = false;
-  //     errorMessage = "Lỗi khi xóa món ăn: $e";
-  //     notifyListeners();
-  //     return false;
-  //   }
-  // }
+      if (success) {
+        // Lấy thông tin MealPlan từ server để đồng bộ existingMeals
+        final mealPlan = await _mealPlanService.getMealPlanById(mealPlanId);
+        if (mealPlan != null && mealPlan.mealPlanDetails != null) {
+          // Lọc các MealPlanDetail theo mealType và dayNumber
+          existingMeals = mealPlan.mealPlanDetails!
+              .where((detail) => detail.mealType == mealType && detail.dayNumber == dayNumber)
+              .toList();
+        } else {
+          errorMessage = "Không thể tải danh sách món ăn sau khi thêm";
+          isLoading = false;
+          notifyListeners();
+          return false;
+        }
+      }
+
+      isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      isLoading = false;
+      errorMessage = "Lỗi khi thêm món ăn: $e";
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> removeFoodFromMealPlan(int mealPlanDetailId) async {
+    try {
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      final success = await _mealPlanService.deleteMealPlanDetail(mealPlanDetailId);
+
+      if (success) {
+        existingMeals.removeWhere((meal) => meal.mealPlanDetailId == mealPlanDetailId);
+      }
+
+      isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      isLoading = false;
+      errorMessage = "Lỗi khi xóa món ăn: $e";
+      notifyListeners();
+      return false;
+    }
+  }
 }

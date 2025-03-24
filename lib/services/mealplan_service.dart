@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'models/mealplan.dart';
+import 'models/mealplandetail.dart';
 
 class MealPlanService{
   final ApiService _apiService = ApiService();
@@ -311,6 +312,70 @@ class MealPlanService{
       throw Exception('Lỗi khi cập nhật: ${response.statusCode}, ${response.body}');
     } catch (e) {
       debugPrint("Lỗi khi gọi API updateMealPlan: $e");
+      return false;
+    }
+  }
+
+  Future<bool> createMealPlanDetail({
+    required int mealPlanId,
+    required int foodId,
+    required double quantity,
+    required String mealType,
+    required int dayNumber,
+  }) async {
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+    if (token == null) {
+      debugPrint("Error: No access token found");
+      return false;
+    }
+
+    const String endpoint = "api/meal-plan-detail";
+    final Map<String, dynamic> body = {
+      'foodId': foodId,
+      'quantity': quantity,
+      'mealType': mealType,
+      'dayNumber': dayNumber,
+    };
+
+    try {
+      final response = await _apiService.post(
+        "$endpoint?mealPlanId=$mealPlanId",
+        body: body,
+        token: token,
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        debugPrint("Error creating meal plan detail: ${response.statusCode} - ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Exception creating meal plan detail: $e");
+      return false;
+    }
+  }
+
+  Future<bool> deleteMealPlanDetail(int mealPlanDetailId) async {
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+    if (token == null) {
+      debugPrint("Error: No access token found");
+      return false;
+    }
+
+    final String endpoint = "api/meal-plan-detail/$mealPlanDetailId";
+
+    try {
+      final response = await _apiService.delete(endpoint, token: token);
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        debugPrint("Error deleting meal plan detail: ${response.statusCode} - ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Exception deleting meal plan detail: $e");
       return false;
     }
   }

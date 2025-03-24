@@ -7,6 +7,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/components/mealLog_component_model.dart';
 import '../components/quick_add_widget.dart';
+import 'package:diet_plan_app/services/meallog_service.dart'; // Dành cho model nếu cần
 
 class MealLogComponentWidget extends StatefulWidget {
   const MealLogComponentWidget({Key? key}) : super(key: key);
@@ -43,12 +44,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     final difference = DateTime(date.year, date.month, date.day)
         .difference(DateTime(now.year, now.month, now.day))
         .inDays;
-
     if (difference == 0) return 'Hôm nay';
     if (difference == 1) return 'Ngày mai';
     if (difference == -1) return 'Hôm qua';
-
-    // Các ngày khác hiển thị dạng "d MMMM, yyyy" (tiếng Việt)
     return DateFormat('d MMMM, yyyy', 'vi').format(date);
   }
 
@@ -87,8 +85,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-
-      /// AppBar hiển thị “Diary” bên trái và icon “tia chớp” bên phải
       appBar: AppBar(
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         elevation: 0,
@@ -119,11 +115,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           ),
         ],
       ),
-
-      /// Phần thân
       body: Column(
         children: [
-          /// Thanh chọn ngày (nằm dưới AppBar)
+          // Thanh chọn ngày
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -160,12 +154,11 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ],
             ),
           ),
-
-          /// Nội dung còn lại (danh sách bữa, card calo...)
+          // Nội dung còn lại: danh sách bữa, card calo...
           Expanded(
             child: ListView(
               children: [
-                // Card hiển thị Calories Remaining (Calo còn lại)
+                // Card Calo còn lại
                 Card(
                   margin: const EdgeInsets.all(12.0),
                   color: Colors.white,
@@ -174,7 +167,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Tiêu đề
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: const [
@@ -190,7 +182,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        // Goal - Food - Remaining
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -217,14 +208,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     ),
                   ),
                 ),
-
-                // Khoảng trống xám ngăn giữa Card Calo & các bữa
+                // Khoảng trống
                 Container(
                   height: 8.0,
                   color: Colors.grey[200],
                 ),
-
-                // Hiển thị các bữa, mỗi bữa là 1 Card, xen kẽ khoảng trống xám
+                // Danh sách các bữa
                 for (final category in _model.mealCategories) ...[
                   _buildMealCategoryCard(context, category),
                   Container(
@@ -232,6 +221,93 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     color: Colors.grey[200],
                   ),
                 ],
+                // Nút "Nhận thực đơn AI"
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 16.0),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // Gọi hàm fetchMealLogsAI từ model (hàm này trả về List<MealLog> trong trường hợp của bạn)
+                      final aiMealLogs = await _model.fetchMealLogsAI();
+                      // Hiển thị popup với danh sách các món ăn AI
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Thực đơn AI"),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            child: _model.mealLogAis.isNotEmpty
+                                ? ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: _model.mealLogAis.length,
+                                    itemBuilder: (context, index) {
+                                      final meal = _model.mealLogAis[index];
+                                      return ListTile(
+                                        title: Text(meal.foodName),
+                                        subtitle: Text(
+                                          "${meal.mealType} - ${meal.servingSize} - ${meal.calories} Calories",
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : const Text("Không có dữ liệu thực đơn AI"),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text("Reject"),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                // Hiển thị dialog nhập Feedback
+                                String feedback = "";
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text("Nhập Feedback"),
+                                      content: TextField(
+                                        onChanged: (value) {
+                                          feedback = value;
+                                        },
+                                        decoration: const InputDecoration(
+                                          hintText: "Nhập feedback của bạn...",
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            Navigator.pop(context);
+                                            await _model
+                                                .sendAIChosenMealFeedback(
+                                                    feedback);
+                                            await _model.fetchMealLogs();
+                                          },
+                                          child: const Text("Submit"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: const Text("Accept"),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: const Text("Nhận thực đơn AI"),
+                  ),
+                ),
               ],
             ),
           ),
@@ -240,7 +316,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  /// Xây dựng hiển thị cột Calo
   Widget _buildCalorieColumn(String value, String label, FontWeight weight) {
     return Column(
       children: [
@@ -263,7 +338,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  /// Dấu +, -, = ...
   Widget _buildOperator(String operator) {
     return Text(
       operator,
@@ -275,7 +349,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  /// Chuyển từ tiếng Anh sang tiếng Việt tên bữa
   String _mapCategoryToVietnamese(String category) {
     switch (category.toLowerCase()) {
       case 'breakfast':
@@ -293,14 +366,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     }
   }
 
-  /// Tạo Card cho mỗi bữa
   Widget _buildMealCategoryCard(BuildContext context, String category) {
     final vietnameseCategory = _mapCategoryToVietnamese(category);
-
-    // Giả định: Mỗi ngày có 1 MealLog, ta lấy mealLogs[0].
-    // Thực tế bạn có thể cần logic khác để lấy MealLog tương ứng ngày.
     final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 0),
       color: Colors.white,
@@ -316,14 +384,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  /// Nội dung trong Card của bữa ăn
   Widget _buildMealCategoryContent(
     BuildContext context,
-    mealLog,
+    dynamic mealLog,
     String category,
     String vietnameseCategory,
   ) {
-    // Nếu chưa có mealLog => bữa này chưa có gì
     if (mealLog == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +397,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           _buildMealHeader(vietnameseCategory, null),
           ListTile(
             title: const Text(
-              'Thêm món',
+              'Thêm',
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
@@ -394,21 +460,14 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         ],
       );
     }
-
-    // Nếu đã có mealLog, ta lọc các chi tiết thuộc bữa này
     final details = mealLog.mealLogDetails
         .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
         .toList();
-
-    // Kiểm tra bữa này có món không
     final bool hasAnyFood = details.isNotEmpty;
-
-    // Tính tổng Calories & macro
     final mealCals = details.fold(0, (sum, d) => sum + d.calories);
     final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
     final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
-
     final totalMacros = mealCarbs + mealFat + mealProtein;
     final carbsPercent =
         totalMacros > 0 ? (mealCarbs / totalMacros * 100).round() : 0;
@@ -433,12 +492,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ),
             ),
           ),
-
-        // Danh sách món ăn
         for (int i = 0; i < details.length; i++) ...[
           GestureDetector(
             onLongPress: () {
-              // Dialog thao tác: chuyển bữa hoặc xóa món
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -459,7 +515,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      // Liệt kê các bữa
                                       for (final mealType in [
                                         'Breakfast',
                                         'Lunch',
@@ -469,9 +524,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                         ListTile(
                                           title: Text(mealType),
                                           onTap: () async {
-                                            // Khi user chọn bữa, đóng popup
                                             Navigator.pop(context);
-                                            // Gọi hàm transferMealLogDetailEntry
                                             await _model
                                                 .transferMealLogDetailEntry(
                                               detailId: details[i].detailId,
@@ -511,9 +564,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 ),
               ),
               subtitle: Text(
-                '${details[i].calories} Calories, '
-                '${details[i].quantity} serving(s)'
-                '${details[i].servingSize != null ? ', ${details[i].servingSize}' : ''}',
+                '${details[i].calories} Calories, ${details[i].quantity} serving(s)${details[i].servingSize != null ? ', ${details[i].servingSize}' : ''}',
                 style: const TextStyle(
                   fontFamily: 'Figtree',
                   fontSize: 14,
@@ -525,14 +576,10 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           if (i < details.length - 1)
             const Divider(color: Colors.black, thickness: 1),
         ],
-
-        // Nếu có món, thêm một Divider để ngăn nút "Thêm món"
         if (hasAnyFood) const Divider(color: Colors.black, thickness: 1),
-
-        // Nút "Thêm món"
         ListTile(
           title: const Text(
-            'Thêm món',
+            'Thêm',
             style: TextStyle(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -558,7 +605,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   });
                   break;
                 case 'reminders':
-                  // Xử lý khác nếu cần
                   break;
               }
             },
@@ -596,14 +642,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  /// Header cho mỗi bữa (hiển thị tên bữa & tổng calo bữa)
   Widget _buildMealHeader(String category, int? mealCals) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Tên bữa (Bữa sáng, Bữa trưa, ...)
           Text(
             category,
             style: const TextStyle(
@@ -612,7 +656,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          // Nếu mealCals == null => ẩn, còn != null => hiển thị
           mealCals == null
               ? const SizedBox.shrink()
               : Text(

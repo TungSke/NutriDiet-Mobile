@@ -259,4 +259,62 @@ class MeallogService {
       throw Exception("Lỗi trong getNutritionSummary: $e");
     }
   }
+
+  Future<List<MealLogDetail>> getMealLogAI() async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      const String endpoint = 'api/meal-log/meallogai';
+      final response = await _apiService.get(endpoint, token: token);
+
+      debugPrint(
+          "API getMealLogAI: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> logsJson = data['data'] ?? [];
+        return logsJson.map((e) => MealLogDetail.fromJson(e)).toList();
+      } else if (response.statusCode == 204) {
+        debugPrint("No AI meal logs found (204).");
+        return [];
+      } else {
+        throw Exception(
+            'Lỗi lấy Meal Log AI: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API getMealLogAI: $e");
+      return [];
+    }
+  }
+
+  Future<bool> saveMealLogAI({required String feedback}) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      final Map<String, String> formData = {
+        'feedback': feedback,
+      };
+
+      final response = await _apiService.postMultipart(
+        'api/meal-log/savemeallogai',
+        body: formData,
+        token: token,
+      );
+
+      debugPrint(
+          "API saveMealLogAI: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        throw Exception(
+            'Lỗi saveMealLogAI: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API saveMealLogAI: $e");
+      return false;
+    }
+  }
 }

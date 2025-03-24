@@ -654,7 +654,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
           _buildMealHeader(vietnameseCategory, null),
           ListTile(
             title: const Text(
-              'Thêm món',
+              'Thêm',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.green,
@@ -821,7 +821,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
         ],
         ListTile(
           title: const Text(
-            'Thêm món',
+            'Thêm',
             style: TextStyle(
               fontSize: 14,
               color: Colors.green,
