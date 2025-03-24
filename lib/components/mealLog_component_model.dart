@@ -195,6 +195,23 @@ class MealLogComponentModel extends FlutterFlowModel {
     }
   }
 
+  Future<void> deleteMealLogEntry({
+    required int mealLogId,
+  }) async {
+    try {
+      final service = MeallogService();
+      final bool success = await service.deleteMealLog(mealLogId: mealLogId);
+      if (success) {
+        debugPrint('Xóa Meal Log thành công');
+        await fetchMealLogs();
+      } else {
+        debugPrint('Xóa Meal Log thất bại');
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi xóa Meal Log: $e');
+    }
+  }
+
   void changeDate(DateTime newDate) {
     selectedDate = newDate;
     mealLogs = [];

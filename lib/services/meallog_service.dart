@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:diet_plan_app/services/api_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -314,6 +315,135 @@ class MeallogService {
       }
     } catch (e) {
       debugPrint("Lỗi khi gọi API saveMealLogAI: $e");
+      return false;
+    }
+  }
+
+  Future<MealLogDetail?> getMealLogDetail({
+    required int detailId,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      final String endpoint = 'api/meal-log/detail/$detailId';
+      final response = await _apiService.get(endpoint, token: token);
+      debugPrint(
+          "API getMealLogDetail: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        final dynamic detailData = jsonResponse['data'];
+        if (detailData != null) {
+          return MealLogDetail.fromJson(detailData);
+        }
+        return null;
+      }
+      throw Exception(
+          'Lỗi getMealLogDetail: ${response.statusCode} - ${response.body}');
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API getMealLogDetail: $e");
+      return null;
+    }
+  }
+
+  Future<bool> updateMealLogDetailNutrition({
+    required int detailId,
+    required int calorie,
+    required int protein,
+    required int carbs,
+    required int fat,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      final String endpoint = 'api/meal-log/detail/$detailId/nutrition';
+      // Các trường theo yêu cầu của API
+      final Map<String, String> fields = {
+        'Calorie': calorie.toString(),
+        'Protein': protein.toString(),
+        'Carbs': carbs.toString(),
+        'Fat': fat.toString(),
+      };
+
+      final response = await _apiService.putMultipart(
+        endpoint,
+        fields: fields,
+        token: token,
+      );
+
+      debugPrint(
+          "API updateMealLogDetailNutrition: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      }
+      throw Exception(
+          'Lỗi updateMealLogDetailNutrition: ${response.statusCode} - ${response.body}');
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API updateMealLogDetailNutrition: $e");
+      return false;
+    }
+  }
+
+  Future<bool> addImageToMealLogDetail({
+    required int detailId,
+    required File imageFile,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Nếu cần truyền thêm trường form-data, bạn thêm vào đây
+      final fields = <String, String>{
+        // 'key1': 'value1',
+        // 'key2': 'value2',
+        // ...
+      };
+
+      final response = await _apiService.postMultipartWithFile(
+        'api/meal-log/detail/$detailId/image',
+        fields: fields,
+        fileFieldName: 'Image',
+        filePath: imageFile.path,
+        token: token,
+      );
+
+      debugPrint("Status: ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true; // Upload thành công
+      } else {
+        throw Exception(
+            'Lỗi upload ảnh: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API addImageToMealLogDetail: $e");
+      return false;
+    }
+  }
+
+  Future<bool> deleteMealLog({
+    required int mealLogId,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      final String endpoint = 'api/meal-log/$mealLogId';
+      final response = await _apiService.delete(endpoint, token: token);
+      debugPrint(
+          "API deleteMealLog: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception(
+            'Lỗi xóa Meal Log: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API deleteMealLog: $e");
       return false;
     }
   }

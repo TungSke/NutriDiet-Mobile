@@ -2,12 +2,11 @@ import 'package:diet_plan_app/components/mealLog_list_food.dart';
 import 'package:diet_plan_app/components/mealLog_nutrition.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import '../components/meallog_detail_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/components/mealLog_component_model.dart';
 import '../components/quick_add_widget.dart';
-import 'package:diet_plan_app/services/meallog_service.dart'; // Dành cho model nếu cần
 
 class MealLogComponentWidget extends StatefulWidget {
   const MealLogComponentWidget({Key? key}) : super(key: key);
@@ -169,8 +168,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
+                          children: [
+                            const Text(
                               'Calo còn lại',
                               style: TextStyle(
                                 fontFamily: 'Figtree',
@@ -178,7 +177,51 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Icon(Icons.more_horiz),
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_horiz),
+                              onSelected: (value) async {
+                                switch (value) {
+                                  case 'delete_log':
+                                    if (_model.mealLogs.isNotEmpty) {
+                                      int mealLogId =
+                                          _model.mealLogs[0].mealLogId;
+                                      await _model.deleteMealLogEntry(
+                                          mealLogId: mealLogId);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text('Xóa nhật ký thành công')),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Không có nhật ký để xóa')),
+                                      );
+                                    }
+                                    break;
+                                  case 'end_day':
+                                    // Xử lý kết thúc ngày theo logic của bạn
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Kết thúc ngày')),
+                                    );
+                                    break;
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem<String>(
+                                  value: 'delete_log',
+                                  child: Text('Xóa nhật ký'),
+                                ),
+                                const PopupMenuItem<String>(
+                                  value: 'end_day',
+                                  child: Text('Kết thúc ngày'),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -227,8 +270,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                       horizontal: 12.0, vertical: 16.0),
                   child: ElevatedButton(
                     onPressed: () async {
-                      // Gọi hàm fetchMealLogsAI từ model (hàm này trả về List<MealLog> trong trường hợp của bạn)
-                      final aiMealLogs = await _model.fetchMealLogsAI();
+                      // Gọi hàm fetchMealLogsAI từ model
+                      await _model.fetchMealLogsAI();
                       // Hiển thị popup với danh sách các món ăn AI
                       showDialog(
                         context: context,
@@ -468,13 +511,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
     final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
-    final totalMacros = mealCarbs + mealFat + mealProtein;
     final carbsPercent =
-        totalMacros > 0 ? (mealCarbs / totalMacros * 100).round() : 0;
+        mealCals > 0 ? (mealCarbs * 4 / mealCals * 100).round() : 0;
     final fatPercent =
-        totalMacros > 0 ? (mealFat / totalMacros * 100).round() : 0;
+        mealCals > 0 ? (mealFat * 9 / mealCals * 100).round() : 0;
     final proteinPercent =
-        totalMacros > 0 ? (mealProtein / totalMacros * 100).round() : 0;
+        mealCals > 0 ? (mealProtein * 4 / mealCals * 100).round() : 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,6 +536,16 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           ),
         for (int i = 0; i < details.length; i++) ...[
           GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MealLogDetailWidget(
+                    detailId: details[i].detailId, // Truyền detailId
+                  ),
+                ),
+              );
+            },
             onLongPress: () {
               showDialog(
                 context: context,
