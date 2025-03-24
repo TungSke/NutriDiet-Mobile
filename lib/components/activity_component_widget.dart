@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-
 import '../flutter_flow/flutter_flow_model.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../services/user_service.dart';
@@ -14,21 +13,25 @@ class ActivityComponentWidget extends StatefulWidget {
   const ActivityComponentWidget({super.key});
 
   @override
-  State<ActivityComponentWidget> createState() =>
-      _ActivityComponentWidgetState();
+  State<ActivityComponentWidget> createState() => _ActivityComponentWidgetState();
 }
 
 class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   late ActivityComponentModel _model;
   final UserService _userService = UserService();
-  void _refreshChart() {
-    setState(() {
-      // Gọi lại hàm làm mới biểu đồ khi có thay đổi
-    });
+  final _weightLineChartKey = GlobalKey<WeightLineChartState>(); // Sử dụng WeightLineChartState
+
+  void _refreshChart() async {
+    await _model.fetchHealthProfile(); // Lấy dữ liệu mới từ server
+    await _weightLineChartKey.currentState?.refresh(); // Làm mới biểu đồ
+    if (mounted) {
+      setState(() {}); // Rebuild giao diện
+    }
   }
 
   final animationsMap = <String, AnimationInfo>{};
 
+  @override
   void initState() {
     super.initState();
     _model = createModel(context, () => ActivityComponentModel());
@@ -69,27 +72,24 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
               ),
             ),
             child: Padding(
-              padding:
-                  const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
+              padding: const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0.0, 0.0, 0.0, 16.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                     child: Text(
                       'Hoạt động',
                       maxLines: 1,
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily: 'figtree',
-                            fontSize: 22.0,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            useGoogleFonts: false,
-                            lineHeight: 1.5,
-                          ),
-                    ).animateOnPageLoad(
-                        animationsMap['textOnPageLoadAnimation']!),
+                        fontFamily: 'figtree',
+                        fontSize: 22.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        useGoogleFonts: false,
+                        lineHeight: 1.5,
+                      ),
+                    ).animateOnPageLoad(animationsMap['textOnPageLoadAnimation']!),
                   ),
                 ],
               ),
@@ -111,19 +111,17 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         borderRadius: BorderRadius.circular(0.0),
                         child: _model.avatar.isNotEmpty
                             ? Image.network(
-                                // Nếu có avatar từ API, sử dụng Image.network
-                                _model.avatar,
-                                width: 80.0,
-                                height: 80.0,
-                                fit: BoxFit.cover,
-                              )
+                          _model.avatar,
+                          width: 80.0,
+                          height: 80.0,
+                          fit: BoxFit.cover,
+                        )
                             : Image.asset(
-                                // Nếu không có avatar, sử dụng hình mặc định
-                                'assets/images/dummy_profile.png',
-                                width: 80.0,
-                                height: 80.0,
-                                fit: BoxFit.cover,
-                              ),
+                          'assets/images/dummy_profile.png',
+                          width: 80.0,
+                          height: 80.0,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -132,13 +130,13 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         padding: const EdgeInsets.only(top: 10),
                         child: Column(
                           children: [
-                            Text(_model.name,
-                                style: GoogleFonts.roboto(
-                                    fontSize: 18, fontWeight: FontWeight.w600)),
+                            Text(
+                              _model.name,
+                              style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.w600),
+                            ),
                             Text(
                               "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
-                              style: GoogleFonts.roboto(
-                                  fontSize: 12, color: Colors.grey),
+                              style: GoogleFonts.roboto(fontSize: 12, color: Colors.grey),
                             ),
                           ],
                         ),
@@ -147,15 +145,13 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(
-                      20.0, 24.0, 20.0, 16.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 24.0, 20.0, 16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Mục tiêu gần đây:',
-                        style: GoogleFonts.roboto(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         _model.goalType,
@@ -180,9 +176,10 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             children: [
                               Row(
                                 children: [
-                                  Text("Cân nặng ban đầu: ",
-                                      style: TextStyle(
-                                          fontSize: 14, color: Colors.grey)),
+                                  Text(
+                                    "Cân nặng ban đầu: ",
+                                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                                  ),
                                   Text(
                                     "${_model.weight} kg",
                                     style: TextStyle(
@@ -195,14 +192,14 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text("Cân nặng mục tiêu:",
-                                      style: TextStyle(
-                                          fontSize: 14, color: Colors.grey)),
+                                  Text(
+                                    "Cân nặng mục tiêu:",
+                                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                                  ),
                                   Text(
                                     "${_model.targetWeight} kg",
                                     style: TextStyle(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
+                                      color: FlutterFlowTheme.of(context).primary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -231,10 +228,11 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Đã hoàn thành ",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: FlutterFlowTheme.of(context).primary)),
+                          Text(
+                            "Đã hoàn thành ",
+                            style: TextStyle(
+                                fontSize: 14, color: FlutterFlowTheme.of(context).primary),
+                          ),
                           Text(
                             "${_model.progressPercentage}/100 %",
                             style: TextStyle(
@@ -254,8 +252,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     child: Container(
                       height: 400,
                       child: WeightLineChart(
-                        refreshChart:
-                            _refreshChart, // Truyền callback refreshChart vào đây
+                        key: _weightLineChartKey, // Gắn key để truy cập state
+                        refreshChart: _refreshChart, // Truyền callback
                       ),
                     ),
                   ),
@@ -267,8 +265,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     children: [
                       Text(
                         "Tình trạng hiện tại:",
-                        style: GoogleFonts.roboto(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         _model.bmiType,
@@ -293,31 +290,27 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                               fontWeight: FontWeight.bold),
                         ),
                         Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 0.0, 24.0),
+                          padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
                           child: CircularPercentIndicator(
                             radius: 75.0,
                             lineWidth: 12.0,
                             animation: true,
                             animateFromLastPercent: true,
                             progressColor: FlutterFlowTheme.of(context).primary,
-                            backgroundColor:
-                                FlutterFlowTheme.of(context).primary,
+                            backgroundColor: FlutterFlowTheme.of(context).primary,
                             center: Text(
                               _model.bmi,
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Figtree',
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.normal,
-                                    useGoogleFonts: false,
-                                  ),
+                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'Figtree',
+                                color: FlutterFlowTheme.of(context).grey,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.normal,
+                                useGoogleFonts: false,
+                              ),
                             ),
                           ),
                         ),
-                        Text("Chỉ số cơ thể")
+                        Text("Chỉ số cơ thể"),
                       ],
                     ),
                     Column(
@@ -330,31 +323,27 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                               fontWeight: FontWeight.bold),
                         ),
                         Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 0.0, 24.0),
+                          padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
                           child: CircularPercentIndicator(
                             radius: 75.0,
                             lineWidth: 12.0,
                             animation: true,
                             animateFromLastPercent: true,
                             progressColor: FlutterFlowTheme.of(context).primary,
-                            backgroundColor:
-                                FlutterFlowTheme.of(context).primary,
+                            backgroundColor: FlutterFlowTheme.of(context).primary,
                             center: Text(
                               _model.tdee,
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Figtree',
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.normal,
-                                    useGoogleFonts: false,
-                                  ),
+                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'Figtree',
+                                color: FlutterFlowTheme.of(context).grey,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.normal,
+                                useGoogleFonts: false,
+                              ),
                             ),
                           ),
                         ),
-                        Text("Năng lượng cần tiêu thụ")
+                        Text("Năng lượng cần tiêu thụ"),
                       ],
                     ),
                   ],
@@ -371,10 +360,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     double currentWeight = _model.weight;
     double currentHeight = _model.height;
     String currentActivityLevel = _model.activityLevel;
-    List<int> currentAllergies =
-        _model.allergies; // Using the existing allergies list
-    List<int> currentDiseases =
-        _model.diseases; // Using the existing diseases list
+    List<int> currentAllergies = _model.allergies;
+    List<int> currentDiseases = _model.diseases;
 
     showModalBottomSheet(
       context: context,
@@ -412,8 +399,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         onPressed: () {
                           setStateForBottomSheet(() {
                             currentWeight -= 0.1;
-                            currentWeight =
-                                double.parse(currentWeight.toStringAsFixed(1));
+                            currentWeight = double.parse(currentWeight.toStringAsFixed(1));
                           });
                         },
                       ),
@@ -422,8 +408,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         onPressed: () {
                           setStateForBottomSheet(() {
                             currentWeight += 0.1;
-                            currentWeight =
-                                double.parse(currentWeight.toStringAsFixed(1));
+                            currentWeight = double.parse(currentWeight.toStringAsFixed(1));
                           });
                         },
                       ),
@@ -432,30 +417,12 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
-                      // Cập nhật giá trị mới cho _model
                       _model.weight = currentWeight;
-
-                      // Gọi updateHealthProfile và cập nhật lại trọng lượng trong _model
                       await _model.updateHealthProfile(context);
-
-                      // Fetch lại dữ liệu sức khỏe sau khi cập nhật
                       await _model.fetchHealthProfile();
-
-                      // Cập nhật lại weight trong _model
-                      setState(() {
-                        _model.weight = currentWeight;
-                      });
-
-                      // Làm mới chart
-                      _refreshChart();
-
-                      // Thông báo thành công
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text('Cập nhật cân nặng thành công!')),
-                      );
-
-                      // Đóng bottom sheet sau khi lưu
+                      if (mounted) {
+                        _refreshChart(); // Gọi làm mới biểu đồ
+                      }
                       Navigator.pop(context);
                     },
                     child: Text('Lưu'),

@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../../services/mealplan_service.dart';
 import '../../services/models/mealplan.dart';
 import '../../services/models/mealplandetail.dart';
+import '../../services/user_service.dart';
 
 class MealPlanDetailModel extends ChangeNotifier {
   final MealPlanService _mealPlanService = MealPlanService();
+  final UserService _userService = UserService();
   MealPlan? mealPlan;
   Map<String, dynamic>? mealPlanTotals;
+  Map<String, double>? userGoals;
   bool isLoading = false;
   String? errorMessage;
 
@@ -20,6 +25,20 @@ class MealPlanDetailModel extends ChangeNotifier {
 
       mealPlan = await _mealPlanService.getMealPlanById(mealPlanId);
       mealPlanTotals = await _mealPlanService.getMealPlanDetailTotals(mealPlanId);
+
+      final response = await _userService.getPersonalGoal();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body)['data'];
+        userGoals = {
+          'calories': (data['dailyCalories'] as num?)?.toDouble() ?? 2000.0,
+          'carbs': (data['dailyCarb'] as num?)?.toDouble() ?? 250.0,
+          'fat': (data['dailyFat'] as num?)?.toDouble() ?? 70.0,
+          'protein': (data['dailyProtein'] as num?)?.toDouble() ?? 100.0,
+        };
+      } else {
+        userGoals = {'calories': 2000.0, 'carbs': 250.0, 'fat': 70.0, 'protein': 100.0};
+        errorMessage = "Không thể lấy mục tiêu cá nhân: ${response.body}";
+      }
 
       isLoading = false;
       notifyListeners();
