@@ -216,8 +216,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const SelectDateOfBirthWidget(),
         ),
         FFRoute(
-          name: 'ingredient',
-          path: '/ingredient',
+          name: 'ingredient_screen',
+          path: '/ingredient_screen',
           builder: (context, params) => const IngredientListScreen(),
         ),
         FFRoute(

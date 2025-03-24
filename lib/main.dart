@@ -59,9 +59,6 @@ Future<void> setupFCM() async {
   // print("FCM Token: $token");
 
   // Lắng nghe sự kiện thay đổi token
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-    print("FCM Token mới: $newToken");
-  });
 
   if (settings.authorizationStatus == AuthorizationStatus.denied) {
     print("Người dùng từ chối nhận thông báo.");

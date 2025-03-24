@@ -11,6 +11,7 @@ class ProfileComponetModel extends FlutterFlowModel<ProfileComponetWidget> {
   String email = "@gmail.com"; // Giá trị mặc định
   bool isLoading = true; // Trạng thái loading
   String avatar = "";
+  String? package = null;
   @override
   void initState(BuildContext context) {
     fetchUserProfile();
@@ -24,6 +25,7 @@ class ProfileComponetModel extends FlutterFlowModel<ProfileComponetWidget> {
         name = data["name"] ?? "Unknown User";
         email = data["email"] ?? "No Email";
         avatar = data["avatar"] ?? "";
+        package = data["package"] ?? null;
       } else {
         debugPrint("Lỗi khi gọi API: ${response.body}");
       }
