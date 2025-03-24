@@ -52,6 +52,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const BuyPremiumPackageScreenWidget(),
         ),
         FFRoute(
+          name: 'checkout_success_screen',
+          path: '/checkoutSuccessScreen',
+          builder: (context, params) => const CheckoutSuccessScreenWidget(),
+        ),
+        FFRoute(
+          name: 'checkout_fail_screen',
+          path: '/checkoutFailScreen',
+          builder: (context, params) => const CheckoutFailScreenWidget(),
+        ),
+        FFRoute(
           name: 'onbodying_screen',
           path: '/onbodyingScreen',
           builder: (context, params) => const OnbodyingScreenWidget(),
