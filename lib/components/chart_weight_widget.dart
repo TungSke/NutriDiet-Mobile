@@ -13,14 +13,14 @@ class WeightData {
 }
 
 class WeightLineChart extends StatefulWidget {
-  final Function? refreshChart;
-  WeightLineChart({this.refreshChart});
+  final VoidCallback? refreshChart; // Callback để làm mới biểu đồ
+  const WeightLineChart({this.refreshChart, super.key});
 
   @override
-  _WeightLineChartState createState() => _WeightLineChartState();
+  WeightLineChartState createState() => WeightLineChartState(); // Đổi tên lớp
 }
 
-class _WeightLineChartState extends State<WeightLineChart> {
+class WeightLineChartState extends State<WeightLineChart> { // Loại bỏ dấu `_`
   List<WeightData> weightChartData = [];
   double targetWeight = 80.0;
   DateTime? minDate;
@@ -32,6 +32,15 @@ class _WeightLineChartState extends State<WeightLineChart> {
     super.initState();
     fetchWeightData();
     fetchTargetWeight();
+    if (widget.refreshChart != null) {
+      widget.refreshChart!(); // Gọi callback nếu được cung cấp
+    }
+  }
+
+  // Phương thức công khai để làm mới dữ liệu
+  Future<void> refresh() async {
+    await fetchWeightData();
+    await fetchTargetWeight();
   }
 
   Future<void> fetchWeightData() async {
@@ -40,7 +49,7 @@ class _WeightLineChartState extends State<WeightLineChart> {
       if (response.statusCode == 200) {
         final dataJson = jsonDecode(response.body)['data'];
 
-        // Lấy giá trị cân nặng mới nhất mỗi ngày (key là ngày dạng "yyyy-MM-dd")
+        // Lấy giá trị cân nặng mới nhất mỗi ngày
         Map<String, double> latestDataMap = {};
         for (var item in dataJson) {
           double weight = item['value'].toDouble();
@@ -58,13 +67,15 @@ class _WeightLineChartState extends State<WeightLineChart> {
         // Sắp xếp theo thời gian tăng dần
         tempData.sort((a, b) => a.date.compareTo(b.date));
 
-        setState(() {
-          weightChartData = tempData;
-          if (weightChartData.isNotEmpty) {
-            minDate = weightChartData.first.date;
-            maxDate = weightChartData.last.date;
-          }
-        });
+        if (mounted) {
+          setState(() {
+            weightChartData = tempData;
+            if (weightChartData.isNotEmpty) {
+              minDate = weightChartData.first.date;
+              maxDate = weightChartData.last.date;
+            }
+          });
+        }
       } else {
         throw Exception('Failed to load weight data');
       }
@@ -78,9 +89,11 @@ class _WeightLineChartState extends State<WeightLineChart> {
       final response = await userService.getPersonalGoal();
       if (response.statusCode == 200) {
         final dataJson = jsonDecode(response.body)['data'];
-        setState(() {
-          targetWeight = dataJson['targetWeight']?.toDouble() ?? 80.0;
-        });
+        if (mounted) {
+          setState(() {
+            targetWeight = dataJson['targetWeight']?.toDouble() ?? 80.0;
+          });
+        }
       } else {
         throw Exception('Failed to load target weight');
       }
@@ -91,10 +104,7 @@ class _WeightLineChartState extends State<WeightLineChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (weightChartData.isEmpty ||
-        targetWeight == 0.0 ||
-        minDate == null ||
-        maxDate == null) {
+    if (weightChartData.isEmpty || targetWeight == 0.0 || minDate == null || maxDate == null) {
       return Center(
         child: CircularProgressIndicator(
           color: FlutterFlowTheme.of(context).primary,
@@ -102,7 +112,7 @@ class _WeightLineChartState extends State<WeightLineChart> {
       );
     }
 
-    // Tạo dữ liệu cho đường trọng lượng mục tiêu: chỉ cần 2 điểm từ ngày nhỏ nhất đến ngày lớn nhất
+    // Tạo dữ liệu cho đường trọng lượng mục tiêu
     final List<WeightData> targetSeriesData = [
       WeightData(minDate!, targetWeight),
       WeightData(maxDate!, targetWeight)
@@ -123,7 +133,7 @@ class _WeightLineChartState extends State<WeightLineChart> {
                 dataSource: weightChartData,
                 xValueMapper: (WeightData data, _) => data.date,
                 yValueMapper: (WeightData data, _) => data.weight,
-                markerSettings: MarkerSettings(isVisible: true),
+                markerSettings: const MarkerSettings(isVisible: true),
                 color: Colors.blue,
               ),
               // Đường biểu diễn trọng lượng mục tiêu
@@ -133,7 +143,7 @@ class _WeightLineChartState extends State<WeightLineChart> {
                 yValueMapper: (WeightData data, _) => data.weight,
                 width: 2,
                 color: Colors.tealAccent,
-                markerSettings: MarkerSettings(isVisible: false),
+                markerSettings: const MarkerSettings(isVisible: false),
               ),
             ],
           ),

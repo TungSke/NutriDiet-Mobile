@@ -265,6 +265,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
 
   Widget _buildDaySelector() {
     final activeDays = _model.getActiveDays();
+    final maxDay = selectedDay > activeDays.last ? selectedDay : activeDays.last; // Lấy ngày lớn nhất
     return Row(
       children: [
         Expanded(
@@ -272,7 +273,9 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                ...activeDays.map((day) => _buildDayButton(day, "Ngày $day")).toList(),
+                ...List.generate(maxDay, (index) => index + 1)
+                    .map((day) => _buildDayButton(day, "Ngày $day"))
+                    .toList(),
                 if (widget.source == MealPlanSource.myMealPlan)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -374,7 +377,7 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     final protein = nutrients['protein']!;
     final fat = nutrients['fat']!;
 
-    const userGoals = {'calories': 2000.0, 'carbs': 250.0, 'protein': 100.0, 'fat': 70.0};
+    final userGoals = _model.userGoals ?? {'calories': 2000.0, 'carbs': 250.0, 'fat': 70.0, 'protein': 100.0};
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
