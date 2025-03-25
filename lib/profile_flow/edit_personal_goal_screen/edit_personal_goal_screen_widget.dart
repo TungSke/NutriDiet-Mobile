@@ -470,7 +470,7 @@ class _EditPersonalGoalScreenWidgetState
                 isEdited = true;
               });
             }),
-            _buildPickerRow(
+            _buildPickerweightChangeRateRow(
               'Mức độ thay đổi',
               _model.weightChangeRate,
               [
@@ -497,6 +497,31 @@ class _EditPersonalGoalScreenWidgetState
 
   Widget _buildPickerRow(String title, String value, List<String> options,
       Function(String) onSelected) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          InkWell(
+            onTap: () =>
+                _showCupertinoPicker(title, options, value, onSelected),
+            child: Row(
+              children: [
+                Text(value, style: TextStyle(fontSize: 16)),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPickerweightChangeRateRow(String title, String value,
+      List<String> options, Function(String) onSelected) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(

@@ -508,9 +508,9 @@ class UserService {
   }
 
   Future<http.Response> updateDailyMacronutrients({
-    required int dailyCarb,
-    required int dailyFat,
-    required int dailyProtein,
+    required double dailyCarb,
+    required double dailyFat,
+    required double dailyProtein,
     required BuildContext context, // Thêm context vào tham số
   }) async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
