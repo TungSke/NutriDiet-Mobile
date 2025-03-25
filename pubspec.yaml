@@ -84,6 +84,8 @@ dependencies:
   syncfusion_flutter_charts: ^28.2.12
   webview_flutter: ^4.10.0
   flutter_dotenv: ^5.2.1
+  health: ^12.1.0
+  permission_handler: ^11.4.0
 
 
 
