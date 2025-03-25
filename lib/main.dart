@@ -28,7 +28,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await setupFCM();
-  await _requestPermissions();
+  // await _requestPermissions();
   await fetchStepsAndHealthData();
 
   if (kIsWeb) {
@@ -66,27 +66,33 @@ Future<void> setupFCM() async {
 }
 
 Future<void> _requestPermissions() async {
-  // Yêu cầu quyền nhận diện hoạt động
-  PermissionStatus activityRecognitionStatus = await Permission.activityRecognition.request();
-  if (!activityRecognitionStatus.isGranted) {
-    print("Quyền Activity Recognition không được cấp.");
-  }
+  // Kiểm tra nếu ứng dụng chạy trên Android hoặc iOS
+  if (Platform.isAndroid || Platform.isIOS) {
+    // Yêu cầu quyền nhận diện hoạt động
+    PermissionStatus activityRecognitionStatus = await Permission.activityRecognition.request();
+    if (!activityRecognitionStatus.isGranted) {
+      print("Quyền Activity Recognition không được cấp.");
+    }
 
-  // Yêu cầu quyền vị trí
-  PermissionStatus locationStatus = await Permission.location.request();
-  if (!locationStatus.isGranted) {
-    print("Quyền vị trí không được cấp.");
-  }
+    if (Platform.isAndroid || Platform.isIOS) {
+    PermissionStatus locationStatus = await Permission.location.request();
+    if (!locationStatus.isGranted) {
+      print("Quyền vị trí không được cấp.");
+    }
+    }
 
-  // Xử lý quyền Health Connect
-  final health = Health();
-  final types = [HealthDataType.STEPS];
-  final permissions = [HealthDataAccess.READ];
-  bool? hasPermission = await health.hasPermissions(types, permissions: permissions);
+    // Xử lý quyền Health Connect
+    final health = Health();
+    final types = [HealthDataType.STEPS];
+    final permissions = [HealthDataAccess.READ];
+    bool? hasPermission = await health.hasPermissions(types, permissions: permissions);
 
-  if (hasPermission == null || !hasPermission) {
-    final authorized = await health.requestAuthorization(types, permissions: permissions);
-    print("Quyền Health Connect được cấp: $authorized");
+    if (hasPermission == null || !hasPermission) {
+      final authorized = await health.requestAuthorization(types, permissions: permissions);
+      print("Quyền Health Connect được cấp: $authorized");
+    }
+  } else {
+    print("Ứng dụng không chạy trên Android hoặc iOS. Bỏ qua xử lý quyền.");
   }
 }
 
