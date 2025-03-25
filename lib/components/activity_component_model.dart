@@ -26,7 +26,7 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
   List<int> allergies = []; // ✅ Dị ứng
   List<int> diseases = []; // ✅ Bệnh nền
   String goalType = ''; // ✅ Mục tiêu sức khỏe
-  String targetWeight = ''; // ✅ Cân nặng mục tiêu
+  double targetWeight = 0; // ✅ Cân nặng mục tiêu
   String weightChangeRate = '';
   int progressPercentage = 0;
   final Map<String, String> _goalTypeMap = {
@@ -74,7 +74,10 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         {
-          targetWeight = data['targetWeight']?.toDouble() ?? 80.0;
+          // targetWeight = data['targetWeight']?.toDouble() ?? 80.0;
+          targetWeight = data["targetWeight"] != null
+              ? double.parse(data['targetWeight'].toString())
+              : 0.0;
         }
         ;
       } else {
@@ -118,8 +121,14 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
         bmi = data["BMI"] ?? "N/A";
         bmiType = data["BMIType"] ?? "N/A";
         tdee = data["TDEE"] ?? "N/A";
-        height = data["height"];
-        weight = data["weight"];
+        // height = data["height"];
+        height = data["height"] != null
+            ? double.parse(data['height'].toString())
+            : 0.0;
+        // weight = data["weight"];
+        weight = data["weight"] != null
+            ? double.parse(data['weight'].toString())
+            : 0.0;
         activityLevel =
             _reverseActivityLevelMap[data["activityLevel"]] ?? "N/A";
 
@@ -141,7 +150,10 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
           final personalGoal = healthData["personalGoal"];
           goalType =
               _goalTypeMap[personalGoal["goalType"]] ?? "Chưa đặt mục tiêu";
-          targetWeight = personalGoal["targetWeight"]?.toString() ?? "N/A";
+
+          targetWeight = personalGoal["targetWeight"] != null
+              ? double.parse(personalGoal['targetWeight'].toString())
+              : 0.0;
           progressPercentage = personalGoal["progressPercentage"] ?? 0;
           weightChangeRate =
               _weightChangeRateMap[personalGoal["weightChangeRate"]] ??

@@ -203,7 +203,7 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
   String location = '';
   String email = '';
 
-  int height = 0; // Chiều cao
+  double height = 0; // Chiều cao
   double weight = 0.0; // Cân nặng (sử dụng double)
   String activityLevel = ''; // Mức độ vận động
 
@@ -293,7 +293,7 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
 
         // Parse height and weight as integers
         height = healthData['data']['height'] != null
-            ? int.parse(healthData['data']['height'].toString())
+            ? double.parse(healthData['data']['height'].toString())
             : 0;
         weight = healthData['data']['weight'] != null
             ? double.parse(
@@ -330,8 +330,9 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
         final personalData = jsonDecode(response.body);
         goalType =
             _goalTypeMap[personalData['data']['goalType']] ?? "Chưa cập nhật";
-        targetWeight = personalData['data']['targetWeight'] ??
-            0; // Đảm bảo targetWeight là double
+        targetWeight = personalData['data']['targetWeight'] != null
+            ? double.parse(personalData['data']['targetWeight'].toString())
+            : 0.0;
         dailyCalories = personalData['data']['dailyCalories'] ?? 0;
         dailyCarb = personalData['data']['dailyCarb'] ?? 0;
         dailyFat = personalData['data']['dailyFat'] ?? 0;

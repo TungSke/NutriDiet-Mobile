@@ -771,7 +771,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                         fontWeight: FontWeight.normal,
                                       )),
                                   Text(
-                                    "${_model.dailyCalories ?? ''}",
+                                    "${_model.dailyCalories ?? ''} kcal",
                                     style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -789,7 +789,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                         fontWeight: FontWeight.normal,
                                       )),
                                   Text(
-                                    "${_model.dailyFat ?? ''}/100% ",
+                                    "${_model.dailyFat ?? ''} g ",
                                     style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -807,7 +807,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                         fontWeight: FontWeight.normal,
                                       )),
                                   Text(
-                                    "${_model.dailyProtein ?? ''}/100% ",
+                                    "${_model.dailyProtein ?? ''} g ",
                                     style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -825,7 +825,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                         fontWeight: FontWeight.normal,
                                       )),
                                   Text(
-                                    "${_model.dailyCarb ?? ''}/100%  ",
+                                    "${_model.dailyCarb ?? ''} g",
                                     style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
