@@ -297,9 +297,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                                       _model.mealLogs[0]
                                                           .dailyCalories)
                                               ? Colors
-                                                  .red // If totalCalories > dailyCalories, set color to red
-                                              : FlutterFlowTheme.of(context)
-                                                  .primary, // Default color // If totalCalories > dailyCalories, set color to red
+                                                  .green // If totalCalories > dailyCalories, set color to red
+                                              : Colors
+                                                  .red, // Default color // If totalCalories > dailyCalories, set color to red
                                           backgroundColor:
                                               const Color(0x33808080),
                                           center: RichText(
@@ -810,7 +810,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Text(
-              'Carbs $carbsPercent% • Fat $fatPercent% • Protein $proteinPercent%',
+              'Carbs $mealCarbs (g) • Fat $mealFat (g) • Protein $mealProtein (g)',
               style: const TextStyle(
                 fontFamily: 'Figtree',
                 fontSize: 14,

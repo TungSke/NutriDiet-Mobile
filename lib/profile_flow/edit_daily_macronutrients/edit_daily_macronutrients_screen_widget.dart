@@ -153,44 +153,150 @@ class _EditDailyMacronutrientsScreenWidgetState
       child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
-          _buildEditableRow(
-            'Protein',
-            _model.dailyProtein,
-            (val) {
-              setState(() {
-                _model.dailyProtein = val;
-                isEdited = true;
-              });
-            },
-            _model.dailyProtein == 0
-                ? "Protein không được để trống"
-                : null, // ✅ Show error if protein is 0
+          // _buildEditableRow(
+          //   'Protein',
+          //   _model.dailyProtein,
+          //   (val) {
+          //     setState(() {
+          //       _model.dailyProtein = val;
+          //       isEdited = true;
+          //     });
+          //   },
+          //   _model.dailyProtein == 0
+          //       ? "Protein không được để trống"
+          //       : null, // ✅ Show error if protein is 0
+          // ),
+          _buildDailyProteinRow('Protein (g)', _model.dailyProtein.toString(),
+              (val) {
+            setState(() {
+              _model.dailyProtein = double.tryParse(val) ?? 0.0;
+              isEdited = true;
+            });
+          }),
+          _buildDailyCarbRow('Carb (g)', _model.dailyCarb.toString(), (val) {
+            setState(() {
+              _model.dailyCarb = double.tryParse(val) ?? 0.0;
+              isEdited = true;
+            });
+          }),
+          _buildDailyFatRow('Fat (g)', _model.dailyFat.toString(), (val) {
+            setState(() {
+              _model.dailyFat = double.tryParse(val) ?? 0.0;
+              isEdited = true;
+            });
+          }),
+          // _buildEditableRow(
+          //   'Carb',
+          //   _model.dailyCarb,
+          //   (val) {
+          //     setState(() {
+          //       _model.dailyCarb = val;
+          //       isEdited = true;
+          //     });
+          //   },
+          //   _model.dailyCarb == 0
+          //       ? "Carb không được để trống"
+          //       : null, // ✅ Show error if carb is 0
+          // ),
+          // _buildEditableRow(
+          //   'Fat',
+          //   _model.dailyFat,
+          //   (val) {
+          //     setState(() {
+          //       _model.dailyFat = val;
+          //       isEdited = true;
+          //     });
+          //   },
+          //   _model.dailyFat == 0
+          //       ? "Fat không được để trống"
+          //       : null, // ✅ Show error if fat is 0
+          // ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDailyProteinRow(
+      String title, String value, Function(String) onChanged) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(
+            width: 150,
+            child: TextFormField(
+              initialValue: value,
+              textAlign: TextAlign.end,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Nhập g',
+              ),
+              onChanged: (val) {
+                onChanged(val);
+              },
+            ),
           ),
-          _buildEditableRow(
-            'Carb',
-            _model.dailyCarb,
-            (val) {
-              setState(() {
-                _model.dailyCarb = val;
-                isEdited = true;
-              });
-            },
-            _model.dailyCarb == 0
-                ? "Carb không được để trống"
-                : null, // ✅ Show error if carb is 0
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDailyCarbRow(
+      String title, String value, Function(String) onChanged) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(
+            width: 150,
+            child: TextFormField(
+              initialValue: value,
+              textAlign: TextAlign.end,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Nhập g',
+              ),
+              onChanged: (val) {
+                onChanged(val);
+              },
+            ),
           ),
-          _buildEditableRow(
-            'Fat',
-            _model.dailyFat,
-            (val) {
-              setState(() {
-                _model.dailyFat = val;
-                isEdited = true;
-              });
-            },
-            _model.dailyFat == 0
-                ? "Fat không được để trống"
-                : null, // ✅ Show error if fat is 0
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDailyFatRow(
+      String title, String value, Function(String) onChanged) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(
+            width: 150,
+            child: TextFormField(
+              initialValue: value,
+              textAlign: TextAlign.end,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Nhập g',
+              ),
+              onChanged: (val) {
+                onChanged(val);
+              },
+            ),
           ),
         ],
       ),

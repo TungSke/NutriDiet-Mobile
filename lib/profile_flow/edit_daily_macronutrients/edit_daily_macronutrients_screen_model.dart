@@ -197,9 +197,9 @@ import '../../services/user_service.dart';
 
 class EditDailyMacronutrientsScreenModel extends ChangeNotifier {
   int dailyCalories = 0;
-  int dailyCarb = 0;
-  int dailyFat = 0;
-  int dailyProtein = 0;
+  double dailyCarb = 0;
+  double dailyFat = 0;
+  double dailyProtein = 0;
   int height = 0;
   final _userService = UserService();
   String name = '';
@@ -260,9 +260,19 @@ class EditDailyMacronutrientsScreenModel extends ChangeNotifier {
         final personalData = jsonDecode(response.body);
 
         dailyCalories = personalData['data']['dailyCalories'] ?? 0;
-        dailyCarb = personalData['data']['dailyCarb'] ?? 0;
-        dailyFat = personalData['data']['dailyFat'] ?? 0;
-        dailyProtein = personalData['data']['dailyProtein'] ?? 0;
+        dailyCarb = personalData['data']['dailyCarb'] != null
+            ? double.parse(personalData['data']['dailyCarb']
+                .toString()) // Chuyển sang double
+            : 0.0;
+        // dailyCarb = personalData['data']['dailyCarb'] ?? 0;
+        dailyFat = personalData['data']['dailyFat'] != null
+            ? double.parse(personalData['data']['dailyFat']
+                .toString()) // Chuyển sang double
+            : 0.0;
+        dailyProtein = personalData['data']['dailyProtein'] != null
+            ? double.parse(personalData['data']['dailyProtein']
+                .toString()) // Chuyển sang double
+            : 0.0;
 
         isLoading = false;
         notifyListeners();

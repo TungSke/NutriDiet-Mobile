@@ -23,12 +23,12 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
   List<String> allergies = []; // ✅ Dị ứng
   List<String> diseases = []; // ✅ Bệnh nền
   String goalType = ''; // ✅ Mục tiêu sức khỏe
-  String targetWeight = ''; // ✅ Cân nặng mục tiêu
+  double targetWeight = 0.0; // ✅ Cân nặng mục tiêu
   String weightChangeRate = '';
   int dailyCalories = 0;
-  int dailyCarb = 0;
-  int dailyFat = 0;
-  int dailyProtein = 0;
+  double dailyCarb = 0.0;
+  double dailyFat = 0.0;
+  double dailyProtein = 0.0;
   int progressPercentage = 0;
   final Map<String, String> _goalTypeMap = {
     'LoseWeight': 'Giảm cân',
@@ -123,13 +123,21 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
           final personalGoal = healthData["personalGoal"];
           goalType =
               _goalTypeMap[personalGoal["goalType"]] ?? "Chưa đặt mục tiêu";
-          targetWeight = personalGoal["targetWeight"]?.toString() ?? "N/A";
+          // targetWeight = personalGoal["targetWeight"]?.toString() ?? "N/A";
+          targetWeight = personalGoal["targetWeight"] != null
+              ? double.parse(personalGoal['targetWeight'].toString())
+              : 0.0;
           progressPercentage = personalGoal["progressPercentage"] ?? 0;
-          dailyCalories = personalGoal["dailyCalories"] ?? 0;
-          dailyFat = personalGoal["dailyFat"] ?? 0;
-          dailyCarb = personalGoal["dailyCarb"] ?? 0;
-          dailyProtein = personalGoal["dailyProtein"] ?? 0;
-
+          dailyCalories = personalGoal["dailyCalories"] ?? "";
+          dailyCarb = personalGoal["dailyCarb"] != null
+              ? double.parse(personalGoal['dailyCarb'].toString())
+              : 0.0;
+          dailyFat = personalGoal["dailyFat"] != null
+              ? double.parse(personalGoal['dailyFat'].toString())
+              : 0.0;
+          dailyProtein = personalGoal["dailyProtein"] != null
+              ? double.parse(personalGoal['dailyProtein'].toString())
+              : 0.0;
           weightChangeRate =
               _weightChangeRateMap[personalGoal["weightChangeRate"]] ??
                   "Chưa cập nhật";
