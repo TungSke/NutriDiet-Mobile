@@ -228,17 +228,28 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
         if (userData.statusCode != 200) {
           throw Exception("Failed to fetch user data: ${userData.statusCode}");
         }
-
         final userDataJson = jsonDecode(userData.body);
-        print(userDataJson);
         final String? email = userDataJson["email"];
-
         if (email == null || email.isEmpty) {
           throw Exception("User email not found.");
         }
 
         FFAppState().email = email;
-        context.push("/bottomNavbarScreen");
+
+        // Chuyển hướng sau khi hiển thị thông báo
+        await Future.delayed(Duration(seconds: 1));
+
+        final String? name = userDataJson["name"];
+        final String? gender = userDataJson["gender"];
+        final String? age = userDataJson["age"];
+        final String? address = userDataJson["address"];
+        if(name == null || name.isEmpty || gender == null || gender.isEmpty ||
+            age == null || age.isEmpty || address == null || address.isEmpty){
+          context.push("/profileEnterScreen");
+        }
+        else {
+          context.push("/bottomNavbarScreen");
+        }
       } else {
         print("Login failed: ${response.statusCode} - ${response.body}");
       }

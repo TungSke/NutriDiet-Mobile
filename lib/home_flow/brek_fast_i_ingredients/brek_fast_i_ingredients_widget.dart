@@ -15,7 +15,8 @@ class BrekFastIIngredientsWidget extends StatefulWidget {
       _BrekFastIIngredientsWidgetState();
 }
 
-class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget> {
+class _BrekFastIIngredientsWidgetState
+    extends State<BrekFastIIngredientsWidget> {
   late BrekFastIIngredientsModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -668,7 +669,93 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        if (_model.foodRecipe != null)
+                        // Dropdown chọn loại ẩm thực
+                        DropdownButton<int>(
+                          value: _model.cusinetypelist.any((c) =>
+                          c["cuisineId"] == _model.selectedCuisineId)
+                              ? _model.selectedCuisineId
+                              : null,
+                          hint: const Text("Chọn loại ẩm thực"),
+                          isExpanded: true,
+                          items: _model.cusinetypelist.map((cuisine) {
+                            return DropdownMenuItem<int>(
+                              value: cuisine["cuisineId"],
+                              child: Container(
+                                color: Colors.transparent, // Đặt màu nền trong suốt
+                                padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                                child: Text(
+                                  cuisine["cuisineName"],
+                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    fontSize: 15.0,
+                                    letterSpacing: 0.0,
+                                    useGoogleFonts: false,
+                                    lineHeight: 1.5,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _model.selectedCuisineId = value!;
+                            });
+                          },
+                          dropdownColor: Colors.white, // Đặt màu nền menu
+                          style: const TextStyle(color: Colors.black), // Màu chữ mặc định
+                        ),
+                        SizedBox(height: 16),
+
+                        // Nút Tạo công thức bằng AI
+                        GestureDetector(
+                          onTap: () async {
+                            await _model.createFoodRecipeAI(widget.foodId, context);
+                            setState(() {});
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 5.0,
+                                  offset: Offset(2, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (_model.isLoading)
+                                  SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                if (!_model.isLoading)
+                                  Icon(Icons.auto_awesome, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  _model.isLoading ? "Đang tạo..." : "Tạo công thức bằng AI",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 16),
+
+                        // Nội dung phản hồi (response)
+                        if (_model.foodRecipe != null) ...[
                           Column(
                             children: [
                               RichText(
@@ -683,7 +770,22 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                             ],
-                          )
+                          ),
+                          SizedBox(height: 16),
+
+                          // Nút Từ chối công thức (chỉ hiển thị khi có response)
+                          ElevatedButton(
+                            onPressed: () => _model.showRejectDialog(widget.foodId, context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              padding: EdgeInsets.all(20),
+                            ),
+                            child: Text(
+                              "Từ chối công thức",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ]
                         else
                           Column(
                             children: [
@@ -706,76 +808,6 @@ class _BrekFastIIngredientsWidgetState extends State<BrekFastIIngredientsWidget>
                               ),
                             ],
                           ),
-
-                        SizedBox(height: 16),
-
-                        // Dropdown chọn loại ẩm thực
-                        DropdownButton<int>(
-                          value: _model.cusinetypelist.any((c) => c["cuisineId"] == _model.selectedCuisineId)
-                              ? _model.selectedCuisineId
-                              : null,
-                          hint: const Text("Chọn loại ẩm thực"),
-                          isExpanded: true,
-                          items: _model.cusinetypelist.map((cuisine) {
-                            return DropdownMenuItem<int>(
-                              value: cuisine["cuisineId"],
-                              child: Text(cuisine["cuisineName"]),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _model.selectedCuisineId = value!;
-                            });
-                          },style: TextStyle(backgroundColor: Colors.white),
-                        ),
-
-                        SizedBox(height: 16),
-
-                        ElevatedButton(
-                          onPressed: () => _model.showRejectDialog(widget.foodId, context),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: EdgeInsets.all(20)),
-                          child: Text("Từ chối công thức",style: TextStyle(color: Colors.white))
-                        ),
-
-                        SizedBox(height: 16),
-
-                        GestureDetector(
-                          onTap: () async {
-                            await _model.createFoodRecipeAI(widget.foodId, context);
-                            setState(() {});
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: [
-                                BoxShadow(color: Colors.black26, blurRadius: 5.0, offset: Offset(2, 2)),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (_model.isLoading)
-                                  SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                  ),
-                                if (!_model.isLoading) Icon(Icons.auto_awesome, color: Colors.white),
-                                SizedBox(width: 8),
-                                Text(
-                                  _model.isLoading ? "Đang tạo..." : "Tạo công thức bằng AI",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   );
