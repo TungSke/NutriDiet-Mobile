@@ -30,14 +30,24 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
   final TextEditingController _searchController = TextEditingController();
   Map<int, Food> _foodCache = {};
 
+  // Map ánh xạ mealType sang tiếng Việt
+  final Map<String, String> _mealTypeTranslations = {
+    'BreakFast': 'Bữa sáng',
+    'Lunch': 'Bữa trưa',
+    'Dinner': 'Bữa tối',
+    'Snacks': 'Bữa phụ',
+  };
+
+  String _getMealTypeInVietnamese(String mealType) {
+    return _mealTypeTranslations[mealType] ?? mealType; // Trả về gốc nếu không khớp
+  }
+
   @override
   void initState() {
     super.initState();
     _model = SelectFoodModel();
     _model.setExistingMeals(widget.existingMeals);
     _model.fetchFoods();
-    for (var meal in widget.existingMeals) {
-    }
     _fetchFoodDetailsForExistingMeals();
   }
 
@@ -57,7 +67,6 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
             imageUrl: "",
           );
         }
-      } else {
       }
     }
     if (mounted) {
@@ -88,113 +97,203 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
   }
 
   void _showQuantityDialog(Food food) {
-    final TextEditingController _quantityController = TextEditingController(text: "1");
+    int quantity = 1; // Giá trị khởi tạo
 
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Text(
+            "Thêm ${food.foodName}",
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: FlutterFlowTheme.of(context).primary,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (food.servingSize != null && food.servingSize!.isNotEmpty)
+                Text(
+                  "Serving Size: ${food.servingSize}",
+                  style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
+                ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.remove, color: FlutterFlowTheme.of(context).primary),
+                    onPressed: () {
+                      if (quantity > 1) {
+                        setState(() {
+                          quantity--;
+                        });
+                      }
+                    },
+                  ),
+                  Text(
+                    "$quantity",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: FlutterFlowTheme.of(context).primary,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.add, color: FlutterFlowTheme.of(context).primary),
+                    onPressed: () {
+                      setState(() {
+                        quantity++;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Hủy",
+                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: FlutterFlowTheme.of(context).primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () async {
+                Navigator.pop(context); // Đóng dialog số lượng
+
+                final response = await _model.foodService.checkFoodAvoidance(
+                  foodId: food.foodId!,
+                  context: context,
+                );
+                final statusCode = response.statusCode;
+                final responseData = jsonDecode(response.body);
+                final message = responseData['message'] as String?;
+
+                if (statusCode == 200 && mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      title: Text(
+                        "Cảnh báo",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                      content: Text(
+                        "$message\nBạn vẫn muốn thêm món ăn này?",
+                        style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            "Hủy",
+                            style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: FlutterFlowTheme.of(context).primary,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            final success = await _model.addFoodToMealPlan(
+                              mealPlanId: widget.mealPlanId,
+                              dayNumber: widget.dayNumber,
+                              mealType: widget.mealType,
+                              foodId: food.foodId!,
+                              quantity: quantity.toDouble(),
+                              context: context,
+                            );
+
+                            if (success && mounted) {
+                              await _fetchFoodDetail(food.foodId!);
+                              _showSuccessDialog(food);
+                            } else if (mounted) {
+                              _showErrorSnackBar();
+                            }
+                          },
+                          child: const Text("Vẫn thêm", style: TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (statusCode == 400 && mounted) {
+                  final success = await _model.addFoodToMealPlan(
+                    mealPlanId: widget.mealPlanId,
+                    dayNumber: widget.dayNumber,
+                    mealType: widget.mealType,
+                    foodId: food.foodId!,
+                    quantity: quantity.toDouble(),
+                    context: context,
+                  );
+
+                  if (success && mounted) {
+                    await _fetchFoodDetail(food.foodId!);
+                    _showSuccessDialog(food);
+                  } else if (mounted) {
+                    _showErrorSnackBar();
+                  }
+                } else if (mounted) {
+                  _showErrorSnackBar();
+                }
+              },
+              child: const Text("Xác nhận", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessDialog(Food food) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: Text(
-          "Thêm ${food.foodName}",
+          "Thành công",
           style: GoogleFonts.montserrat(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: FlutterFlowTheme.of(context).primary,
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (food.servingSize != null && food.servingSize!.isNotEmpty)
-              Text(
-                "Serving Size: ${food.servingSize}",
-                style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
-              ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _quantityController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Số lượng",
-                labelStyle: TextStyle(color: FlutterFlowTheme.of(context).primary),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
-                ),
-              ),
-            ),
-          ],
+        content: Text(
+          'Đã thêm "${food.foodName}" vào ${_getMealTypeInVietnamese(widget.mealType)}',
+          style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              "Hủy",
+              "OK",
               style: TextStyle(color: FlutterFlowTheme.of(context).primary),
             ),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: FlutterFlowTheme.of(context).primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () async {
-              final double quantity = double.tryParse(_quantityController.text) ?? 1.0;
-
-              final success = await _model.addFoodToMealPlan(
-                mealPlanId: widget.mealPlanId,
-                dayNumber: widget.dayNumber,
-                mealType: widget.mealType,
-                foodId: food.foodId!,
-                quantity: quantity,
-              );
-
-              Navigator.pop(context);
-
-              if (success && mounted) {
-                await _fetchFoodDetail(food.foodId!); // Tải hình ảnh cho món mới
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    title: Text(
-                      "Thành công",
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: FlutterFlowTheme.of(context).primary,
-                      ),
-                    ),
-                    content: Text(
-                      'Đã thêm "${food.foodName}" vào ${widget.mealType}',
-                      style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          "OK",
-                          style: TextStyle(color: FlutterFlowTheme.of(context).primary),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              } else if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(_model.errorMessage ?? "Lỗi khi thêm món ăn"),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            child: const Text("Xác nhận", style: TextStyle(color: Colors.white)),
-          ),
         ],
+      ),
+    );
+  }
+
+  void _showErrorSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_model.errorMessage ?? "Lỗi khi thêm món ăn hoặc kiểm tra tránh thức ăn"),
+        backgroundColor: Colors.red,
       ),
     );
   }
@@ -217,7 +316,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
           ),
         ),
         content: Text(
-          "Bạn có chắc muốn xóa ${meal.foodName} khỏi ${widget.mealType}?",
+          "Bạn có chắc muốn xóa ${meal.foodName} khỏi ${_getMealTypeInVietnamese(widget.mealType)}?",
           style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
         ),
         actions: [
@@ -253,14 +352,14 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                         ),
                       ),
                       content: Text(
-                        "Không còn món ăn nào trong ${widget.mealType}",
+                        "Không còn món ăn nào trong ${_getMealTypeInVietnamese(widget.mealType)}",
                         style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
                       ),
                       actions: [
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            Navigator.pop(context, true); // Trả về true để cập nhật MealPlanDetailWidget
+                            Navigator.pop(context, true);
                           },
                           child: Text(
                             "OK",
@@ -284,14 +383,14 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                         ),
                       ),
                       content: Text(
-                        'Đã xóa "${meal.foodName}" khỏi ${widget.mealType}',
+                        'Đã xóa "${meal.foodName}" khỏi ${_getMealTypeInVietnamese(widget.mealType)}',
                         style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
                       ),
                       actions: [
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            Navigator.pop(context, true); // Trả về true để cập nhật MealPlanDetailWidget
+                            Navigator.pop(context, true);
                           },
                           child: Text(
                             "OK",
@@ -333,7 +432,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
           ),
           centerTitle: true,
           title: Text(
-            'Chọn món cho ${widget.mealType} - Ngày ${widget.dayNumber}',
+            'Chọn món cho ${_getMealTypeInVietnamese(widget.mealType)} - Ngày ${widget.dayNumber}',
             style: GoogleFonts.montserrat(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -403,7 +502,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                       children: [
                         if (_model.existingMeals.isNotEmpty) ...[
                           Text(
-                            "Món ăn hiện có trong ${widget.mealType}",
+                            "Món ăn hiện có trong ${_getMealTypeInVietnamese(widget.mealType)}",
                             style: GoogleFonts.montserrat(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
@@ -431,8 +530,11 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                                         food.imageUrl!.isNotEmpty
                                         ? NetworkImage(food.imageUrl!)
                                         : null,
-                                    child: food == null || food.imageUrl == null || food.imageUrl!.isEmpty
-                                        ? Icon(Icons.fastfood, color: FlutterFlowTheme.of(context).primary)
+                                    child: food == null ||
+                                        food.imageUrl == null ||
+                                        food.imageUrl!.isEmpty
+                                        ? Icon(Icons.fastfood,
+                                        color: FlutterFlowTheme.of(context).primary)
                                         : null,
                                   ),
                                   title: Text(
@@ -446,7 +548,8 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                                   ),
                                   subtitle: Text(
                                     "Số lượng: ${(meal.quantity?.toInt() ?? 0)}",
-                                    style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
+                                    style: TextStyle(
+                                        color: FlutterFlowTheme.of(context).secondaryText),
                                   ),
                                   trailing: IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
@@ -478,7 +581,8 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                             return Card(
                               color: Colors.white,
                               elevation: 2,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
                               margin: const EdgeInsets.symmetric(vertical: 4),
                               child: ListTile(
                                 onTap: () {
@@ -486,19 +590,22 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => BrekFastIIngredientsWidget(
-                                          foodId: food.foodId!,
-                                        ),
+                                        builder: (context) =>
+                                            BrekFastIIngredientsWidget(
+                                              foodId: food.foodId!,
+                                            ),
                                       ),
                                     );
                                   }
                                 },
                                 leading: CircleAvatar(
                                   radius: 25,
-                                  backgroundImage: (food.imageUrl != null && food.imageUrl!.isNotEmpty)
+                                  backgroundImage: (food.imageUrl != null &&
+                                      food.imageUrl!.isNotEmpty)
                                       ? NetworkImage(food.imageUrl!)
                                       : null,
-                                  child: (food.imageUrl == null || food.imageUrl!.isEmpty)
+                                  child: (food.imageUrl == null ||
+                                      food.imageUrl!.isEmpty)
                                       ? Icon(Icons.fastfood,
                                       color: FlutterFlowTheme.of(context).primary)
                                       : null,
@@ -514,11 +621,13 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                                 ),
                                 subtitle: Text(
                                   '${food.calories?.toStringAsFixed(0) ?? "0"} cal • ${food.servingSize ?? "1 serving"}',
-                                  style:
-                                  TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
+                                  style: TextStyle(
+                                      color:
+                                      FlutterFlowTheme.of(context).secondaryText),
                                 ),
                                 trailing: IconButton(
-                                  icon: Icon(Icons.add, color: FlutterFlowTheme.of(context).primary),
+                                  icon: Icon(Icons.add,
+                                      color: FlutterFlowTheme.of(context).primary),
                                   onPressed: () => _addToMealPlan(food),
                                 ),
                               ),

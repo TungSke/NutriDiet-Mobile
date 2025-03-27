@@ -62,4 +62,17 @@ class FoodService {
         body: {'foodId': foodId, 'rejectionReason': rejectionReason}, token: accessToken);
     return response;
   }
+
+  Future<http.Response> checkFoodAvoidance(
+      {required int foodId, required BuildContext context}) async {
+    String? accessToken = await _apiService.getAccessToken(context);
+
+    final response = await _apiService.get(
+      "api/food/avoidance/$foodId",
+      token: accessToken,
+    );
+
+    return response;
+  }
+
 }
