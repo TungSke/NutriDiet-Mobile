@@ -29,7 +29,6 @@ class _FavScreenWidgetState extends State<FavScreenWidget> {
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
   }
 
@@ -49,94 +48,18 @@ class _FavScreenWidgetState extends State<FavScreenWidget> {
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'Favorite',
+                  title: 'Danh sách yêu thích',
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(
-                      20.0, 0.0, 20.0, 0.0),
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(
-                      0,
-                      16.0,
-                      0,
-                      16.0,
+                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                  child: wrapWithModel(
+                    model: _model.foodListComponentModel,
+                    updateCallback: () => safeSetState(() {}),
+                    child: const FoodListComponentWidget(
+                      showFavoritesOnly: true,
                     ),
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    children: [
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel1,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel2,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel3,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel4,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('brek_fast_iIngredients');
-                        },
-                        child: wrapWithModel(
-                          model: _model.foodListComponentModel5,
-                          updateCallback: () => safeSetState(() {}),
-                          child: const FoodListComponentWidget(),
-                        ),
-                      ),
-                    ].divide(const SizedBox(height: 16.0)),
                   ),
                 ),
               ),

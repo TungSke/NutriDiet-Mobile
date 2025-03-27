@@ -6,28 +6,21 @@ import 'foodList_component_model.dart';
 import 'serch_data_widget.dart' show SerchDataWidget;
 
 class SerchDataModel extends FlutterFlowModel<SerchDataWidget> {
-  ///  Local state fields for this component.
-
   bool reslut = true;
-
   bool select = true;
 
-  ///  State fields for stateful widgets in this component.
-
-  // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode;
   TextEditingController? textController;
   String? Function(BuildContext, String?)? textControllerValidator;
 
-  // Model for comon_componet component.
   late FoodListComponentModel foodListComponentModel;
-
   late SearchEmptyModel searchemptyModel;
 
   @override
   void initState(BuildContext context) {
     foodListComponentModel = createModel(context, () => FoodListComponentModel());
     searchemptyModel = createModel(context, () => SearchEmptyModel());
+    foodListComponentModel.fetchFoods(context: context);
   }
 
   @override
