@@ -41,6 +41,7 @@ class SelectFoodModel extends ChangeNotifier {
     required String mealType,
     required int foodId,
     required double quantity,
+    required BuildContext context, // thêm context để thực hiện cho check avoidance
   }) async {
     try {
       isLoading = true;
