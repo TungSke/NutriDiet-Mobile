@@ -227,7 +227,7 @@ class _IngredientAvoidScreenWidgetState
                                                       if (ingredients
                                                           .isNotEmpty) {
                                                         return Text(
-                                                            "• $ingredients");
+                                                            "$ingredients");
                                                       }
                                                     }
                                                     return SizedBox();
@@ -240,7 +240,7 @@ class _IngredientAvoidScreenWidgetState
                                                       if (ingredients
                                                           .isNotEmpty) {
                                                         return Text(
-                                                            "• $ingredients");
+                                                            "$ingredients");
                                                       }
                                                     }
                                                     return SizedBox();
@@ -279,6 +279,18 @@ class _IngredientAvoidScreenWidgetState
                         ),
                       ),
                     ],
+                  ),
+                  Positioned(
+                    top: 40,
+                    right: 20,
+                    child: ClipOval(
+                      child: FloatingActionButton(
+                        onPressed: () =>
+                            context.pushNamed('bottom_navbar_screen'),
+                        backgroundColor: Colors.white.withOpacity(0.7),
+                        child: const Icon(Icons.close, color: Colors.black),
+                      ),
+                    ),
                   ),
                 ],
               ));
