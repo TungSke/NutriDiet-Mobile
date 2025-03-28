@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:diet_plan_app/components/ingredient_component_widget.dart';
 import 'package:diet_plan_app/components/serch_data_widget.dart';
+import 'package:diet_plan_app/log_in_flow/Ingredient_avoid_screen/ingredient_avoid_screen_widget.dart';
 import 'package:diet_plan_app/log_in_flow/profile_enter_screen/profile_enter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +46,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'splace_scren',
           path: '/splaceScren',
           builder: (context, params) => const SplaceScrenWidget(),
+        ),
+        FFRoute(
+          name: 'ingredient_avoid_screen',
+          path: '/ingredientAvoidScreen',
+          builder: (context, params) => const IngredientAvoidScreenWidget(),
         ),
         FFRoute(
           name: 'buy_premium_package',

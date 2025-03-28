@@ -118,7 +118,7 @@ class _HealthIndicatorScreenWidgetState
                 "Lượng calo cần nạp mỗi ngày"),
             const SizedBox(height: 20.0),
             FFButtonWidget(
-              onPressed: () => context.pushNamed('bottom_navbar_screen'),
+              onPressed: () => context.pushNamed('ingredient_avoid_screen'),
               text: 'Tiếp tục',
               options: FFButtonOptions(
                 width: double.infinity,
