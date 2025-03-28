@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewPage extends StatelessWidget {
-  const WebViewPage({super.key});
+  final String url;
+  const WebViewPage({Key? key, required this.url}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,13 +12,14 @@ class WebViewPage extends StatelessWidget {
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            // Update loading bar.
+            // Cập nhật thanh loading nếu cần
           },
           onPageStarted: (String url) {},
           onPageFinished: (String url) {},
           onHttpError: (HttpResponseError error) {},
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
+            // Ví dụ chặn điều hướng đến YouTube
             if (request.url.startsWith('https://www.youtube.com')) {
               return NavigationDecision.prevent;
             }
@@ -25,9 +27,12 @@ class WebViewPage extends StatelessWidget {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://google.com'));
+      ..loadRequest(Uri.parse(url));
+
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text("Thanh toán"),
+      ),
       body: WebViewWidget(controller: controller),
     );
   }

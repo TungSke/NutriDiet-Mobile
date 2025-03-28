@@ -88,4 +88,35 @@ class PackageService {
           "Không thể thanh toán.", 500); // Trả về HTTP response lỗi
     }
   }
+
+  Future<dynamic> fetchPackagePayment({
+    String packageId = "1",
+    String cancelUrl = "http://localhost:52060/checkoutFailScreen",
+    String returnUrl = "http://localhost:52060/checkoutSuccessScreen",
+  }) async {
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("Access token không hợp lệ");
+    }
+
+    final Uri url = Uri.parse(
+      "${_apiService.baseUrl}/api/package/payment?cancelUrl=${Uri.encodeComponent(cancelUrl)}&returnUrl=${Uri.encodeComponent(returnUrl)}&packageId=$packageId",
+    );
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'accept': '*/*',
+      },
+      body: '',
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return response.body.isNotEmpty ? jsonDecode(response.body) : null;
+    } else {
+      throw Exception("Lỗi API: ${response.statusCode} - ${response.body}");
+    }
+  }
 }
