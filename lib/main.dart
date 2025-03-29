@@ -6,7 +6,7 @@ import 'package:diet_plan_app/services/models/health_profile_provider.dart';
 import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,7 +16,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
-import 'firebase_options.dart';
+import 'firebase_options.dart'; // Tùy chọn Firebase (tự động tạo khi cấu hình Firebase)
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,9 +28,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await setupFCM();
-  // await _requestPermissions();
-  await fetchStepsAndHealthData();
+  await setupPermissions();
 
   if (kIsWeb) {
     await FacebookAuth.i.webAndDesktopInitialize(
@@ -52,96 +51,75 @@ void main() async {
   );
 }
 
-Future<void> setupFCM() async {
+
+Future<void> setupPermissions() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // Yêu cầu quyền thông báo
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
     badge: true,
     sound: true,
     announcement: false,
   );
+
+  // Lắng nghe thông báo khi ứng dụng đang hoạt động (foreground)
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print("Nhận thông báo khi đang hoạt động: ${message.notification?.title}");
+  });
+
+  // Đăng ký hàm xử lý khi ứng dụng nhận thông báo ở chế độ nền
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Lắng nghe khi ứng dụng mở từ thông báo
+  // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+  //   print("Ứng dụng mở từ thông báo: ${message.notification?.title}");
+  // });
+
+  // Kiểm tra trạng thái quyền thông báo
   if (settings.authorizationStatus == AuthorizationStatus.denied) {
     print("Người dùng từ chối nhận thông báo.");
+  } else if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print("Quyền thông báo được cấp.");
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    print("Quyền thông báo được cấp tạm thời.");
   }
-}
 
-Future<void> _requestPermissions() async {
-  // Kiểm tra nếu ứng dụng chạy trên Android hoặc iOS
-  if (Platform.isAndroid || Platform.isIOS) {
-    // Yêu cầu quyền nhận diện hoạt động
-    PermissionStatus activityRecognitionStatus = await Permission.activityRecognition.request();
+  // Yêu cầu quyền Activity Recognition (chỉ áp dụng với Android API >= 29)
+  if (defaultTargetPlatform == TargetPlatform.android &&
+      Platform.version.contains('29')) {
+    PermissionStatus activityRecognitionStatus =
+    await Permission.activityRecognition.request();
     if (!activityRecognitionStatus.isGranted) {
       print("Quyền Activity Recognition không được cấp.");
     }
-
-    if (Platform.isAndroid || Platform.isIOS) {
     PermissionStatus locationStatus = await Permission.location.request();
     if (!locationStatus.isGranted) {
       print("Quyền vị trí không được cấp.");
     }
-    }
+  }
 
-    // Xử lý quyền Health Connect
+  // Yêu cầu quyền vị trí
+
+  // Yêu cầu quyền Health Connect (Android)
+  if (defaultTargetPlatform == TargetPlatform.android) {
     final health = Health();
     final types = [HealthDataType.STEPS];
     final permissions = [HealthDataAccess.READ];
-    bool? hasPermission = await health.hasPermissions(types, permissions: permissions);
+    bool? hasPermission =
+    await health.hasPermissions(types, permissions: permissions);
 
     if (hasPermission == null || !hasPermission) {
-      final authorized = await health.requestAuthorization(types, permissions: permissions);
+      final authorized =
+      await health.requestAuthorization(types, permissions: permissions);
       print("Quyền Health Connect được cấp: $authorized");
     }
-  } else {
-    print("Ứng dụng không chạy trên Android hoặc iOS. Bỏ qua xử lý quyền.");
   }
 }
 
-Future<void> fetchStepsAndHealthData() async {
-  try {
-    final health = Health();
-
-    // Kiểm tra tính khả dụng của Health Connect
-    if (!kIsWeb && Platform.isAndroid) {
-      final status = await health.getHealthConnectSdkStatus();
-      print("Trạng thái Health Connect: $status");
-
-      if (status != HealthConnectSdkStatus.sdkAvailable) {
-        print("Health Connect không khả dụng. Hướng dẫn cài đặt...");
-        await health.installHealthConnect();
-        return;
-      }
-    }
-
-    // Cấu hình Health
-    await health.configure();
-
-    // Yêu cầu quyền truy cập dữ liệu Health Connect
-    final types = [HealthDataType.STEPS];
-    final permissions = [HealthDataAccess.READ];
-    bool? hasPermission = await health.hasPermissions(types, permissions: permissions);
-
-    if (hasPermission == null || !hasPermission) {
-      final authorized = await health.requestAuthorization(types, permissions: permissions);
-      if (!authorized) {
-        print("Không thể yêu cầu quyền Health Connect.");
-        return;
-      }
-    }
-
-    // Lấy số bước chân
-    final now = DateTime.now();
-    final midnightPreviousDay = DateTime(now.year, now.month, now.day - 1);
-    final midnightNextDay = DateTime(now.year, now.month, now.day + 1);
-
-    final steps = await health.getTotalStepsInInterval(midnightPreviousDay, midnightNextDay);
-    if (steps != null) {
-      print("Số bước chân: $steps");
-    } else {
-      print("Không thể lấy số bước chân. Kiểm tra dữ liệu Health Connect.");
-    }
-  } catch (e) {
-    print("Đã xảy ra lỗi khi lấy dữ liệu từ Health Connect: $e");
-  }
+// Hàm xử lý thông báo ở chế độ nền
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Nhận thông báo khi ở chế độ nền: ${message.notification?.title}");
 }
 
 

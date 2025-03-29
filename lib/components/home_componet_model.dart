@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/services/gg_fit_service.dart';
 import 'package:flutter/material.dart';
 
 import '/flutter_flow/flutter_flow_calendar.dart';
@@ -5,6 +6,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '../services/meallog_service.dart';
 import '../services/models/meallog.dart';
 import '../services/user_service.dart';
+import '../services/health_service.dart';
 import 'home_componet_widget.dart' show HomeComponetWidget;
 
 class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
@@ -20,7 +22,15 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   int calorieGoal = 1300; // Giá trị mặc định, sẽ được cập nhật từ API
   int foodCalories = 0;
   int exerciseCalories = 0;
+  int steps = 0; // Số bước chân
+  int caloriesBurned = 0; // Calories đốt cháy
+  String? activityError; // Lưu thông báo lỗi từ GGFitService
   final UserService _userService = UserService();
+  final HealthService _healthService = HealthService();
+  final GGFitService _ggFitService = GGFitService(); // Khởi tạo GGFitService
+
+  double stepProgress = 50;
+  double caloriesBurnedProgress = 10;
 
   // Các bữa
   final List<String> mealCategories = [
@@ -42,9 +52,7 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
 
   String name = "Chưa đăng nhập"; // Giá trị mặc định
   String email = "@gmail.com"; // Giá trị mặc định
-  // Trạng thái loading
   String avatar = "";
-  // Các bữa
 
   Future<void> fetchUserProfile() async {
     try {
@@ -88,6 +96,34 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     }
   }
 
+  // Sửa phương thức để lấy dữ liệu từ GGFitService
+  Future<void> fetchActivityData() async {
+    try {
+      // Xác định khoảng thời gian cho ngày được chọn
+      final startDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+      final endDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
+
+      // Gọi GGFitService để lấy dữ liệu
+      final result = await _ggFitService.fetchStepsAndHealthData(startDate, endDate);
+      print(result);
+      steps = (result['steps'] is int)
+          ? result['steps'] as int
+          : (result['steps'] as double).toInt();
+
+      caloriesBurned = (result['caloriesBurned'] is double)
+          ? (result['caloriesBurned'] as double).toInt()
+          : result['caloriesBurned'] as int;
+      activityError = result['error'] as String?;
+    } catch (e) {
+      debugPrint('Lỗi khi fetch Activity Data: $e');
+      steps = 0;
+      caloriesBurned = 0;
+      activityError = "Đã xảy ra lỗi khi lấy dữ liệu hoạt động: $e";
+    } finally {
+      _updateCallback?.call();
+    }
+  }
+
   void changeDate(DateTime newDate) {
     selectedDate = newDate;
     calendarSelectedDay = DateTimeRange(
@@ -96,7 +132,11 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     );
     mealLogs = [];
     foodCalories = 0;
+    steps = 0; // Reset steps
+    caloriesBurned = 0; // Reset calories burned
+    activityError = null; // Reset lỗi
     fetchMealLogs();
+    fetchActivityData(); // Fetch dữ liệu mới khi thay đổi ngày
   }
 
   Future<void> transferMealLogDetailEntry({
@@ -133,17 +173,16 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     exerciseCalories = newCalories;
   }
 
-  // @override
-  // void initState(BuildContext context) {
-  //   calendarSelectedDay = DateTimeRange(
-  //     start: DateTime.now().startOfDay,
-  //     end: DateTime.now().endOfDay,
-  //   );
-  //   fetchUserProfile();
-  //   fetchMealLogs();
-  // }
   @override
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    calendarSelectedDay = DateTimeRange(
+      start: DateTime.now().startOfDay,
+      end: DateTime.now().endOfDay,
+    );
+    fetchUserProfile();
+    fetchMealLogs();
+    fetchActivityData(); // Gọi fetchActivityData khi khởi tạo
+  }
 
   @override
   void dispose() {}

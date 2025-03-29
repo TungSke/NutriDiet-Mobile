@@ -233,12 +233,200 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         )),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(10),
                     child: Image.asset(
                       "assets/images/main_bg.png",
                       fit: BoxFit.cover,
                     ),
                   ),
+                  //UI số bước chân
+                  // Thay thế phần "Hoạt động hôm nay" trong build()
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
+                    child: Text(
+                      'Hoạt động hôm nay',
+                      maxLines: 1,
+                      style: GoogleFonts.roboto(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  if (_model.activityError != null) // Hiển thị thông báo lỗi nếu có
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red[100],
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Lỗi lấy dữ liệu hoạt động',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red[800],
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                _model.activityError!,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.red[800],
+                                ),
+                              ),
+                              if (_model.activityError!.contains("từ chối cấp quyền")) // Nếu lỗi là do từ chối quyền
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      // Gọi lại fetchActivityData để yêu cầu quyền lần nữa
+                                      await _model.fetchActivityData();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: FlutterFlowTheme.of(context).primary,
+                                    ),
+                                    child: const Text(
+                                      'Thử lại',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (_model.activityError == null) // Chỉ hiển thị dữ liệu nếu không có lỗi
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          // Thẻ hiển thị số bước chân
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context).lightGrey,
+                                borderRadius: BorderRadius.circular(16.0),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 16.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    CircularPercentIndicator(
+                                      percent: _model.stepProgress.clamp(0.0, 1.0),
+                                      radius: 50.0,
+                                      lineWidth: 8.0,
+                                      animation: true,
+                                      animateFromLastPercent: true,
+                                      progressColor: Colors.blueAccent,
+                                      backgroundColor: Colors.grey[300]!,
+                                      center: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.directions_walk,
+                                            color: Colors.blueAccent,
+                                            size: 24.0,
+                                          ),
+                                          Text(
+                                            '${_model.steps}',
+                                            style: TextStyle(
+                                              color: Colors.blueAccent,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20.0,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      'Bước chân',
+                                      maxLines: 1,
+                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 18.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w500,
+                                        useGoogleFonts: false,
+                                      ),
+                                    ),
+                                  ].divide(const SizedBox(height: 8.0)),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Thẻ hiển thị calories đốt cháy
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context).lightGrey,
+                                borderRadius: BorderRadius.circular(16.0),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 16.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    CircularPercentIndicator(
+                                      percent: _model.caloriesBurnedProgress.clamp(0.0, 1.0),
+                                      radius: 50.0,
+                                      lineWidth: 8.0,
+                                      animation: true,
+                                      animateFromLastPercent: true,
+                                      progressColor: Colors.redAccent,
+                                      backgroundColor: Colors.grey[300]!,
+                                      center: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.local_fire_department,
+                                            color: Colors.redAccent,
+                                            size: 24.0,
+                                          ),
+                                          Text(
+                                            '${_model.caloriesBurned}',
+                                            style: TextStyle(
+                                              color: Colors.redAccent,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20.0,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      'Calories đốt cháy',
+                                      maxLines: 1,
+                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 15.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w500,
+                                        useGoogleFonts: false,
+                                      ),
+                                    ),
+                                  ].divide(const SizedBox(height: 8.0)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]
+                            .divide(const SizedBox(width: 16.0))
+                            .addToStart(const SizedBox(width: 20.0))
+                            .addToEnd(const SizedBox(width: 20.0)),
+                      ),
+                    ),
                   Opacity(
                     opacity: FFAppState().isLogin
                         ? 1.0
