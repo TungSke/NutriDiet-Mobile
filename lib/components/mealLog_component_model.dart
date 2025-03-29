@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:diet_plan_app/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../services/firebase_service.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../services/models/meallog.dart';
 import '../services/meallog_service.dart';
@@ -209,6 +210,40 @@ class MealLogComponentModel extends FlutterFlowModel {
       }
     } catch (e) {
       debugPrint('Lỗi khi xóa Meal Log: $e');
+    }
+  }
+
+  Future<void> toggleReminder(BuildContext context) async {
+    try {
+      final firebaseService = FirebaseService();
+      final message = await firebaseService.EnableReminder(context);
+      if (message != null) {
+        String dialogMessage;
+        if (message == "Reminder enabled") {
+          dialogMessage = "Thông báo nhắc bữa ăn đã được bật";
+        } else if (message == "Reminder disabled") {
+          dialogMessage = "Thông báo nhắc bữa ăn đã được tắt";
+        } else {
+          dialogMessage = "Có lỗi xảy ra khi thay đổi cài đặt nhắc nhở";
+        }
+
+        // Hiển thị dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Thông báo"),
+            content: Text(dialogMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi bật/tắt nhắc nhở: $e');
     }
   }
 

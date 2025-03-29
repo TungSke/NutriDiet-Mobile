@@ -120,6 +120,20 @@ class ApiService {
     return response;
   }
 
+  // Hàm Post với body chỉ gửi phần thô
+  Future<http.Response> postRaw(String endpoint,
+      {required String body, String? token}) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: body,
+    );
+    return response;
+  }
+
   /// Hàm PUT - Cập nhật dữ liệu
   Future<http.Response> put(String endpoint,
       {required Map<String, dynamic> body, String? token}) async {

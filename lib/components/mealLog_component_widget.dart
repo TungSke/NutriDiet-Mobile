@@ -428,11 +428,11 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
   }
 
   Widget _buildMealCategoryContent(
-    BuildContext context,
-    dynamic mealLog,
-    String category,
-    String vietnameseCategory,
-  ) {
+      BuildContext context,
+      dynamic mealLog,
+      String category,
+      String vietnameseCategory,
+      ) {
     if (mealLog == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,7 +448,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             ),
             trailing: PopupMenuButton<String>(
               icon: const Icon(Icons.more_horiz),
-              onSelected: (String value) {
+              onSelected: (String value) async { // Thêm async
                 switch (value) {
                   case 'quick_add':
                     Navigator.push(
@@ -466,7 +466,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     });
                     break;
                   case 'reminders':
-                    // Xử lý khác nếu cần
+                    await _model.toggleReminder(context); // Gọi hàm bật/tắt nhắc nhở
                     break;
                 }
               },
@@ -512,11 +512,11 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
     final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
     final carbsPercent =
-        mealCals > 0 ? (mealCarbs * 4 / mealCals * 100).round() : 0;
+    mealCals > 0 ? (mealCarbs * 4 / mealCals * 100).round() : 0;
     final fatPercent =
-        mealCals > 0 ? (mealFat * 9 / mealCals * 100).round() : 0;
+    mealCals > 0 ? (mealFat * 9 / mealCals * 100).round() : 0;
     final proteinPercent =
-        mealCals > 0 ? (mealProtein * 4 / mealCals * 100).round() : 0;
+    mealCals > 0 ? (mealProtein * 4 / mealCals * 100).round() : 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -541,7 +541,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => MealLogDetailWidget(
-                    detailId: details[i].detailId, // Truyền detailId
+                    detailId: details[i].detailId,
                   ),
                 ),
               );
@@ -639,7 +639,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           ),
           trailing: PopupMenuButton<String>(
             icon: const Icon(Icons.more_horiz),
-            onSelected: (String value) {
+            onSelected: (String value) async { // Thêm async
               switch (value) {
                 case 'quick_add':
                   Navigator.push(
@@ -657,6 +657,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   });
                   break;
                 case 'reminders':
+                  await _model.toggleReminder(context); // Gọi hàm bật/tắt nhắc nhở
                   break;
               }
             },
@@ -711,13 +712,13 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           mealCals == null
               ? const SizedBox.shrink()
               : Text(
-                  mealCals.toString(),
-                  style: const TextStyle(
-                    fontFamily: 'Figtree',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+            mealCals.toString(),
+            style: const TextStyle(
+              fontFamily: 'Figtree',
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
