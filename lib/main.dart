@@ -93,26 +93,10 @@ Future<void> setupPermissions() async {
     if (!activityRecognitionStatus.isGranted) {
       print("Quyền Activity Recognition không được cấp.");
     }
+    // Yêu cầu quyền vị trí
     PermissionStatus locationStatus = await Permission.location.request();
     if (!locationStatus.isGranted) {
       print("Quyền vị trí không được cấp.");
-    }
-  }
-
-  // Yêu cầu quyền vị trí
-
-  // Yêu cầu quyền Health Connect (Android)
-  if (defaultTargetPlatform == TargetPlatform.android) {
-    final health = Health();
-    final types = [HealthDataType.STEPS];
-    final permissions = [HealthDataAccess.READ];
-    bool? hasPermission =
-    await health.hasPermissions(types, permissions: permissions);
-
-    if (hasPermission == null || !hasPermission) {
-      final authorized =
-      await health.requestAuthorization(types, permissions: permissions);
-      print("Quyền Health Connect được cấp: $authorized");
     }
   }
 }

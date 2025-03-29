@@ -26,8 +26,7 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   int caloriesBurned = 0; // Calories đốt cháy
   String? activityError; // Lưu thông báo lỗi từ GGFitService
   final UserService _userService = UserService();
-  final HealthService _healthService = HealthService();
-  final GGFitService _ggFitService = GGFitService(); // Khởi tạo GGFitService
+  final GGFitService _ggFitService = GGFitService();
 
   double stepProgress = 50;
   double caloriesBurnedProgress = 10;
@@ -181,7 +180,7 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     );
     fetchUserProfile();
     fetchMealLogs();
-    fetchActivityData(); // Gọi fetchActivityData khi khởi tạo
+    fetchActivityData();
   }
 
   @override
