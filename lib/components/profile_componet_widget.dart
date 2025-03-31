@@ -108,37 +108,40 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 borderRadius: BorderRadius.circular(40.0),
                                 child: _model.avatar.isNotEmpty
                                     ? Image.network(
-                                  _model.avatar,
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
-                                )
+                                        _model.avatar,
+                                        width: 80.0,
+                                        height: 80.0,
+                                        fit: BoxFit.cover,
+                                      )
                                     : Image.asset(
-                                  'assets/images/dummy_profile.png',
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
-                                ),
+                                        'assets/images/dummy_profile.png',
+                                        width: 80.0,
+                                        height: 80.0,
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
                               if (_model.package != null)
                                 Positioned(
                                   top: 0,
                                   right: 0,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 4.0),
                                     decoration: BoxDecoration(
                                       color: Colors.yellow,
                                       borderRadius: BorderRadius.circular(12.0),
                                     ),
                                     child: Text(
                                       'VIP',
-                                      style: FlutterFlowTheme.of(context).bodySmall.override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        useGoogleFonts: false,
-                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .override(
+                                            fontFamily: 'figtree',
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            useGoogleFonts: false,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -152,37 +155,45 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                               children: [
                                 Text(
                                   _model.name,
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.w500,
-                                    useGoogleFonts: false,
-                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w500,
+                                        useGoogleFonts: false,
+                                      ),
                                 ),
                                 Text(
                                   _model.email,
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 16.0,
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    useGoogleFonts: false,
-                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        color:
+                                            FlutterFlowTheme.of(context).grey,
+                                        useGoogleFonts: false,
+                                      ),
                                 ),
                                 if (_model.package != null)
                                   Text(
                                     _model.package!,
-                                    style: FlutterFlowTheme.of(context).bodySmall.override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.yellow,
-                                      useGoogleFonts: false,
-                                    ),
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodySmall
+                                        .override(
+                                          fontFamily: 'figtree',
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.yellow,
+                                          useGoogleFonts: false,
+                                        ),
                                   ),
                               ],
                             ),
                           ),
-                          if (_model.package == null) // Nếu không phải VIP thì hiển thị nút
+                          if (_model.package ==
+                              null) // Nếu không phải VIP thì hiển thị nút
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: InkWell(
@@ -194,33 +205,41 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                   context.pushNamed('buy_premium_package');
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0, vertical: 6.0),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.yellow, width: 2.0),
+                                    border: Border.all(
+                                        color: Colors.yellow, width: 2.0),
                                     borderRadius: BorderRadius.circular(20.0),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       ClipRRect(
-                                        borderRadius: BorderRadius.circular(0.0),
+                                        borderRadius:
+                                            BorderRadius.circular(0.0),
                                         child: Image.asset(
                                           'assets/images/diamond.png',
-                                          width: 20.0,  // Giảm kích thước một chút để vừa với nút
+                                          width:
+                                              20.0, // Giảm kích thước một chút để vừa với nút
                                           height: 20.0,
                                           fit: BoxFit.contain,
                                         ),
                                       ),
-                                      const SizedBox(width: 6.0), // Khoảng cách giữa icon và chữ
+                                      const SizedBox(
+                                          width:
+                                              6.0), // Khoảng cách giữa icon và chữ
                                       Text(
                                         'Mua Premium',
-                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          fontFamily: 'figtree',
-                                          color: Colors.yellow,
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold,
-                                          useGoogleFonts: false,
-                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              fontFamily: 'figtree',
+                                              color: Colors.yellow,
+                                              fontSize: 14.0,
+                                              fontWeight: FontWeight.bold,
+                                              useGoogleFonts: false,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -530,6 +549,84 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                             12.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'Công thức của tôi',
+                                      maxLines: 1,
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                            fontFamily: 'figtree',
+                                            fontSize: 16.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            useGoogleFonts: false,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(0.0),
+                                  child: SvgPicture.asset(
+                                    'assets/images/profile-asrow.svg',
+                                    width: 24.0,
+                                    height: 24.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (FFAppState().isLogin == true)
+                  Builder(
+                    builder: (context) => Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 16.0),
+                      child: InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          context.push("/aiSuggestionScreen");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).lightGrey,
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8.0, 8.0, 16.0, 8.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      child: Image.asset(
+                                        'assets/images/ai.png',
+                                        width: 24.0,
+                                        height: 24.0,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'Lời khuyên AI',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium

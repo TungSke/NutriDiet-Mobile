@@ -601,4 +601,19 @@ class UserService {
           "Không thể cập nhật dinh dưỡng", 500); // Trả về HTTP response lỗi
     }
   }
+
+  Future<http.Response> createAiSuggestion(String token) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${_apiService.baseUrl}/api/health-profile/ai-suggestion"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      return response;
+    } catch (e) {
+      throw Exception("Lỗi khi gọi API: $e");
+    }
+  }
 }

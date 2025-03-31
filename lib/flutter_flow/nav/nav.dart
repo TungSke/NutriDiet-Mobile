@@ -78,6 +78,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const HealthIndicatorScreenWidget(),
         ),
         FFRoute(
+          name: 'ai_suggestion_screen',
+          path: '/aiSuggestionScreen',
+          builder: (context, params) => const AiSuggestionScreenWidget(),
+        ),
+        FFRoute(
           name: 'login_screen',
           path: '/loginScreen',
           builder: (context, params) => const LoginScreenWidget(),
