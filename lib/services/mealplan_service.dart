@@ -150,8 +150,9 @@ class MealPlanService{
         body: {},
         token: token,
       ).timeout(const Duration(seconds: 45), onTimeout: () {
-        throw Exception("Request timed out after 30 seconds");
+        return http.Response('Request timed out', 408); // Trả về timeout giả lập
       });
+
       final data = jsonDecode(response.body);
       if (response.statusCode == 201) {
         final mealPlan = MealPlan.fromJson(data['data']);
@@ -160,12 +161,20 @@ class MealPlanService{
           'mealPlan': mealPlan,
           'message': data['message'] ?? 'Meal plan created successfully'
         };
+      } else if (response.statusCode == 403) {
+        return {
+          'success': false,
+          'mealPlan': null,
+          'message': data['message'] ?? 'Chỉ tài khoản Premium mới sử dụng được tính năng này',
+          'requiresPremium': true // Thêm key để báo hiệu cần premium
+        };
+      } else {
+        return {
+          'success': false,
+          'mealPlan': null,
+          'message': data['message'] ?? 'Failed to create meal plan (Status: ${response.statusCode})'
+        };
       }
-      return {
-        'success': false,
-        'mealPlan': null,
-        'message': data['message'] ?? 'Failed to create meal plan (Status: ${response.statusCode})'
-      };
     } catch (e) {
       return {
         'success': false,

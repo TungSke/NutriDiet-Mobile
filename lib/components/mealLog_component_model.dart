@@ -164,6 +164,11 @@ class MealLogComponentModel extends FlutterFlowModel {
       debugPrint('Lỗi khi xóa Meal Log Detail: $e');
     }
   }
+  // check premium
+  Future<bool> checkPremiumStatus() async {
+    final userService = UserService();
+    return await userService.isPremium();
+  }
 
   /// Gọi API để lấy Meal Log gợi ý từ AI
   Future<void> fetchMealLogsAI() async {

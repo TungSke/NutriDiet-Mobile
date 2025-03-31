@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import '/components/log_out_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -21,19 +22,17 @@ class ProfileComponetWidget extends StatefulWidget {
 class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
     with TickerProviderStateMixin {
   late ProfileComponetModel _model;
+  bool isPremium = false; //lưu trạng thái premium
 
   final animationsMap = <String, AnimationInfo>{};
-
-  @override
-  void setState(VoidCallback callback) {
-    super.setState(callback);
-    _model.onUpdate();
-  }
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => ProfileComponetModel());
+
+    // Kiểm tra trạng thái premium khi tạo trang
+    _checkPremiumStatus();
 
     animationsMap.addAll({
       'textOnPageLoadAnimation': AnimationInfo(
@@ -50,7 +49,114 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
       ),
     });
   }
+  // Hàm kiểm tra premium
+  Future<void> _checkPremiumStatus() async {
+    final premiumStatus = await _model.checkPremiumStatus();
+    if (mounted) {
+      setState(() {
+        isPremium = premiumStatus;
+      });
+    }
+  }
+// Hàm hiển thị dialog "Yêu cầu Premium"
+  Future<void> _showPremiumRequiredDialog() async {
+    final proceedToPremium = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                FlutterFlowTheme.of(context).primary,
+                FlutterFlowTheme.of(context).secondary,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.star,
+                color: Colors.yellow,
+                size: 50,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Yêu cầu Premium',
+                style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Để sử dụng tính năng "Nguyên liệu cần tránh", bạn cần nâng cấp lên tài khoản Premium.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
+                textAlign: TextAlign.center,
+                style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white70,
+                    ),
+                    child: const Text(
+                      'Hủy',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text(
+                      'Tiếp tục',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
 
+    if (proceedToPremium == true && mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BuyPremiumPackageScreenWidget(),
+        ),
+      );
+      // Kiểm tra lại trạng thái premium sau khi quay lại
+      await _checkPremiumStatus();
+    }
+  }
   @override
   void dispose() {
     _model.maybeDispose();
@@ -562,30 +668,36 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                 if (FFAppState().isLogin == true)
                   Builder(
                     builder: (context) => Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          0.0, 0.0, 0.0, 16.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                       child: InkWell(
                         splashColor: Colors.transparent,
                         focusColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
-                        onTap: () async {
+                        onTap: isPremium
+                            ? () async {
                           context.push("/ingredientAvoidScreen");
+                        }
+                            : () async {
+                          await _showPremiumRequiredDialog();
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).lightGrey,
+                            color: isPremium
+                                ? FlutterFlowTheme.of(context).lightGrey
+                                : Colors.grey[600], // Màu xám đen khi không premium
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                8.0, 8.0, 16.0, 8.0),
+                            padding: const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 16.0, 8.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context).primary,
+                                    color: isPremium
+                                        ? FlutterFlowTheme.of(context).primary
+                                        : Colors.grey[400], // Điều chỉnh màu icon khi không premium
                                     shape: BoxShape.circle,
                                   ),
                                   child: Padding(
@@ -597,27 +709,25 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
+                                        color: isPremium ? null : Colors.grey[200], // Làm mờ icon nếu không premium
                                       ),
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                    padding: const EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Nguyên liệu cần tránh ',
+                                      'Nguyên liệu cần tránh',
                                       maxLines: 1,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'figtree',
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            useGoogleFonts: false,
-                                          ),
+                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                        color: isPremium ? null : Colors.grey[200], // Màu chữ xám khi không premium
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -628,6 +738,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                     width: 24.0,
                                     height: 24.0,
                                     fit: BoxFit.cover,
+                                    color: isPremium ? null : Colors.grey[200], // Màu mũi tên xám khi không premium
                                   ),
                                 ),
                               ],

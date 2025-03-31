@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:diacritic/diacritic.dart' as diacritic;
+import 'package:diet_plan_app/services/user_service.dart';
 import '../services/models/mealplan.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'my_mealplan_component_widget.dart';
@@ -8,6 +9,7 @@ import '../services/mealplan_service.dart';
 
 class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> {
   final MealPlanService _mealPlanService = MealPlanService();
+  final UserService _userService = UserService();
   List<MealPlan> mealPlans = [];
   bool isLoading = true;
   int pageIndex = 1;
@@ -94,7 +96,9 @@ class MyMealPlanComponentModel extends FlutterFlowModel<MyMealPlanScreenWidget> 
       };
     }
   }
-
+  Future<bool> checkPremiumStatus() async {
+    return await _userService.isPremium();
+  }
   List<MealPlan> getFilteredMealPlans() {
     String searchQueryNoDiacritics = removeDiacritics(searchQuery.toLowerCase());
 
