@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
+import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import '../meal_plan_flow/meal_plan_detail/ai_meal_plan_detail/ai_meal_plan_detail_widget.dart';
 import '../meal_plan_flow/meal_plan_detail/meal_plan_detail_widget.dart';
 import '../meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_widget.dart';
@@ -17,6 +18,7 @@ class MyMealPlanScreenWidget extends StatefulWidget {
 class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   late MyMealPlanComponentModel _model;
   String? activeMealPlan;
+  bool isPremium = false; // Biến trạng thái premium
 
   @override
   void initState() {
@@ -28,12 +30,23 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       }
     });
     _model.fetchMealPlans();
+    _checkPremiumStatus(); // Kiểm tra premium khi khởi tạo
   }
 
   @override
   void dispose() {
     _model.dispose();
     super.dispose();
+  }
+
+  // Hàm kiểm tra trạng thái premium
+  Future<void> _checkPremiumStatus() async {
+    final premiumStatus = await _model.checkPremiumStatus();
+    if (mounted) {
+      setState(() {
+        isPremium = premiumStatus;
+      });
+    }
   }
 
   Future<void> _navigateToSampleMealPlan() async {
@@ -47,7 +60,110 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
   }
 
   Future<void> _navigateToAIMealPlan() async {
-    // Hiển thị dialog xác nhận
+    if (!mounted) return;
+
+    // Kiểm tra trạng thái premium trước
+    final isPremium = await _model.checkPremiumStatus();
+    if (!isPremium) {
+      final proceedToPremium = await showDialog<bool>(
+        context: context,
+        builder: (context) => Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  FlutterFlowTheme.of(context).primary,
+                  FlutterFlowTheme.of(context).secondary,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.star,
+                  color: Colors.yellow,
+                  size: 50,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Yêu cầu Premium',
+                  style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Để nhận thực đơn AI, bạn cần nâng cấp lên tài khoản Premium.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
+                  textAlign: TextAlign.center,
+                  style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
+                    color: Colors.white70,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white70,
+                      ),
+                      child: const Text(
+                        'Hủy',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.yellow,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      child: const Text(
+                        'Tiếp tục',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      if (proceedToPremium != true || !mounted) return;
+
+      // Chuyển đến màn hình mua premium
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BuyPremiumPackageScreenWidget(),
+        ),
+      );
+      return; // Dừng lại nếu không phải premium
+    }
+
+    // Nếu là premium, hiển thị dialog xác nhận
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -72,13 +188,13 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
 
     if (confirmed != true || !mounted) return;
 
-    // Hiển thị loading dialog với BuildContext riêng
+    // Hiển thị loading dialog
     BuildContext? loadingContext;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
-        loadingContext = dialogContext; // Lưu context của loading dialog
+        loadingContext = dialogContext;
         return const Center(child: CircularProgressIndicator());
       },
     );
@@ -87,12 +203,11 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       // Gọi API tạo meal plan
       final result = await _model.createSuitableMealPlanByAI();
 
-      // Đóng loading dialog nếu vẫn mở
+      // Đóng loading dialog
       if (loadingContext != null && Navigator.canPop(loadingContext!)) {
         Navigator.pop(loadingContext!);
       }
 
-      // Kiểm tra kết quả và chuyển hướng
       if (result['success'] && mounted) {
         final mealPlan = result['mealPlan'] as MealPlan;
         debugPrint("Navigating to AI Meal Plan Detail with temporary MealPlan");
@@ -108,7 +223,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
           await _model.fetchMealPlans();
         }
       } else if (mounted) {
-        debugPrint("Failed to create AI meal plan: ${result['message']}");
+        // Nếu backend trả về lỗi (ví dụ: 403), hiển thị SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result['message'] ?? 'Lỗi khi tạo thực đơn AI'),
@@ -487,7 +602,9 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       height: 60,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: FlutterFlowTheme.of(context).primary,
+          backgroundColor: title == "Nhận thực đơn AI" && !isPremium
+              ? Colors.grey[600] // Màu xám đen khi không premium
+              : FlutterFlowTheme.of(context).primary, // Màu gốc khi premium
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
         onPressed: onPressed,
