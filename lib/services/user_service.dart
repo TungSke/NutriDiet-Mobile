@@ -616,4 +616,31 @@ class UserService {
       throw Exception("Lỗi khi gọi API: $e");
     }
   }
+
+  Future<bool> isPremium() async {
+    try {
+      final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+      final String? accessToken =
+          await flutterSecureStorage.read(key: 'accessToken');
+
+      if (accessToken == null) {
+        throw Exception("No access token available");
+      }
+      final response =
+          await _apiService.get("/api/user/is-premium", token: accessToken);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        bool isPremium = responseData['data'] as bool;
+        return isPremium;
+      } else if (response.statusCode == 401) {
+        throw Exception("Unauthorized: Please log in again.");
+      } else {
+        throw Exception(
+            "Failed to check premium status: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error: $e");
+      return false;
+    }
+  }
 }
