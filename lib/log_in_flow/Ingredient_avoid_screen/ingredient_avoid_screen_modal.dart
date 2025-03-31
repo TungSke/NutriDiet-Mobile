@@ -1,15 +1,19 @@
 import 'package:diet_plan_app/log_in_flow/Ingredient_avoid_screen/ingredient_avoid_screen_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../components/appbar_model.dart';
 import '../../flutter_flow/flutter_flow_model.dart';
 import '../../services/health_service.dart';
+import '../../services/user_service.dart';
 
 class IngredientAvoidScreenModel
     extends FlutterFlowModel<IngredientAvoidScreenWidget> with ChangeNotifier {
   ///  Local state fields for this page.
   List<String> allergies = []; // ✅ Dị ứng
   List<String> diseases = [];
+  final UserService _userService = UserService();
+  String aisuggestion = '';
 
   ///  State fields for stateful widgets in this page.
   late AppbarModel appbarModel;
@@ -68,6 +72,30 @@ class IngredientAvoidScreenModel
       }
     } catch (e) {
       print("❌ Lỗi khi fetch dữ liệu sức khỏe: $e");
+    }
+  }
+
+  Future<void> createAiSuggestion() async {
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("⚠ Access token không hợp lệ, vui lòng đăng nhập lại.");
+    }
+
+    try {
+      final response = await _userService.createAiSuggestion(token);
+
+      if (response.statusCode == 200) {
+        print("Lời khuyên AI đã được tạo thành công.");
+        await fetchHealthProfile();
+      } else {
+        print('Lỗi khi tạo lời khuyên AI: ${response.body}');
+        throw Exception('Lỗi khi tạo lời khuyên AI: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error creating AI suggestion: $e');
+      throw Exception("Không thể kết nối đến server.");
     }
   }
 

@@ -18,7 +18,7 @@ class _IngredientAvoidScreenWidgetState
     extends State<IngredientAvoidScreenWidget> {
   late IngredientAvoidScreenModel _model;
   bool isLoading = true; // Biến để theo dõi trạng thái loading
-
+  bool isCreating = false;
   @override
   void initState() {
     super.initState();
@@ -247,6 +247,42 @@ class _IngredientAvoidScreenWidgetState
                                                   }).toList(),
                                                 ],
                                               ),
+                                            ),
+                                          ),
+                                          FFButtonWidget(
+                                            onPressed: () async {
+                                              setState(() {
+                                                isCreating =
+                                                    true; // Hiển thị trạng thái loading cho nút
+                                              });
+
+                                              await _model
+                                                  .createAiSuggestion(); // Gọi hàm tạo lời khuyên AI
+                                              await _model
+                                                  .fetchHealthProfile(); // Cập nhật lại dữ liệu sau khi tạo
+
+                                              setState(() {
+                                                isCreating =
+                                                    false; // Tắt trạng thái loading
+                                              });
+
+                                              context.pushNamed(
+                                                  'ai_suggestion_screen'); // Điều hướng sau khi tạo xong
+                                            },
+                                            text: isCreating
+                                                ? 'Đang tạo lại...'
+                                                : 'Tạo lời khuyên AI',
+                                            options: FFButtonOptions(
+                                              width: double.infinity,
+                                              height: 54.0,
+                                              color: Colors.red,
+                                              textStyle: GoogleFonts.roboto(
+                                                fontSize: 18.0,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
                                             ),
                                           ),
                                           FFButtonWidget(

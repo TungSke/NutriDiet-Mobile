@@ -602,32 +602,45 @@ class UserService {
     }
   }
 
-  Future<bool> isPremium() async{
+  Future<http.Response> createAiSuggestion(String token) async {
+    try {
+      final response = await http.post(
+        Uri.parse("${_apiService.baseUrl}/api/health-profile/ai-suggestion"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      return response;
+    } catch (e) {
+      throw Exception("Lỗi khi gọi API: $e");
+    }
+  }
+
+  Future<bool> isPremium() async {
     try {
       final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
-      final String? accessToken = await flutterSecureStorage.read(key: 'accessToken');
+      final String? accessToken =
+          await flutterSecureStorage.read(key: 'accessToken');
 
       if (accessToken == null) {
         throw Exception("No access token available");
       }
-        final response = await _apiService.get(
-          "/api/user/is-premium",
-        token: accessToken
-        );
+      final response =
+          await _apiService.get("/api/user/is-premium", token: accessToken);
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         bool isPremium = responseData['data'] as bool;
         return isPremium;
-      }
-      else if (response.statusCode == 401) {
+      } else if (response.statusCode == 401) {
         throw Exception("Unauthorized: Please log in again.");
       } else {
-        throw Exception("Failed to check premium status: ${response.statusCode}");
+        throw Exception(
+            "Failed to check premium status: ${response.statusCode}");
       }
+    } catch (e) {
+      print("Error: $e");
+      return false;
     }
-    catch (e) {
-        print("Error: $e");
-        return false;
-      }
-    }
+  }
 }

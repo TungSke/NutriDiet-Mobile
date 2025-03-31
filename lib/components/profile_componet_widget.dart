@@ -3,11 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import '/components/log_out_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import 'profile_componet_model.dart';
 
 export 'profile_componet_model.dart';
@@ -25,6 +25,12 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
   bool isPremium = false; //lưu trạng thái premium
 
   final animationsMap = <String, AnimationInfo>{};
+
+  @override
+  void setState(VoidCallback callback) {
+    super.setState(callback);
+    _model.onUpdate();
+  }
 
   @override
   void initState() {
@@ -49,6 +55,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
       ),
     });
   }
+
   // Hàm kiểm tra premium
   Future<void> _checkPremiumStatus() async {
     final premiumStatus = await _model.checkPremiumStatus();
@@ -58,6 +65,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
       });
     }
   }
+
 // Hàm hiển thị dialog "Yêu cầu Premium"
   Future<void> _showPremiumRequiredDialog() async {
     final proceedToPremium = await showDialog<bool>(
@@ -89,19 +97,19 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
               Text(
                 'Yêu cầu Premium',
                 style: FlutterFlowTheme.of(context).titleLarge.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
               ),
               const SizedBox(height: 12),
               Text(
                 'Để sử dụng tính năng "Nguyên liệu cần tránh", bạn cần nâng cấp lên tài khoản Premium.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
                 textAlign: TextAlign.center,
                 style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
               ),
               const SizedBox(height: 24),
               Row(
@@ -127,7 +135,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                     ),
                     child: const Text(
                       'Tiếp tục',
@@ -157,6 +166,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
       await _checkPremiumStatus();
     }
   }
+
   @override
   void dispose() {
     _model.maybeDispose();
@@ -214,37 +224,40 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 borderRadius: BorderRadius.circular(40.0),
                                 child: _model.avatar.isNotEmpty
                                     ? Image.network(
-                                  _model.avatar,
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
-                                )
+                                        _model.avatar,
+                                        width: 80.0,
+                                        height: 80.0,
+                                        fit: BoxFit.cover,
+                                      )
                                     : Image.asset(
-                                  'assets/images/dummy_profile.png',
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
-                                ),
+                                        'assets/images/dummy_profile.png',
+                                        width: 80.0,
+                                        height: 80.0,
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
                               if (_model.package != null)
                                 Positioned(
                                   top: 0,
                                   right: 0,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 4.0),
                                     decoration: BoxDecoration(
                                       color: Colors.yellow,
                                       borderRadius: BorderRadius.circular(12.0),
                                     ),
                                     child: Text(
                                       'VIP',
-                                      style: FlutterFlowTheme.of(context).bodySmall.override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        useGoogleFonts: false,
-                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .override(
+                                            fontFamily: 'figtree',
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            useGoogleFonts: false,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -258,37 +271,45 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                               children: [
                                 Text(
                                   _model.name,
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.w500,
-                                    useGoogleFonts: false,
-                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w500,
+                                        useGoogleFonts: false,
+                                      ),
                                 ),
                                 Text(
                                   _model.email,
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 16.0,
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    useGoogleFonts: false,
-                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        color:
+                                            FlutterFlowTheme.of(context).grey,
+                                        useGoogleFonts: false,
+                                      ),
                                 ),
                                 if (_model.package != null)
                                   Text(
                                     _model.package!,
-                                    style: FlutterFlowTheme.of(context).bodySmall.override(
-                                      fontFamily: 'figtree',
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.yellow,
-                                      useGoogleFonts: false,
-                                    ),
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodySmall
+                                        .override(
+                                          fontFamily: 'figtree',
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.yellow,
+                                          useGoogleFonts: false,
+                                        ),
                                   ),
                               ],
                             ),
                           ),
-                          if (_model.package == null) // Nếu không phải VIP thì hiển thị nút
+                          if (_model.package ==
+                              null) // Nếu không phải VIP thì hiển thị nút
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: InkWell(
@@ -300,33 +321,41 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                   context.pushNamed('buy_premium_package');
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0, vertical: 6.0),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.yellow, width: 2.0),
+                                    border: Border.all(
+                                        color: Colors.yellow, width: 2.0),
                                     borderRadius: BorderRadius.circular(20.0),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       ClipRRect(
-                                        borderRadius: BorderRadius.circular(0.0),
+                                        borderRadius:
+                                            BorderRadius.circular(0.0),
                                         child: Image.asset(
                                           'assets/images/diamond.png',
-                                          width: 20.0,  // Giảm kích thước một chút để vừa với nút
+                                          width:
+                                              20.0, // Giảm kích thước một chút để vừa với nút
                                           height: 20.0,
                                           fit: BoxFit.contain,
                                         ),
                                       ),
-                                      const SizedBox(width: 6.0), // Khoảng cách giữa icon và chữ
+                                      const SizedBox(
+                                          width:
+                                              6.0), // Khoảng cách giữa icon và chữ
                                       Text(
                                         'Mua Premium',
-                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          fontFamily: 'figtree',
-                                          color: Colors.yellow,
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold,
-                                          useGoogleFonts: false,
-                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              fontFamily: 'figtree',
+                                              color: Colors.yellow,
+                                              fontSize: 14.0,
+                                              fontWeight: FontWeight.bold,
+                                              useGoogleFonts: false,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -668,36 +697,30 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                 if (FFAppState().isLogin == true)
                   Builder(
                     builder: (context) => Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 16.0),
                       child: InkWell(
                         splashColor: Colors.transparent,
                         focusColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
-                        onTap: isPremium
-                            ? () async {
-                          context.push("/ingredientAvoidScreen");
-                        }
-                            : () async {
-                          await _showPremiumRequiredDialog();
+                        onTap: () async {
+                          context.push("/aiSuggestionScreen");
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: isPremium
-                                ? FlutterFlowTheme.of(context).lightGrey
-                                : Colors.grey[600], // Màu xám đen khi không premium
+                            color: FlutterFlowTheme.of(context).lightGrey,
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 16.0, 8.0),
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8.0, 8.0, 16.0, 8.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: isPremium
-                                        ? FlutterFlowTheme.of(context).primary
-                                        : Colors.grey[400], // Điều chỉnh màu icon khi không premium
+                                    color: FlutterFlowTheme.of(context).primary,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Padding(
@@ -709,25 +732,27 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
-                                        color: isPremium ? null : Colors.grey[200], // Làm mờ icon nếu không premium
                                       ),
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Nguyên liệu cần tránh',
+                                      'Nguyên liệu cần tránh ',
                                       maxLines: 1,
-                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                        color: isPremium ? null : Colors.grey[200], // Màu chữ xám khi không premium
-                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                            fontFamily: 'figtree',
+                                            fontSize: 16.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            useGoogleFonts: false,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -738,7 +763,84 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                     width: 24.0,
                                     height: 24.0,
                                     fit: BoxFit.cover,
-                                    color: isPremium ? null : Colors.grey[200], // Màu mũi tên xám khi không premium
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (FFAppState().isLogin == true)
+                  Builder(
+                    builder: (context) => Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 16.0),
+                      child: InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          context.push("/ingredientAvoidScreen");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).lightGrey,
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8.0, 8.0, 16.0, 8.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      child: Image.asset(
+                                        'assets/images/nofood.png',
+                                        width: 24.0,
+                                        height: 24.0,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'Nguyên liệu cần tránh ',
+                                      maxLines: 1,
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                            fontFamily: 'figtree',
+                                            fontSize: 16.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            useGoogleFonts: false,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(0.0),
+                                  child: SvgPicture.asset(
+                                    'assets/images/profile-asrow.svg',
+                                    width: 24.0,
+                                    height: 24.0,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               ],
