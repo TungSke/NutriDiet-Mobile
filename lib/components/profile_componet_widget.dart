@@ -572,7 +572,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: Image.asset(
-                                        'assets/images/ingredient.png',
+                                        'assets/images/sugar.png',
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -664,7 +664,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                         const EdgeInsetsDirectional.fromSTEB(
                                             12.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Danh sách món ăn',
+                                      'Công thức của tôi',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
@@ -726,7 +726,8 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                   decoration: BoxDecoration(
                                     color: isPremium
                                         ? FlutterFlowTheme.of(context).primary
-                                        : Colors.grey[600], // Màu xám khi không premium
+                                        : Colors.grey[
+                                            600], // Màu xám khi không premium
                                     shape: BoxShape.circle,
                                   ),
                                   child: Padding(
@@ -734,7 +735,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: Image.asset(
-                                        'assets/images/nofood.png',
+                                        'assets/images/advice.png',
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -745,20 +746,20 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 Expanded(
                                   child: Padding(
                                     padding:
-                                    const EdgeInsetsDirectional.fromSTEB(
-                                        12.0, 0.0, 0.0, 0.0),
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'Lời khuyên sức khỏe',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                            fontFamily: 'figtree',
+                                            fontSize: 16.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            useGoogleFonts: false,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -826,7 +827,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                         const EdgeInsetsDirectional.fromSTEB(
                                             12.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Nguyên liệu cần tránh',
+                                      'Nguyên liệu cần tránh ',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
