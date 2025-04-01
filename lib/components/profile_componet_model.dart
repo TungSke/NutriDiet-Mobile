@@ -36,7 +36,7 @@ class ProfileComponetModel extends FlutterFlowModel<ProfileComponetWidget> {
     isLoading = false;
   }
 
-//hàm kiểm tra premium
+
   Future<bool> checkPremiumStatus() async {
     return await _userService.isPremium();
   }
