@@ -40,7 +40,6 @@ class UserService {
         .login(); // by default we request the email and the public profile
 
     final AccessToken accessToken = result.accessToken!;
-
     final response = await _apiService.post(
         "api/user/login-with-facebook?idToken=${accessToken.tokenString}&fcmToken=$fcmToken",
         body: {});
@@ -53,6 +52,7 @@ class UserService {
       "api/user/login",
       body: {'email': email, 'password': password, 'fcmToken': fcmToken},
     );
+    debugPrint("fcmToken: ${fcmToken}");
     return response;
   }
 
