@@ -572,7 +572,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: Image.asset(
-                                        'assets/images/ingredient.png',
+                                        'assets/images/sugar.png',
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -728,7 +728,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(0.0),
                                       child: Image.asset(
-                                        'assets/images/nofood.png',
+                                        'assets/images/advice.png',
                                         width: 24.0,
                                         height: 24.0,
                                         fit: BoxFit.contain,
@@ -742,7 +742,7 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                         const EdgeInsetsDirectional.fromSTEB(
                                             12.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'Nguyên liệu cần tránh ',
+                                      'Lời khuyên AI  ',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
