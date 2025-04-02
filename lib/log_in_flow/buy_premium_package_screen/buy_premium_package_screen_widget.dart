@@ -36,15 +36,14 @@ class _BuyPremiumPackageScreenWidgetState
   // Hàm xử lý thanh toán
   Future<void> _handlePayment() async {
     try {
-      // Gọi API để lấy link thanh toán với packageId = "1"
-      final response =
-          await PackageService().fetchPackagePayment(packageId: "1");
+      final response = await PackageService().fetchPackagePayment(
+        packageId: "1",
+        cancelUrl: "https://yourapp.com/checkoutFailScreen",
+        returnUrl: "https://yourapp.com/checkoutSuccessScreen",
+      );
 
-      // Kiểm tra xem API có trả về "data" hay không
       if (response != null && response["data"] != null) {
         final String paymentUrl = response["data"];
-
-        // Nếu thành công, chuyển hướng sang WebViewPage với link trả về
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -52,8 +51,7 @@ class _BuyPremiumPackageScreenWidgetState
           ),
         );
       } else {
-        // Nếu không có link, chuyển hướng sang màn hình thất bại (hoặc tự xử lý)
-        Navigator.pushNamed(context, '/checkoutFailScreen');
+        context.push('/checkoutFailScreen');
       }
     } catch (e) {
       print("❌ Lỗi khi thanh toán: $e");
@@ -62,7 +60,7 @@ class _BuyPremiumPackageScreenWidgetState
           content: Text("Có lỗi xảy ra trong quá trình thanh toán"),
         ),
       );
-      Navigator.pushNamed(context, '/checkoutFailScreen');
+      context.push('/checkoutFailScreen');
     }
   }
 
