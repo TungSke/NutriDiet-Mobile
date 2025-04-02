@@ -14,6 +14,7 @@ class MealPlanDetailModel extends ChangeNotifier {
   Map<String, double>? userGoals;
   bool isLoading = false;
   String? errorMessage;
+  String? aiWarning;
 
   static const List<String> mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
 
@@ -25,6 +26,7 @@ class MealPlanDetailModel extends ChangeNotifier {
 
       mealPlan = await _mealPlanService.getMealPlanById(mealPlanId);
       mealPlanTotals = await _mealPlanService.getMealPlanDetailTotals(mealPlanId);
+      aiWarning = mealPlan?.aiWarning;
 
       final response = await _userService.getPersonalGoal();
       if (response.statusCode == 200) {
@@ -45,6 +47,40 @@ class MealPlanDetailModel extends ChangeNotifier {
     } catch (e) {
       isLoading = false;
       errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<bool> checkPremiumStatus() async {
+    return await _userService.isPremium();
+  }
+
+  Future<void> createAIWarning(int mealPlanId) async {
+    try{
+
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      final result = await _mealPlanService.createAIWarning(mealPlanId);
+      isLoading = false;
+
+      if (result['success']) {
+        aiWarning = result['aiWarning']; // Lưu AIWarning từ response
+        mealPlan = await _mealPlanService.getMealPlanById(mealPlanId); // gọi lại mealplan
+        errorMessage = null;
+      } else {
+        aiWarning = null;
+        errorMessage = result['message'];
+        if (result['requiresPremium'] == true) {
+          errorMessage = "Chỉ tài khoản Premium mới sử dụng được tính năng này";
+        }
+      }
+      notifyListeners();
+    }catch (e){
+      isLoading = false;
+      aiWarning = null;
+      errorMessage = "Lỗi khi lấy cảnh báo AI: $e";
       notifyListeners();
     }
   }

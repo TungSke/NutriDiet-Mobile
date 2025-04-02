@@ -259,6 +259,63 @@ class MealPlanService{
     }
   }
 
+  Future<Map<String, dynamic>> createAIWarning(int mealPlanId) async {
+    try {
+      final String? token = await flutterSecureStorage.read(key: 'accessToken');
+      if (token == null) {
+        debugPrint("Error: No access token found");
+        return {
+          'success': false,
+          'message': 'No access token found',
+          'aiWarning': null,
+        };
+      }
+
+      final String endpoint = "api/meal-plan/AI-warning/$mealPlanId";
+      final response = await _apiService.post(
+        endpoint,
+        body: {}, // Không cần body vì API backend không yêu cầu
+        token: token,
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'AI Warning created successfully',
+          'aiWarning': data['data'], // Lấy chuỗi AIWarning từ response
+        };
+      } else if (response.statusCode == 403) {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Chỉ tài khoản Premium mới sử dụng được tính năng này',
+          'aiWarning': null,
+          'requiresPremium': true, // Báo hiệu cần tài khoản Premium
+        };
+      } else if (response.statusCode == 404) {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'MealPlan not found',
+          'aiWarning': null,
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to create AI Warning (Status: ${response.statusCode})',
+          'aiWarning': null,
+        };
+      }
+    } catch (e) {
+      debugPrint("Error calling CreateAIWarning API: $e");
+      return {
+        'success': false,
+        'message': 'Error creating AI Warning: $e',
+        'aiWarning': null,
+      };
+    }
+  }
+
   Future<bool> createMealPlan(MealPlan mealPlan) async{
     try{
       final String? token = await flutterSecureStorage.read(key:'accessToken');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../flutter_flow/flutter_flow_theme.dart';
+import '../../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import '../../services/models/mealplan.dart';
 import '../../services/models/mealplandetail.dart';
 import '../select_food_screen/select_food_widget.dart';
@@ -28,6 +29,7 @@ class MealPlanDetailWidget extends StatefulWidget {
 class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   late MealPlanDetailModel _model;
   int selectedDay = 1;
+  bool isPremium = false;
 
   final Map<String, String> mealTypeTranslations = {
     'Breakfast': 'Bữa sáng',
@@ -41,6 +43,16 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     super.initState();
     _model = MealPlanDetailModel();
     _model.fetchMealPlanById(widget.mealPlanId);
+    _checkPremiumStatus();
+  }
+
+  Future<void> _checkPremiumStatus() async {
+    final premiumStatus = await _model.checkPremiumStatus();
+    if (mounted) {
+      setState(() {
+        isPremium = premiumStatus;
+      });
+    }
   }
 
   void _addNewDay() {
@@ -323,31 +335,220 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    mealPlan?.planName ?? "Thực đơn",
-                    style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        mealPlan?.planName ?? "Thực đơn",
+                        style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (widget.source == MealPlanSource.myMealPlan && mealPlan != null)
+                      IconButton(
+                        icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
+                        onPressed: _showEditMealPlanDialog,
+                      ),
+                  ],
                 ),
-                if (widget.source == MealPlanSource.myMealPlan && mealPlan != null)
-                  IconButton(
-                    icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
-                    onPressed: _showEditMealPlanDialog,
-                  ),
+                const SizedBox(height: 8),
+                _buildInfoText("Mục tiêu sức khỏe", mealPlan?.healthGoal ?? "Không xác định"),
+                _buildInfoText("Số ngày thực đơn", "${mealPlan?.duration ?? 0} ngày"),
+                _buildInfoText("Tạo bởi", mealPlan?.createdBy ?? "Không rõ"),
               ],
             ),
-            const SizedBox(height: 8),
-            _buildInfoText("Mục tiêu sức khỏe", mealPlan?.healthGoal ?? "Không xác định"),
-            _buildInfoText("Số ngày thực đơn", "${mealPlan?.duration ?? 0} ngày"), // Yêu cầu 1
-            _buildInfoText("Tạo bởi", mealPlan?.createdBy ?? "Không rõ"),
+            // Nút cảnh báo vàng chỉ hiển thị cho myMealPlan
+            if (widget.source == MealPlanSource.myMealPlan)
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.warning_amber_rounded,
+                    color: isPremium ? Colors.yellow : Colors.grey,
+                    size: 30,
+                  ),
+                  onPressed: () async {
+                    if (!isPremium) {
+                      await _showPremiumRequiredDialog();
+                      return;
+                    }
+                    _showAIWarningDialog();
+                  },
+                  tooltip: "Xem cảnh báo AI",
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showPremiumRequiredDialog() async {
+    final proceedToPremium = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                FlutterFlowTheme.of(context).primary,
+                FlutterFlowTheme.of(context).secondary,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.star,
+                color: Colors.yellow,
+                size: 50,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Yêu cầu Premium',
+                style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Để sử dụng tính năng "Xem cảnh báo thực đơn từ chuyên gia AI", bạn cần nâng cấp lên tài khoản Premium.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
+                textAlign: TextAlign.center,
+                style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text(
+                      'Hủy',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text(
+                      'Tiếp tục',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (proceedToPremium == true && mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BuyPremiumPackageScreenWidget(),
+        ),
+      );
+      // Kiểm tra lại trạng thái premium sau khi quay lại
+      await _checkPremiumStatus();
+    }
+  }
+
+// Hàm hiển thị popup AI Warning
+  void _showAIWarningDialog() {
+    bool isRefreshing = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Cảnh báo về thực đơn",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SingleChildScrollView(
+                  child: Text(
+                    _model.mealPlan?.aiWarning ?? _model.errorMessage ?? "Chưa có cảnh báo, vui lòng nhấn Làm mới để tạo.",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Làm mới nếu bạn vừa thay đổi chi tiết thực đơn",
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                if (isRefreshing) ...[
+                  const SizedBox(height: 8),
+                  const Center(child: CircularProgressIndicator()),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Đóng", style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () async {
+                setDialogState(() {
+                  isRefreshing = true;
+                });
+
+                await _model.createAIWarning(widget.mealPlanId);
+
+                if (mounted) {
+                  setDialogState(() {
+                    isRefreshing = false;
+                  });
+                }
+              },
+              child: Text(
+                "Làm mới",
+                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+              ),
+            ),
           ],
         ),
       ),
