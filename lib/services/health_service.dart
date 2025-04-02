@@ -1,8 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:diet_plan_app/services/api_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../services/user_service.dart';
 
 class HealthService {
+  final ApiService _apiService = ApiService();
+
   static Future<Map<String, dynamic>> fetchHealthData() async {
     try {
       // Gọi hai API cùng lúc bằng Future.wait()
@@ -62,6 +68,86 @@ class HealthService {
         "personalGoal": null,
         "errorMessage": e.toString(),
       };
+    }
+  }
+
+  Future<bool> addImageToHealthProfile({
+    required int profileId,
+    required File imageFile,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Nếu cần truyền thêm các trường form-data, thêm vào đây
+      final fields = <String, String>{
+        // 'key1': 'value1',
+        // 'key2': 'value2',
+      };
+
+      final response = await _apiService.postMultipartWithFile(
+        'api/health-profile/$profileId/image',
+        fields: fields,
+        fileFieldName: 'Image',
+        filePath: imageFile.path,
+        token: token,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true; // Upload thành công
+      } else {
+        throw Exception(
+          'Lỗi upload ảnh: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      print('Error during image upload: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteHealthProfile({required int profileId}) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      final response = await _apiService.delete(
+        'api/health-profile/$profileId',
+        token: token,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      }
+      print(
+          'Lỗi delete health profile: ${response.statusCode} - ${response.body}');
+      return false;
+    } catch (e) {
+      print('Error deleting health profile: $e');
+      return false;
+    }
+  }
+
+  /// Xóa ảnh Health Profile (ví dụ: DELETE api/health-profile/{profileId}/image)
+  Future<bool> deleteHealthProfileImage({required int profileId}) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      final response = await _apiService.delete(
+        'api/health-profile/$profileId/image',
+        token: token,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      }
+      print(
+          'Lỗi delete health profile image: ${response.statusCode} - ${response.body}');
+      return false;
+    } catch (e) {
+      print('Error deleting health profile image: $e');
+      return false;
     }
   }
 }

@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:diet_plan_app/components/activity_component_model.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_animations.dart';
+import 'package:diet_plan_app/services/health_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart'; // Để format ngày tháng
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../flutter_flow/flutter_flow_model.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
@@ -13,23 +18,91 @@ class ActivityComponentWidget extends StatefulWidget {
   const ActivityComponentWidget({super.key});
 
   @override
-  State<ActivityComponentWidget> createState() => _ActivityComponentWidgetState();
+  State<ActivityComponentWidget> createState() =>
+      _ActivityComponentWidgetState();
 }
 
 class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   late ActivityComponentModel _model;
   final UserService _userService = UserService();
-  final _weightLineChartKey = GlobalKey<WeightLineChartState>(); // Sử dụng WeightLineChartState
 
+  // Key để truy cập state bên trong WeightLineChart
+  final _weightLineChartKey = GlobalKey<WeightLineChartState>();
+
+  // Danh sách lưu lịch sử cân nặng
+  List<Map<String, dynamic>> _weightHistory = [];
+
+  // Hàm gọi trong onPressed để làm mới biểu đồ
   void _refreshChart() async {
-    await _model.fetchHealthProfile(); // Lấy dữ liệu mới từ server
-    await _weightLineChartKey.currentState?.refresh(); // Làm mới biểu đồ
+    await _model.fetchHealthProfile();
+    await _weightLineChartKey.currentState?.refresh();
     if (mounted) {
-      setState(() {}); // Rebuild giao diện
+      setState(() {});
     }
   }
 
   final animationsMap = <String, AnimationInfo>{};
+
+  Future<void> _uploadImage(int profileId) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final File imageFile = File(pickedFile.path);
+
+      // Gọi API upload ảnh qua HealthService với profileId tương ứng
+      final bool success = await HealthService().addImageToHealthProfile(
+        profileId: profileId,
+        imageFile: imageFile,
+      );
+
+      if (success) {
+        // Nếu upload thành công, cập nhật lại danh sách lịch sử cân nặng
+        await _fetchWeightHistory();
+        setState(() {});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Lỗi upload ảnh")),
+        );
+      }
+    }
+  }
+
+  Future<void> _deletePhoto(int profileId) async {
+    bool success =
+        await HealthService().deleteHealthProfileImage(profileId: profileId);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Đã xóa ảnh profile thành công")),
+      );
+      // Làm mới danh sách sau khi xóa ảnh
+      await _fetchWeightHistory();
+      setState(() {});
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Xóa ảnh profile thất bại")),
+      );
+    }
+  }
+
+  Future<void> _deleteEntry(int profileId) async {
+    bool success =
+        await HealthService().deleteHealthProfile(profileId: profileId);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Đã xóa profile thành công")),
+      );
+      // Cập nhật lại thông tin health profile (cân nặng hiện tại)
+      await _model.fetchHealthProfile();
+      // Cập nhật lại danh sách lịch sử cân nặng
+      await _fetchWeightHistory();
+      setState(() {});
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Không thể xóa profile duy nhất")),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -37,20 +110,52 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     _model = createModel(context, () => ActivityComponentModel());
     _model.fetchUserProfile();
     _model.fetchHealthProfile();
+
+    // Gọi API lấy lịch sử cân nặng
+    _fetchWeightHistory();
+
+    // Thêm animation cho tiêu đề
     animationsMap.addAll({
       'textOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
         effectsBuilder: () => [
           MoveEffect(
             curve: Curves.linear,
-            delay: 50.0.ms,
-            duration: 400.0.ms,
+            delay: 50.ms,
+            duration: 400.ms,
             begin: const Offset(0.0, -20.0),
             end: const Offset(0.0, 0.0),
           ),
         ],
       ),
     });
+  }
+
+  // Hàm lấy dữ liệu cân nặng theo thời gian (lịch sử) từ API
+  Future<void> _fetchWeightHistory() async {
+    try {
+      final response = await _userService.getHealthProfileReport();
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final dataList = responseData['data'] as List;
+        // Lưu lại vào biến state
+        setState(() {
+          // Ép kiểu về List<Map<String,dynamic>>
+          _weightHistory =
+              dataList.map((item) => item as Map<String, dynamic>).toList();
+          // Có thể sắp xếp theo thời gian giảm dần hoặc tăng dần
+          _weightHistory.sort((a, b) {
+            final dateA = DateTime.parse(a['date']);
+            final dateB = DateTime.parse(b['date']);
+            return dateB.compareTo(dateA); // Mới nhất lên đầu
+          });
+        });
+      } else {
+        throw Exception('Failed to load weight history');
+      }
+    } catch (e) {
+      print('Error fetching weight history: $e');
+    }
   }
 
   @override
@@ -62,6 +167,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
+          // Header
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -72,38 +178,44 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 16.0),
                     child: Text(
                       'Hoạt động',
                       maxLines: 1,
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        fontFamily: 'figtree',
-                        fontSize: 22.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        useGoogleFonts: false,
-                        lineHeight: 1.5,
-                      ),
-                    ).animateOnPageLoad(animationsMap['textOnPageLoadAnimation']!),
+                            fontFamily: 'figtree',
+                            fontSize: 22.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            useGoogleFonts: false,
+                            lineHeight: 1.5,
+                          ),
+                    ).animateOnPageLoad(
+                        animationsMap['textOnPageLoadAnimation']!),
                   ),
                 ],
               ),
             ),
           ),
+
+          // Nội dung chính
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
+                // Thông tin người dùng
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      padding: EdgeInsets.only(top: 30),
+                      padding: const EdgeInsets.only(top: 30),
                       decoration: BoxDecoration(
                         color: FlutterFlowTheme.of(context).secondaryBackground,
                       ),
@@ -111,17 +223,17 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         borderRadius: BorderRadius.circular(0.0),
                         child: _model.avatar.isNotEmpty
                             ? Image.network(
-                          _model.avatar,
-                          width: 80.0,
-                          height: 80.0,
-                          fit: BoxFit.cover,
-                        )
+                                _model.avatar,
+                                width: 80.0,
+                                height: 80.0,
+                                fit: BoxFit.cover,
+                              )
                             : Image.asset(
-                          'assets/images/dummy_profile.png',
-                          width: 80.0,
-                          height: 80.0,
-                          fit: BoxFit.cover,
-                        ),
+                                'assets/images/dummy_profile.png',
+                                width: 80.0,
+                                height: 80.0,
+                                fit: BoxFit.cover,
+                              ),
                       ),
                     ),
                     SizedBox(
@@ -132,11 +244,13 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                           children: [
                             Text(
                               _model.name,
-                              style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.roboto(
+                                  fontSize: 18, fontWeight: FontWeight.w600),
                             ),
                             Text(
                               "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
-                              style: GoogleFonts.roboto(fontSize: 12, color: Colors.grey),
+                              style: GoogleFonts.roboto(
+                                  fontSize: 12, color: Colors.grey),
                             ),
                           ],
                         ),
@@ -144,14 +258,18 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     ),
                   ],
                 ),
+
+                // Mục tiêu
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 24.0, 20.0, 16.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 24.0, 20.0, 16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Mục tiêu gần đây:',
-                        style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.roboto(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         _model.goalType,
@@ -164,6 +282,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     ],
                   ),
                 ),
+
+                // Cân nặng ban đầu, mục tiêu, button cập nhật
                 Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Column(
@@ -178,28 +298,32 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                 children: [
                                   Text(
                                     "Cân nặng ban đầu: ",
-                                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
                                   ),
                                   Text(
                                     "${_model.weight} kg",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Row(
                                 children: [
                                   Text(
                                     "Cân nặng mục tiêu:",
-                                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
                                   ),
                                   Text(
                                     "${_model.targetWeight} kg",
                                     style: TextStyle(
-                                      color: FlutterFlowTheme.of(context).primary,
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -214,24 +338,26 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             },
                             backgroundColor: Colors.green,
                             elevation: 4.0,
-                            shape: CircleBorder(),
+                            shape: const CircleBorder(),
                             mini: true,
                             heroTag: null,
-                            child: Icon(
+                            child: const Icon(
                               Icons.add,
                               color: Colors.white,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             "Đã hoàn thành ",
                             style: TextStyle(
-                                fontSize: 14, color: FlutterFlowTheme.of(context).primary),
+                              fontSize: 14,
+                              color: FlutterFlowTheme.of(context).primary,
+                            ),
                           ),
                           Text(
                             "${_model.progressPercentage}/100 %",
@@ -246,18 +372,22 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     ],
                   ),
                 ),
+
+                // Biểu đồ
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: SingleChildScrollView(
-                    child: Container(
+                    child: SizedBox(
                       height: 400,
                       child: WeightLineChart(
-                        key: _weightLineChartKey, // Gắn key để truy cập state
-                        refreshChart: _refreshChart, // Truyền callback
+                        key: _weightLineChartKey,
+                        refreshChart: _refreshChart,
                       ),
                     ),
                   ),
                 ),
+
+                // BMI / TDEE
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 25),
                   child: Row(
@@ -265,14 +395,16 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     children: [
                       Text(
                         "Tình trạng hiện tại:",
-                        style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.roboto(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         _model.bmiType,
                         style: GoogleFonts.roboto(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: FlutterFlowTheme.of(context).primary),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: FlutterFlowTheme.of(context).primary,
+                        ),
                       ),
                     ],
                   ),
@@ -282,71 +414,168 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                   children: [
                     Column(
                       children: [
-                        Text(
+                        const Text(
                           "BMI",
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 0.0, 0.0, 24.0),
                           child: CircularPercentIndicator(
                             radius: 75.0,
                             lineWidth: 12.0,
                             animation: true,
                             animateFromLastPercent: true,
                             progressColor: FlutterFlowTheme.of(context).primary,
-                            backgroundColor: FlutterFlowTheme.of(context).primary,
+                            backgroundColor:
+                                FlutterFlowTheme.of(context).primary,
                             center: Text(
                               _model.bmi,
-                              style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'Figtree',
-                                color: FlutterFlowTheme.of(context).grey,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.normal,
-                                useGoogleFonts: false,
-                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Figtree',
+                                    color: FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
                             ),
                           ),
                         ),
-                        Text("Chỉ số cơ thể"),
+                        const Text("Chỉ số cơ thể"),
                       ],
                     ),
                     Column(
                       children: [
-                        Text(
+                        const Text(
                           "TDEE",
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 0.0, 0.0, 24.0),
                           child: CircularPercentIndicator(
                             radius: 75.0,
                             lineWidth: 12.0,
                             animation: true,
                             animateFromLastPercent: true,
                             progressColor: FlutterFlowTheme.of(context).primary,
-                            backgroundColor: FlutterFlowTheme.of(context).primary,
+                            backgroundColor:
+                                FlutterFlowTheme.of(context).primary,
                             center: Text(
                               _model.tdee,
-                              style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'Figtree',
-                                color: FlutterFlowTheme.of(context).grey,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.normal,
-                                useGoogleFonts: false,
-                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Figtree',
+                                    color: FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
                             ),
                           ),
                         ),
-                        Text("Năng lượng cần tiêu thụ"),
+                        const Text("Năng lượng cần tiêu thụ"),
                       ],
                     ),
                   ],
+                ),
+
+                // ----------- PHẦN LỊCH SỬ CÂN NẶNG -----------
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(25, 10, 25, 25),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Lịch sử cân nặng:",
+                        style: GoogleFonts.roboto(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      if (_weightHistory.isEmpty)
+                        const Text('Chưa có dữ liệu.'),
+                      if (_weightHistory.isNotEmpty)
+                        // Dùng Column + map để hiển thị nhanh
+                        Column(
+                          children: _weightHistory.map((item) {
+                            // Parse ngày
+                            final date = DateTime.parse(item['date']);
+                            // Format ngày tháng bằng tiếng Việt
+                            final formattedDate =
+                                DateFormat("EEEE, dd 'thg' M, yyyy", "vi_VN")
+                                    .format(date);
+                            final weight = item['value'];
+                            final imageUrl = item['imageUrl'];
+
+                            return GestureDetector(
+                              onLongPress: () => _showEntryMenu(
+                                  item), // Gọi popup khi long press
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  formattedDate,
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  '$weight kg',
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                trailing: imageUrl != null
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => Dialog(
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: InteractiveViewer(
+                                                  child: Image.network(
+                                                    imageUrl,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Image.network(
+                                          imageUrl,
+                                          width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : IconButton(
+                                        icon: const Icon(Icons.cloud_upload),
+                                        onPressed: () async {
+                                          // Nếu muốn cho phép upload ngay khi bấm icon
+                                          await _uploadImage(item['profileId']);
+                                        },
+                                      ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -356,6 +585,67 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     );
   }
 
+  // Thêm hàm hiển thị bottom sheet khi long press
+  void _showEntryMenu(Map<String, dynamic> item) {
+    // Lấy thông tin cần thiết
+    final date = DateTime.parse(item['date']);
+    final formattedDate =
+        DateFormat("EEEE, dd 'thg' M, yyyy", "vi_VN").format(date);
+    final imageUrl = item['imageUrl'];
+    final profileId = item['profileId'];
+
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              // Hiển thị ngày của entry
+              ListTile(
+                title: Text(
+                  formattedDate,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              // Nếu đã có ảnh, hiển thị nút Delete Photo, ngược lại hiển thị nút Import Photo
+              if (imageUrl != null)
+                ListTile(
+                  leading: const Icon(Icons.delete),
+                  title: const Text('Delete Photo'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _deletePhoto(profileId);
+                  },
+                )
+              else
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text('Import Photo'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _uploadImage(profileId);
+                  },
+                ),
+              // Nút xóa luôn entry (profile)
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('Delete Entry'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteEntry(profileId);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // BottomSheet cập nhật cân nặng
   void _showBottomSheet(BuildContext context) async {
     double currentWeight = _model.weight;
     double currentHeight = _model.height;
@@ -374,58 +664,62 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Cập nhật cân nặng',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Text(
                     '${currentWeight.toStringAsFixed(1)} kg',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 32.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.remove),
+                        icon: const Icon(Icons.remove),
                         onPressed: () {
                           setStateForBottomSheet(() {
                             currentWeight -= 0.1;
-                            currentWeight = double.parse(currentWeight.toStringAsFixed(1));
+                            currentWeight =
+                                double.parse(currentWeight.toStringAsFixed(1));
                           });
                         },
                       ),
                       IconButton(
-                        icon: Icon(Icons.add),
+                        icon: const Icon(Icons.add),
                         onPressed: () {
                           setStateForBottomSheet(() {
                             currentWeight += 0.1;
-                            currentWeight = double.parse(currentWeight.toStringAsFixed(1));
+                            currentWeight =
+                                double.parse(currentWeight.toStringAsFixed(1));
                           });
                         },
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
                       _model.weight = currentWeight;
                       await _model.updateHealthProfile(context);
                       await _model.fetchHealthProfile();
                       if (mounted) {
-                        _refreshChart(); // Gọi làm mới biểu đồ
+                        _refreshChart(); // Làm mới biểu đồ
+                        // Gọi lại fetchWeightHistory để cập nhật danh sách
+                        await _fetchWeightHistory();
                       }
                       Navigator.pop(context);
                     },
-                    child: Text('Lưu'),
+                    child: const Text('Lưu'),
                   ),
                 ],
               );

@@ -17,10 +17,10 @@ class WeightLineChart extends StatefulWidget {
   const WeightLineChart({this.refreshChart, super.key});
 
   @override
-  WeightLineChartState createState() => WeightLineChartState(); // Đổi tên lớp
+  WeightLineChartState createState() => WeightLineChartState();
 }
 
-class WeightLineChartState extends State<WeightLineChart> { // Loại bỏ dấu `_`
+class WeightLineChartState extends State<WeightLineChart> {
   List<WeightData> weightChartData = [];
   double targetWeight = 80.0;
   DateTime? minDate;
@@ -104,12 +104,21 @@ class WeightLineChartState extends State<WeightLineChart> { // Loại bỏ dấu
 
   @override
   Widget build(BuildContext context) {
-    if (weightChartData.isEmpty || targetWeight == 0.0 || minDate == null || maxDate == null) {
+    if (weightChartData.isEmpty ||
+        targetWeight == 0.0 ||
+        minDate == null ||
+        maxDate == null) {
       return Center(
         child: CircularProgressIndicator(
           color: FlutterFlowTheme.of(context).primary,
         ),
       );
+    }
+
+    // Nếu chỉ có 1 data point, mở rộng khoảng thời gian hiển thị (thêm 1 ngày trước và sau)
+    if (minDate == maxDate) {
+      minDate = minDate!.subtract(const Duration(days: 1));
+      maxDate = maxDate!.add(const Duration(days: 1));
     }
 
     // Tạo dữ liệu cho đường trọng lượng mục tiêu
