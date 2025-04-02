@@ -6,7 +6,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '../services/meallog_service.dart';
 import '../services/models/meallog.dart';
 import '../services/user_service.dart';
-import '../services/health_service.dart';
 import 'home_componet_widget.dart' show HomeComponetWidget;
 
 class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
@@ -123,19 +122,31 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     }
   }
 
-  void changeDate(DateTime newDate) {
+  void changeDate(DateTime newDate) async {
     selectedDate = newDate;
     calendarSelectedDay = DateTimeRange(
       start: newDate.startOfDay,
       end: newDate.endOfDay,
     );
+
+    // Reset dữ liệu trước khi fetch
     mealLogs = [];
     foodCalories = 0;
-    steps = 0; // Reset steps
-    caloriesBurned = 0; // Reset calories burned
-    activityError = null; // Reset lỗi
-    fetchMealLogs();
-    fetchActivityData(); // Fetch dữ liệu mới khi thay đổi ngày
+    steps = 0;
+    caloriesBurned = 0;
+    activityError = null;
+
+    isLoading = true;
+    _updateCallback?.call();
+
+    // Fetch dữ liệu đồng bộ
+    await Future.wait([
+      fetchMealLogs(),
+      fetchActivityData(),
+    ]);
+
+    isLoading = false;
+    _updateCallback?.call(); // Cập nhật giao diện sau khi fetch xong
   }
 
   Future<void> transferMealLogDetailEntry({

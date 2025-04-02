@@ -10,7 +10,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../services/health_service.dart';
 import 'home_componet_model.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 export 'home_componet_model.dart';
 
 class HomeComponetWidget extends StatefulWidget {
@@ -189,8 +189,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                           });
 
                           // Fetch lại meal logs ngay khi thay đổi ngày
-                          await _model
-                              .fetchMealLogs(); // Fetch dữ liệu cho ngày mới
+                          _model.changeDate(newSelectedDate.start);
+                          setState(() {});
                         }
                       },
                       titleStyle:
@@ -257,8 +257,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                     //UI số bước chân
                     // Thay thế phần "Hoạt động hôm nay" trong build()
                     Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          20.0, 0.0, 20.0, 24.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
                       child: Text(
                         'Hoạt động hôm nay',
                         maxLines: 1,
@@ -269,11 +268,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         ),
                       ),
                     ),
-                    if (_model.activityError !=
-                        null) // Hiển thị thông báo lỗi nếu có
+                    if (_model.activityError != null || kIsWeb) // Sử dụng kIsWeb thay vì Platform.isWeb
                       Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(
-                            20.0, 0.0, 20.0, 24.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.red[100],
@@ -285,7 +282,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Lỗi lấy dữ liệu hoạt động',
+                                  kIsWeb ? 'Không hỗ trợ trên web' : 'Lỗi lấy dữ liệu hoạt động',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -294,25 +291,25 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                 ),
                                 const SizedBox(height: 8.0),
                                 Text(
-                                  _model.activityError!,
+                                  kIsWeb
+                                      ? 'Dữ liệu hoạt động không khả dụng trên trình duyệt web.'
+                                      : _model.activityError!,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.red[800],
                                   ),
                                 ),
-                                if (_model.activityError!.contains(
-                                    "từ chối cấp quyền")) // Nếu lỗi là do từ chối quyền
+                                if (!kIsWeb && _model.activityError!.contains("từ chối cấp quyền"))
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: ElevatedButton(
                                       onPressed: () async {
-                                        // Gọi lại fetchActivityData để yêu cầu quyền lần nữa
+                                        // Gọi lại fetchActivityData để yêu cầu quyền lần nữa (chỉ trên mobile)
                                         await _model.fetchActivityData();
+                                        setState(() {}); // Rebuild sau khi thử lại
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primary,
+                                        backgroundColor: FlutterFlowTheme.of(context).primary,
                                       ),
                                       child: const Text(
                                         'Thử lại',
@@ -325,11 +322,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                           ),
                         ),
                       ),
-                    if (_model.activityError ==
-                        null) // Chỉ hiển thị dữ liệu nếu không có lỗi
+                    if (_model.activityError == null && !kIsWeb) // Chỉ hiển thị dữ liệu nếu không có lỗi và không chạy trên web
                       Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(
-                            0.0, 0.0, 0.0, 24.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -342,14 +337,12 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   borderRadius: BorderRadius.circular(16.0),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 16.0, 0.0, 16.0),
+                                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 16.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       CircularPercentIndicator(
-                                        percent:
-                                            _model.stepProgress.clamp(0.0, 1.0),
+                                        percent: _model.stepProgress.clamp(0.0, 1.0),
                                         radius: 50.0,
                                         lineWidth: 8.0,
                                         animation: true,
@@ -357,8 +350,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                         progressColor: Colors.blueAccent,
                                         backgroundColor: Colors.grey[300]!,
                                         center: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.directions_walk,
@@ -379,15 +371,13 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                       Text(
                                         'Bước chân',
                                         maxLines: 1,
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'figtree',
-                                              fontSize: 18.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.w500,
-                                              useGoogleFonts: false,
-                                            ),
+                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                          fontFamily: 'figtree',
+                                          fontSize: 18.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w500,
+                                          useGoogleFonts: false,
+                                        ),
                                       ),
                                     ].divide(const SizedBox(height: 8.0)),
                                   ),
@@ -402,14 +392,12 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   borderRadius: BorderRadius.circular(16.0),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 16.0, 0.0, 16.0),
+                                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 16.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       CircularPercentIndicator(
-                                        percent: _model.caloriesBurnedProgress
-                                            .clamp(0.0, 1.0),
+                                        percent: _model.caloriesBurnedProgress.clamp(0.0, 1.0),
                                         radius: 50.0,
                                         lineWidth: 8.0,
                                         animation: true,
@@ -417,8 +405,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                         progressColor: Colors.redAccent,
                                         backgroundColor: Colors.grey[300]!,
                                         center: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.local_fire_department,
@@ -439,25 +426,20 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                       Text(
                                         'Calories đốt cháy',
                                         maxLines: 1,
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'figtree',
-                                              fontSize: 15.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.w500,
-                                              useGoogleFonts: false,
-                                            ),
+                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                          fontFamily: 'figtree',
+                                          fontSize: 15.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w500,
+                                          useGoogleFonts: false,
+                                        ),
                                       ),
                                     ].divide(const SizedBox(height: 8.0)),
                                   ),
                                 ),
                               ),
                             ),
-                          ]
-                              .divide(const SizedBox(width: 16.0))
-                              .addToStart(const SizedBox(width: 20.0))
-                              .addToEnd(const SizedBox(width: 20.0)),
+                          ].divide(const SizedBox(width: 16.0)).addToStart(const SizedBox(width: 20.0)).addToEnd(const SizedBox(width: 20.0)),
                         ),
                       ),
                     Opacity(

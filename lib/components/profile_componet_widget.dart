@@ -224,40 +224,37 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 borderRadius: BorderRadius.circular(40.0),
                                 child: _model.avatar.isNotEmpty
                                     ? Image.network(
-                                        _model.avatar,
-                                        width: 80.0,
-                                        height: 80.0,
-                                        fit: BoxFit.cover,
-                                      )
+                                  _model.avatar,
+                                  width: 80.0,
+                                  height: 80.0,
+                                  fit: BoxFit.cover,
+                                )
                                     : Image.asset(
-                                        'assets/images/dummy_profile.png',
-                                        width: 80.0,
-                                        height: 80.0,
-                                        fit: BoxFit.cover,
-                                      ),
+                                  'assets/images/dummy_profile.png',
+                                  width: 80.0,
+                                  height: 80.0,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               if (_model.package != null)
                                 Positioned(
                                   top: 0,
                                   right: 0,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0, vertical: 4.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                                     decoration: BoxDecoration(
                                       color: Colors.yellow,
                                       borderRadius: BorderRadius.circular(12.0),
                                     ),
                                     child: Text(
                                       'VIP',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodySmall
-                                          .override(
-                                            fontFamily: 'figtree',
-                                            fontSize: 12.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                            useGoogleFonts: false,
-                                          ),
+                                      style: FlutterFlowTheme.of(context).bodySmall.override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        useGoogleFonts: false,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -271,93 +268,87 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                               children: [
                                 Text(
                                   _model.name,
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.w500,
-                                        useGoogleFonts: false,
-                                      ),
+                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w500,
+                                    useGoogleFonts: false,
+                                  ),
                                 ),
+                                const SizedBox(height: 4.0),
                                 Text(
                                   _model.email,
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 16.0,
-                                        color:
-                                            FlutterFlowTheme.of(context).grey,
-                                        useGoogleFonts: false,
-                                      ),
+                                  overflow: TextOverflow.ellipsis, // Giới hạn nếu quá dài
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    fontSize: 16.0,
+                                    color: FlutterFlowTheme.of(context).grey,
+                                    useGoogleFonts: false,
+                                  ),
                                 ),
                                 if (_model.package != null)
-                                  Text(
-                                    _model.package!,
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodySmall
-                                        .override(
-                                          fontFamily: 'figtree',
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.yellow,
-                                          useGoogleFonts: false,
-                                        ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4.0),
+                                    child: Text(
+                                      _model.package!,
+                                      style: FlutterFlowTheme.of(context).bodySmall.override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.yellow,
+                                        useGoogleFonts: false,
+                                      ),
+                                    ),
                                   ),
                               ],
                             ),
                           ),
-                          if (_model.package ==
-                              null) // Nếu không phải VIP thì hiển thị nút
+                          if (_model.package == null)
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
-                              child: InkWell(
-                                splashColor: Colors.transparent,
-                                focusColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                onTap: () async {
-                                  context.pushNamed('buy_premium_package');
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12.0, vertical: 6.0),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors.yellow, width: 2.0),
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(0.0),
-                                        child: Image.asset(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 130.0), // Giới hạn chiều rộng của nút
+                                child: InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    context.pushNamed('buy_premium_package');
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.yellow, width: 2.0),
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
                                           'assets/images/diamond.png',
-                                          width:
-                                              20.0, // Giảm kích thước một chút để vừa với nút
-                                          height: 20.0,
+                                          width: 18.0,
+                                          height: 18.0,
                                           fit: BoxFit.contain,
                                         ),
-                                      ),
-                                      const SizedBox(
-                                          width:
-                                              6.0), // Khoảng cách giữa icon và chữ
-                                      Text(
-                                        'Mua Premium',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
+                                        const SizedBox(width: 6.0),
+                                        Flexible(
+                                          child: Text(
+                                            'Mua Premium',
+                                            overflow: TextOverflow.ellipsis,
+                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
                                               fontFamily: 'figtree',
                                               color: Colors.yellow,
-                                              fontSize: 14.0,
+                                              fontSize: 10.0,
                                               fontWeight: FontWeight.bold,
                                               useGoogleFonts: false,
                                             ),
-                                      ),
-                                    ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
