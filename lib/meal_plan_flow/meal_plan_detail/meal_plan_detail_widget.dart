@@ -323,31 +323,118 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    mealPlan?.planName ?? "Thực đơn",
-                    style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        mealPlan?.planName ?? "Thực đơn",
+                        style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (widget.source == MealPlanSource.myMealPlan && mealPlan != null)
+                      IconButton(
+                        icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
+                        onPressed: _showEditMealPlanDialog,
+                      ),
+                  ],
                 ),
-                if (widget.source == MealPlanSource.myMealPlan && mealPlan != null)
-                  IconButton(
-                    icon: Icon(Icons.edit, color: FlutterFlowTheme.of(context).primary),
-                    onPressed: _showEditMealPlanDialog,
-                  ),
+                const SizedBox(height: 8),
+                _buildInfoText("Mục tiêu sức khỏe", mealPlan?.healthGoal ?? "Không xác định"),
+                _buildInfoText("Số ngày thực đơn", "${mealPlan?.duration ?? 0} ngày"),
+                _buildInfoText("Tạo bởi", mealPlan?.createdBy ?? "Không rõ"),
               ],
             ),
-            const SizedBox(height: 8),
-            _buildInfoText("Mục tiêu sức khỏe", mealPlan?.healthGoal ?? "Không xác định"),
-            _buildInfoText("Số ngày thực đơn", "${mealPlan?.duration ?? 0} ngày"), // Yêu cầu 1
-            _buildInfoText("Tạo bởi", mealPlan?.createdBy ?? "Không rõ"),
+            // Nút cảnh báo vàng chỉ hiển thị cho myMealPlan
+            if (widget.source == MealPlanSource.myMealPlan)
+
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.yellow,
+                    size: 30,
+                  ),
+                  onPressed: _showAIWarningDialog,
+                  tooltip: "Xem cảnh báo AI",
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+// Hàm hiển thị popup AI Warning
+  void _showAIWarningDialog() {
+    bool isRefreshing = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Cảnh báo về thực đơn",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SingleChildScrollView(
+                  child: Text(
+                    _model.mealPlan?.aiWarning ?? _model.errorMessage ?? "Chưa có cảnh báo, vui lòng nhấn Làm mới để tạo.",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Làm mới nếu bạn vừa thay đổi chi tiết thực đơn",
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                if (isRefreshing) ...[
+                  const SizedBox(height: 8),
+                  const Center(child: CircularProgressIndicator()),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Đóng", style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () async {
+                setDialogState(() {
+                  isRefreshing = true;
+                });
+
+                await _model.createAIWarning(widget.mealPlanId);
+
+                if (mounted) {
+                  setDialogState(() {
+                    isRefreshing = false;
+                  });
+                }
+              },
+              child: Text(
+                "Làm mới",
+                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+              ),
+            ),
           ],
         ),
       ),

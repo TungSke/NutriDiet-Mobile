@@ -87,7 +87,7 @@ class UserService {
     if (token == null || token.isEmpty) {
       throw Exception("Access token not found.");
     }
-    final response = await _apiService.get("/api/user/whoami", token: token);
+    final response = await _apiService.get("/api/user/whoami", token: token); 
     return response;
   }
 
