@@ -1,8 +1,11 @@
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
 import 'appbar_model.dart';
+
 export 'appbar_model.dart';
 
 class AppbarWidget extends StatefulWidget {
@@ -55,7 +58,8 @@ class _AppbarWidgetState extends State<AppbarWidget> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(16.0, 21.0, 16.0, 0.0),
+            padding:
+                const EdgeInsetsDirectional.fromSTEB(16.0, 21.0, 16.0, 0.0),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -94,21 +98,14 @@ class _AppbarWidgetState extends State<AppbarWidget> {
                   child: Align(
                     alignment: const AlignmentDirectional(0.0, 0.0),
                     child: Text(
-                      valueOrDefault<String>(
-                        widget.title,
-                        '0',
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily: 'figtree',
-                            fontSize: 22.0,
-                            letterSpacing: 0.0,
-                            fontWeight: FontWeight.bold,
-                            useGoogleFonts: false,
-                            lineHeight: 1.5,
-                          ),
-                    ),
+                        valueOrDefault<String>(
+                          widget.title,
+                          '0',
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: GoogleFonts.roboto(
+                            fontSize: 22, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 Container(

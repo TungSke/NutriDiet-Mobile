@@ -1,10 +1,13 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'about_us_screen_model.dart';
+
 export 'about_us_screen_model.dart';
 
 class AboutUsScreenWidget extends StatefulWidget {
@@ -66,12 +69,13 @@ class _AboutUsScreenWidgetState extends State<AboutUsScreenWidget>
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'About us',
+                  title: 'Về Nutridiet',
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 0.0, 20.0, 0.0),
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(
                       0,
@@ -91,76 +95,60 @@ class _AboutUsScreenWidgetState extends State<AboutUsScreenWidget>
                           fit: BoxFit.cover,
                         ),
                       ),
+                      Text('Câu chuyện về Nutridiet',
+                          maxLines: 1,
+                          style: GoogleFonts.roboto(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
                       Text(
-                        'What do you mean by diet?',
-                        maxLines: 1,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'figtree',
-                              fontSize: 20.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.bold,
-                              useGoogleFonts: false,
-                            ),
-                      ),
-                      Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. ',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'figtree',
+                          'Ngày nay, việc duy trì lối sống lành mạnh đã trở thành một thách thức lớn đối với nhiều người do lịch trình bận rộn, thiếu kiến thức về dinh dưỡng và khó khăn trong việc lựa chọn chế độ ăn uống phù hợp. Không ít người gặp khó khăn trong việc đạt được mục tiêu sức khỏe, từ tăng cân, giảm cân đến duy trì sức khỏe tổng thể. Việc thiếu một nền tảng tích hợp giữa dữ liệu sức khỏe cá nhân và các gợi ý dinh dưỡng hiệu quả thường dẫn đến kế hoạch bữa ăn không cân đối, gây ra những vấn đề nghiêm trọng như béo phì, suy dinh dưỡng và bệnh mãn tính.',
+                          style: GoogleFonts.roboto(
                               color: FlutterFlowTheme.of(context).grey,
-                              fontSize: 16.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.normal,
-                              useGoogleFonts: false,
-                              lineHeight: 1.5,
-                            ),
-                      ),
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal)),
                       Text(
-                        'Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'figtree',
+                          'NutriDiet ra đời để giải quyết những thách thức này bằng cách cung cấp một nền tảng dinh dưỡng thông minh, cá nhân hóa dựa trên dữ liệu sức khỏe và mục tiêu của từng người dùng. Với công nghệ AI hiện đại, NutriDiet không chỉ giúp bạn dễ dàng lập kế hoạch bữa ăn mà còn điều chỉnh và tối ưu hóa liên tục dựa trên phản hồi và sở thích cá nhân. NutriDiet không chỉ mang đến sự tiện lợi mà còn giúp người dùng định hình một lối sống lành mạnh, bền vững và hiệu quả hơn.',
+                          style: GoogleFonts.roboto(
                               color: FlutterFlowTheme.of(context).grey,
-                              fontSize: 16.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.normal,
-                              useGoogleFonts: false,
-                              lineHeight: 1.5,
-                            ),
-                      ),
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal)),
+                      Text('Vì sao bạn nên chọn Nutridiet?',
+                          maxLines: 1,
+                          style: GoogleFonts.roboto(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
                       Text(
-                        'In a laoreet purus. Integer turpis quam, laoreet id orci nec, ultrices lacinia nunc. Aliquam erat volutpat. Curabitur fringilla in purus eget egestas. Etiam quis.',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'figtree',
+                          'NutriDiet sử dụng AI để tạo ra kế hoạch bữa ăn phù hợp với mục tiêu sức khỏe, sở thích ăn uống và chế độ dinh dưỡng riêng của mỗi người dùng.',
+                          style: GoogleFonts.roboto(
                               color: FlutterFlowTheme.of(context).grey,
-                              fontSize: 16.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.normal,
-                              useGoogleFonts: false,
-                              lineHeight: 1.5,
-                            ),
-                      ),
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal)),
                       Text(
-                        'IVorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. ',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'figtree',
+                          'Phân tích các thông số như cân nặng, chiều cao, và mục tiêu sức khỏe để đưa ra các bữa ăn cân bằng và phù hợp nhất.',
+                          style: GoogleFonts.roboto(
                               color: FlutterFlowTheme.of(context).grey,
-                              fontSize: 16.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.normal,
-                              useGoogleFonts: false,
-                            ),
-                      ),
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal)),
                       Text(
-                        'Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. ',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'figtree',
+                          'NutriDiet liên tục học hỏi và cải tiến dựa trên phản hồi và sở thích của người dùng, đảm bảo kế hoạch luôn cập nhật và hiệu quả.',
+                          style: GoogleFonts.roboto(
                               color: FlutterFlowTheme.of(context).grey,
-                              fontSize: 16.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.normal,
-                              useGoogleFonts: false,
-                              lineHeight: 1.5,
-                            ),
-                      ),
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal)),
+                      Text(
+                          'Không còn đau đầu với việc lên kế hoạch bữa ăn, NutriDiet tự động hóa quá trình và giúp bạn tập trung vào việc tận hưởng thực phẩm lành mạnh.',
+                          style: GoogleFonts.roboto(
+                              color: FlutterFlowTheme.of(context).grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal)),
+                      Text('Định hình lối sóống lành mạnh với Nutridiet',
+                          maxLines: 1,
+                          style: GoogleFonts.roboto(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text(
+                          'NutriDiet không chỉ là một công cụ, mà là người bạn đồng hành giúp bạn đạt được mục tiêu sức khỏe một cách dễ dàng và hiệu quả. Với công nghệ AI tiên tiến, NutriDiet cá nhân hóa kế hoạch bữa ăn dựa trên dữ liệu sức khỏe và sở thích của từng người dùng. Hệ thống không ngừng học hỏi và cải tiến, mang đến những gợi ý tối ưu nhất cho chế độ dinh dưỡng của bạn. NutriDiet giúp đơn giản hóa việc quản lý chế độ ăn uống, tạo sự cân bằng giữa tiện lợi và hiệu quả, đồng thời trao quyền cho bạn trên hành trình chăm sóc sức khỏe toàn diện.',
+                          style: GoogleFonts.roboto(
+                              color: FlutterFlowTheme.of(context).grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal)),
                     ].divide(const SizedBox(height: 16.0)),
                   ).animateOnPageLoad(
                       animationsMap['listViewOnPageLoadAnimation']!),
