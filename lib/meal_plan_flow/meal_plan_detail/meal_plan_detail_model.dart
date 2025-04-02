@@ -51,6 +51,10 @@ class MealPlanDetailModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> checkPremiumStatus() async {
+    return await _userService.isPremium();
+  }
+
   Future<void> createAIWarning(int mealPlanId) async {
     try{
 

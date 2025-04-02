@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../flutter_flow/flutter_flow_theme.dart';
+import '../../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import '../../services/models/mealplan.dart';
 import '../../services/models/mealplandetail.dart';
 import '../select_food_screen/select_food_widget.dart';
@@ -28,6 +29,7 @@ class MealPlanDetailWidget extends StatefulWidget {
 class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   late MealPlanDetailModel _model;
   int selectedDay = 1;
+  bool isPremium = false;
 
   final Map<String, String> mealTypeTranslations = {
     'Breakfast': 'Bữa sáng',
@@ -41,6 +43,16 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     super.initState();
     _model = MealPlanDetailModel();
     _model.fetchMealPlanById(widget.mealPlanId);
+    _checkPremiumStatus();
+  }
+
+  Future<void> _checkPremiumStatus() async {
+    final premiumStatus = await _model.checkPremiumStatus();
+    if (mounted) {
+      setState(() {
+        isPremium = premiumStatus;
+      });
+    }
   }
 
   void _addNewDay() {
@@ -354,17 +366,22 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             ),
             // Nút cảnh báo vàng chỉ hiển thị cho myMealPlan
             if (widget.source == MealPlanSource.myMealPlan)
-
               Positioned(
                 bottom: 0,
                 right: 0,
                 child: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.warning_amber_rounded,
-                    color: Colors.yellow,
+                    color: isPremium ? Colors.yellow : Colors.grey,
                     size: 30,
                   ),
-                  onPressed: _showAIWarningDialog,
+                  onPressed: () async {
+                    if (!isPremium) {
+                      await _showPremiumRequiredDialog();
+                      return;
+                    }
+                    _showAIWarningDialog();
+                  },
                   tooltip: "Xem cảnh báo AI",
                 ),
               ),
@@ -372,6 +389,103 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
         ),
       ),
     );
+  }
+
+  Future<void> _showPremiumRequiredDialog() async {
+    final proceedToPremium = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                FlutterFlowTheme.of(context).primary,
+                FlutterFlowTheme.of(context).secondary,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.star,
+                color: Colors.yellow,
+                size: 50,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Yêu cầu Premium',
+                style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Để sử dụng tính năng "Xem cảnh báo thực đơn từ chuyên gia AI", bạn cần nâng cấp lên tài khoản Premium.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
+                textAlign: TextAlign.center,
+                style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text(
+                      'Hủy',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text(
+                      'Tiếp tục',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (proceedToPremium == true && mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BuyPremiumPackageScreenWidget(),
+        ),
+      );
+      // Kiểm tra lại trạng thái premium sau khi quay lại
+      await _checkPremiumStatus();
+    }
   }
 
 // Hàm hiển thị popup AI Warning

@@ -28,7 +28,7 @@ class FirebaseService {
         return null;
       }
       final response = await _apiService.postRaw(
-          "/api/firebase/enable-reminder",
+          "api/firebase/enable-reminder",
           body: jsonEncode(fcmToken), // mã hóa token thành json rồi gửi đi
           token: token
       );
