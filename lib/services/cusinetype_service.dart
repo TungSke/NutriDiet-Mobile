@@ -5,7 +5,7 @@ class CusinetypeService {
   final ApiService _apiService = ApiService();
 
   Future<http.Response> getAllCuisineType() async {
-    final response = await _apiService.get("/api/cusine-type");
+    final response = await _apiService.get("api/cusine-type");
     return response;
   }
 }

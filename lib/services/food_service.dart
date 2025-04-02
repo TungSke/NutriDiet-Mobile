@@ -58,7 +58,7 @@ class FoodService {
       {required int foodId, required String rejectionReason, required BuildContext context}) async {
     String? accessToken = await _apiService.getAccessToken(context);
 
-    final response = await _apiService.post("/api/food/reject-recipe",
+    final response = await _apiService.post("api/food/reject-recipe",
         body: {'foodId': foodId, 'rejectionReason': rejectionReason},
         token: accessToken);
     return response;

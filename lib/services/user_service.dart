@@ -87,7 +87,7 @@ class UserService {
     if (token == null || token.isEmpty) {
       throw Exception("Access token not found.");
     }
-    final response = await _apiService.get("/api/user/whoami", token: token);
+    final response = await _apiService.get("api/user/whoami", token: token);
     return response;
   }
 
@@ -189,7 +189,7 @@ class UserService {
 
     try {
       final response = await _apiService
-          .get("/api/health-profile/reports?field=Weight", token: token);
+          .get("api/health-profile/reports?field=Weight", token: token);
 
       if (response.statusCode == 200) {
         return response;
@@ -493,7 +493,7 @@ class UserService {
 
     try {
       final response =
-          await _apiService.get("/api/personal-goal", token: token);
+          await _apiService.get("api/personal-goal", token: token);
 
       if (response.statusCode == 200) {
         return response;
@@ -627,7 +627,7 @@ class UserService {
         throw Exception("No access token available");
       }
       final response =
-          await _apiService.get("/api/user/is-premium", token: accessToken);
+          await _apiService.get("api/user/is-premium", token: accessToken);
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         bool isPremium = responseData['data'] as bool;
