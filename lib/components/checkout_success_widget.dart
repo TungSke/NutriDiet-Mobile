@@ -33,118 +33,125 @@ class _CheckoutSuccessScreenWidgetState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-      children: [
-        // Hình ảnh package.png phóng to khi cuộn (Lớp dưới cùng)
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: Image.asset(
-            "assets/images/package.png", // Set your image here
-            height: 200, // Initial height of the image
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-        ),
-        Spacer(),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+      body: SafeArea(
+        child: Stack(
           children: [
-            Container(
-              height: 500, // Nội dung dưới hình ảnh
-              color: Colors.white.withOpacity(0.3),
-
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 20,
-                  children: [
-                    Spacer(),
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          color: Colors.white),
-                      child: Image.asset(
-                        'assets/images/app_launcher_icon.png',
-                        width: 200,
-                        height: 200,
-                      ),
-                    ),
-                    Spacer(),
-                    Column(
+            // Cột chính gồm hình ảnh ở trên và nội dung bên dưới
+            Column(
+              children: [
+                // Hình ảnh package.png ở phần trên
+                Image.asset(
+                  "assets/images/package.png",
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                // Phần nội dung bên dưới chiếm phần còn lại của màn hình
+                Expanded(
+                  child: Container(
+                    color: Colors.white, // Màu nền rõ ràng
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Logo ứng dụng
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.white,
+                          ),
+                          child: Image.asset(
+                            'assets/images/app_launcher_icon.png',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        // Icon thông báo thanh toán thành công
                         Icon(
                           Icons.check_circle_outline_rounded,
                           size: 80,
                           color: Colors.green,
                         ),
-                        Text("Cảm ơn đã thanh toán!",
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 12),
+                        // Tiêu đề
+                        Text(
+                          "Cảm ơn đã thanh toán!",
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        // Nội dung mô tả
                         RichText(
-                            text: TextSpan(children: <TextSpan>[
-                          TextSpan(
-                              text: "Bạn đã thanh toán ",
-                              style: GoogleFonts.roboto(
+                          text: TextSpan(
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: "Bạn đã thanh toán ",
+                                style: GoogleFonts.roboto(
                                   color: Colors.black,
                                   fontSize: 24,
-                                  fontWeight: FontWeight.normal)),
-                          TextSpan(
-                              text: "thành công ",
-                              style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "thành công ",
+                                style: GoogleFonts.roboto(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.green)),
-                        ])),
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        // Nút "Bắt đầu"
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: FFButtonWidget(
+                            onPressed: () {
+                              context.push("/bottomNavbarScreen");
+                            },
+                            text: 'Bắt đầu ',
+                            options: FFButtonOptions(
+                              width: double.infinity,
+                              height: 70,
+                              color: FlutterFlowTheme.of(context).primary,
+                              textStyle: GoogleFonts.roboto(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                    Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: FFButtonWidget(
-                        onPressed: () {
-                          context.push("/bottomNavbarScreen");
-                        },
-                        text: 'Bắt đầu ',
-                        options: FFButtonOptions(
-                          width: double.infinity,
-                          height: 70,
-                          color: FlutterFlowTheme.of(context).primary,
-                          textStyle: GoogleFonts.roboto(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 10,
+              right: 20,
+              child: ClipOval(
+                child: FloatingActionButton(
+                  onPressed: () {
+                    context.push("/bottomNavbarScreen");
+                  },
+                  backgroundColor: Colors.white,
+                  child: const Icon(Icons.close, color: Colors.black),
                 ),
               ),
             ),
           ],
         ),
-
-        Positioned(
-          top: 40, // Đặt ở góc trên bên phải
-          right: 20,
-          child: ClipOval(
-            child: FloatingActionButton(
-              onPressed: () {
-                context.push("/bottomNavbarScreen");
-              },
-              backgroundColor: Colors.white.withOpacity(0.7),
-              child: Icon(Icons.close, color: Colors.black),
-            ),
-          ),
-        ),
-      ],
-    ));
+      ),
+    );
   }
 }
