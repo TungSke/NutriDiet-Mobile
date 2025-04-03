@@ -692,6 +692,23 @@ class _EditHealthProfileScreenWidgetState
               });
             },
           ),
+          _buildDietStylePickerRow(
+            'Chế độ ăn ',
+            _model.dietStyle,
+            [
+              'Nhiều Carb, giảm Protein',
+              'Nhiều Protein, giảm Carb',
+              'Ăn chay',
+              'Thuần chay',
+              'Cân bằng'
+            ],
+            (val) {
+              setState(() {
+                _model.dietStyle = val;
+                isEdited = true;
+              });
+            },
+          ),
           _buildAllergySelector(_model.allergyLevelsData),
           _buildDiseaseSelector(_model.diseaseLevelsData),
         ],
@@ -891,6 +908,31 @@ class _EditHealthProfileScreenWidgetState
 
   Widget _buildPickerRow(String title, String value, List<String> options,
       Function(String) onSelected) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          InkWell(
+            onTap: () =>
+                _showCupertinoPicker(title, options, value, onSelected),
+            child: Row(
+              children: [
+                Text(value, style: TextStyle(fontSize: 16)),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDietStylePickerRow(String title, String value,
+      List<String> options, Function(String) onSelected) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(

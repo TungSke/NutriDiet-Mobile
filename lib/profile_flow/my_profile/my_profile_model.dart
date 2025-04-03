@@ -18,6 +18,7 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
   String height = '';
   String weight = '';
   String activityLevel = '';
+  String dietStyle = '';
   String userId = '';
   String avatar = '';
   List<String> allergies = []; // ✅ Dị ứng
@@ -51,6 +52,13 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
     'ModeratelyActive': 'Vận động vừa phải',
     'VeryActive': 'vận động nhiều',
     'ExtraActive': 'Cường độ rất cao',
+  };
+  final Map<String, String> _dietStyleMap = {
+    'HighCarbLowProtein': 'Nhiều Carb, giảm Protein',
+    'HighProteinLowCarb': 'Nhiều Protein, giảm Carb',
+    'Vegetarian': 'Ăn chay',
+    'Vegan': 'Thuần chay',
+    'Balanced': 'Cân bằng',
   };
 
   final Map<int, String> _weightChangeRateMap = {
@@ -103,7 +111,7 @@ class MyProfileModel extends FlutterFlowModel<MyProfileWidget>
         height = data["height"]?.toString() ?? "N/A";
         weight = data["weight"]?.toString() ?? "N/A";
         activityLevel = _activityLevelMap[data["activityLevel"]] ?? "N/A";
-
+        dietStyle = _dietStyleMap[data["dietStyle"]] ?? "N/A";
         // Lấy danh sách dị ứng
         allergies = data["allergies"] != null
             ? (data["allergies"] as List)

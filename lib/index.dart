@@ -3,6 +3,8 @@ export 'package:diet_plan_app/log_in_flow/ai_suggestion_screen/ai_suggestion_scr
     show AiSuggestionScreenWidget;
 export 'package:diet_plan_app/log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart'
     show BuyPremiumPackageScreenWidget;
+export 'package:diet_plan_app/log_in_flow/diet_style_screen/diet_style_screen_widget.dart'
+    show DietStyleScreenWidget;
 export 'package:diet_plan_app/log_in_flow/health_indicator_screen/health_indicator_screen_widget.dart'
     show HealthIndicatorScreenWidget;
 export 'package:diet_plan_app/log_in_flow/whats_your_goal/decrease_weight_change_rate_widget.dart'

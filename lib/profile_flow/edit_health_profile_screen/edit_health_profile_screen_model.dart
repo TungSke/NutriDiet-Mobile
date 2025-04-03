@@ -204,6 +204,7 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
   double height = 0.0; // Chiều cao, đổi sang double
   double weight = 0.0; // Cân nặng, đổi sang double
   String activityLevel = ''; // Mức độ vận động
+  String dietStyle = '';
   List<String> allergies = []; // ✅ Dị ứng
   List<String> diseases = [];
   bool isLoading = true;
@@ -218,6 +219,20 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
     'Vận động vừa phải': 'ModeratelyActive',
     'Vận động nhiều': 'VeryActive',
     'Cường độ rất cao': 'ExtraActive',
+  };
+  final Map<String, String> _dietStyleMap = {
+    'Nhiều Carb, giảm Protein': 'HighCarbLowProtein',
+    'Nhiều Protein, giảm Carb': 'HighProteinLowCarb',
+    'Ăn chay': 'Vegetarian',
+    'Thuần chay': 'Vegan',
+    'Cân bằng': 'Balanced',
+  };
+  final Map<String, String> _reverseDietStyleMap = {
+    'HighCarbLowProtein': 'Nhiều Carb, giảm Protein',
+    'HighProteinLowCarb': 'Nhiều Protein, giảm Carb',
+    'Vegetarian': 'Ăn chay',
+    'Vegan': 'Thuần chay',
+    'Balanced': 'Cân bằng',
   };
 
   final Map<String, String> _reverseActivityLevelMap = {
@@ -269,7 +284,8 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
         activityLevel =
             _reverseActivityLevelMap[healthData['data']['activityLevel']] ??
                 "Chưa cập nhật";
-
+        dietStyle = _reverseDietStyleMap[healthData['data']['dietStyle']] ??
+            "Chưa cập nhật";
         // Cập nhật tên dị ứng
         allergies = healthData['data']["allergies"] != null
             ? (healthData['data']["allergies"] as List)
@@ -338,9 +354,11 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
       // Nếu không có dị ứng được chọn, vẫn tiếp tục cập nhật mà không gửi danh sách dị ứng
       final activityLevelInEnglish =
           _activityLevelMap[activityLevel] ?? 'Sedentary';
+      final dietStyleInEnglish = _dietStyleMap[dietStyle] ?? 'Balanced';
 
       final response = await _userService.updateHealthProfile(
         activityLevel: activityLevelInEnglish,
+        dietStyle: dietStyleInEnglish,
         weight: weight, // Cập nhật cân nặng kiểu double
         height: height, // Cập nhật chiều cao kiểu double
         allergies: selectedAllergyIds.isEmpty
