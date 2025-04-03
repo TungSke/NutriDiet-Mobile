@@ -106,6 +106,7 @@ class _FlutterFlowCalendarState extends State<FlutterFlowCalendar> {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+          // Trong phần build() của _FlutterFlowCalendarState:
           CalendarHeader(
             focusedDay: focusedDay,
             onLeftChevronTap: () => setState(
@@ -118,12 +119,20 @@ class _FlutterFlowCalendarState extends State<FlutterFlowCalendar> {
                   ? _nextWeek(focusedDay)
                   : _nextMonth(focusedDay),
             ),
-            onTodayButtonTap: () => setState(() => focusedDay = DateTime.now()),
+            // Sửa callback của nút Today:
+            onTodayButtonTap: () {
+              final today = DateTime.now();
+              setState(() {
+                focusedDay = today;
+                setSelectedDay(today); // Cập nhật selectedDay và selectedRange
+              });
+            },
             titleStyle: widget.titleStyle,
             iconColor: widget.iconColor,
             locale: widget.locale,
             twoRowHeader: widget.twoRowHeader,
           ),
+
           TableCalendar(
             focusedDay: focusedDay,
             selectedDayPredicate: (date) => isSameDay(selectedDay, date),
@@ -136,10 +145,10 @@ class _FlutterFlowCalendarState extends State<FlutterFlowCalendar> {
             calendarStyle: CalendarStyle(
               defaultTextStyle:
                   widget.dateStyle ?? const TextStyle(color: Color(0xFF5A5A5A)),
-              weekendTextStyle: widget.dateStyle ??
-                  const TextStyle(color: Color(0xFF5A5A5A)),
-              holidayTextStyle: widget.dateStyle ??
-                  const TextStyle(color: Color(0xFF5C6BC0)),
+              weekendTextStyle:
+                  widget.dateStyle ?? const TextStyle(color: Color(0xFF5A5A5A)),
+              holidayTextStyle:
+                  widget.dateStyle ?? const TextStyle(color: Color(0xFF5C6BC0)),
               selectedTextStyle:
                   const TextStyle(color: Color(0xFFFAFAFA), fontSize: 16.0)
                       .merge(widget.selectedDateStyle),
