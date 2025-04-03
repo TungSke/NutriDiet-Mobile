@@ -1,4 +1,5 @@
 import 'package:diet_plan_app/index.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +11,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../services/health_service.dart';
 import 'home_componet_model.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+
 export 'home_componet_model.dart';
 
 class HomeComponetWidget extends StatefulWidget {
@@ -257,7 +258,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                     //UI số bước chân
                     // Thay thế phần "Hoạt động hôm nay" trong build()
                     Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          20.0, 0.0, 20.0, 24.0),
                       child: Text(
                         'Hoạt động hôm nay',
                         maxLines: 1,
@@ -268,9 +270,11 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         ),
                       ),
                     ),
-                    if (_model.activityError != null || kIsWeb) // Sử dụng kIsWeb thay vì Platform.isWeb
+                    if (_model.activityError != null ||
+                        kIsWeb) // Sử dụng kIsWeb thay vì Platform.isWeb
                       Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            20.0, 0.0, 20.0, 24.0),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.red[100],
@@ -282,7 +286,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  kIsWeb ? 'Không hỗ trợ trên web' : 'Lỗi lấy dữ liệu hoạt động',
+                                  kIsWeb
+                                      ? 'Không hỗ trợ trên web'
+                                      : 'Lỗi lấy dữ liệu hoạt động',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -299,17 +305,22 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                     color: Colors.red[800],
                                   ),
                                 ),
-                                if (!kIsWeb && _model.activityError!.contains("từ chối cấp quyền"))
+                                if (!kIsWeb &&
+                                    _model.activityError!
+                                        .contains("từ chối cấp quyền"))
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: ElevatedButton(
                                       onPressed: () async {
                                         // Gọi lại fetchActivityData để yêu cầu quyền lần nữa (chỉ trên mobile)
                                         await _model.fetchActivityData();
-                                        setState(() {}); // Rebuild sau khi thử lại
+                                        setState(
+                                            () {}); // Rebuild sau khi thử lại
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: FlutterFlowTheme.of(context).primary,
+                                        backgroundColor:
+                                            FlutterFlowTheme.of(context)
+                                                .primary,
                                       ),
                                       child: const Text(
                                         'Thử lại',
@@ -322,9 +333,11 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                           ),
                         ),
                       ),
-                    if (_model.activityError == null && !kIsWeb) // Chỉ hiển thị dữ liệu nếu không có lỗi và không chạy trên web
+                    if (_model.activityError == null &&
+                        !kIsWeb) // Chỉ hiển thị dữ liệu nếu không có lỗi và không chạy trên web
                       Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 0.0, 0.0, 24.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -337,12 +350,14 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   borderRadius: BorderRadius.circular(16.0),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 16.0),
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 16.0, 0.0, 16.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       CircularPercentIndicator(
-                                        percent: _model.stepProgress.clamp(0.0, 1.0),
+                                        percent:
+                                            _model.stepProgress.clamp(0.0, 1.0),
                                         radius: 50.0,
                                         lineWidth: 8.0,
                                         animation: true,
@@ -350,7 +365,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                         progressColor: Colors.blueAccent,
                                         backgroundColor: Colors.grey[300]!,
                                         center: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.directions_walk,
@@ -371,13 +387,15 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                       Text(
                                         'Bước chân',
                                         maxLines: 1,
-                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          fontFamily: 'figtree',
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
-                                          useGoogleFonts: false,
-                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              fontFamily: 'figtree',
+                                              fontSize: 18.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.w500,
+                                              useGoogleFonts: false,
+                                            ),
                                       ),
                                     ].divide(const SizedBox(height: 8.0)),
                                   ),
@@ -392,12 +410,14 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   borderRadius: BorderRadius.circular(16.0),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 16.0),
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 16.0, 0.0, 16.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       CircularPercentIndicator(
-                                        percent: _model.caloriesBurnedProgress.clamp(0.0, 1.0),
+                                        percent: _model.caloriesBurnedProgress
+                                            .clamp(0.0, 1.0),
                                         radius: 50.0,
                                         lineWidth: 8.0,
                                         animation: true,
@@ -405,7 +425,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                         progressColor: Colors.redAccent,
                                         backgroundColor: Colors.grey[300]!,
                                         center: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.local_fire_department,
@@ -426,20 +447,25 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                       Text(
                                         'Calories đốt cháy',
                                         maxLines: 1,
-                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          fontFamily: 'figtree',
-                                          fontSize: 15.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
-                                          useGoogleFonts: false,
-                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              fontFamily: 'figtree',
+                                              fontSize: 15.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.w500,
+                                              useGoogleFonts: false,
+                                            ),
                                       ),
                                     ].divide(const SizedBox(height: 8.0)),
                                   ),
                                 ),
                               ),
                             ),
-                          ].divide(const SizedBox(width: 16.0)).addToStart(const SizedBox(width: 20.0)).addToEnd(const SizedBox(width: 20.0)),
+                          ]
+                              .divide(const SizedBox(width: 16.0))
+                              .addToStart(const SizedBox(width: 20.0))
+                              .addToEnd(const SizedBox(width: 20.0)),
                         ),
                       ),
                     Opacity(
@@ -480,15 +506,20 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(0.0, 0.0, 0.0, 24.0),
                                           child: CircularPercentIndicator(
-                                            percent: _model.mealLogs.isNotEmpty
-                                                ? min(
-                                                    (_model.mealLogs[0]
+                                            percent: (_model
+                                                        .mealLogs.isNotEmpty &&
+                                                    personalGoal != null &&
+                                                    personalGoal![
+                                                            'dailyCalories'] >
+                                                        0)
+                                                ? (_model.mealLogs[0]
                                                             .totalCalories
                                                             .toDouble() /
-                                                        _model.mealLogs[0]
-                                                            .dailyCalories
-                                                            .toDouble()),
-                                                    1.0) // Ensure that the value doesn't exceed 1.0
+                                                        personalGoal![
+                                                                'dailyCalories']
+                                                            .toDouble())
+                                                    .clamp(0.0,
+                                                        1.0) // Giới hạn tỷ lệ trong khoảng 0.0 - 1.0
                                                 : 0.0,
                                             radius: 75.0,
                                             lineWidth: 12.0,
@@ -498,12 +529,12 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                                         .mealLogs.isNotEmpty &&
                                                     _model.mealLogs[0]
                                                             .totalCalories >
-                                                        _model.mealLogs[0]
-                                                            .dailyCalories)
+                                                        personalGoal![
+                                                            'dailyCalories'])
                                                 ? Colors
-                                                    .green // If totalCalories > dailyCalories, set color to red
+                                                    .red // Nếu totalCalories > dailyCalories, set màu đỏ
                                                 : Colors
-                                                    .red, // Default color // If totalCalories > dailyCalories, set color to red
+                                                    .green, // Nếu không, set màu xanhu không, set màu xanh// Nếu không, set màu xanhhông, set màu xanh
                                             backgroundColor:
                                                 const Color(0x33808080),
                                             center: RichText(
