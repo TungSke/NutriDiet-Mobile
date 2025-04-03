@@ -68,6 +68,7 @@ class HealthProfileProvider extends ChangeNotifier {
   double? height; // Đổi từ int? thành double?
   double? weight; // Đổi từ int? thành double?
   String? activityLevel;
+  String? dietStyle;
   String aisuggestion = "string"; // ✅ Giá trị mặc định
 
   List<int> allergies = []; // List để chứa các dị ứng
@@ -93,6 +94,11 @@ class HealthProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setDietStyle(String value) {
+    dietStyle = value;
+    notifyListeners();
+  }
+
   // Cập nhật đề xuất AI (aisuggestion)
   void setAisuggestion(String value) {
     aisuggestion = value;
@@ -113,7 +119,10 @@ class HealthProfileProvider extends ChangeNotifier {
 
   // Kiểm tra xem thông tin đã đầy đủ chưa
   bool isComplete() {
-    return height != null && weight != null && activityLevel != null;
+    return height != null &&
+        weight != null &&
+        activityLevel != null &&
+        dietStyle != null;
   }
 
   // Chuyển đổi thông tin profile thành một Map
@@ -122,6 +131,7 @@ class HealthProfileProvider extends ChangeNotifier {
       'Height': height,
       'Weight': weight,
       'ActivityLevel': activityLevel,
+      'DietStyle': dietStyle,
       'Aisuggestion': aisuggestion,
       'Allergies': allergies,
       'Diseases': diseases,

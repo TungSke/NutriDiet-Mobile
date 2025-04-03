@@ -233,6 +233,7 @@ class UserService {
     double? weight, // Use double instead of int
     String? activityLevel,
     String? aisuggestion,
+    String? dietStyle,
     List<dynamic>? allergies,
     List<dynamic>? diseases,
   }) async {
@@ -245,8 +246,15 @@ class UserService {
 
     try {
       // If any value is null, fetch data from health-profile
-      if ([height, weight, activityLevel, aisuggestion, allergies, diseases]
-          .any((e) => e == null)) {
+      if ([
+        height,
+        weight,
+        activityLevel,
+        dietStyle,
+        aisuggestion,
+        allergies,
+        diseases
+      ].any((e) => e == null)) {
         final healthProfileResponse = await getHealthProfile();
         if (healthProfileResponse.statusCode == 200) {
           final Map<String, dynamic> healthProfile =
@@ -256,7 +264,7 @@ class UserService {
           weight ??= double.tryParse(healthProfile['weight']?.toString() ?? '');
           activityLevel ??= healthProfile['activityLevel']?.toString();
           aisuggestion ??= healthProfile['aisuggestion']?.toString();
-
+          dietStyle ??= healthProfile['dietStyle']?.toString();
           allergies ??= (healthProfile['allergies'] as List?)
                   ?.map((e) => int.tryParse(e['allergyId'].toString()) ?? 0)
                   .where((e) => e > 0)
@@ -284,6 +292,7 @@ class UserService {
       if (weight != null) request.fields['Weight'] = weight.toString();
       if (activityLevel != null)
         request.fields['ActivityLevel'] = activityLevel;
+      if (dietStyle != null) request.fields['DietStyle'] = dietStyle;
       if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
 
       // Add allergies and diseases if not empty
@@ -492,8 +501,7 @@ class UserService {
     }
 
     try {
-      final response =
-          await _apiService.get("api/personal-goal", token: token);
+      final response = await _apiService.get("api/personal-goal", token: token);
 
       if (response.statusCode == 200) {
         return response;

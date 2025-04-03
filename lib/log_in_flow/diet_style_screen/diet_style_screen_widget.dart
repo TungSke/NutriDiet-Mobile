@@ -4,55 +4,58 @@ import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'frequency_exercise_screen_model.dart';
+import 'diet_style_screen_model.dart';
 
-export 'frequency_exercise_screen_model.dart';
+export 'diet_style_screen_model.dart';
 
-class FrequencyExerciseScreenWidget extends StatefulWidget {
-  const FrequencyExerciseScreenWidget({super.key});
+class DietStyleScreenWidget extends StatefulWidget {
+  const DietStyleScreenWidget({super.key});
 
   @override
-  State<FrequencyExerciseScreenWidget> createState() =>
-      _FrequencyExerciseScreenWidgetState();
+  State<DietStyleScreenWidget> createState() => _DietStyleScreenWidgetState();
 }
 
-final List<Map<String, String>> exerciseLevels = [
+final List<Map<String, String>> dietStyles = [
   {
-    'title': 'Ít vận động',
-    'description': 'Công việc văn phòng, ít tập thể dục.',
-    'image': 'assets/images/exercise-2.png'
+    'title': 'Nhiều Carb, giảm Protein',
+    'description':
+        'Cung cấp năng lượng từ các nguồn tinh bột như gạo, bánh mì, khoai tây.',
+    'image': 'assets/images/46.png'
   },
   {
-    'title': 'Vận động nhẹ',
-    'description': 'Tập thể dục nhẹ hoặc đi bộ mỗi ngày 30 phút.',
-    'image': 'assets/images/exercise-6.png'
+    'title': 'Nhiều Protein, giảm Carb',
+    'description':
+        'Ưu tiên nguồn protein dồi dào từ thịt, cá, trứng, và các sản phẩm từ sữa, đồng thời hạn chế lượng carbohydrate.',
+    'image': 'assets/images/47.png'
   },
   {
-    'title': 'Vận động vừa phải',
-    'description': 'Tập thể dục 1 giờ (3-5 lần/tuần).',
-    'image': 'assets/images/exercise-3.png'
+    'title': 'Ăn chay',
+    'description':
+        'Loại bỏ thịt và cá nhưng vẫn có thể bao gồm các sản phẩm từ sữa, trứng hoặc mật ong..',
+    'image': 'assets/images/45.png'
   },
   {
-    'title': 'Vận động nhiều',
-    'description': 'Tập luyện cường độ cao 5-7 lần/tuần.',
-    'image': 'assets/images/exercise-4.png'
+    'title': 'Thuần chay',
+    'description':
+        'Loại bỏ hoàn toàn tất cả sản phẩm có nguồn gốc từ động vật,...tập trung vào thực phẩm từ thực vật như rau củ, quả, ngũ cốc và các loại hạt.',
+    'image': 'assets/images/44.png'
   },
   {
-    'title': 'Cường độ rất cao',
-    'description': 'Thể thao chuyên nghiệp hoặc tập luyện cường độ rất cao.',
-    'image': 'assets/images/exercise-5.png'
+    'title': 'Cân bằng',
+    'description':
+        'Cung cấp đầy đủ các nhóm chất dinh dưỡng: carbohydrate, protein, và chất béo, cùng với vitamin và khoáng chất.',
+    'image': 'assets/images/include--3.png'
   }
 ];
 
-class _FrequencyExerciseScreenWidgetState
-    extends State<FrequencyExerciseScreenWidget> {
-  late FrequencyExerciseScreenModel _model;
+class _DietStyleScreenWidgetState extends State<DietStyleScreenWidget> {
+  late DietStyleScreenModel _model;
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => FrequencyExerciseScreenModel());
+    _model = createModel(context, () => DietStyleScreenModel());
   }
 
   @override
@@ -76,16 +79,16 @@ class _FrequencyExerciseScreenWidgetState
               model: _model.appbarModel,
               updateCallback: () => safeSetState(() {}),
               child: const AppbarWidget(
-                title: 'Tần suất vận động của bạn?',
+                title: 'Chế độ ăn của bạn?',
               ),
             ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: ListView.builder(
-                  itemCount: exerciseLevels.length,
+                  itemCount: dietStyles.length,
                   itemBuilder: (context, index) {
-                    final level = exerciseLevels[index];
+                    final level = dietStyles[index];
                     final isSelected = _model.select == index;
 
                     return InkWell(
@@ -117,8 +120,8 @@ class _FrequencyExerciseScreenWidgetState
                                 padding: const EdgeInsets.all(13.0),
                                 child: Image.asset(
                                   level['image']!,
-                                  width: 40.0,
-                                  height: 40.0,
+                                  width: 40,
+                                  height: 40,
                                   fit: BoxFit.contain,
                                 ),
                               ),
@@ -165,8 +168,8 @@ class _FrequencyExerciseScreenWidgetState
                   const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
               child: FFButtonWidget(
                 onPressed: () async {
-                  await _model.updateActivityLevel(context);
-                  context.pushNamed('diet_style_screen');
+                  await _model.updateDietStyle(context);
+                  context.pushNamed('Select_allergy_screen');
                 },
                 text: 'Tiếp tục',
                 options: FFButtonOptions(

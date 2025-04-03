@@ -72,6 +72,9 @@ class FFAppState extends ChangeNotifier {
       _activityLevel = prefs.getString('ff_activityLevel');
     });
     _safeInit(() {
+      _dietStyle = prefs.getString('ff_dietStyle');
+    });
+    _safeInit(() {
       _kgvalue = prefs.getString('ff_kgvalue') ?? _kgvalue;
     });
   }
@@ -203,6 +206,13 @@ class FFAppState extends ChangeNotifier {
   }
 
   String? _activityLevel;
+  String? _dietStyle;
+  String? get dietStyle => _dietStyle;
+  set dietStyle(String? value) {
+    _dietStyle = value;
+    prefs.setString('ff_dietStyle', value ?? ''); // Lưu vào SharedPreferences
+  }
+
   String? get activityLevel => _activityLevel;
   set activityLevel(String? value) {
     _activityLevel = value;

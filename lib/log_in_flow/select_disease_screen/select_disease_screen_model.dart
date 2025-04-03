@@ -178,7 +178,7 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
           healthProfileProvider.weight ?? 0.0; // Cập nhật thành double
       String aisuggestion = healthProfileProvider.aisuggestion ?? "string";
       String activityLevel = healthProfileProvider.activityLevel ?? "";
-
+      String dietStyle = healthProfileProvider.dietStyle ?? "";
       // Kiểm tra xem có đầy đủ thông tin không
       if (height == 0.0 || weight == 0.0 || activityLevel.isEmpty) {
         showSnackbar(context, '⚠️ Thông tin sức khỏe chưa đầy đủ.');
@@ -203,7 +203,8 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
         height: height,
         weight: weight,
         activityLevel: activityLevel,
-        aisuggestion: "string",
+        dietStyle: dietStyle,
+        aisuggestion: "",
         allergies: allergies, // Gửi allergy
         diseases: diseases, // Gửi disease
       );
