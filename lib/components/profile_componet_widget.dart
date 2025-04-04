@@ -224,37 +224,40 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                 borderRadius: BorderRadius.circular(40.0),
                                 child: _model.avatar.isNotEmpty
                                     ? Image.network(
-                                  _model.avatar,
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
-                                )
+                                        _model.avatar,
+                                        width: 80.0,
+                                        height: 80.0,
+                                        fit: BoxFit.cover,
+                                      )
                                     : Image.asset(
-                                  'assets/images/dummy_profile.png',
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
-                                ),
+                                        'assets/images/dummy_profile.png',
+                                        width: 80.0,
+                                        height: 80.0,
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
                               if (_model.package != null)
                                 Positioned(
                                   top: 0,
                                   right: 0,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 4.0),
                                     decoration: BoxDecoration(
                                       color: Colors.yellow,
                                       borderRadius: BorderRadius.circular(12.0),
                                     ),
                                     child: Text(
                                       'VIP',
-                                      style: FlutterFlowTheme.of(context).bodySmall.override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        useGoogleFonts: false,
-                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .override(
+                                            fontFamily: 'figtree',
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            useGoogleFonts: false,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -268,38 +271,46 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                               children: [
                                 Text(
                                   _model.name,
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.w500,
-                                    useGoogleFonts: false,
-                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w500,
+                                        useGoogleFonts: false,
+                                      ),
                                 ),
                                 const SizedBox(height: 4.0),
                                 Text(
                                   _model.email,
-                                  overflow: TextOverflow.ellipsis, // Giới hạn nếu quá dài
+                                  overflow: TextOverflow
+                                      .ellipsis, // Giới hạn nếu quá dài
                                   maxLines: 1,
                                   softWrap: false,
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 16.0,
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    useGoogleFonts: false,
-                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        color:
+                                            FlutterFlowTheme.of(context).grey,
+                                        useGoogleFonts: false,
+                                      ),
                                 ),
                                 if (_model.package != null)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 4.0),
                                     child: Text(
                                       _model.package!,
-                                      style: FlutterFlowTheme.of(context).bodySmall.override(
-                                        fontFamily: 'figtree',
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.yellow,
-                                        useGoogleFonts: false,
-                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .override(
+                                            fontFamily: 'figtree',
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.yellow,
+                                            useGoogleFonts: false,
+                                          ),
                                     ),
                                   ),
                               ],
@@ -309,7 +320,9 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 130.0), // Giới hạn chiều rộng của nút
+                                constraints: const BoxConstraints(
+                                    maxWidth:
+                                        130.0), // Giới hạn chiều rộng của nút
                                 child: InkWell(
                                   splashColor: Colors.transparent,
                                   focusColor: Colors.transparent,
@@ -319,9 +332,11 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                     context.pushNamed('buy_premium_package');
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0, vertical: 6.0),
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.yellow, width: 2.0),
+                                      border: Border.all(
+                                          color: Colors.yellow, width: 2.0),
                                       borderRadius: BorderRadius.circular(20.0),
                                     ),
                                     child: Row(
@@ -338,13 +353,15 @@ class _ProfileComponetWidgetState extends State<ProfileComponetWidget>
                                           child: Text(
                                             'Mua Premium',
                                             overflow: TextOverflow.ellipsis,
-                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                              fontFamily: 'figtree',
-                                              color: Colors.yellow,
-                                              fontSize: 10.0,
-                                              fontWeight: FontWeight.bold,
-                                              useGoogleFonts: false,
-                                            ),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  fontFamily: 'figtree',
+                                                  color: Colors.yellow,
+                                                  fontSize: 10.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  useGoogleFonts: false,
+                                                ),
                                           ),
                                         ),
                                       ],

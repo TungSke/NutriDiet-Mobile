@@ -60,25 +60,6 @@ class _LoginIntroScreenWidgetState extends State<LoginIntroScreenWidget>
               ),
             ),
 
-            // Nút "Bỏ qua"
-            Positioned(
-              top: 40,
-              right: 16,
-              child: GestureDetector(
-                onTap: () {
-                  context.pushNamed("bottom_navbar_screen");
-                },
-                child: Text(
-                  "Bỏ qua >",
-                  style: GoogleFonts.roboto(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white70,
-                  ),
-                ),
-              ),
-            ),
-
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

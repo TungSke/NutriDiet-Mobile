@@ -179,7 +179,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
             ),
             child: Padding(
               padding:
-                  const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
+                  const EdgeInsetsDirectional.fromSTEB(20.0, 25.0, 20.0, 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

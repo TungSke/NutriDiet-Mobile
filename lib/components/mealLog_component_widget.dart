@@ -1,6 +1,7 @@
 import 'package:diet_plan_app/components/mealLog_list_food.dart';
 import 'package:diet_plan_app/components/mealLog_nutrition.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import '/components/mealLog_component_model.dart';
@@ -102,7 +103,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       final proceedToPremium = await showDialog<bool>(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -128,19 +130,19 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 Text(
                   'Yêu cầu Premium',
                   style: FlutterFlowTheme.of(context).titleLarge.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Để nhận thực đơn AI, bạn cần nâng cấp lên tài khoản Premium.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -166,7 +168,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
                       ),
                       child: const Text(
                         'Tiếp tục',
@@ -210,18 +213,18 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           width: double.maxFinite,
           child: _model.mealLogAis.isNotEmpty
               ? ListView.builder(
-            shrinkWrap: true,
-            itemCount: _model.mealLogAis.length,
-            itemBuilder: (context, index) {
-              final meal = _model.mealLogAis[index];
-              return ListTile(
-                title: Text(meal.foodName),
-                subtitle: Text(
-                  "${meal.mealType} - ${meal.servingSize} - ${meal.calories} Calories",
-                ),
-              );
-            },
-          )
+                  shrinkWrap: true,
+                  itemCount: _model.mealLogAis.length,
+                  itemBuilder: (context, index) {
+                    final meal = _model.mealLogAis[index];
+                    return ListTile(
+                      title: Text(meal.foodName),
+                      subtitle: Text(
+                        "${meal.mealType} - ${meal.servingSize} - ${meal.calories} Calories",
+                      ),
+                    );
+                  },
+                )
               : const Text("Không có dữ liệu thực đơn AI"),
         ),
         actions: [
@@ -394,7 +397,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                           .showSnackBar(
                                         const SnackBar(
                                             content:
-                                            Text('Xóa nhật ký thành công')),
+                                                Text('Xóa nhật ký thành công')),
                                       );
                                     } else {
                                       ScaffoldMessenger.of(context)
@@ -406,10 +409,53 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                     }
                                     break;
                                   case 'end_day':
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('Kết thúc ngày')),
-                                    );
+                                    // Gọi API phân tích Meal Log
+                                    final String? analysis =
+                                        await _model.fetchAnalyzeMealLog();
+                                    if (analysis != null) {
+                                      // Tạo tiêu đề hiển thị ngày
+                                      final String formattedDate =
+                                          DateFormat('dd/MM/yyyy')
+                                              .format(_model.selectedDate);
+
+                                      // Hiển thị kết quả phân tích dưới dạng Markdown
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          // Bạn có thể tùy chỉnh title theo ý muốn
+                                          title: Text(
+                                              "Phân tích ngày: $formattedDate"),
+                                          content: SingleChildScrollView(
+                                            child: MarkdownBody(
+                                              data: analysis,
+                                              styleSheet: MarkdownStyleSheet(
+                                                p: const TextStyle(
+                                                    fontSize: 16),
+                                                // Bạn có thể tuỳ chỉnh màu, kích cỡ chữ, v.v. cho từng phần
+                                                strong: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                // Đặt style cho bullet points, headings, links, v.v. nếu cần
+                                              ),
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: const Text("Đóng"),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "Không có kết quả phân tích.")),
+                                      );
+                                    }
                                     break;
                                 }
                               },
@@ -459,16 +505,21 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   Container(height: 10.0, color: Colors.grey[200]),
                 ],
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 16.0),
                   child: ElevatedButton(
                     onPressed: _navigateToAIMealLog,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isPremium
-                          ? FlutterFlowTheme.of(context).primary // Màu gốc khi premium
+                          ? FlutterFlowTheme.of(context)
+                              .primary // Màu gốc khi premium
                           : Colors.grey[600], // Màu xám đen khi không premium
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text("Nhận thực đơn AI", style: const TextStyle(color: Colors.white, fontSize: 18)),
+                    child: const Text("Nhận thực đơn AI",
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ),
               ],
@@ -548,11 +599,11 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
   }
 
   Widget _buildMealCategoryContent(
-      BuildContext context,
-      dynamic mealLog,
-      String category,
-      String vietnameseCategory,
-      ) {
+    BuildContext context,
+    dynamic mealLog,
+    String category,
+    String vietnameseCategory,
+  ) {
     if (mealLog == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -568,7 +619,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             ),
             trailing: PopupMenuButton<String>(
               icon: const Icon(Icons.more_horiz),
-              onSelected: (String value) async { // Thêm async
+              onSelected: (String value) async {
+                // Thêm async
                 switch (value) {
                   case 'quick_add':
                     Navigator.push(
@@ -586,7 +638,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     });
                     break;
                   case 'reminders':
-                    await _model.toggleReminder(context); // Gọi hàm bật/tắt nhắc nhở
+                    await _model
+                        .toggleReminder(context); // Gọi hàm bật/tắt nhắc nhở
                     break;
                 }
               },
@@ -632,11 +685,11 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
     final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
     final carbsPercent =
-    mealCals > 0 ? (mealCarbs * 4 / mealCals * 100).round() : 0;
+        mealCals > 0 ? (mealCarbs * 4 / mealCals * 100).round() : 0;
     final fatPercent =
-    mealCals > 0 ? (mealFat * 9 / mealCals * 100).round() : 0;
+        mealCals > 0 ? (mealFat * 9 / mealCals * 100).round() : 0;
     final proteinPercent =
-    mealCals > 0 ? (mealProtein * 4 / mealCals * 100).round() : 0;
+        mealCals > 0 ? (mealProtein * 4 / mealCals * 100).round() : 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -759,7 +812,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           ),
           trailing: PopupMenuButton<String>(
             icon: const Icon(Icons.more_horiz),
-            onSelected: (String value) async { // Thêm async
+            onSelected: (String value) async {
+              // Thêm async
               switch (value) {
                 case 'quick_add':
                   Navigator.push(
@@ -777,7 +831,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   });
                   break;
                 case 'reminders':
-                  await _model.toggleReminder(context); // Gọi hàm bật/tắt nhắc nhở
+                  await _model
+                      .toggleReminder(context); // Gọi hàm bật/tắt nhắc nhở
                   break;
               }
             },
@@ -832,13 +887,13 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           mealCals == null
               ? const SizedBox.shrink()
               : Text(
-            mealCals.toString(),
-            style: const TextStyle(
-              fontFamily: 'Figtree',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+                  mealCals.toString(),
+                  style: const TextStyle(
+                    fontFamily: 'Figtree',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ],
       ),
     );

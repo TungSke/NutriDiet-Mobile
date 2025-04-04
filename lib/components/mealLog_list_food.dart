@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:diet_plan_app/services/meallog_service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import '../services/food_service.dart';
 import '../services/models/food.dart';
 import 'mealLog_food_detail.dart';
@@ -56,7 +59,6 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Hiển thị ServingSize của food (nếu có)
             if (food.servingSize != null && food.servingSize!.isNotEmpty)
               Text("Serving Size: ${food.servingSize}"),
             const SizedBox(height: 8),
@@ -72,15 +74,88 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // đóng dialog
+            onPressed: () => Navigator.pop(context),
             child: const Text("Hủy"),
           ),
           ElevatedButton(
             onPressed: () async {
-              // Lấy số lượng nhập vào, mặc định là 1 nếu không parse được
+              // 1) Lấy số lượng nhập vào
               final int quantity = int.tryParse(_quantityController.text) ?? 1;
+              // 2) Tính thêm Calories
+              final int additionalCalories =
+                  ((food.calories ?? 0) * quantity).toInt();
 
-              // Gọi API createMealLog
+              // 3) Check vượt Calories
+              final bool exceedsCalories =
+                  await _meallogService.calorieEstimator(
+                logDate: widget.selectedDate.toIso8601String(),
+                additionalCalories: additionalCalories,
+              );
+
+              // Nếu vượt Calories, hỏi người dùng
+              if (exceedsCalories) {
+                final bool? confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Cảnh báo'),
+                    content: const Text(
+                      'Đã vượt lượng Calories mục tiêu. Bạn có chắc muốn thêm?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Hủy'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Đồng ý'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirm != true) {
+                  // Người dùng không đồng ý
+                  Navigator.pop(context);
+                  return;
+                }
+              }
+              final Response avoidMessage =
+                  await _foodService.checkFoodAvoidance(
+                foodId: food.foodId,
+                context: context,
+              );
+              if (avoidMessage.statusCode == 200) {
+                final jsonData = jsonDecode(avoidMessage.body);
+                final String message = jsonData['message'] ?? '';
+                if (message.isNotEmpty) {
+                  final bool? confirmAvoid = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Cảnh báo'),
+                      content: Text(message),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Hủy'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Đồng ý'),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirmAvoid != true) {
+                    // Người dùng không đồng ý thêm món ăn cần tránh
+                    Navigator.pop(context);
+                    return;
+                  }
+                }
+              }
+
+              // 5) Nếu không vượt calories hoặc người dùng đồng ý vượt
+              // và không phải món cần tránh (hoặc vẫn đồng ý thêm),
+              // thì cuối cùng gọi hàm thêm vào MealLog
               final bool success = await _meallogService.createMealLog(
                 logDate: widget.selectedDate.toIso8601String(),
                 mealType: widget.mealName,
@@ -89,7 +164,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                 quantity: quantity,
               );
 
-              Navigator.pop(context); // Đóng dialog
+              Navigator.pop(context);
 
               if (success) {
                 ScaffoldMessenger.of(context).showSnackBar(
