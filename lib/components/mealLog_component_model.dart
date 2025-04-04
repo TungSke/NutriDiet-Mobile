@@ -164,6 +164,7 @@ class MealLogComponentModel extends FlutterFlowModel {
       debugPrint('Lỗi khi xóa Meal Log Detail: $e');
     }
   }
+
   // check premium
   Future<bool> checkPremiumStatus() async {
     final userService = UserService();
@@ -249,6 +250,28 @@ class MealLogComponentModel extends FlutterFlowModel {
       }
     } catch (e) {
       debugPrint('Lỗi khi bật/tắt nhắc nhở: $e');
+    }
+  }
+
+  Future<String?> fetchAnalyzeMealLog() async {
+    try {
+      // Định dạng ngày theo kiểu "yyyy-M-d" (ví dụ: "2025-4-4")
+      final String formattedDate = DateFormat('yyyy-M-d').format(selectedDate);
+      final service = MeallogService();
+
+      // Gọi API phân tích Meal Log
+      final String? result =
+          await service.analyzeMealLog(logDate: formattedDate);
+
+      if (result != null) {
+        String processedResult = result.trim();
+
+        return processedResult;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error in fetchAnalyzeMealLog: $e');
+      return null;
     }
   }
 

@@ -86,6 +86,40 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       return;
     }
 
+    // Gọi API calorieEstimator để kiểm tra lượng calories thêm vào có vượt mục tiêu không
+    final bool exceedsCalories = await _mealLogService.calorieEstimator(
+      logDate: widget.selectedDate.toIso8601String(),
+      additionalCalories: finalCalories,
+    );
+
+    // Nếu vượt calories, hiển thị dialog cảnh báo xác nhận
+    if (exceedsCalories) {
+      final bool? confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Cảnh báo'),
+          content: const Text(
+            'Đã vượt lượng Calories mục tiêu. Bạn có chắc chắn muốn thêm?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Đồng ý'),
+            ),
+          ],
+        ),
+      );
+      if (confirm != true) {
+        // Người dùng không đồng ý, không thêm món ăn
+        return;
+      }
+    }
+
+    // Gọi API quickAddMeal nếu không vượt hoặc người dùng đã xác nhận đồng ý
     final success = await _mealLogService.quickAddMeal(
       logDate: widget.selectedDate,
       mealType: _selectedMeal,

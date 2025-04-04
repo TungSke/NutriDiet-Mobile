@@ -68,7 +68,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       final proceedToPremium = await showDialog<bool>(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -94,19 +95,19 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                 Text(
                   'Yêu cầu Premium',
                   style: FlutterFlowTheme.of(context).titleLarge.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Để nhận thực đơn AI, bạn cần nâng cấp lên tài khoản Premium.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -132,7 +133,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
                       ),
                       child: const Text(
                         'Tiếp tục',
@@ -168,7 +170,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: FlutterFlowTheme.of(context).primary,
-        title: const Text('Nhận thực đơn AI', style: TextStyle(color: Colors.white)),
+        title: const Text('Nhận thực đơn AI',
+            style: TextStyle(color: Colors.white)),
         content: const Text(
           'Nhận thực đơn 1 tuần từ AI',
           style: TextStyle(color: Colors.white),
@@ -180,7 +183,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xác nhận', style: TextStyle(color: Colors.white)),
+            child:
+                const Text('Xác nhận', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -254,18 +258,37 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32, top: 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Thay thế Container header hiện tại trong build() của MyMealPlanScreenWidget
             Container(
-              height: 119.0,
-              alignment: const AlignmentDirectional(0.0, 1.0),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).primary,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(16.0),
+                  bottomRight: Radius.circular(16.0),
+                ),
+              ),
+              padding: EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                top: MediaQuery.of(context).padding.top +
+                    16.0, // thêm padding.top để tránh notch
+                bottom: 16.0,
+              ),
               child: Text(
                 "Quản lý thực đơn",
-                style: theme.titleLarge.copyWith(fontSize: 22, fontWeight: FontWeight.bold),
+                style: theme.titleLarge.copyWith(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
+
             const SizedBox(height: 16),
             Row(
               children: [
@@ -274,13 +297,16 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black26, blurRadius: 4)
+                      ],
                     ),
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: 'Tìm kiếm thực đơn...',
                         hintStyle: theme.bodyMedium,
-                        prefixIcon: const Icon(Icons.search_sharp, color: Colors.grey),
+                        prefixIcon:
+                            const Icon(Icons.search_sharp, color: Colors.grey),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.all(16),
                       ),
@@ -292,7 +318,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                 ),
                 const SizedBox(width: 10),
                 IconButton(
-                  icon: const Icon(Icons.filter_list, color: Colors.grey, size: 28),
+                  icon: const Icon(Icons.filter_list,
+                      color: Colors.grey, size: 28),
                   onPressed: () => _showFilterDialog(),
                 ),
               ],
@@ -301,9 +328,13 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: _buildLargeButton("Thực đơn mẫu", _navigateToSampleMealPlan)),
+                Expanded(
+                    child: _buildLargeButton(
+                        "Thực đơn mẫu", _navigateToSampleMealPlan)),
                 const SizedBox(width: 10),
-                Expanded(child: _buildLargeButton("Nhận thực đơn AI", _navigateToAIMealPlan)),
+                Expanded(
+                    child: _buildLargeButton(
+                        "Nhận thực đơn AI", _navigateToAIMealPlan)),
               ],
             ),
             const SizedBox(height: 16),
@@ -314,7 +345,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (_model.mealPlans.isEmpty) {
-                    return const Center(child: Text("Không có thực đơn được tìm thấy"));
+                    return const Center(
+                        child: Text("Không có thực đơn được tìm thấy"));
                   }
                   final filteredPlans = _model.getFilteredMealPlans();
                   return ListView.builder(
@@ -407,7 +439,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: FlutterFlowTheme.of(context).primary,
-        title: const Text('Xác nhận xóa', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Xác nhận xóa', style: TextStyle(color: Colors.white)),
         content: Text(
           'Bạn có chắc muốn xóa "${mealPlan.planName}" không?',
           style: const TextStyle(color: Colors.white),
@@ -446,14 +479,16 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Lọc theo mục tiêu sức khỏe", style: TextStyle(color: Colors.white)),
+          title: const Text("Lọc theo mục tiêu sức khỏe",
+              style: TextStyle(color: Colors.white)),
           backgroundColor: FlutterFlowTheme.of(context).primary,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Wrap(
                 spacing: 10,
-                children: ["Giảm cân", "Tăng cân", "Duy trì cân nặng"].map((goal) {
+                children:
+                    ["Giảm cân", "Tăng cân", "Duy trì cân nặng"].map((goal) {
                   return ChoiceChip(
                     label: Text(goal),
                     selected: _model.selectedFilter == goal,
@@ -485,7 +520,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: FlutterFlowTheme.of(context).primary,
-        title: const Text('Thêm mới thực đơn', style: TextStyle(color: Colors.white)),
+        title: const Text('Thêm mới thực đơn',
+            style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -511,7 +547,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
               dropdownColor: FlutterFlowTheme.of(context).primary,
               style: const TextStyle(color: Colors.black),
               items: ['Giảm cân', 'Tăng cân', 'Duy trì cân nặng']
-                  .map((goal) => DropdownMenuItem(value: goal, child: Text(goal)))
+                  .map((goal) =>
+                      DropdownMenuItem(value: goal, child: Text(goal)))
                   .toList(),
               onChanged: (value) => healthGoal = value,
             ),
@@ -539,9 +576,11 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                 );
 
                 try {
-                  final mealPlanId = await _model.createMealPlan(planName, healthGoal);
+                  final mealPlanId =
+                      await _model.createMealPlan(planName, healthGoal);
 
-                  if (loadingContext != null && Navigator.canPop(loadingContext!)) {
+                  if (loadingContext != null &&
+                      Navigator.canPop(loadingContext!)) {
                     Navigator.pop(loadingContext!);
                   }
 
@@ -560,14 +599,14 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                           ),
                         ),
                       );
-
                     }
                   } else {
                     Navigator.pop(dialogContext);
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Lỗi khi tạo thực đơn: mealPlanId không hợp lệ'),
+                          content: Text(
+                              'Lỗi khi tạo thực đơn: mealPlanId không hợp lệ'),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -575,7 +614,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
                   }
                 } catch (e) {
                   // Đóng loading nếu có lỗi
-                  if (loadingContext != null && Navigator.canPop(loadingContext!)) {
+                  if (loadingContext != null &&
+                      Navigator.canPop(loadingContext!)) {
                     Navigator.pop(loadingContext!);
                   }
                   Navigator.pop(dialogContext);
@@ -605,10 +645,12 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget> {
           backgroundColor: title == "Nhận thực đơn AI" && !isPremium
               ? Colors.grey[600] // Màu xám đen khi không premium
               : FlutterFlowTheme.of(context).primary, // Màu gốc khi premium
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
         onPressed: onPressed,
-        child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 18)),
+        child: Text(title,
+            style: const TextStyle(color: Colors.white, fontSize: 18)),
       ),
     );
   }

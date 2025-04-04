@@ -93,7 +93,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
             ),
             child: Padding(
               padding:
-                  const EdgeInsetsDirectional.fromSTEB(20.0, 63.0, 20.0, 16.0),
+                  const EdgeInsetsDirectional.fromSTEB(20.0, 25.0, 20.0, 16.0),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -125,9 +125,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                     fontFamily: 'figtree',
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
-                                    fontSize: 16.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.normal,
+                                    fontSize: 25.0,
+                                    letterSpacing: 0.5,
+                                    fontWeight: FontWeight.bold,
                                     useGoogleFonts: false,
                                     lineHeight: 1.5,
                                   ),
@@ -260,16 +260,20 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(
                           20.0, 0.0, 20.0, 24.0),
-                      child: Text(
-                        'Hoạt động hôm nay',
-                        maxLines: 1,
-                        style: GoogleFonts.roboto(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Hoạt động hôm nay',
+                          maxLines: 1,
+                          style: GoogleFonts.roboto(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
+
                     if (_model.activityError != null ||
                         kIsWeb) // Sử dụng kIsWeb thay vì Platform.isWeb
                       Padding(
@@ -607,279 +611,129 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                       0.0, 0.0, 0.0, 24.0),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: FlutterFlowTheme.of(context)
-                                                .lightGrey,
-                                            borderRadius:
-                                                BorderRadius.circular(16.0),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(0.0, 16.0, 0.0, 16.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                RichText(
-                                                  textScaler:
-                                                      MediaQuery.of(context)
-                                                          .textScaler,
-                                                  text: TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalCarbs : 0}/',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'figtree',
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .grey,
-                                                                  fontSize:
-                                                                      16.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                  useGoogleFonts:
-                                                                      false,
-                                                                ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:
-                                                            "${personalGoal?['dailyCarb'] ?? "N/A"}",
-                                                        style: TextStyle(
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .primary,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 20.0,
-                                                        ),
-                                                      )
-                                                    ],
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily: 'figtree',
-                                                          letterSpacing: 0.0,
-                                                          useGoogleFonts: false,
-                                                        ),
-                                                  ),
-                                                  maxLines: 1,
-                                                ),
-                                                Text(
-                                                  'Carbs',
-                                                  maxLines: 1,
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                                ),
-                                              ].divide(
-                                                  const SizedBox(height: 8.0)),
+                                      // Carbs
+                                      CircularPercentIndicator(
+                                        percent: _model.mealLogs.isNotEmpty
+                                            ? min(
+                                                _model.mealLogs[0].totalCarbs /
+                                                    personalGoal?['dailyCarb'],
+                                                1.0)
+                                            : 0.0,
+                                        radius: 50.0,
+                                        lineWidth: 8.0,
+                                        animation: true,
+                                        animateFromLastPercent: true,
+                                        progressColor: Colors.teal,
+                                        backgroundColor: Colors.grey[200]!,
+                                        center: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalCarbs : 0}',
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
                                             ),
-                                          ),
+                                            Text(
+                                              '/${personalGoal?['dailyCarb'] ?? "N/A"}',
+                                              style: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12),
+                                            ),
+                                          ],
+                                        ),
+                                        footer: const Padding(
+                                          padding: EdgeInsets.only(top: 8.0),
+                                          child: Text('Carbs'),
                                         ),
                                       ),
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: FlutterFlowTheme.of(context)
-                                                .lightGrey,
-                                            borderRadius:
-                                                BorderRadius.circular(16.0),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(0.0, 16.0, 0.0, 16.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                RichText(
-                                                  textScaler:
-                                                      MediaQuery.of(context)
-                                                          .textScaler,
-                                                  text: TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalProtein : 0}/',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'figtree',
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .grey,
-                                                                  fontSize:
-                                                                      16.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                  useGoogleFonts:
-                                                                      false,
-                                                                ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:
-                                                            "${personalGoal?['dailyProtein'] ?? "N/A"}",
-                                                        style: TextStyle(
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .primary,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 20.0,
-                                                        ),
-                                                      )
-                                                    ],
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily: 'figtree',
-                                                          letterSpacing: 0.0,
-                                                          useGoogleFonts: false,
-                                                        ),
-                                                  ),
-                                                  maxLines: 1,
-                                                ),
-                                                Text(
-                                                  'Protein',
-                                                  maxLines: 1,
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                                ),
-                                              ].divide(
-                                                  const SizedBox(height: 8.0)),
+                                      // Protein
+                                      CircularPercentIndicator(
+                                        percent: _model.mealLogs.isNotEmpty
+                                            ? min(
+                                                _model.mealLogs[0]
+                                                        .totalProtein /
+                                                    personalGoal?[
+                                                        'dailyProtein'],
+                                                1.0)
+                                            : 0.0,
+                                        radius: 50.0,
+                                        lineWidth: 8.0,
+                                        animation: true,
+                                        animateFromLastPercent: true,
+                                        progressColor: Colors.orange,
+                                        backgroundColor: Colors.grey[200]!,
+                                        center: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalProtein : 0}',
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
                                             ),
-                                          ),
+                                            Text(
+                                              '/${personalGoal?['dailyProtein'] ?? "N/A"}',
+                                              style: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12),
+                                            ),
+                                          ],
+                                        ),
+                                        footer: const Padding(
+                                          padding: EdgeInsets.only(top: 8.0),
+                                          child: Text('Protein'),
                                         ),
                                       ),
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: FlutterFlowTheme.of(context)
-                                                .lightGrey,
-                                            borderRadius:
-                                                BorderRadius.circular(16.0),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(0.0, 16.0, 0.0, 16.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                RichText(
-                                                  textScaler:
-                                                      MediaQuery.of(context)
-                                                          .textScaler,
-                                                  text: TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalFat : 0}/',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'figtree',
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .grey,
-                                                                  fontSize:
-                                                                      16.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                  useGoogleFonts:
-                                                                      false,
-                                                                ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:
-                                                            "${personalGoal?['dailyFat'] ?? "N/A"}",
-                                                        style: TextStyle(
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .primary,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 20.0,
-                                                        ),
-                                                      )
-                                                    ],
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily: 'figtree',
-                                                          letterSpacing: 0.0,
-                                                          useGoogleFonts: false,
-                                                        ),
-                                                  ),
-                                                  maxLines: 1,
-                                                ),
-                                                Text(
-                                                  'Fat',
-                                                  maxLines: 1,
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'figtree',
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        useGoogleFonts: false,
-                                                      ),
-                                                ),
-                                              ].divide(
-                                                  const SizedBox(height: 8.0)),
+                                      // Fat
+                                      CircularPercentIndicator(
+                                        percent: _model.mealLogs.isNotEmpty
+                                            ? min(
+                                                _model.mealLogs[0].totalFat /
+                                                    personalGoal?['dailyFat'],
+                                                1.0)
+                                            : 0.0,
+                                        radius: 50.0,
+                                        lineWidth: 8.0,
+                                        animation: true,
+                                        animateFromLastPercent: true,
+                                        progressColor: Colors.purple,
+                                        backgroundColor: Colors.grey[200]!,
+                                        center: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalFat : 0}',
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
                                             ),
-                                          ),
+                                            Text(
+                                              '/${personalGoal?['dailyFat'] ?? "N/A"}',
+                                              style: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12),
+                                            ),
+                                          ],
+                                        ),
+                                        footer: const Padding(
+                                          padding: EdgeInsets.only(top: 8.0),
+                                          child: Text('Fat'),
                                         ),
                                       ),
-                                    ]
-                                        .divide(const SizedBox(width: 16.0))
-                                        .addToStart(const SizedBox(width: 20.0))
-                                        .addToEnd(const SizedBox(width: 20.0)),
+                                    ],
                                   ),
                                 ),
                                 Padding(

@@ -447,4 +447,57 @@ class MeallogService {
       return false;
     }
   }
+
+  Future<String?> analyzeMealLog({required String logDate}) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Xây dựng endpoint với query parameter logDate
+      final String endpoint = 'api/meal-log/analyze?logDate=$logDate';
+      final response = await _apiService.get(endpoint, token: token);
+      debugPrint(
+          "API analyzeMealLog: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        // Giả sử API trả về một JSON có key 'data' chứa thông tin phân tích
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        return jsonResponse['data'] as String;
+      } else {
+        throw Exception(
+            'Lỗi khi fetch analyze meal log: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API analyzeMealLog: $e");
+      return null;
+    }
+  }
+
+  Future<bool> calorieEstimator({
+    required String logDate,
+    required int additionalCalories,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Xây dựng endpoint với query parameters logdate và additionalCalories
+      final String endpoint =
+          'api/meal-log/calorie-estimator?logdate=$logDate&additionalCalories=$additionalCalories';
+      final response = await _apiService.get(endpoint, token: token);
+      debugPrint(
+          "API calorieEstimator: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final bool result = jsonDecode(response.body) as bool;
+        return result;
+      } else {
+        throw Exception(
+            'Lỗi khi gọi API calorieEstimator: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Lỗi khi gọi API calorieEstimator: $e");
+      return false;
+    }
+  }
 }
