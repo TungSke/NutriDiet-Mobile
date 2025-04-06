@@ -99,6 +99,10 @@ class IngredientAvoidScreenModel
     }
   }
 
+  Future<bool> checkPremiumStatus() async {
+    return await _userService.isPremium();
+  }
+
   @override
   void dispose() {}
 }
