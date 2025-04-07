@@ -792,11 +792,13 @@ class _EditHealthProfileScreenWidgetState
                 context: context,
                 builder: (BuildContext context) {
                   return MultiSelectDialog(
+                    backgroundColor: Colors.white,
                     items: allergies.map((allergy) {
                       return MultiSelectItem<int>(
                           int.tryParse(allergy['id'].toString()) ?? 0,
                           allergy['title']);
                     }).toList(),
+                    selectedColor: FlutterFlowTheme.of(context).primary,
                     initialValue: List<int>.from(_model.selectedAllergyIds),
                   );
                 },
@@ -858,11 +860,13 @@ class _EditHealthProfileScreenWidgetState
                 context: context,
                 builder: (BuildContext context) {
                   return MultiSelectDialog(
+                    backgroundColor: Colors.white,
                     items: diseases.map((disease) {
                       return MultiSelectItem<int>(
                           int.tryParse(disease['id'].toString()) ?? 0,
                           disease['title']);
                     }).toList(),
+                    selectedColor: FlutterFlowTheme.of(context).primary,
                     initialValue: List<int>.from(_model.selectedDiseaseIds),
                   );
                 },
@@ -1011,7 +1015,7 @@ class _EditHealthProfileScreenWidgetState
                   });
                   Navigator.pop(context);
                 },
-                child: Text("DONE",
+                child: Text("Xác nhận",
                     style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
             ),
