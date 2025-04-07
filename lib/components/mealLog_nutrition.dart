@@ -31,9 +31,7 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
   }
 
   Future<void> _fetchNutritionData() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
     try {
       final String formattedDate = DateFormat('yyyy-M-d').format(_selectedDate);
       final service = MeallogService();
@@ -43,9 +41,7 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
       debugPrint("Error fetching nutrition data: $e");
     }
   }
@@ -73,9 +69,7 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
               onSurface: Colors.black,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.green,
-              ),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
             ),
           ),
           child: child!,
@@ -101,89 +95,40 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
 
   @override
   Widget build(BuildContext context) {
+    // Nếu đang tải dữ liệu => hiển thị loading
     if (_isLoading) {
       return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(120),
-          child: AppBar(
-            backgroundColor: Colors.white,
-            automaticallyImplyLeading: true,
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.chevron_left, color: Colors.black),
-                      onPressed: () {
-                        _changeDate(
-                            _selectedDate.subtract(const Duration(days: 1)));
-                      },
-                    ),
-                    GestureDetector(
-                      onTap: () => _showDatePicker(context),
-                      child: Text(
-                        _getCustomDateString(_selectedDate),
-                        style: const TextStyle(
-                          fontFamily: 'Figtree',
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon:
-                          const Icon(Icons.chevron_right, color: Colors.black),
-                      onPressed: () {
-                        _changeDate(_selectedDate.add(const Duration(days: 1)));
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Nutrition',
-                  style: TextStyle(
-                    fontFamily: 'Figtree',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            bottom: TabBar(
-              controller: _tabController,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.grey,
-              tabs: const [
-                Tab(text: 'CALORIES'),
-                Tab(text: 'MACROS'),
-              ],
-            ),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
           ),
+          title: const Text(
+            'Dinh dưỡng',
+            style: TextStyle(color: Colors.black),
+          ),
+          centerTitle: false,
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    // Phân tích dữ liệu nutrition từ _nutritionData
+    // Dữ liệu đã sẵn sàng
     final totalCalories = _nutritionData?['totalCalories'] ?? 0;
     final netCalories = _nutritionData?['netCalories'] ?? 0;
     final goalCalories = _nutritionData?['goal'] ?? 0;
 
-    // Meal breakdown: chuyển đổi danh sách thành Map<String, double>
+    // Meal breakdown
     final List<dynamic> mealBreakdownList =
         _nutritionData?['mealBreakdown'] ?? [];
     Map<String, double> mealCaloriesMap = {};
     for (var meal in mealBreakdownList) {
-      // Nếu cần chuyển về chữ thường để nhất quán
       final mealType = meal['mealType'].toString();
       mealCaloriesMap[mealType] = (meal['calories'] as num).toDouble();
     }
-    // Nếu thiếu snack, thêm mặc định 0.0
+    // Nếu thiếu snack => thêm 0
     if (!mealCaloriesMap.containsKey('Snack') &&
         !mealCaloriesMap.containsKey('snack') &&
         !mealCaloriesMap.containsKey('Snacks')) {
@@ -203,7 +148,8 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
     // Highest in Calories
     final List<dynamic> highestInCaloriesList =
         _nutritionData?['highestInCalories'] ?? [];
-    // Trích xuất Highest in Carbs, Fat, Protein
+
+    // Highest in Carbs, Fat, Protein
     final List<dynamic> highestInCarbsList =
         _nutritionData?['highestInCarbs'] ?? [];
     final List<dynamic> highestInFatList =
@@ -212,86 +158,98 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
         _nutritionData?['highestInProtein'] ?? [];
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(120),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: true,
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left, color: Colors.black),
-                    onPressed: () {
-                      _changeDate(
-                          _selectedDate.subtract(const Duration(days: 1)));
-                    },
-                  ),
-                  GestureDetector(
-                    onTap: () => _showDatePicker(context),
-                    child: Text(
-                      _getCustomDateString(_selectedDate),
-                      style: const TextStyle(
-                        fontFamily: 'Figtree',
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right, color: Colors.black),
-                    onPressed: () {
-                      _changeDate(_selectedDate.add(const Duration(days: 1)));
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Nutrition',
-                style: TextStyle(
-                  fontFamily: 'Figtree',
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-          bottom: TabBar(
-            controller: _tabController,
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.grey,
-            tabs: const [
-              Tab(text: 'CALORIES'),
-              Tab(text: 'MACROS'),
-            ],
+      // AppBar chỉ chứa tiêu đề + nút back
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Nutrition',
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'Figtree',
+            fontWeight: FontWeight.bold,
           ),
         ),
+        centerTitle: false,
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          // Tab CALORIES: hiển thị PieChart và các thông tin calo
-          _buildCaloriesTab(
-            totalCalories,
-            goalCalories,
-            netCalories,
-            mealCaloriesMap,
-            highestInCaloriesList,
+          // Phần chọn ngày, tách riêng 1 hàng
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left, color: Colors.black),
+                  onPressed: () {
+                    _changeDate(
+                        _selectedDate.subtract(const Duration(days: 1)));
+                  },
+                ),
+                GestureDetector(
+                  onTap: () => _showDatePicker(context),
+                  child: Text(
+                    _getCustomDateString(_selectedDate),
+                    style: const TextStyle(
+                      fontFamily: 'Figtree',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right, color: Colors.black),
+                  onPressed: () {
+                    _changeDate(_selectedDate.add(const Duration(days: 1)));
+                  },
+                ),
+              ],
+            ),
           ),
-          // Tab MACROS: hiển thị PieChart, thông tin macro và dữ liệu Highest in Carbs/Fat/Protein
-          _buildMacrosTab(
-            carbs,
-            fat,
-            protein,
-            highestInCarbsList,
-            highestInFatList,
-            highestInProteinList,
+
+          // TabBar ngay dưới
+          Container(
+            color: Colors.white,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.grey,
+              tabs: const [
+                Tab(text: 'CALORIES'),
+                Tab(text: 'MACROS'),
+              ],
+            ),
+          ),
+
+          // Phần nội dung 2 tab
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildCaloriesTab(
+                  totalCalories,
+                  goalCalories,
+                  netCalories,
+                  mealCaloriesMap,
+                  highestInCaloriesList,
+                ),
+                _buildMacrosTab(
+                  carbs,
+                  fat,
+                  protein,
+                  highestInCarbsList,
+                  highestInFatList,
+                  highestInProteinList,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -389,7 +347,7 @@ class _MealLogNutritionWidgetState extends State<MealLogNutritionWidget>
           _buildMacroInfoRow('Fat', fat, totalMacro),
           _buildMacroInfoRow('Protein', protein, totalMacro),
           const SizedBox(height: 16),
-          // Hiển thị Highest in Carbohydrates
+          // Hiển thị Highest in Carbs
           const Text(
             'Highest in Carbohydrates (g)',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

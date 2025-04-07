@@ -288,7 +288,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         elevation: 0,
         centerTitle: false,
         title: const Text(
-          'Diary',
+          'Nhật ký',
           style: TextStyle(
             color: Colors.black,
             fontFamily: 'Figtree',
@@ -504,24 +504,29 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   _buildMealCategoryCard(context, category),
                   Container(height: 10.0, color: Colors.grey[200]),
                 ],
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0, vertical: 16.0),
-                  child: ElevatedButton(
-                    onPressed: _navigateToAIMealLog,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isPremium
-                          ? FlutterFlowTheme.of(context)
-                              .primary // Màu gốc khi premium
-                          : Colors.grey[600], // Màu xám đen khi không premium
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                if (_model.selectedDate.year == DateTime.now().year &&
+                    _model.selectedDate.month == DateTime.now().month &&
+                    _model.selectedDate.day == DateTime.now().day)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 16.0),
+                    child: ElevatedButton(
+                      onPressed: _navigateToAIMealLog,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isPremium
+                            ? FlutterFlowTheme.of(context)
+                                .primary // Màu gốc khi premium
+                            : Colors.grey[600], // Màu xám đen khi không premium
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        "Nhận thực đơn AI",
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
                     ),
-                    child: const Text("Nhận thực đơn AI",
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 18)),
                   ),
-                ),
               ],
             ),
           ),
@@ -573,8 +578,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         return 'Bữa tối';
       case 'snacks':
         return 'Bữa phụ';
-      case 'exercise':
-        return 'Tập luyện';
       default:
         return category;
     }
@@ -709,8 +712,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           ),
         for (int i = 0; i < details.length; i++) ...[
           GestureDetector(
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => MealLogDetailWidget(
@@ -718,6 +721,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   ),
                 ),
               );
+              if (result == true) {
+                _model.fetchMealLogs();
+              }
             },
             onLongPress: () {
               showDialog(

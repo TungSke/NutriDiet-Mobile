@@ -792,8 +792,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
         return 'Bữa tối';
       case 'snacks':
         return 'Bữa phụ';
-      case 'exercise':
-        return 'Tập luyện';
       default:
         return category;
     }
@@ -845,8 +843,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
         return Colors.blue; // Màu cho bữa tối
       case 'snacks':
         return Colors.purple; // Màu cho bữa phụ
-      case 'exercise':
-        return Colors.red; // Màu cho tập luyện
       default:
         return Colors.grey; // Màu mặc định cho các bữa khác
     }

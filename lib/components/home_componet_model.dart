@@ -20,7 +20,6 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   bool isLoading = true;
   int calorieGoal = 1300; // Giá trị mặc định, sẽ được cập nhật từ API
   int foodCalories = 0;
-  int exerciseCalories = 0;
   int steps = 0; // Số bước chân
   int caloriesBurned = 0; // Calories đốt cháy
   String? activityError; // Lưu thông báo lỗi từ GGFitService
@@ -36,7 +35,6 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     'Lunch',
     'Dinner',
     'Snacks',
-    'Exercise'
   ];
 
   VoidCallback? _updateCallback;
@@ -45,8 +43,7 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     _updateCallback = callback;
   }
 
-  // Tính Remaining (Goal - Food + Exercise)
-  int get remainingCalories => calorieGoal - foodCalories + exerciseCalories;
+  int get remainingCalories => calorieGoal - foodCalories;
 
   String name = "Chưa đăng nhập"; // Giá trị mặc định
   String email = "@gmail.com"; // Giá trị mặc định
@@ -98,11 +95,14 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   Future<void> fetchActivityData() async {
     try {
       // Xác định khoảng thời gian cho ngày được chọn
-      final startDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-      final endDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
+      final startDate =
+          DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+      final endDate =
+          DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
 
       // Gọi GGFitService để lấy dữ liệu
-      final result = await _ggFitService.fetchStepsAndHealthData(startDate, endDate);
+      final result =
+          await _ggFitService.fetchStepsAndHealthData(startDate, endDate);
       print(result);
       steps = (result['steps'] is int)
           ? result['steps'] as int
@@ -177,10 +177,6 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
 
   void updateFoodCalories(int newCalories) {
     foodCalories = newCalories;
-  }
-
-  void updateExerciseCalories(int newCalories) {
-    exerciseCalories = newCalories;
   }
 
   @override
