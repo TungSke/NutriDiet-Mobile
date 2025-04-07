@@ -85,6 +85,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   health: ^12.1.0
   permission_handler: ^11.4.0
+  mobile_scanner: ^6.0.7
 
 dependency_overrides:
   http: 1.2.2

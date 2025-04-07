@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import '../services/meallog_service.dart';
 
@@ -19,7 +20,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
   final MeallogService _mealLogService = MeallogService();
 
   // Danh sách bữa ăn
-  final List<String> _mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
+  final List<String> _mealTypes = const ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
   late String _selectedMeal;
 
   // Controllers
@@ -31,13 +32,10 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
   @override
   void initState() {
     super.initState();
-    // Mặc định bữa ăn từ ngoài truyền vào (tiếng Anh)
     _selectedMeal = widget.mealName;
-    // Lắng nghe thay đổi ở Fat/Carbs/Protein để cập nhật giao diện
     _fatController.addListener(_onMacroChanged);
     _carbsController.addListener(_onMacroChanged);
     _proteinController.addListener(_onMacroChanged);
-    // Lắng nghe thay đổi Calories để cập nhật giao diện
     _caloriesController.addListener(() => setState(() {}));
   }
 
@@ -53,7 +51,6 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     super.dispose();
   }
 
-  /// Tính tổng Calories từ Fat/Carbs/Protein (1g Fat = 9 cal, 1g Carbs = 4 cal, 1g Protein = 4 cal)
   double get _macroCalories {
     final double fat = double.tryParse(_fatController.text) ?? 0;
     final double carbs = double.tryParse(_carbsController.text) ?? 0;
@@ -61,18 +58,14 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     return fat * 9 + carbs * 4 + protein * 4;
   }
 
-  /// Mỗi khi Fat/Carbs/Protein thay đổi => cập nhật UI
   void _onMacroChanged() {
     setState(() {});
   }
 
-  /// Lấy giá trị Calories người dùng nhập (0 nếu rỗng)
   int get _typedCalories => int.tryParse(_caloriesController.text) ?? 0;
 
-  /// Trả về chênh lệch giữa Calories người dùng nhập và Calories tính từ macros
   int get _calDiff => _typedCalories - _macroCalories.round();
 
-  /// Khi người dùng bấm Lưu, nếu ô Calories trống thì dùng macro, ngược lại dùng giá trị người dùng nhập
   Future<void> _onSave() async {
     final int fats = int.tryParse(_fatController.text) ?? 0;
     final int carbs = int.tryParse(_carbsController.text) ?? 0;
@@ -86,13 +79,11 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       return;
     }
 
-    // Gọi API calorieEstimator để kiểm tra lượng calories thêm vào có vượt mục tiêu không
     final bool exceedsCalories = await _mealLogService.calorieEstimator(
       logDate: widget.selectedDate.toIso8601String(),
       additionalCalories: finalCalories,
     );
 
-    // Nếu vượt calories, hiển thị dialog cảnh báo xác nhận
     if (exceedsCalories) {
       final bool? confirm = await showDialog<bool>(
         context: context,
@@ -118,7 +109,6 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       }
     }
 
-    // Gọi API quickAddMeal nếu không vượt hoặc người dùng đã xác nhận đồng ý
     final success = await _mealLogService.quickAddMeal(
       logDate: widget.selectedDate,
       mealType: _selectedMeal,
@@ -137,21 +127,71 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     }
   }
 
+  void _onScanBarcode() async {
+    try {
+      final result = await context.pushNamed('barcode_scanner_screen');
+      if (result != null && mounted) {
+        final barcode = result as String;
+        print('Mã vạch: $barcode');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Mã vạch: $barcode')),
+        );
+
+        final foodData = await _fetchFoodDataFromBarcode(barcode);
+        if (foodData != null) {
+          setState(() {
+            _caloriesController.text = foodData['calories'].toString();
+            _fatController.text = foodData['fat'].toString();
+            _carbsController.text = foodData['carbs'].toString();
+            _proteinController.text = foodData['protein'].toString();
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Không tìm thấy thông tin món ăn!')),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error navigating to barcode_scanner_screen: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi điều hướng: $e')),
+      );
+    }
+  }
+
+  Future<Map<String, dynamic>?> _fetchFoodDataFromBarcode(String barcode) async {
+    await Future.delayed(const Duration(seconds: 1));
+    if (barcode == '123456789') {
+      return {
+        'calories': 350,
+        'fat': 10,
+        'carbs': 50,
+        'protein': 15,
+      };
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final double macroCals = _macroCalories;
     final int typedCals = _typedCalories;
 
     return Scaffold(
-      backgroundColor: Colors.white, // Màu nền trắng
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white, // AppBar trắng
+        backgroundColor: Colors.white,
         title: const Text(
           'Thêm nhanh',
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            tooltip: 'Quét mã vạch',
+            onPressed: _onScanBarcode,
+          ),
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: _onSave,
@@ -189,7 +229,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
-  final Map<String, String> mealTypeMapping = {
+  final Map<String, String> mealTypeMapping = const {
     'Breakfast': 'Bữa sáng',
     'Lunch': 'Bữa trưa',
     'Dinner': 'Bữa tối',
@@ -200,22 +240,21 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Bữa (in đậm)
         const Text(
           'Bữa',
           style: TextStyle(
             fontSize: 16,
             color: Colors.black,
-            fontWeight: FontWeight.bold, // In đậm
+            fontWeight: FontWeight.bold,
           ),
         ),
         DropdownButton<String>(
           value: _selectedMeal,
-          underline: const SizedBox(), // ẩn gạch chân
+          underline: const SizedBox(),
           items: _mealTypes.map((type) {
             return DropdownMenuItem(
-              value: type, // Giá trị này vẫn là tiếng Anh khi gọi API
-              child: Text(mealTypeMapping[type] ?? type), // Hiển thị tiếng Việt
+              value: type,
+              child: Text(mealTypeMapping[type] ?? type),
             );
           }).toList(),
           onChanged: (val) {
@@ -230,7 +269,6 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
-  /// Row Calories với placeholder và thông báo chênh lệch
   Widget _buildCaloriesRow(double macroCals, int typedCals) {
     bool hasMacros = macroCals > 0;
     bool userTyped = typedCals > 0;
@@ -240,13 +278,12 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     } else if (userTyped && hasMacros && (typedCals != macroCals.round())) {
       final diff = typedCals - macroCals.round();
       subLabel =
-          "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
+      "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Calories (in đậm)
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -255,7 +292,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.black,
-                fontWeight: FontWeight.bold, // In đậm
+                fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(
@@ -284,7 +321,6 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
-  /// Row cho Fat/Carbohydrates/Protein
   Widget _buildMacroRow({
     required String label,
     required TextEditingController controller,
@@ -293,13 +329,12 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // label (in đậm)
         Text(
           label,
           style: const TextStyle(
             fontSize: 16,
             color: Colors.black,
-            fontWeight: FontWeight.bold, // In đậm
+            fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(
