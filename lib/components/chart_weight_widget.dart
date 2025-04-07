@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:diet_plan_app/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // for date formatting
 import 'package:syncfusion_flutter_charts/charts.dart';
+
 import '../flutter_flow/flutter_flow_theme.dart';
 
 // Định nghĩa model cho dữ liệu cân nặng
@@ -130,6 +132,7 @@ class WeightLineChartState extends State<WeightLineChart> {
     return Scaffold(
       body: Center(
         child: Container(
+          color: Colors.white,
           padding: const EdgeInsets.all(18),
           child: SfCartesianChart(
             primaryXAxis: DateTimeAxis(
