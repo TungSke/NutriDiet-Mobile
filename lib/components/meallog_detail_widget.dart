@@ -25,6 +25,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Chi tiết'),
       ),
@@ -54,145 +55,245 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    mealDetail.foodName,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  if (mealDetail.imageUrl != null &&
-                      mealDetail.imageUrl!.isNotEmpty)
-                    Image.network(mealDetail.imageUrl ?? ""),
-                  const SizedBox(height: 10),
-                  Text("Serving: ${mealDetail.servingSize}"),
-                  Text("Quantity: ${mealDetail.quantity}"),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                    controller: _calorieController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: "Calories (kcal)",
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập calories';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return "Nhập số hợp lệ";
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _proteinController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: "Protein (g)",
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập protein';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return "Nhập số hợp lệ";
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _carbsController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: "Carbs (g)",
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập carbs';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return "Nhập số hợp lệ";
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _fatController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: "Fat (g)",
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập fat';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return "Nhập số hợp lệ";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        final int calories =
-                            int.parse(_calorieController!.text);
-                        final int protein = int.parse(_proteinController!.text);
-                        final int carbs = int.parse(_carbsController!.text);
-                        final int fat = int.parse(_fatController!.text);
-
-                        bool result =
-                            await mealLogService.updateMealLogDetailNutrition(
-                          detailId: widget.detailId,
-                          calorie: calories,
-                          protein: protein,
-                          carbs: carbs,
-                          fat: fat,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(result
-                                ? 'Update thành công'
-                                : 'Update thất bại'),
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text("Cập nhật dinh dưỡng"),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Giả sử bạn có File imageFile từ thư viện hay máy ảnh
-                      File imageFile = File('path/to/your/image.jpg');
-                      bool result =
-                          await mealLogService.addImageToMealLogDetail(
-                        detailId: widget.detailId,
-                        imageFile: imageFile,
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(result
-                              ? 'Upload ảnh thành công'
-                              : 'Upload ảnh thất bại'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Tên món và khẩu phần ở phía trên
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Tên món ăn
+                    Expanded(
+                      child: Text(
+                        mealDetail.foodName,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    },
-                    child: const Text("Thêm ảnh"),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // Khẩu phần (Serving/Quantity)
+                    Text(
+                      "${mealDetail.servingSize}",
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                // Ảnh hoặc icon upload
+                Center(
+                  child: (mealDetail.imageUrl != null &&
+                          mealDetail.imageUrl!.isNotEmpty)
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(
+                            mealDetail.imageUrl!,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : IconButton(
+                          icon: const Icon(
+                            Icons.camera_alt,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () async {
+                            // Mở dialog / flow để upload ảnh
+                          },
+                        ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Tiêu đề phần "Thành phần món"
+                const Text(
+                  "Thành phần món",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 8),
+
+                // Hiển thị tóm tắt dinh dưỡng (Calories, Protein, Carbs, Fat)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildNutritionItem("Calories", _calorieController!.text),
+                    _buildNutritionItem("Protein", _proteinController!.text),
+                    _buildNutritionItem("Carbs", _carbsController!.text),
+                    _buildNutritionItem("Fat", _fatController!.text),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Form cập nhật chi tiết dinh dưỡng
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _calorieController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: "Calories (kcal)",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Vui lòng nhập calories';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return "Nhập số hợp lệ";
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _proteinController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: "Protein (g)",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Vui lòng nhập protein';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return "Nhập số hợp lệ";
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _carbsController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: "Carbs (g)",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Vui lòng nhập carbs';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return "Nhập số hợp lệ";
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _fatController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: "Fat (g)",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Vui lòng nhập fat';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return "Nhập số hợp lệ";
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Nút cập nhật
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            final int calories =
+                                int.parse(_calorieController!.text);
+                            final int protein =
+                                int.parse(_proteinController!.text);
+                            final int carbs = int.parse(_carbsController!.text);
+                            final int fat = int.parse(_fatController!.text);
+
+                            bool result = await mealLogService
+                                .updateMealLogDetailNutrition(
+                              detailId: widget.detailId,
+                              calorie: calories,
+                              protein: protein,
+                              carbs: carbs,
+                              fat: fat,
+                            );
+                            if (result) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  backgroundColor: Colors.green,
+                                  content: Text('Update thành công'),
+                                ),
+                              );
+                              // Khi update thành công, pop màn hình và trả về kết quả true
+                              Navigator.pop(context, true);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  backgroundColor: Colors.red,
+                                  content: Text('Update thất bại'),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: const Text("Cập nhật dinh dưỡng"),
+                      ),
+
+                      // Nút upload ảnh chỉ hiển thị khi không có ảnh
+                      if (mealDetail.imageUrl == null ||
+                          mealDetail.imageUrl!.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              // Ví dụ mô phỏng upload ảnh từ File
+                              File imageFile = File('path/to/your/image.jpg');
+                              bool result =
+                                  await mealLogService.addImageToMealLogDetail(
+                                detailId: widget.detailId,
+                                imageFile: imageFile,
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(result
+                                      ? 'Upload ảnh thành công'
+                                      : 'Upload ảnh thất bại'),
+                                ),
+                              );
+                            },
+                            child: const Text("Thêm ảnh"),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         },
       ),
+    );
+  }
+
+  /// Widget con hiển thị từng chỉ số dinh dưỡng
+  Widget _buildNutritionItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(label),
+      ],
     );
   }
 

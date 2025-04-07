@@ -15,9 +15,8 @@ class MealLogComponentModel extends FlutterFlowModel {
   List<MealLog> mealLogs = [];
   List<MealLogDetail> mealLogAis = [];
   bool isLoading = true;
-  int calorieGoal = 1300; // Giá trị mặc định, sẽ được cập nhật từ API
+  int calorieGoal = 1500;
   int foodCalories = 0;
-  int exerciseCalories = 0;
 
   // Các bữa
   final List<String> mealCategories = [
@@ -25,7 +24,6 @@ class MealLogComponentModel extends FlutterFlowModel {
     'Lunch',
     'Dinner',
     'Snacks',
-    'Exercise'
   ];
 
   VoidCallback? _updateCallback;
@@ -35,7 +33,7 @@ class MealLogComponentModel extends FlutterFlowModel {
   }
 
   // Tính Remaining (Goal - Food + Exercise)
-  int get remainingCalories => calorieGoal - foodCalories + exerciseCalories;
+  int get remainingCalories => calorieGoal - foodCalories;
 
   /// Gọi API lấy personal goal và cập nhật calorieGoal
   Future<void> fetchPersonalGoal() async {
@@ -288,10 +286,6 @@ class MealLogComponentModel extends FlutterFlowModel {
 
   void updateFoodCalories(int newCalories) {
     foodCalories = newCalories;
-  }
-
-  void updateExerciseCalories(int newCalories) {
-    exerciseCalories = newCalories;
   }
 
   @override

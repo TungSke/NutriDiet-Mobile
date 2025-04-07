@@ -114,7 +114,6 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
         ),
       );
       if (confirm != true) {
-        // Người dùng không đồng ý, không thêm món ăn
         return;
       }
     }
@@ -148,7 +147,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       appBar: AppBar(
         backgroundColor: Colors.white, // AppBar trắng
         title: const Text(
-          'Quick Add',
+          'Thêm nhanh',
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
@@ -170,19 +169,19 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
           _buildMacroRow(
             label: 'Fat (g)',
             controller: _fatController,
-            hintText: 'Optional',
+            hintText: 'Không bắt buộc',
           ),
           const Divider(),
           _buildMacroRow(
             label: 'Carbohydrates (g)',
             controller: _carbsController,
-            hintText: 'Optional',
+            hintText: 'Không bắt buộc',
           ),
           const Divider(),
           _buildMacroRow(
             label: 'Protein (g)',
             controller: _proteinController,
-            hintText: 'Optional',
+            hintText: 'Không bắt buộc',
           ),
           const Divider(),
         ],
@@ -190,18 +189,33 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
+  final Map<String, String> mealTypeMapping = {
+    'Breakfast': 'Bữa sáng',
+    'Lunch': 'Bữa trưa',
+    'Dinner': 'Bữa tối',
+    'Snacks': 'Bữa phụ',
+  };
+
   Widget _buildMealRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text('Meal', style: TextStyle(fontSize: 16, color: Colors.black)),
+        // Bữa (in đậm)
+        const Text(
+          'Bữa',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold, // In đậm
+          ),
+        ),
         DropdownButton<String>(
           value: _selectedMeal,
           underline: const SizedBox(), // ẩn gạch chân
           items: _mealTypes.map((type) {
             return DropdownMenuItem(
-              value: type,
-              child: Text(type),
+              value: type, // Giá trị này vẫn là tiếng Anh khi gọi API
+              child: Text(mealTypeMapping[type] ?? type), // Hiển thị tiếng Việt
             );
           }).toList(),
           onChanged: (val) {
@@ -216,27 +230,34 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
-  /// Row Calories với placeholder và thông báo chênh lệch (ảnh 2 & 3)
+  /// Row Calories với placeholder và thông báo chênh lệch
   Widget _buildCaloriesRow(double macroCals, int typedCals) {
     bool hasMacros = macroCals > 0;
     bool userTyped = typedCals > 0;
     String subLabel = '';
     if (!userTyped && hasMacros) {
-      subLabel = 'Calculated based on nutrient values.';
+      subLabel = 'Tính toán dựa trên giá trị dinh dưỡng.';
     } else if (userTyped && hasMacros && (typedCals != macroCals.round())) {
       final diff = typedCals - macroCals.round();
       subLabel =
-          "Your macros total ${macroCals.round()} cals.\nDifference: $diff cals";
+          "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Calories (in đậm)
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Calories',
-                style: TextStyle(fontSize: 16, color: Colors.black)),
+            const Text(
+              'Calories',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.bold, // In đậm
+              ),
+            ),
             SizedBox(
               width: 130,
               child: TextFormField(
@@ -245,7 +266,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
                 textAlign: TextAlign.end,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
-                  hintText: 'Enter calorie amount',
+                  hintText: 'Nhập số lượng calorie',
                 ),
               ),
             ),
@@ -263,7 +284,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
-  /// Row cho Fat/Carbohydrates/Protein với placeholder "Optional"
+  /// Row cho Fat/Carbohydrates/Protein
   Widget _buildMacroRow({
     required String label,
     required TextEditingController controller,
@@ -272,7 +293,15 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 16, color: Colors.black)),
+        // label (in đậm)
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold, // In đậm
+          ),
+        ),
         SizedBox(
           width: 130,
           child: TextFormField(
