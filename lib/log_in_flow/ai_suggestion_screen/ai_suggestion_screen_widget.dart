@@ -1,6 +1,7 @@
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:diet_plan_app/log_in_flow/ai_suggestion_screen/ai_suggestion_screen_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../flutter_flow/flutter_flow_theme.dart';
@@ -163,12 +164,32 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text("Lời khuyên:"),
+                                                Text(
+                                                  "Lời khuyên:",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
                                                 Expanded(
                                                   child: SingleChildScrollView(
-                                                    child: Text(
-                                                        _model.aisuggestion),
-                                                  ),
+                                                      // child:
+                                                      //   Text(
+                                                      //       _model.aisuggestion),
+                                                      // ),
+                                                      child: MarkdownBody(
+                                                    data: _model.aisuggestion,
+                                                    styleSheet:
+                                                        MarkdownStyleSheet(
+                                                      p: const TextStyle(
+                                                          fontSize: 16),
+                                                      // Bạn có thể tuỳ chỉnh màu, kích cỡ chữ, v.v. cho từng phần
+                                                      strong: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                      // Đặt style cho bullet points, headings, links, v.v. nếu cần
+                                                    ),
+                                                  )),
                                                 ),
                                               ],
                                             ),

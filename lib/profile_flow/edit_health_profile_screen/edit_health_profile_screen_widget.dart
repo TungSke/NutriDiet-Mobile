@@ -824,13 +824,14 @@ class _EditHealthProfileScreenWidgetState
               ),
               child: Row(
                 children: [
-                  Text(
-                    _model.allergies.isNotEmpty
-                        ? _model.allergies.join(', ')
-                        : 'Chưa chọn dị ứng',
-                    style: TextStyle(fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      _model.allergies.isNotEmpty
+                          ? _model.allergies.join(', ')
+                          : 'Chưa chọn dị ứng',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
-                  Spacer(),
                   Icon(Icons.arrow_drop_down),
                 ],
               ),
@@ -889,13 +890,14 @@ class _EditHealthProfileScreenWidgetState
               ),
               child: Row(
                 children: [
-                  Text(
-                    _model.diseases.isNotEmpty
-                        ? _model.diseases.join(', ')
-                        : 'Chưa chọn bệnh',
-                    style: TextStyle(fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      _model.diseases.isNotEmpty
+                          ? _model.diseases.join(', ')
+                          : 'Chưa chọn bệnh',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
-                  Spacer(),
                   Icon(Icons.arrow_drop_down),
                 ],
               ),
@@ -938,8 +940,10 @@ class _EditHealthProfileScreenWidgetState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Expanded(
+            child: Text(title,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
           InkWell(
             onTap: () =>
                 _showCupertinoPicker(title, options, value, onSelected),

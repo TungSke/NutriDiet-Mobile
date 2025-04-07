@@ -205,6 +205,7 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
   double weight = 0.0; // Cân nặng, đổi sang double
   String activityLevel = ''; // Mức độ vận động
   String dietStyle = '';
+  String aisuggestion = '';
   List<String> allergies = []; // ✅ Dị ứng
   List<String> diseases = [];
   bool isLoading = true;
@@ -280,7 +281,7 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
         weight = healthData['data']['weight'] != null
             ? double.tryParse(healthData['data']['weight'].toString()) ?? 0.0
             : 0.0;
-
+        aisuggestion = healthData['data']['aisuggestion'] ?? "Chưa cập nhật";
         activityLevel =
             _reverseActivityLevelMap[healthData['data']['activityLevel']] ??
                 "Chưa cập nhật";
@@ -357,15 +358,15 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
       final dietStyleInEnglish = _dietStyleMap[dietStyle] ?? 'Balanced';
 
       final response = await _userService.updateHealthProfile(
-        activityLevel: activityLevelInEnglish,
-        dietStyle: dietStyleInEnglish,
-        weight: weight, // Cập nhật cân nặng kiểu double
-        height: height, // Cập nhật chiều cao kiểu double
-        allergies: selectedAllergyIds.isEmpty
-            ? []
-            : selectedAllergyIds, // Nếu không có dị ứng thì gửi danh sách trống
-        diseases: selectedDiseaseIds.isEmpty ? [] : selectedDiseaseIds,
-      );
+          activityLevel: activityLevelInEnglish,
+          dietStyle: dietStyleInEnglish,
+          weight: weight, // Cập nhật cân nặng kiểu double
+          height: height, // Cập nhật chiều cao kiểu double
+          allergies: selectedAllergyIds.isEmpty
+              ? []
+              : selectedAllergyIds, // Nếu không có dị ứng thì gửi danh sách trống
+          diseases: selectedDiseaseIds.isEmpty ? [] : selectedDiseaseIds,
+          aisuggestion: aisuggestion);
 
       if (response.statusCode == 200) {
         print('✅ Cập nhật thành công!');
