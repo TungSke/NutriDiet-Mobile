@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:diet_plan_app/components/barcode_scanner_widget.dart';
 import 'package:diet_plan_app/components/ingredient_component_widget.dart';
+import 'package:diet_plan_app/components/quick_add_widget.dart';
 import 'package:diet_plan_app/components/serch_data_widget.dart';
 import 'package:diet_plan_app/log_in_flow/Ingredient_avoid_screen/ingredient_avoid_screen_widget.dart';
 import 'package:diet_plan_app/log_in_flow/profile_enter_screen/profile_enter_widget.dart';
@@ -57,11 +58,6 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'buy_premium_package',
           path: '/buyPremiumPackage',
           builder: (context, params) => const BuyPremiumPackageScreenWidget(),
-        ),
-        FFRoute(
-          name: 'barcode_scanner_screen',
-          path: '/barcodeScannerScreen',
-          builder: (context, params) => const BarcodeScannerScreen(),
         ),
         FFRoute(
           name: 'checkout_success_screen',

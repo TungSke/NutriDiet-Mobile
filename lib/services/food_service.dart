@@ -154,4 +154,16 @@ class FoodService {
       return false;
     }
   }
+
+  Future<http.Response> searchFoodBarCode({required String barcode, required BuildContext context,}) async{
+      String? accessToken = await _apiService.getAccessToken(context);
+      if (accessToken == null) {
+        throw Exception("No access token available");
+      }
+      final response = await _apiService.get(
+        "api/barcode/$barcode",
+        token: accessToken,
+      );
+      return response;
+  }
 }

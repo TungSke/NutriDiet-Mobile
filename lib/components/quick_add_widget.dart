@@ -1,9 +1,12 @@
+import 'dart:convert';
+import 'package:diet_plan_app/components/barcode_scanner_widget.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
+import 'package:diet_plan_app/services/food_service.dart';
 import 'package:flutter/material.dart';
 import '../services/meallog_service.dart';
 
 class QuickAddWidget extends StatefulWidget {
-  final String mealName; // "Breakfast", "Lunch", "Dinner", "Snacks"
+  final String mealName;
   final DateTime selectedDate;
 
   const QuickAddWidget({
@@ -18,12 +21,9 @@ class QuickAddWidget extends StatefulWidget {
 
 class _QuickAddWidgetState extends State<QuickAddWidget> {
   final MeallogService _mealLogService = MeallogService();
-
-  // Danh sách bữa ăn
   final List<String> _mealTypes = const ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
   late String _selectedMeal;
 
-  // Controllers
   final TextEditingController _caloriesController = TextEditingController();
   final TextEditingController _fatController = TextEditingController();
   final TextEditingController _carbsController = TextEditingController();
@@ -62,7 +62,10 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     setState(() {});
   }
 
-  int get _typedCalories => int.tryParse(_caloriesController.text) ?? 0;
+  int get _typedCalories {
+    final double? value = double.tryParse(_caloriesController.text);
+    return value != null ? value.round() : 0;
+  }
 
   int get _calDiff => _typedCalories - _macroCalories.round();
 
@@ -127,49 +130,67 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     }
   }
 
-  void _onScanBarcode() async {
-    try {
-      final result = await context.pushNamed('barcode_scanner_screen');
-      if (result != null && mounted) {
-        final barcode = result as String;
-        print('Mã vạch: $barcode');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Mã vạch: $barcode')),
+  void _onScanBarcode() {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.zero,
+          child: BarcodeScannerScreen(
+            onBarcodeDetected: (barcode) {
+              Navigator.pop(dialogContext);
+              _fetchDataFromBarcode(barcode);
+            },
+          ),
         );
-
-        final foodData = await _fetchFoodDataFromBarcode(barcode);
-        if (foodData != null) {
-          setState(() {
-            _caloriesController.text = foodData['calories'].toString();
-            _fatController.text = foodData['fat'].toString();
-            _carbsController.text = foodData['carbs'].toString();
-            _proteinController.text = foodData['protein'].toString();
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Không tìm thấy thông tin món ăn!')),
-          );
-        }
-      }
-    } catch (e) {
-      print('Error navigating to barcode_scanner_screen: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi điều hướng: $e')),
-      );
-    }
+      },
+    );
   }
 
-  Future<Map<String, dynamic>?> _fetchFoodDataFromBarcode(String barcode) async {
-    await Future.delayed(const Duration(seconds: 1));
-    if (barcode == '123456789') {
-      return {
-        'calories': 350,
-        'fat': 10,
-        'carbs': 50,
-        'protein': 15,
-      };
+  Future<void> _fetchDataFromBarcode(String barcode) async {
+    if (!mounted) return;
+
+    print('Mã vạch: $barcode');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Mã vạch: $barcode')),
+    );
+
+    try {
+      FoodService _foodService = FoodService();
+      final foodData = await _foodService.searchFoodBarCode(barcode: barcode, context: context);
+      if (foodData != null && mounted) {
+        final responseBody = jsonDecode(foodData.body);
+        final data = responseBody["data"] as Map<String, dynamic>?;
+
+        if (data != null) {
+          setState(() {
+            _caloriesController.text = (double.tryParse(data['calories']?.toString() ?? '0') ?? 0).round().toString();
+            // Lấy fat, mặc định là 0 nếu không parse được
+            _fatController.text = (double.tryParse(data['fat']?.toString() ?? '0') ?? 0).round().toString();
+            // Lấy carbs, mặc định là 0 nếu không parse được
+            _carbsController.text = (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0).round().toString();
+            // Lấy protein, mặc định là 0 nếu không parse được
+            _proteinController.text = (double.tryParse(data['protein']?.toString() ?? '0') ?? 0).round().toString();
+          });
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Không có dữ liệu món ăn trong phản hồi!')),
+          );
+        }
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Không tìm thấy thông tin món ăn!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        print('Error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi khi lấy dữ liệu: $e')),
+        );
+      }
     }
-    return null;
   }
 
   @override
@@ -277,8 +298,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       subLabel = 'Tính toán dựa trên giá trị dinh dưỡng.';
     } else if (userTyped && hasMacros && (typedCals != macroCals.round())) {
       final diff = typedCals - macroCals.round();
-      subLabel =
-      "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
+      subLabel = "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
     }
 
     return Column(
@@ -311,7 +331,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
         ),
         if (subLabel.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(bottom: 6.0),
+            padding: const EdgeInsets.only(top: 6.0),
             child: Text(
               subLabel,
               style: const TextStyle(fontSize: 12, color: Colors.grey),
