@@ -22,13 +22,17 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   Food? _food;
   bool _isLoading = false;
 
-  // Ví dụ cho Meal (bữa ăn) và số lượng (servings)
+  // Màu cho chart
+  final Color accent1 = const Color(0xFFF04770);
+  final Color accent3 = const Color(0xFFFFD167);
+  final Color accent5 = const Color(0xFF073A4B);
+
+  // Ví dụ cho Bữa ăn và số lượng khẩu phần
   String _selectedMeal = 'Breakfast';
   int _numberOfServings = 1;
 
-  // Danh sách 7 ngày (ví dụ) bắt đầu từ hôm nay
+  // Danh sách 7 ngày bắt đầu từ hôm nay
   late List<DateTime> _weekDays;
-  // Tập hợp các index của _weekDays được chọn
   final Set<int> _selectedDaysIndex = {};
 
   @override
@@ -44,56 +48,42 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   }
 
   Future<void> _fetchFoodDetail() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
     try {
       final response = await _foodService.getFoodById(foodId: widget.foodId);
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        final data = jsonData['data'];
-        setState(() {
-          _food = Food.fromJson(data);
-        });
-      } else {
-        debugPrint("Failed to load food detail: ${response.statusCode}");
+        final data = jsonDecode(response.body)['data'];
+        setState(() => _food = Food.fromJson(data));
       }
     } catch (e) {
-      debugPrint("Error fetching food detail: $e");
+      debugPrint("Lỗi tải chi tiết món ăn: $e");
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
-  // Hàm gọi API addMealToMultipleDays
   void _addToMealLog() async {
-    List<DateTime> selectedDates;
-    if (_selectedDaysIndex.isEmpty) {
-      selectedDates = [DateTime.now()];
-    } else {
-      selectedDates =
-          _selectedDaysIndex.map((index) => _weekDays[index]).toList();
-    }
+    List<DateTime> selectedDates = _selectedDaysIndex.isEmpty
+        ? [DateTime.now()]
+        : _selectedDaysIndex.map((i) => _weekDays[i]).toList();
 
-    final bool success = await _meallogService.addMealToMultipleDays(
+    final success = await _meallogService.addMealToMultipleDays(
       dates: selectedDates,
       foodId: widget.foodId,
       quantity: _numberOfServings.toDouble(),
-      mealType: _selectedMeal,
+      mealType: _selectedMeal, // giữ tiếng Anh gọi API
     );
 
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Added to Meal Log successfully!')),
-      );
-      Navigator.pop(context, true);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to add to Meal Log.')),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? 'Thêm vào nhật ký ăn uống thành công!'
+              : 'Thêm vào nhật ký ăn uống thất bại.',
+        ),
+      ),
+    );
+    if (success) Navigator.pop(context, true);
   }
 
   @override
@@ -106,45 +96,36 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
 
     if (_food == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Add Food')),
+        appBar: AppBar(title: const Text('Chi tiết món ăn')),
         body: const Center(child: Text('Không tìm thấy thông tin món ăn.')),
       );
     }
 
-    // Lấy giá trị int của các macro nutrients
-    final int calories = _food?.calories ?? 0;
-    final int carbs = _food?.carbs ?? 0;
-    final int fat = _food?.fat ?? 0;
-    final int protein = _food?.protein ?? 0;
-
+    // Lấy số liệu
+    final int calories = _food!.calories ?? 0;
+    final int carbs = _food!.carbs ?? 0;
+    final int fat = _food!.fat ?? 0;
+    final int protein = _food!.protein ?? 0;
     final int totalMacro = carbs + fat + protein;
-    final double carbsRatio = totalMacro > 0 ? (carbs / totalMacro * 100) : 0;
-    final double fatRatio = totalMacro > 0 ? (fat / totalMacro * 100) : 0;
-    final double proteinRatio =
-        totalMacro > 0 ? (protein / totalMacro * 100) : 0;
-
+    final double carbsRatio = totalMacro > 0 ? carbs / totalMacro * 100 : 0;
+    final double fatRatio = totalMacro > 0 ? fat / totalMacro * 100 : 0;
+    final double proteinRatio = totalMacro > 0 ? protein / totalMacro * 100 : 0;
     final Map<String, double> macroDataMap = {
-      "Carbs": carbsRatio,
-      "Fat": fatRatio,
+      "Tinh bột": carbsRatio,
+      "Chất béo": fatRatio,
       "Protein": proteinRatio,
     };
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Food'),
+        title: const Text('Chi tiết món ăn',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.check_circle, color: Colors.white),
-            onPressed: () {
-              // Bạn có thể thực hiện xử lý bổ sung khi nhấn icon check
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildFoodImage(_food!),
             const SizedBox(height: 16),
@@ -154,29 +135,75 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
                 Text(
                   _food!.foodName,
                   style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const Icon(Icons.check_circle, color: Colors.green),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             _buildMealRow(),
-            const SizedBox(height: 10),
-            _buildNumberOfServingsRow(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
+            _buildServingsRow(),
+            const SizedBox(height: 16),
             _buildServingSizeRow(_food!),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             _buildAddToMultipleDays(),
-            const SizedBox(height: 16),
-            _buildMacroPieChart(calories, carbs, fat, protein, macroDataMap),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
+            // === Pie Chart với màu của bạn ===
+            SizedBox(
+              height: 200,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  PieChart(
+                    dataMap: macroDataMap,
+                    chartType: ChartType.ring,
+                    baseChartColor: Colors.grey[300]!,
+                    chartValuesOptions:
+                        const ChartValuesOptions(showChartValues: false),
+                    colorList: [accent1, accent3, accent5],
+                    ringStrokeWidth: 24,
+                    legendOptions: const LegendOptions(showLegends: false),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('$calories',
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                      const Text('Cal'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildMacroColumn('Tinh bột', carbs, macroDataMap['Tinh bột']!),
+                _buildMacroColumn('Chất béo', fat, macroDataMap['Chất béo']!),
+                _buildMacroColumn('Protein', protein, macroDataMap['Protein']!),
+              ],
+            ),
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _addToMealLog,
-                child: const Text('Add to Meal Log'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).primaryColor,
+                  minimumSize: const Size.fromHeight(48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    side: BorderSide(color: Theme.of(context).primaryColor),
+                  ),
+                ),
+                child: const Text(
+                  'Thêm vào nhật ký',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ),
           ],
@@ -186,22 +213,13 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   }
 
   Widget _buildFoodImage(Food food) {
-    final imageUrl = food.imageUrl;
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
-      child: (imageUrl != null && imageUrl.isNotEmpty)
-          ? Image.network(
-              imageUrl,
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            )
-          : Image.asset(
-              'assets/placeholder_food.png',
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+      child: (food.imageUrl != null && food.imageUrl!.isNotEmpty)
+          ? Image.network(food.imageUrl!,
+              height: 200, width: double.infinity, fit: BoxFit.cover)
+          : Image.asset('assets/placeholder_food.png',
+              height: 200, width: double.infinity, fit: BoxFit.cover),
     );
   }
 
@@ -209,58 +227,41 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Meal',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        const Text('Bữa ăn',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         DropdownButton<String>(
           value: _selectedMeal,
           items: const [
-            DropdownMenuItem(child: Text('Breakfast'), value: 'Breakfast'),
-            DropdownMenuItem(child: Text('Lunch'), value: 'Lunch'),
-            DropdownMenuItem(child: Text('Dinner'), value: 'Dinner'),
-            DropdownMenuItem(child: Text('Snacks'), value: 'Snacks'),
+            DropdownMenuItem(child: Text('Bữa Sáng'), value: 'Breakfast'),
+            DropdownMenuItem(child: Text('Bữa Trưa'), value: 'Lunch'),
+            DropdownMenuItem(child: Text('Bữa Tối'), value: 'Dinner'),
+            DropdownMenuItem(child: Text('Bữa Phụ'), value: 'Snacks'),
           ],
           onChanged: (val) {
-            setState(() {
-              _selectedMeal = val ?? 'Lunch';
-            });
+            setState(() => _selectedMeal = val ?? _selectedMeal);
           },
         ),
       ],
     );
   }
 
-  Widget _buildNumberOfServingsRow() {
+  Widget _buildServingsRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Number of Servings',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        const Text('Số khẩu phần',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         Row(
           children: [
             IconButton(
               onPressed: () {
-                if (_numberOfServings > 1) {
-                  setState(() {
-                    _numberOfServings--;
-                  });
-                }
+                if (_numberOfServings > 1) setState(() => _numberOfServings--);
               },
               icon: const Icon(Icons.remove_circle_outline),
             ),
-            Text(
-              '$_numberOfServings',
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text('$_numberOfServings', style: const TextStyle(fontSize: 16)),
             IconButton(
-              onPressed: () {
-                setState(() {
-                  _numberOfServings++;
-                });
-              },
+              onPressed: () => setState(() => _numberOfServings++),
               icon: const Icon(Icons.add_circle_outline),
             ),
           ],
@@ -273,14 +274,10 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Serving Size',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        Text(
-          food.servingSize ?? '1 serving',
-          style: const TextStyle(fontSize: 16),
-        ),
+        const Text('Khối lượng khẩu phần',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        Text(food.servingSize ?? '1 khẩu phần',
+            style: const TextStyle(fontSize: 16)),
       ],
     );
   }
@@ -289,54 +286,54 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Add to Multiple Days',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        const Text('Thêm vào nhiều ngày',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
         SizedBox(
           height: 50,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: _weekDays.length,
-            separatorBuilder: (context, _) => const SizedBox(width: 8),
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final day = _weekDays[index];
-              final dayString = _formatDay(day);
-              final isSelected = _selectedDaysIndex.contains(index);
-
+              final label = _formatDay(day);
+              final selected = _selectedDaysIndex.contains(index);
               return GestureDetector(
                 onTap: () {
                   setState(() {
-                    if (isSelected) {
+                    if (selected)
                       _selectedDaysIndex.remove(index);
-                    } else {
+                    else
                       _selectedDaysIndex.add(index);
-                    }
                   });
                 },
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.green : Colors.grey[200],
+                    color: selected
+                        ? Theme.of(context).primaryColor // nền primary khi chọn
+                        : Colors.grey[200],
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        day.day.toString(),
+                        '${day.day}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white : Colors.black,
+                          color: selected
+                              ? Colors.white
+                              : Colors.black, // chữ trắng khi chọn
                         ),
                       ),
                       Text(
-                        dayString,
+                        label,
                         style: TextStyle(
                           fontSize: 12,
-                          color: isSelected ? Colors.white : Colors.black,
+                          color: selected ? Colors.white : Colors.black,
                         ),
                       ),
                     ],
@@ -351,77 +348,32 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   }
 
   String _formatDay(DateTime date) {
-    // Chọn định dạng hiển thị ngày (Sun, Mon, ...)
-    return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.weekday % 7];
-  }
-
-  Widget _buildMacroPieChart(
-    int calories,
-    int carbs,
-    int fat,
-    int protein,
-    Map<String, double> macroDataMap,
-  ) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 200,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              PieChart(
-                dataMap: macroDataMap,
-                chartType: ChartType.ring,
-                baseChartColor: Colors.grey[300]!,
-                chartValuesOptions: const ChartValuesOptions(
-                  showChartValues: false,
-                ),
-                colorList: const [Colors.blue, Colors.orange, Colors.purple],
-                ringStrokeWidth: 24,
-                legendOptions: const LegendOptions(
-                  showLegends: false,
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    calories.toString(),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Text("Cal"),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildMacroColumn("Carbs", carbs, macroDataMap["Carbs"] ?? 0),
-            _buildMacroColumn("Fat", fat, macroDataMap["Fat"] ?? 0),
-            _buildMacroColumn("Protein", protein, macroDataMap["Protein"] ?? 0),
-          ],
-        ),
-      ],
-    );
+    switch (date.weekday) {
+      case DateTime.monday:
+        return 'Th 2';
+      case DateTime.tuesday:
+        return 'Th 3';
+      case DateTime.wednesday:
+        return 'Th 4';
+      case DateTime.thursday:
+        return 'Th 5';
+      case DateTime.friday:
+        return 'Th 6';
+      case DateTime.saturday:
+        return 'Th 7';
+      case DateTime.sunday:
+      default:
+        return 'CN';
+    }
   }
 
   Widget _buildMacroColumn(String label, int gram, double percent) {
-    final p = percent.toStringAsFixed(0);
-    final g = gram.toString();
     return Column(
       children: [
-        Text(
-          '$p%',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        Text('$g g'),
-        Text(label),
+        Text('${percent.toStringAsFixed(0)}%',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('$gram g', style: const TextStyle(fontSize: 14)),
+        Text(label, style: const TextStyle(fontSize: 14)),
       ],
     );
   }

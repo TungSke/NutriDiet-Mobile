@@ -1,8 +1,8 @@
 import 'package:diet_plan_app/components/mealLog_list_food.dart';
 import 'package:diet_plan_app/components/mealLog_nutrition.dart';
+import 'package:diet_plan_app/services/models/meallog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-
 import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import '/components/mealLog_component_model.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -20,7 +20,7 @@ class MealLogComponentWidget extends StatefulWidget {
 class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
   late MealLogComponentModel _model;
   bool isPremium = false; // Biến trạng thái premium
-
+  bool _isLoadingAI = false;
   @override
   void initState() {
     super.initState();
@@ -103,8 +103,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       final proceedToPremium = await showDialog<bool>(
         context: context,
         builder: (context) => Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -115,7 +116,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(5),
             ),
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -166,7 +167,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.yellow,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
@@ -201,81 +202,143 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     }
 
     // Nếu là premium, tiếp tục lấy thực đơn AI
+    setState(() => _isLoadingAI = true);
     await _model.fetchMealLogsAI();
+    if (mounted) setState(() => _isLoadingAI = false);
     if (!mounted) return;
 
     // Hiển thị popup với danh sách các món ăn AI
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Thực đơn AI"),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: _model.mealLogAis.isNotEmpty
-              ? ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _model.mealLogAis.length,
-                  itemBuilder: (context, index) {
-                    final meal = _model.mealLogAis[index];
-                    return ListTile(
-                      title: Text(meal.foodName),
-                      subtitle: Text(
-                        "${meal.mealType} - ${meal.servingSize} - ${meal.calories} Calories",
+      builder: (context) {
+        // Gom nhóm theo mealType
+        final Map<String, List<MealLogDetail>> grouped = {};
+        for (var meal in _model.mealLogAis) {
+          grouped.putIfAbsent(meal.mealType, () => []).add(meal);
+        }
+        final primaryColor = Theme.of(context).primaryColor;
+
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          title: const Text("Thực đơn AI"),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: _model.mealLogAis.isNotEmpty
+                ? ListView(
+                    shrinkWrap: true,
+                    children: grouped.entries.map((entry) {
+                      // entry.key là mealType (tiếng Anh), entry.value là list
+                      // Bạn có thể dịch sang tiếng Việt nếu muốn
+                      String header;
+                      switch (entry.key.toLowerCase()) {
+                        case 'breakfast':
+                          header = 'Bữa Sáng';
+                          break;
+                        case 'lunch':
+                          header = 'Bữa Trưa';
+                          break;
+                        case 'dinner':
+                          header = 'Bữa Tối';
+                          break;
+                        case 'snacks':
+                          header = 'Bữa Phụ';
+                          break;
+                        default:
+                          header = entry.key;
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Tiêu đề nhóm
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              header,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ),
+                          // Danh sách món trong nhóm
+                          ...entry.value.map((meal) => ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  meal.foodName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold, // in đậm
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  "${meal.servingSize} • ${meal.calories} Calories",
+                                ),
+                              )),
+                        ],
+                      );
+                    }).toList(),
+                  )
+                : const Text("Không có dữ liệu thực đơn AI"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // chữ màu primary
+              ),
+              child: const Text("Reject"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                // Hiển thị dialog nhập Feedback
+                String feedback = "";
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
                       ),
+                      title: const Text("Nhập Feedback"),
+                      content: TextField(
+                        onChanged: (value) {
+                          feedback = value;
+                        },
+                        decoration: const InputDecoration(
+                          hintText: "Nhập feedback của bạn...",
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            await _model
+                                .sendAIChosenMealFeedback("No feedback");
+                            await _model.fetchMealLogs();
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            await _model.sendAIChosenMealFeedback(feedback);
+                            await _model.fetchMealLogs();
+                          },
+                          child: const Text("Submit"),
+                        ),
+                      ],
                     );
                   },
-                )
-              : const Text("Không có dữ liệu thực đơn AI"),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("Reject"),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              // Hiển thị dialog nhập Feedback
-              String feedback = "";
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text("Nhập Feedback"),
-                    content: TextField(
-                      onChanged: (value) {
-                        feedback = value;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: "Nhập feedback của bạn...",
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text("Cancel"),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          Navigator.pop(context);
-                          await _model.sendAIChosenMealFeedback(feedback);
-                          await _model.fetchMealLogs();
-                        },
-                        child: const Text("Submit"),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            child: const Text("Accept"),
-          ),
-        ],
-      ),
+                );
+              },
+              child: const Text("Accept"),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -367,6 +430,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 Card(
                   margin: const EdgeInsets.all(12.0),
                   color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -384,6 +450,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                               ),
                             ),
                             PopupMenuButton<String>(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                               icon: const Icon(Icons.more_horiz),
                               onSelected: (value) async {
                                 switch (value) {
@@ -422,7 +491,10 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                       showDialog(
                                         context: context,
                                         builder: (context) => AlertDialog(
-                                          // Bạn có thể tùy chỉnh title theo ý muốn
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
                                           title: Text(
                                               "Phân tích ngày: $formattedDate"),
                                           content: SingleChildScrollView(
@@ -431,11 +503,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                               styleSheet: MarkdownStyleSheet(
                                                 p: const TextStyle(
                                                     fontSize: 16),
-                                                // Bạn có thể tuỳ chỉnh màu, kích cỡ chữ, v.v. cho từng phần
                                                 strong: const TextStyle(
                                                     fontWeight:
                                                         FontWeight.bold),
-                                                // Đặt style cho bullet points, headings, links, v.v. nếu cần
                                               ),
                                             ),
                                           ),
@@ -513,18 +583,38 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     child: ElevatedButton(
                       onPressed: _navigateToAIMealLog,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isPremium
-                            ? FlutterFlowTheme.of(context)
-                                .primary // Màu gốc khi premium
-                            : Colors.grey[600], // Màu xám đen khi không premium
+                        // Nền trắng
+                        backgroundColor: Colors.white,
+                        // Chữ màu primary
+                        foregroundColor: FlutterFlowTheme.of(context).primary,
+                        minimumSize: const Size.fromHeight(55),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(5),
+                          side: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary),
                         ),
                       ),
-                      child: const Text(
-                        "Nhận thực đơn AI",
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
+                      child: _isLoadingAI
+                          ? Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Theme.of(context).primaryColor,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              "Nhận thực đơn AI",
+                              style: TextStyle(
+                                // fontSize vẫn 18
+                                fontSize: 18,
+                                // màu chữ dùng foregroundColor nên không cần khai báo ở đây,
+                                // nhưng nếu bạn muốn override:
+                                color: FlutterFlowTheme.of(context).primary,
+                              ),
+                            ),
                     ),
                   ),
               ],
@@ -589,6 +679,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 0),
       color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _buildMealCategoryContent(
@@ -613,14 +706,17 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         children: [
           _buildMealHeader(vietnameseCategory, null),
           ListTile(
-            title: const Text(
+            title: Text(
               'Thêm',
               style: TextStyle(
-                color: Colors.green,
+                color: FlutterFlowTheme.of(context).primary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             trailing: PopupMenuButton<String>(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
               icon: const Icon(Icons.more_horiz),
               onSelected: (String value) async {
                 // Thêm async
@@ -641,8 +737,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     });
                     break;
                   case 'reminders':
-                    await _model
-                        .toggleReminder(context); // Gọi hàm bật/tắt nhắc nhở
+                    await _model.toggleReminder(context);
                     break;
                 }
               },
@@ -730,7 +825,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Nhật ký'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -742,6 +839,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
                                   title: const Text('Chuyển đến...'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -817,6 +917,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             ),
           ),
           trailing: PopupMenuButton<String>(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
             icon: const Icon(Icons.more_horiz),
             onSelected: (String value) async {
               // Thêm async
@@ -837,8 +940,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   });
                   break;
                 case 'reminders':
-                  await _model
-                      .toggleReminder(context); // Gọi hàm bật/tắt nhắc nhở
+                  await _model.toggleReminder(context);
                   break;
               }
             },

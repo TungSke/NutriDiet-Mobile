@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:diet_plan_app/flutter_flow/flutter_flow_theme.dart';
 import 'package:diet_plan_app/services/meallog_service.dart';
 import 'package:diet_plan_app/services/models/meallog.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +25,19 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = FlutterFlowTheme.of(context).primary;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Chi tiết'),
+        title: Text(
+          'Chi tiết',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Colors.grey[200],
       ),
       body: FutureBuilder<MealLogDetail?>(
         future: mealLogService.getMealLogDetail(detailId: widget.detailId),
@@ -43,7 +53,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
             return const Center(child: Text("Không tìm thấy dữ liệu"));
           }
 
-          // Khởi tạo các controller nếu chưa có, dùng giá trị lấy từ API
+          // Khởi tạo controllers
           _calorieController ??=
               TextEditingController(text: mealDetail.calories.toString());
           _proteinController ??=
@@ -58,11 +68,10 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tên món và khẩu phần ở phía trên
+                // Tên món và khẩu phần
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Tên món ăn
                     Expanded(
                       child: Text(
                         mealDetail.foodName,
@@ -73,7 +82,6 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    // Khẩu phần (Serving/Quantity)
                     Text(
                       "${mealDetail.servingSize}",
                       style: const TextStyle(fontSize: 16),
@@ -109,7 +117,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
 
                 const SizedBox(height: 16),
 
-                // Tiêu đề phần "Thành phần món"
+                // Thành phần món
                 const Text(
                   "Thành phần món",
                   style: TextStyle(
@@ -119,7 +127,6 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                 ),
                 const SizedBox(height: 8),
 
-                // Hiển thị tóm tắt dinh dưỡng (Calories, Protein, Carbs, Fat)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -132,127 +139,91 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
 
                 const SizedBox(height: 20),
 
-                // Form cập nhật chi tiết dinh dưỡng
+                // Form cập nhật
                 Form(
                   key: _formKey,
                   child: Column(
                     children: [
-                      TextFormField(
-                        controller: _calorieController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: "Calories (kcal)",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập calories';
-                          }
-                          if (int.tryParse(value) == null) {
-                            return "Nhập số hợp lệ";
-                          }
-                          return null;
-                        },
+                      _buildTextField(
+                        controller: _calorieController!,
+                        label: "Calories (kcal)",
+                        primaryColor: primaryColor,
                       ),
-                      TextFormField(
-                        controller: _proteinController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: "Protein (g)",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập protein';
-                          }
-                          if (int.tryParse(value) == null) {
-                            return "Nhập số hợp lệ";
-                          }
-                          return null;
-                        },
+                      _buildTextField(
+                        controller: _proteinController!,
+                        label: "Protein (g)",
+                        primaryColor: primaryColor,
                       ),
-                      TextFormField(
-                        controller: _carbsController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: "Carbs (g)",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập carbs';
-                          }
-                          if (int.tryParse(value) == null) {
-                            return "Nhập số hợp lệ";
-                          }
-                          return null;
-                        },
+                      _buildTextField(
+                        controller: _carbsController!,
+                        label: "Carbs (g)",
+                        primaryColor: primaryColor,
                       ),
-                      TextFormField(
-                        controller: _fatController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: "Fat (g)",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập fat';
-                          }
-                          if (int.tryParse(value) == null) {
-                            return "Nhập số hợp lệ";
-                          }
-                          return null;
-                        },
+                      _buildTextField(
+                        controller: _fatController!,
+                        label: "Fat (g)",
+                        primaryColor: primaryColor,
                       ),
 
                       const SizedBox(height: 20),
 
-                      // Nút cập nhật
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            final int calories =
-                                int.parse(_calorieController!.text);
-                            final int protein =
-                                int.parse(_proteinController!.text);
-                            final int carbs = int.parse(_carbsController!.text);
-                            final int fat = int.parse(_fatController!.text);
+                      // Nút cập nhật dinh dưỡng full width
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              final calories =
+                                  int.parse(_calorieController!.text);
+                              final protein =
+                                  int.parse(_proteinController!.text);
+                              final carbs = int.parse(_carbsController!.text);
+                              final fat = int.parse(_fatController!.text);
 
-                            bool result = await mealLogService
-                                .updateMealLogDetailNutrition(
-                              detailId: widget.detailId,
-                              calorie: calories,
-                              protein: protein,
-                              carbs: carbs,
-                              fat: fat,
-                            );
-                            if (result) {
+                              bool result = await mealLogService
+                                  .updateMealLogDetailNutrition(
+                                detailId: widget.detailId,
+                                calorie: calories,
+                                protein: protein,
+                                carbs: carbs,
+                                fat: fat,
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  backgroundColor: Colors.green,
-                                  content: Text('Update thành công'),
+                                SnackBar(
+                                  backgroundColor:
+                                      result ? Colors.green : Colors.red,
+                                  content: Text(result
+                                      ? 'Update thành công'
+                                      : 'Update thất bại'),
                                 ),
                               );
-                              // Khi update thành công, pop màn hình và trả về kết quả true
-                              Navigator.pop(context, true);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  backgroundColor: Colors.red,
-                                  content: Text('Update thất bại'),
-                                ),
-                              );
+                              if (result) Navigator.pop(context, true);
                             }
-                          }
-                        },
-                        child: const Text("Cập nhật dinh dưỡng"),
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: primaryColor,
+                            minimumSize: const Size.fromHeight(48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              side: BorderSide(color: primaryColor),
+                            ),
+                          ),
+                          child: const Text(
+                            "Cập nhật dinh dưỡng",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
                       ),
 
-                      // Nút upload ảnh chỉ hiển thị khi không có ảnh
+                      // Nút upload ảnh full width
                       if (mealDetail.imageUrl == null ||
-                          mealDetail.imageUrl!.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          mealDetail.imageUrl!.isEmpty) ...[
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () async {
-                              // Ví dụ mô phỏng upload ảnh từ File
                               File imageFile = File('path/to/your/image.jpg');
                               bool result =
                                   await mealLogService.addImageToMealLogDetail(
@@ -267,9 +238,22 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                                 ),
                               );
                             },
-                            child: const Text("Thêm ảnh"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: primaryColor,
+                              minimumSize: const Size.fromHeight(48),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                side: BorderSide(color: primaryColor),
+                              ),
+                            ),
+                            child: const Text(
+                              "Thêm ảnh",
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
                         ),
+                      ],
                     ],
                   ),
                 ),
@@ -281,7 +265,6 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
     );
   }
 
-  /// Widget con hiển thị từng chỉ số dinh dưỡng
   Widget _buildNutritionItem(String label, String value) {
     return Column(
       children: [
@@ -294,6 +277,36 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
         ),
         Text(label),
       ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required Color primaryColor,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: primaryColor),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: primaryColor),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: primaryColor.withOpacity(0.5)),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Vui lòng nhập $label';
+        }
+        if (int.tryParse(value) == null) {
+          return "Nhập số hợp lệ";
+        }
+        return null;
+      },
     );
   }
 
