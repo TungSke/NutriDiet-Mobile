@@ -2,6 +2,7 @@ import 'package:diet_plan_app/components/foodList_component_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -266,7 +267,7 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                         child: food.imageUrl != null
                             ? Image.network(
                           food.imageUrl!,
-                          width: 80.0,
+                          width: 70.0,
                           height: 80.0,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => Image.asset(
@@ -278,7 +279,7 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                         )
                             : Image.asset(
                           'assets/images/placeholder.png',
-                          width: 80.0,
+                          width: 70.0,
                           height: 80.0,
                           fit: BoxFit.cover,
                         ),
@@ -288,12 +289,12 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            AutoSizeText(
                               food.foodName,
                               maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              minFontSize: 12,
+                              maxFontSize: 16,
                               style: GoogleFonts.montserrat(
-                                fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -303,32 +304,38 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                               children: [
                                 SvgPicture.asset(
                                   'assets/images/fire-icon--1.svg',
-                                  width: 20.0,
-                                  height: 20.0,
+                                  width: 10.0,
+                                  height: 16.0,
                                   fit: BoxFit.cover,
                                 ),
                                 const SizedBox(width: 4.0),
-                                Expanded(
-                                  child: Text(
-                                    '${food.calories ?? '0'} kcal',
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 14.0,
-                                      color: FlutterFlowTheme.of(context).grey,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  "Khẩu phần: ",
+                                AutoSizeText(
+                                  '${food.calories ?? '0'} kcal',
+                                  maxLines: 1,
+                                  minFontSize: 9,
+                                  maxFontSize: 11,
                                   style: GoogleFonts.montserrat(
-                                    fontSize: 14.0,
                                     color: FlutterFlowTheme.of(context).grey,
                                   ),
                                 ),
+                                const SizedBox(width: 8.0),
+                                AutoSizeText(
+                                  "Khẩu phần:",
+                                  maxLines: 1,
+                                  minFontSize: 7,
+                                  maxFontSize: 10,
+                                  style: GoogleFonts.montserrat(
+                                    color: FlutterFlowTheme.of(context).grey,
+                                  ),
+                                ),
+                                const SizedBox(width: 4.0),
                                 Expanded(
-                                  child: Text(
+                                  child: AutoSizeText(
                                     food.servingSize ?? 'Không rõ',
+                                    maxLines: 1,
+                                    minFontSize: 7,
+                                    maxFontSize: 10,
                                     style: GoogleFonts.montserrat(
-                                      fontSize: 14.0,
                                       color: FlutterFlowTheme.of(context).grey,
                                     ),
                                   ),
@@ -344,7 +351,7 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                           color: isFavorite
                               ? FlutterFlowTheme.of(context).primary
                               : Colors.grey,
-                          size: 28.0,
+                          size: 20.0,
                         ),
                         onPressed: () => _showFavoriteDialog(food),
                         splashRadius: 24,

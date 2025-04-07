@@ -44,6 +44,16 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
       appBar: AppBar(
         backgroundColor: FlutterFlowTheme.of(context).primary,
         automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: FlutterFlowTheme.of(context).secondaryBackground,
+            size: 24.0,
+          ),
+          onPressed: () {
+            context.safePop();
+          },
+        ),
         title: Text(
           'Chọn nguyên liệu',
           style: FlutterFlowTheme.of(context).headlineMedium.override(
