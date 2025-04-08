@@ -79,107 +79,151 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
       healthGoal = null;
     }
 
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: FlutterFlowTheme.of(context).primary,
-        title: const Text('Chỉnh sửa thực đơn', style: TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Tên thực đơn',
-                labelStyle: TextStyle(color: Colors.white),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return ScaleTransition(
+          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          ),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 8,
+            contentPadding: const EdgeInsets.all(24),
+            title: Text(
+              'Chỉnh sửa thực đơn',
+              style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                color: FlutterFlowTheme.of(context).primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Tên thực đơn',
+                      labelStyle: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    style: const TextStyle(color: Colors.black),
+                    controller: TextEditingController(text: planName),
+                    onChanged: (value) => planName = value,
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: healthGoal,
+                    decoration: InputDecoration(
+                      labelText: 'Mục tiêu sức khỏe',
+                      labelStyle: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    dropdownColor: Colors.white,
+                    style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                    items: validHealthGoals
+                        .map((goal) => DropdownMenuItem(value: goal, child: Text(goal)))
+                        .toList(),
+                    onChanged: (value) => healthGoal = value,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Hủy',
+                  style: TextStyle(color: FlutterFlowTheme.of(context).primary, fontWeight: FontWeight.w600),
                 ),
               ),
-              style: const TextStyle(color: Colors.black),
-              controller: TextEditingController(text: planName),
-              onChanged: (value) => planName = value,
-            ),
-            DropdownButtonFormField<String>(
-              value: healthGoal,
-              decoration: const InputDecoration(
-                labelText: 'Mục tiêu sức khỏe',
-                labelStyle: TextStyle(color: Colors.white),
+              ElevatedButton(
+                onPressed: () async {
+                  if (planName.isNotEmpty && healthGoal != null) {
+                    BuildContext? loadingContext;
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (loadingDialogContext) {
+                        loadingContext = loadingDialogContext;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    );
+
+                    try {
+                      final success = await _model.updateMealPlan(planName, healthGoal!);
+
+                      if (loadingContext != null && Navigator.canPop(loadingContext!)) {
+                        Navigator.pop(loadingContext!);
+                      }
+
+                      Navigator.pop(context);
+
+                      if (success && mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Cập nhật thực đơn thành công'),
+                            backgroundColor: Colors.green,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      } else if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(_model.errorMessage ?? 'Lỗi khi cập nhật thực đơn'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (loadingContext != null && Navigator.canPop(loadingContext!)) {
+                        Navigator.pop(loadingContext!);
+                      }
+                      Navigator.pop(context);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Lỗi khi cập nhật thực đơn: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: FlutterFlowTheme.of(context).primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text(
+                  'Lưu',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
               ),
-              dropdownColor: FlutterFlowTheme.of(context).primary,
-              style: const TextStyle(color: Colors.black),
-              items: validHealthGoals
-                  .map((goal) => DropdownMenuItem(value: goal, child: Text(goal)))
-                  .toList(),
-              onChanged: (value) => healthGoal = value,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Hủy', style: TextStyle(color: Colors.white)),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              if (planName.isNotEmpty && healthGoal != null) {
-                BuildContext? loadingContext;
-                showDialog(
-                  context: dialogContext,
-                  barrierDismissible: false,
-                  builder: (loadingDialogContext) {
-                    loadingContext = loadingDialogContext;
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                );
-
-                try {
-                  final success = await _model.updateMealPlan(planName, healthGoal!);
-
-                  if (loadingContext != null && Navigator.canPop(loadingContext!)) {
-                    Navigator.pop(loadingContext!);
-                  }
-
-                  Navigator.pop(dialogContext);
-
-                  if (success && mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Cập nhật thực đơn thành công'),
-                        backgroundColor: Colors.green,
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  } else if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(_model.errorMessage ?? 'Lỗi khi cập nhật thực đơn'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (loadingContext != null && Navigator.canPop(loadingContext!)) {
-                    Navigator.pop(loadingContext!);
-                  }
-                  Navigator.pop(dialogContext);
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Lỗi khi cập nhật thực đơn: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                }
-              }
-            },
-            child: const Text('Lưu', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -246,10 +290,6 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                         const SizedBox(height: 12),
                         _buildNutrientProgress(),
                         const SizedBox(height: 12),
-                        Text(
-                          "Total: ${_model.getNutrientTotalsForDay(selectedDay)['calories']!.toStringAsFixed(0)} kcal",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
                         const SizedBox(height: 12),
                         Expanded(
                           child: ListView.builder(
@@ -577,28 +617,44 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     final carbs = nutrients['carbs']!;
     final protein = nutrients['protein']!;
     final fat = nutrients['fat']!;
-
     final userGoals = _model.userGoals ?? {'calories': 2000.0, 'carbs': 250.0, 'fat': 70.0, 'protein': 100.0};
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildNutrientDisplay(
-          "Carbs",
-          widget.source == MealPlanSource.myMealPlan ? "$carbs/${userGoals['carbs']}" : carbs.toStringAsFixed(0),
-          "g",
-        ),
-        _buildNutrientDisplay(
-          "Protein",
-          widget.source == MealPlanSource.myMealPlan ? "$protein/${userGoals['protein']}" : protein.toStringAsFixed(0),
-          "g",
-        ),
-        _buildNutrientDisplay(
-          "Fat",
-          widget.source == MealPlanSource.myMealPlan ? "$fat/${userGoals['fat']}" : fat.toStringAsFixed(0),
-          "g",
-        ),
-      ],
+    return Container(
+      width: double.infinity, // Đảm bảo Row chiếm toàn bộ chiều rộng màn hình
+      padding: const EdgeInsets.symmetric(horizontal: 8), // Thêm padding ngang để tránh sát mép
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Phân bố đều các phần tử
+        children: [
+          _buildNutrientDisplay(
+            "Calories",
+            widget.source == MealPlanSource.myMealPlan
+                ? "${totalCalories.toStringAsFixed(0)}/${userGoals['calories']!.toStringAsFixed(0)}"
+                : totalCalories.toStringAsFixed(0),
+            "kcal",
+          ),
+          _buildNutrientDisplay(
+            "Carbs",
+            widget.source == MealPlanSource.myMealPlan
+                ? "${carbs.toStringAsFixed(0)}/${userGoals['carbs']!.toStringAsFixed(0)}"
+                : carbs.toStringAsFixed(0),
+            "g",
+          ),
+          _buildNutrientDisplay(
+            "Protein",
+            widget.source == MealPlanSource.myMealPlan
+                ? "${protein.toStringAsFixed(0)}/${userGoals['protein']!.toStringAsFixed(0)}"
+                : protein.toStringAsFixed(0),
+            "g",
+          ),
+          _buildNutrientDisplay(
+            "Fat",
+            widget.source == MealPlanSource.myMealPlan
+                ? "${fat.toStringAsFixed(0)}/${userGoals['fat']!.toStringAsFixed(0)}"
+                : fat.toStringAsFixed(0),
+            "g",
+          ),
+        ],
+      ),
     );
   }
 
@@ -616,21 +672,226 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14, // Giảm font size để hiển thị đầy đủ
                 fontWeight: FontWeight.bold,
                 color: FlutterFlowTheme.of(context).primary,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              maxLines: 2, // Cho phép xuống dòng nếu cần
+              overflow: TextOverflow.visible, // Đảm bảo không bị cắt
             ),
           ),
         ),
         const SizedBox(height: 4),
-        Text("$label ($unit)", style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          "$label ($unit)",
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        ),
       ],
     );
   }
 
+  Widget _buildActionButtons() {
+    switch (widget.source) {
+      case MealPlanSource.myMealPlan:
+        final isActive = _model.mealPlan?.status == 'Active';
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isActive ? Colors.red : FlutterFlowTheme.of(context).primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () async {
+              try {
+                final success = await _model.applyMealPlan(widget.mealPlanId);
+                if (!mounted) return;
+                if (success) {
+                  final isActive = _model.mealPlan?.status == 'Active';
+                  showGeneralDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return ScaleTransition(
+                        scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                          CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                        ),
+                        child: AlertDialog(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          elevation: 8,
+                          contentPadding: const EdgeInsets.all(24),
+                          title: Text(
+                            isActive ? "Thực đơn đang được áp dụng" : "Hủy áp dụng thành công",
+                            style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                              color: FlutterFlowTheme.of(context).primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          content: Text(
+                            isActive
+                                ? "Thực đơn đã được áp dụng thành công."
+                                : "Thực đơn đã được hủy áp dụng thành công.",
+                            style: TextStyle(color: Colors.black87, fontSize: 16),
+                          ),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: FlutterFlowTheme.of(context).primary,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: const Text(
+                                "OK",
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  final errorMessage = _model.errorMessage ?? 'Lỗi khi áp dụng/hủy áp dụng thực đơn';
+                  if (errorMessage.contains("Bạn đã có một thực đơn đang được áp dụng")) {
+                    showGeneralDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return ScaleTransition(
+                          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                          ),
+                          child: AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            elevation: 8,
+                            contentPadding: const EdgeInsets.all(24),
+                            title: Text(
+                              "Thông báo",
+                              style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                            content: const Text(
+                              "Bạn đang có thực đơn khác được áp dụng",
+                              style: TextStyle(color: Colors.black87, fontSize: 16),
+                            ),
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () => Navigator.pop(context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: const Text(
+                                  "OK",
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(errorMessage),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Lỗi không xác định: $e"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: Text(
+              isActive ? "HỦY ÁP DỤNG THỰC ĐƠN" : "ÁP DỤNG THỰC ĐƠN",
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      case MealPlanSource.sampleMealPlan:
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FlutterFlowTheme.of(context).primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () async {
+              final success = await _model.cloneSampleMealPlan(widget.mealPlanId);
+              if (!mounted) return;
+              if (success) {
+                showGeneralDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                  pageBuilder: (context, animation, secondaryAnimation) {
+                    return ScaleTransition(
+                      scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                        CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                      ),
+                      child: AlertDialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        elevation: 8,
+                        contentPadding: const EdgeInsets.all(24),
+                        title: Text(
+                          "Sao chép thành công",
+                          style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                            color: FlutterFlowTheme.of(context).primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        content: const Text(
+                          "Sao chép thực đơn thành công, vui lòng kiểm tra trong thực đơn của bạn.",
+                          style: TextStyle(color: Colors.black87, fontSize: 16),
+                        ),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: FlutterFlowTheme.of(context).primary,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: const Text(
+                              "OK",
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(_model.errorMessage ?? 'Lỗi khi sao chép thực đơn'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text("SAO CHÉP THỰC ĐƠN", style: TextStyle(color: Colors.white)),
+          ),
+        );
+    }
+  }
   Widget _buildMealCard(String mealType, List<MealPlanDetail> meals) {
     final vietnameseMealType = mealTypeTranslations[mealType] ?? mealType;
     String foodNames;
@@ -742,133 +1003,5 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
         ),
       ),
     );
-  }
-
-  Widget _buildActionButtons() {
-    switch (widget.source) {
-      case MealPlanSource.myMealPlan:
-        final isActive = _model.mealPlan?.status == 'Active';
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isActive ? Colors.red : FlutterFlowTheme.of(context).primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () async {
-              try {
-                final success = await _model.applyMealPlan(widget.mealPlanId);
-                if (!mounted) return;
-                if (success) {
-                  final isActive = _model.mealPlan?.status == 'Active';
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      backgroundColor: FlutterFlowTheme.of(context).primary,
-                      title: Text(
-                        isActive ? "Thực đơn đang được áp dụng" : "Hủy áp dụng thành công",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      content: Text(
-                        isActive ? "Thực đơn đã được áp dụng thành công." : "Thực đơn đã được hủy áp dụng thành công.",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text("OK", style: TextStyle(color: Colors.white)),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  final errorMessage = _model.errorMessage ?? 'Lỗi khi áp dụng/hủy áp dụng thực đơn';
-                  if (errorMessage.contains("Bạn đã có một thực đơn đang được áp dụng")) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        backgroundColor: Colors.red,
-                        title: const Text(
-                          "Thông báo",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        content: const Text(
-                          "Bạn đang có thực đơn khác được áp dụng",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text("OK", style: TextStyle(color: Colors.white)),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(errorMessage),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                }
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Lỗi không xác định: $e"),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            child: Text(
-              isActive ? "HỦY ÁP DỤNG THỰC ĐƠN" : "ÁP DỤNG THỰC ĐƠN",
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        );
-      case MealPlanSource.sampleMealPlan:
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: FlutterFlowTheme.of(context).primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () async {
-              final success = await _model.cloneSampleMealPlan(widget.mealPlanId);
-              if (!mounted) return;
-              if (success) {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: FlutterFlowTheme.of(context).primary,
-                    title: const Text("Sao chép thành công", style: TextStyle(color: Colors.white)),
-                    content: const Text(
-                      "Sao chép thực đơn thành công, vui lòng kiểm tra trong thực đơn của bạn.",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("OK", style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(_model.errorMessage ?? 'Lỗi khi sao chép thực đơn'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            child: const Text("SAO CHÉP THỰC ĐƠN", style: TextStyle(color: Colors.white)),
-          ),
-        );
-    }
   }
 }

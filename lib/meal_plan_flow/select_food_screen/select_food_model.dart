@@ -10,29 +10,63 @@ class SelectFoodModel extends ChangeNotifier {
   List<Food> foods = [];
   List<MealPlanDetail> existingMeals = [];
   bool isLoading = false;
+  bool isLoadingMore = false; // Trạng thái tải thêm
   String? errorMessage;
+  int currentPage = 1; // Trang hiện tại
+  int pageSize = 10;
+  bool hasMore = true; // Còn dữ liệu để tải không
 
   void setExistingMeals(List<MealPlanDetail> meals) {
     existingMeals = meals;
     notifyListeners();
   }
 
-  Future<void> fetchFoods({String? search, int pageIndex = 1, int pageSize = 50}) async {
+  Future<void> fetchFoods({String? search, int pageIndex = 1, bool loadMore = false}) async {
     try {
-      isLoading = true;
+      if (loadMore) {
+        isLoadingMore = true;
+      } else {
+        isLoading = true;
+        foods.clear(); // Xóa danh sách cũ khi tải lại từ đầu
+        currentPage = 1;
+        hasMore = true;
+      }
       errorMessage = null;
       notifyListeners();
 
       final query = (search == null || search.isEmpty) ? "" : search;
-      foods = await foodService.getAllFoods(pageIndex: pageIndex, pageSize: pageSize, search: query);
+      final newFoods = await foodService.getAllFoods(
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+        search: query,
+      );
+
+      if (loadMore) {
+        foods.addAll(newFoods);
+      } else {
+        foods = newFoods;
+      }
+
+      // Kiểm tra xem còn dữ liệu để tải không
+      if (newFoods.length < pageSize) {
+        hasMore = false;
+      }
 
       isLoading = false;
+      isLoadingMore = false;
       notifyListeners();
     } catch (e) {
       isLoading = false;
+      isLoadingMore = false;
       errorMessage = "Lỗi khi tải danh sách món ăn: $e";
       notifyListeners();
     }
+  }
+
+  Future<void> loadMoreFoods({String? search}) async {
+    if (!hasMore || isLoadingMore) return;
+    currentPage++;
+    await fetchFoods(search: search, pageIndex: currentPage, loadMore: true);
   }
 
   Future<bool> addFoodToMealPlan({

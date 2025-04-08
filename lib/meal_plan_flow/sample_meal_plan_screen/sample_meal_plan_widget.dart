@@ -26,21 +26,72 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Center(
-          child: Text("Thực đơn mẫu", style: TextStyle(color: Colors.white)),
-        ),
-        backgroundColor: theme.primary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32, top: 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header giống "Quản lý thực đơn"
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    theme.primary.withOpacity(0.9),
+                    theme.tertiary.withOpacity(0.7),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(16.0),
+                  bottomRight: Radius.circular(16.0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                top: MediaQuery.of(context).padding.top + 16.0,
+                bottom: 16.0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "Thực đơn mẫu",
+                        style: theme.titleLarge.copyWith(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.3),
+                              offset: const Offset(1, 1),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 48), // Để cân đối với IconButton bên trái
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -81,36 +132,73 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
   }
 
   void _showFilterDialog(BuildContext context, SampleMealPlanModel model) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: FlutterFlowTheme.of(context).primary, // Màu xanh giống button
-              title: const Text("Lọc theo mục tiêu sức khỏe", style: TextStyle(color: Colors.white)),
-              content: Wrap(
-                spacing: 10,
-                children: ["Giảm cân", "Tăng cân", "Healthy", "Tiểu đường"].map((goal) {
-                  final isSelected = model.selectedFilter == goal;
-                  return ChoiceChip(
-                    label: Text(goal),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      model.updateFilter(isSelected ? null : goal); // Chọn lại filter => clear filter
-                      setState(() {}); // Cập nhật UI của dialog
-                    },
-                  );
-                }).toList(), 
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return ScaleTransition(
+          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          ),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 8,
+            title: Text(
+              "Lọc theo mục tiêu sức khỏe",
+              style: TextStyle(
+                color: FlutterFlowTheme.of(context).primary,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Đóng", style: TextStyle(color: Colors.white)),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: ["Giảm cân", "Tăng cân", "Duy trì cân nặng"].map((goal) {
+                      final isSelected = model.selectedFilter == goal;
+                      return ChoiceChip(
+                        label: Text(goal, style: const TextStyle(fontSize: 16)),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          model.updateFilter(selected ? goal : null);
+                          Navigator.pop(context); // Đóng dialog sau khi chọn
+                        },
+                        backgroundColor: Colors.grey[100],
+                        selectedColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
+                        labelStyle: TextStyle(
+                          color: isSelected ? FlutterFlowTheme.of(context).primary : Colors.black87,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: FlutterFlowTheme.of(context).primary.withOpacity(0.5)),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  "Đóng",
+                  style: TextStyle(
+                    color: FlutterFlowTheme.of(context).primary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ],
-            );
-          },
+              ),
+            ],
+          ),
         );
       },
     );
@@ -136,7 +224,6 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
               ),
             ),
           );
-          // Nếu sao chép thành công, trả về true cho MyMealPlanScreenWidget
           if (result == true && mounted) {
             Navigator.pop(context, true);
           }
