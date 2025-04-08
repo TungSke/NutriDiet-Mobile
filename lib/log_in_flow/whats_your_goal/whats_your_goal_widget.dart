@@ -81,7 +81,7 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
 
         if (updateResponse.statusCode == 201 ||
             updateResponse.statusCode == 204) {
-          showSnackbar(context, "🎉 Gửi mục tiêu thành công!");
+          showSnackbar(context, "Gửi mục tiêu thành công!");
           context.pushNamed('health_indicator_screen');
         } else {
           showSnackbar(context, "⚠️ Gửi thất bại: ${updateResponse.body}");
@@ -229,4 +229,19 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
       ),
     );
   }
+}
+
+void showSnackbar(BuildContext context, String message) {
+  final snackBar = SnackBar(
+    content: Text(
+      message,
+      style: TextStyle(
+        color: Colors.white, // Set text color to white
+      ),
+    ),
+    backgroundColor: Colors.green, // Set background color to green
+    duration: Duration(seconds: 2), // Duration for the snackbar to be visible
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }

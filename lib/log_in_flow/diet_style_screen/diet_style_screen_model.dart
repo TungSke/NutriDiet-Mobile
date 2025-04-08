@@ -64,3 +64,18 @@ class DietStyleScreenModel extends FlutterFlowModel<DietStyleScreenWidget> {
     }
   }
 }
+
+void showSnackbar(BuildContext context, String message) {
+  final snackBar = SnackBar(
+    content: Text(
+      message,
+      style: TextStyle(
+        color: Colors.white, // Set text color to white
+      ),
+    ),
+    backgroundColor: Colors.green, // Set background color to green
+    duration: Duration(seconds: 2), // Duration for the snackbar to be visible
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
