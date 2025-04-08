@@ -17,34 +17,33 @@ class FirebaseService {
     }
   }
 
-  Future<String?> EnableReminder(BuildContext context) async{
-    try{
-      final fcmToken = await _getFcmToken();
-      if(fcmToken == null){
-        return null;
-      }
+  Future<String?> enableReminder(BuildContext context) async {
+    try {
+      // Lấy access token
       final token = await _apiService.getAccessToken(context);
-      if(token == null){
+      if (token == null) {
         return null;
       }
-      final response = await _apiService.postRaw(
-          "api/firebase/enable-reminder",
-          body: jsonEncode(fcmToken), // mã hóa token thành json rồi gửi đi
-          token: token
+
+      // Gửi yêu cầu POST tới endpoint /api/firebase/enable-reminder
+      final response = await _apiService.post(
+        "api/firebase/enable-reminder",
+        body: {}, // Không cần body vì backend lấy userId từ token
+        token: token,
       );
-      if(response.statusCode == 200){
 
-        return response.body;
-
-      }
-      else{
+      if (response.statusCode == 200) {
+        return response.body; // "Reminder enabled" hoặc "Reminder disabled"
+      } else {
         debugPrint('Lỗi khi gọi API enable-reminder: ${response.body}');
+        if (response.statusCode == 400 &&
+            response.body.contains("FCM token is required")) {
+          return "FCM token is required";
+        }
         return null;
       }
-
-    }
-    catch (e) {
-      debugPrint("lỗi EnableRemider: $e");
+    } catch (e) {
+      debugPrint("Lỗi enableReminder: $e");
       return null;
     }
   }

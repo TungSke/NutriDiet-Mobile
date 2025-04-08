@@ -220,18 +220,19 @@ class MealLogComponentModel extends FlutterFlowModel {
   Future<void> toggleReminder(BuildContext context) async {
     try {
       final firebaseService = FirebaseService();
-      final message = await firebaseService.EnableReminder(context);
+      final message = await firebaseService.enableReminder(context);
       if (message != null) {
         String dialogMessage;
         if (message == "Reminder enabled") {
           dialogMessage = "Thông báo nhắc bữa ăn đã được bật";
         } else if (message == "Reminder disabled") {
           dialogMessage = "Thông báo nhắc bữa ăn đã được tắt";
+        } else if (message == "FCM token is required") {
+          _showPermissionRequiredDialog(context);
+          return;
         } else {
           dialogMessage = "Có lỗi xảy ra khi thay đổi cài đặt nhắc nhở";
         }
-
-        // Hiển thị dialog
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -249,6 +250,23 @@ class MealLogComponentModel extends FlutterFlowModel {
     } catch (e) {
       debugPrint('Lỗi khi bật/tắt nhắc nhở: $e');
     }
+  }
+
+  void _showPermissionRequiredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Yêu cầu quyền thông báo"),
+        content: const Text(
+            "Bạn cần cho phép ứng dụng gửi thông báo để bật nhắc nhở."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Hủy"),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<String?> fetchAnalyzeMealLog() async {
