@@ -147,22 +147,22 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                       _buildTextField(
                         controller: _calorieController!,
                         label: "Calories (kcal)",
-                        primaryColor: primaryColor,
+                        primaryColor: Colors.black,
                       ),
                       _buildTextField(
                         controller: _proteinController!,
                         label: "Protein (g)",
-                        primaryColor: primaryColor,
+                        primaryColor: Colors.black,
                       ),
                       _buildTextField(
                         controller: _carbsController!,
                         label: "Carbs (g)",
-                        primaryColor: primaryColor,
+                        primaryColor: Colors.black,
                       ),
                       _buildTextField(
                         controller: _fatController!,
                         label: "Fat (g)",
-                        primaryColor: primaryColor,
+                        primaryColor: Colors.black,
                       ),
 
                       const SizedBox(height: 20),

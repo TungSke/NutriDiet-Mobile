@@ -21,10 +21,18 @@ class HomeComponetWidget extends StatefulWidget {
   State<HomeComponetWidget> createState() => _HomeComponetWidgetState();
 }
 
-class _HomeComponetWidgetState extends State<HomeComponetWidget> {
+class _HomeComponetWidgetState extends State<HomeComponetWidget>
+    with SingleTickerProviderStateMixin {
   late HomeComponetModel _model;
-  final ValueNotifier<DateTime> selectedDateNotifier = ValueNotifier<DateTime>(
-      DateTime.now()); // Thêm ValueNotifier để theo dõi ngày
+  final ValueNotifier<DateTime> selectedDateNotifier =
+      ValueNotifier<DateTime>(DateTime.now());
+
+  // Các Animation Controller và Animation cho hiệu ứng của trang chủ
+  late AnimationController _animationController;
+  late Animation<double> _headerFadeAnimation;
+  late Animation<Offset> _headerSlideAnimation;
+  late Animation<double> _calendarScaleAnimation;
+  late Animation<double> _contentFadeAnimation;
 
   @override
   void initState() {
@@ -33,17 +41,48 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
 
     _model = createModel(context, () => HomeComponetModel());
     _model.setUpdateCallback(() {
-      if (mounted) {
-        setState(() {});
-      }
+      if (mounted) setState(() {});
     });
     _model.fetchMealLogs();
     _model.fetchUserProfile();
+
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _headerFadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.3, curve: Curves.easeIn),
+    ));
+
+    _headerSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, -0.2), end: Offset.zero)
+            .animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
+    ));
+
+    _calendarScaleAnimation =
+        Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.3, 0.6, curve: Curves.elasticOut),
+    ));
+
+    _contentFadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.6, 1.0, curve: Curves.easeIn),
+    ));
+
+    _animationController.forward();
   }
 
   @override
   void dispose() {
-    selectedDateNotifier.dispose(); // Đừng quên dispose ValueNotifier
+    selectedDateNotifier.dispose();
+    _animationController.dispose();
     _model.dispose();
     super.dispose();
   }
@@ -80,48 +119,51 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primary,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(16.0),
-                bottomRight: Radius.circular(16.0),
-                topLeft: Radius.circular(0.0),
-                topRight: Radius.circular(0.0),
-              ),
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsetsDirectional.fromSTEB(20.0, 25.0, 20.0, 16.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          // Header với hiệu ứng Fade và Slide
+          FadeTransition(
+            opacity: _headerFadeAnimation,
+            child: SlideTransition(
+              position: _headerSlideAnimation,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).primary,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16.0),
+                    bottomRight: Radius.circular(16.0),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      20.0, 25.0, 20.0, 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Chào ngày mới !',
-                        maxLines: 1,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'figtree',
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              fontSize: 22.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.bold,
-                              useGoogleFonts: false,
-                              lineHeight: 1.5,
-                            ),
-                      ),
-                      if (FFAppState().isLogin == true)
-                        Text(
-                          _model.name,
-                          maxLines: 1,
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Chào ngày mới !',
+                            maxLines: 1,
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  fontFamily: 'figtree',
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.bold,
+                                  useGoogleFonts: false,
+                                  lineHeight: 1.5,
+                                ),
+                          ),
+                          if (FFAppState().isLogin == true)
+                            Text(
+                              _model.name,
+                              maxLines: 1,
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
                                     fontFamily: 'figtree',
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
@@ -131,122 +173,111 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                     useGoogleFonts: false,
                                     lineHeight: 1.5,
                                   ),
-                        ),
-                    ],
-                  ),
-                  InkWell(
-                    splashColor: Colors.transparent,
-                    focusColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () async {
-                      context.pushNamed('Notification_screen');
-                    },
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0x3CF5F5F5),
-                        shape: BoxShape.circle,
+                            ),
+                        ],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(0.0),
-                          child: SvgPicture.asset(
-                            'assets/images/notification.svg',
-                            width: 24.0,
-                            height: 24.0,
-                            fit: BoxFit.cover,
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () async {
+                          context.pushNamed('Notification_screen');
+                        },
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Color(0x3CF5F5F5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: ClipRRect(
+                              child: SvgPicture.asset(
+                                'assets/images/notification.svg',
+                                width: 24.0,
+                                height: 24.0,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
-          Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(1),
-                child: Container(
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).lightGrey,
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                    child: FlutterFlowCalendar(
-                      color: FlutterFlowTheme.of(context).primary,
-                      iconColor: FlutterFlowTheme.of(context).secondaryText,
-                      weekFormat: true,
-                      weekStartsMonday: true,
-                      rowHeight: 64.0,
-                      onChange: (DateTimeRange? newSelectedDate) async {
-                        if (newSelectedDate != null) {
-                          setState(() {
-                            _model.selectedDate =
-                                newSelectedDate.start; // Lưu ngày đã chọn
-                            _model.calendarSelectedDay =
-                                newSelectedDate; // Lưu lại phạm vi ngày đã chọn
-                          });
-
-                          // Fetch lại meal logs ngay khi thay đổi ngày
-                          _model.changeDate(newSelectedDate.start);
-                          setState(() {});
-                        }
-                      },
-                      titleStyle:
-                          FlutterFlowTheme.of(context).headlineSmall.override(
-                                fontFamily: 'figtree',
-                                fontSize: 18.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                              ),
-                      dayOfWeekStyle:
-                          FlutterFlowTheme.of(context).labelLarge.override(
-                                fontFamily: 'figtree',
-                                fontSize: 13.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                              ),
-                      dateStyle:
-                          FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'figtree',
-                                fontSize: 16.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                              ),
-                      selectedDateStyle:
-                          FlutterFlowTheme.of(context).titleSmall.override(
-                                fontFamily: 'figtree',
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.normal,
-                                useGoogleFonts: false,
-                              ),
-                      inactiveDateStyle:
-                          FlutterFlowTheme.of(context).labelMedium.override(
-                                fontFamily: 'figtree',
-                                fontSize: 16.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: false,
-                              ),
-                    )),
+          // Calendar với hiệu ứng Scale
+          ScaleTransition(
+            scale: _calendarScaleAnimation,
+            child: Padding(
+              padding: const EdgeInsets.all(1),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).lightGrey,
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: FlutterFlowCalendar(
+                  color: FlutterFlowTheme.of(context).primary,
+                  iconColor: FlutterFlowTheme.of(context).secondaryText,
+                  weekFormat: true,
+                  weekStartsMonday: true,
+                  rowHeight: 64.0,
+                  onChange: (DateTimeRange? newSelectedDate) async {
+                    if (newSelectedDate != null) {
+                      setState(() {
+                        _model.selectedDate = newSelectedDate.start;
+                        _model.calendarSelectedDay = newSelectedDate;
+                      });
+                      _model.changeDate(newSelectedDate.start);
+                    }
+                  },
+                  titleStyle:
+                      FlutterFlowTheme.of(context).headlineSmall.override(
+                            fontFamily: 'figtree',
+                            fontSize: 18.0,
+                            useGoogleFonts: false,
+                          ),
+                  dayOfWeekStyle:
+                      FlutterFlowTheme.of(context).labelLarge.override(
+                            fontFamily: 'figtree',
+                            fontSize: 13.0,
+                            useGoogleFonts: false,
+                          ),
+                  dateStyle: FlutterFlowTheme.of(context).bodyMedium.override(
+                        fontFamily: 'figtree',
+                        fontSize: 16.0,
+                        useGoogleFonts: false,
+                      ),
+                  selectedDateStyle:
+                      FlutterFlowTheme.of(context).titleSmall.override(
+                            fontFamily: 'figtree',
+                            fontWeight: FontWeight.normal,
+                            useGoogleFonts: false,
+                          ),
+                  inactiveDateStyle:
+                      FlutterFlowTheme.of(context).labelMedium.override(
+                            fontFamily: 'figtree',
+                            fontSize: 16.0,
+                            useGoogleFonts: false,
+                          ),
+                ),
               ),
-            ],
+            ),
           ),
+          // Nội dung chính với hiệu ứng Fade
           Expanded(
-            child: RefreshIndicator(
-              color: FlutterFlowTheme.of(context).primary,
-              backgroundColor: Colors.white,
-              onRefresh: () async {
-                // Fetch data again when pulling to refresh
-                await loadData(); // Call loadData() to fetch health data
-                await _model.fetchMealLogs(); // Fetch meal logs
-                await _model.fetchUserProfile(); // Fetch user profile data
-                setState(() {}); // Trigger a rebuild after data is refreshed
-              },
-              child: ListView(
+            child: FadeTransition(
+              opacity: _contentFadeAnimation,
+              child: RefreshIndicator(
+                color: FlutterFlowTheme.of(context).primary,
+                backgroundColor: Colors.white,
+                onRefresh: () async {
+                  await loadData();
+                  await _model.fetchMealLogs();
+                  await _model.fetchUserProfile();
+                  setState(() {});
+                },
+                child: ListView(
                   padding: EdgeInsets.zero,
-                  scrollDirection: Axis.vertical,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(10),
@@ -255,8 +286,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    //UI số bước chân
-                    // Thay thế phần "Hoạt động hôm nay" trong build()
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(
                           20.0, 0.0, 20.0, 24.0),
@@ -273,9 +302,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                         ),
                       ),
                     ),
-
-                    if (_model.activityError != null ||
-                        kIsWeb) // Sử dụng kIsWeb thay vì Platform.isWeb
+                    if (_model.activityError != null || kIsWeb)
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             20.0, 0.0, 20.0, 24.0),
@@ -316,10 +343,8 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: ElevatedButton(
                                       onPressed: () async {
-                                        // Gọi lại fetchActivityData để yêu cầu quyền lần nữa (chỉ trên mobile)
                                         await _model.fetchActivityData();
-                                        setState(
-                                            () {}); // Rebuild sau khi thử lại
+                                        setState(() {});
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
@@ -337,16 +362,13 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                           ),
                         ),
                       ),
-                    if (_model.activityError == null &&
-                        !kIsWeb) // Chỉ hiển thị dữ liệu nếu không có lỗi và không chạy trên web
+                    if (_model.activityError == null && !kIsWeb)
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             0.0, 0.0, 0.0, 24.0),
                         child: Row(
-                          mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            // Thẻ hiển thị số bước chân
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -354,10 +376,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   borderRadius: BorderRadius.circular(16.0),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 16.0, 0.0, 16.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
                                   child: Column(
-                                    mainAxisSize: MainAxisSize.max,
                                     children: [
                                       CircularPercentIndicator(
                                         percent:
@@ -379,7 +400,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                             ),
                                             Text(
                                               '${_model.steps}',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 color: Colors.blueAccent,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20.0,
@@ -390,13 +411,11 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                       ),
                                       Text(
                                         'Bước chân',
-                                        maxLines: 1,
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
                                               fontFamily: 'figtree',
                                               fontSize: 18.0,
-                                              letterSpacing: 0.0,
                                               fontWeight: FontWeight.w500,
                                               useGoogleFonts: false,
                                             ),
@@ -406,7 +425,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                 ),
                               ),
                             ),
-                            // Thẻ hiển thị calories đốt cháy
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -414,10 +432,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   borderRadius: BorderRadius.circular(16.0),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 16.0, 0.0, 16.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
                                   child: Column(
-                                    mainAxisSize: MainAxisSize.max,
                                     children: [
                                       CircularPercentIndicator(
                                         percent: _model.caloriesBurnedProgress
@@ -439,7 +456,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                             ),
                                             Text(
                                               '${_model.caloriesBurned}',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 color: Colors.redAccent,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20.0,
@@ -450,13 +467,11 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                       ),
                                       Text(
                                         'Calories đốt cháy',
-                                        maxLines: 1,
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
                                               fontFamily: 'figtree',
                                               fontSize: 15.0,
-                                              letterSpacing: 0.0,
                                               fontWeight: FontWeight.w500,
                                               useGoogleFonts: false,
                                             ),
@@ -472,15 +487,13 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                               .addToEnd(const SizedBox(width: 20.0)),
                         ),
                       ),
+                    // Calories hôm nay section with overlay opacity for non-login
                     Opacity(
-                      opacity: FFAppState().isLogin
-                          ? 1.0
-                          : 0.3, // Làm mờ khi chưa đăng nhập
+                      opacity: FFAppState().isLogin ? 1.0 : 0.3,
                       child: GestureDetector(
                         onTap: () {
                           if (FFAppState().isLogin == false) {
-                            _showLoginModal(
-                                context); // Hiển thị modal đăng nhập nếu chưa đăng nhập
+                            _showLoginModal(context);
                           }
                         },
                         child: Stack(
@@ -504,81 +517,76 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                       const AlignmentDirectional(0.0, 0.0),
                                   children: [
                                     Align(
-                                        alignment: const AlignmentDirectional(
-                                            0.0, 0.0),
-                                        child: Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(0.0, 0.0, 0.0, 24.0),
-                                          child: CircularPercentIndicator(
-                                            percent: (_model
-                                                        .mealLogs.isNotEmpty &&
-                                                    personalGoal != null &&
-                                                    personalGoal![
-                                                            'dailyCalories'] >
-                                                        0)
-                                                ? (_model.mealLogs[0]
-                                                            .totalCalories
-                                                            .toDouble() /
-                                                        personalGoal![
-                                                                'dailyCalories']
-                                                            .toDouble())
-                                                    .clamp(0.0,
-                                                        1.0) // Giới hạn tỷ lệ trong khoảng 0.0 - 1.0
-                                                : 0.0,
-                                            radius: 75.0,
-                                            lineWidth: 12.0,
-                                            animation: true,
-                                            animateFromLastPercent: true,
-                                            progressColor: (_model
-                                                        .mealLogs.isNotEmpty &&
-                                                    _model.mealLogs[0]
-                                                            .totalCalories >
-                                                        personalGoal![
-                                                            'dailyCalories'])
-                                                ? Colors
-                                                    .red // Nếu totalCalories > dailyCalories, set màu đỏ
-                                                : Colors
-                                                    .green, // Nếu không, set màu xanhu không, set màu xanh// Nếu không, set màu xanhhông, set màu xanh
-                                            backgroundColor:
-                                                const Color(0x33808080),
-                                            center: RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text:
-                                                        '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalCalories : 0}/',
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily: 'figtree',
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .grey,
-                                                          fontSize: 16.0,
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                          useGoogleFonts: false,
-                                                        ),
+                                      alignment:
+                                          const AlignmentDirectional(0.0, 0.0),
+                                      child: Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 24.0),
+                                        child: CircularPercentIndicator(
+                                          percent: (_model
+                                                      .mealLogs.isNotEmpty &&
+                                                  personalGoal != null &&
+                                                  personalGoal![
+                                                          'dailyCalories'] >
+                                                      0)
+                                              ? (_model.mealLogs[0]
+                                                          .totalCalories
+                                                          .toDouble() /
+                                                      personalGoal![
+                                                              'dailyCalories']
+                                                          .toDouble())
+                                                  .clamp(0.0, 1.0)
+                                              : 0.0,
+                                          radius: 75.0,
+                                          lineWidth: 12.0,
+                                          animation: true,
+                                          animateFromLastPercent: true,
+                                          progressColor:
+                                              (_model.mealLogs.isNotEmpty &&
+                                                      _model.mealLogs[0]
+                                                              .totalCalories >
+                                                          personalGoal![
+                                                              'dailyCalories'])
+                                                  ? Colors.red
+                                                  : Colors.green,
+                                          backgroundColor:
+                                              const Color(0x33808080),
+                                          center: RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text:
+                                                      '${_model.mealLogs.isNotEmpty ? _model.mealLogs[0].totalCalories : 0}/',
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        fontFamily: 'figtree',
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .grey,
+                                                        fontSize: 16.0,
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        useGoogleFonts: false,
+                                                      ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      "${personalGoal?['dailyCalories'] ?? "N/A"}",
+                                                  style: const TextStyle(
+                                                    color: Colors.blue,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20.0,
                                                   ),
-                                                  TextSpan(
-                                                    text:
-                                                        "${personalGoal?['dailyCalories'] ?? "N/A"}",
-                                                    style: TextStyle(
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primary,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 20.0,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        )),
+                                        ),
+                                      ),
+                                    ),
                                     Align(
                                       alignment:
                                           const AlignmentDirectional(0.0, 1.0),
@@ -596,7 +604,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .grey,
                                                 fontSize: 16.0,
-                                                letterSpacing: 0.0,
                                                 fontWeight: FontWeight.normal,
                                                 useGoogleFonts: false,
                                                 lineHeight: 1.5,
@@ -610,11 +617,9 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 24.0),
                                   child: Row(
-                                    mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      // Carbs
                                       CircularPercentIndicator(
                                         percent: _model.mealLogs.isNotEmpty
                                             ? min(
@@ -653,7 +658,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                           child: Text('Carbs'),
                                         ),
                                       ),
-                                      // Protein
                                       CircularPercentIndicator(
                                         percent: _model.mealLogs.isNotEmpty
                                             ? min(
@@ -694,7 +698,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                           child: Text('Protein'),
                                         ),
                                       ),
-                                      // Fat
                                       CircularPercentIndicator(
                                         percent: _model.mealLogs.isNotEmpty
                                             ? min(
@@ -759,22 +762,23 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                 ],
                               ],
                             ),
-                            // Hiển thị icon ổ khóa nếu chưa đăng nhập
                             if (FFAppState().isLogin == false)
-                              Positioned(
+                              const Positioned(
                                 top: 10.0,
                                 right: 10.0,
                                 child: Icon(
                                   Icons.lock,
                                   size: 40.0,
-                                  color: Colors.black.withOpacity(0.5),
+                                  color: Colors.black54,
                                 ),
                               ),
                           ],
                         ),
                       ),
                     ),
-                  ]),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -799,20 +803,17 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
 
   Widget _buildMealCategoryCard(BuildContext context, String category) {
     final vietnameseCategory = _mapCategoryToVietnamese(category);
-
     final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
 
     return Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-                child: Container(
+      padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Container(
               decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context)
-                    .lightGrey, // Thay màu sắc nếu cần
+                color: FlutterFlowTheme.of(context).lightGrey,
                 borderRadius: BorderRadius.circular(16.0),
               ),
               child: Padding(
@@ -825,26 +826,28 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   vietnameseCategory,
                 ),
               ),
-            ))
-          ]
-              .divide(const SizedBox(width: 16.0))
-              .addToStart(const SizedBox(width: 20.0))
-              .addToEnd(const SizedBox(width: 20.0)),
-        ));
+            ),
+          ),
+        ]
+            .divide(const SizedBox(width: 16.0))
+            .addToStart(const SizedBox(width: 20.0))
+            .addToEnd(const SizedBox(width: 20.0)),
+      ),
+    );
   }
 
   Color _getMealProgressColor(String category) {
     switch (category.toLowerCase()) {
       case 'breakfast':
-        return Colors.orange; // Màu cho bữa sáng
+        return Colors.orange;
       case 'lunch':
-        return Colors.green; // Màu cho bữa trưa
+        return Colors.green;
       case 'dinner':
-        return Colors.blue; // Màu cho bữa tối
+        return Colors.blue;
       case 'snacks':
-        return Colors.purple; // Màu cho bữa phụ
+        return Colors.purple;
       default:
-        return Colors.grey; // Màu mặc định cho các bữa khác
+        return Colors.grey;
     }
   }
 
@@ -854,7 +857,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
     String category,
     String vietnameseCategory,
   ) {
-    // Nếu chưa có mealLog => bữa này chưa có gì
     if (mealLog == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -876,9 +878,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                   builder: (context) => MealLogComponentWidget(),
                 ),
               ).then((result) {
-                if (result == true) {
-                  _model.fetchMealLogs();
-                }
+                if (result == true) _model.fetchMealLogs();
               });
             },
           ),
@@ -886,15 +886,11 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
       );
     }
 
-    // Nếu đã có mealLog, ta lọc các chi tiết thuộc bữa này
     final details = mealLog.mealLogDetails
         .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
         .toList();
 
-    // Kiểm tra bữa này có món không
     final bool hasAnyFood = details.isNotEmpty;
-
-    // Tính tổng Calories & macro
     final mealCals = details.fold(0, (sum, d) => sum + d.calories);
     final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
     final mealFat = details.fold(0, (sum, d) => sum + d.fat);
@@ -919,18 +915,15 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: LinearProgressIndicator(
-            value: mealCals > 0
-                ? (mealCals / 1000)
-                : 0, // Tính tỷ lệ phần trăm calo
+            value: mealCals > 0 ? (mealCals / 1000) : 0,
             backgroundColor: Colors.grey[300],
-            valueColor: AlwaysStoppedAnimation<Color>(_getMealProgressColor(
-                category)), // Chọn màu tùy vào loại bữa ăn
+            valueColor:
+                AlwaysStoppedAnimation<Color>(_getMealProgressColor(category)),
           ),
         ),
         for (int i = 0; i < details.length; i++) ...[
           GestureDetector(
             onLongPress: () {
-              // Dialog thao tác: chuyển bữa hoặc xóa món
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -951,7 +944,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      // Liệt kê các bữa
                                       for (final mealType in [
                                         'Breakfast',
                                         'Lunch',
@@ -961,9 +953,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                                         ListTile(
                                           title: Text(mealType),
                                           onTap: () async {
-                                            // Khi user chọn bữa, đóng popup
                                             Navigator.pop(context);
-                                            // Gọi hàm transferMealLogDetailEntry
                                             await _model
                                                 .transferMealLogDetailEntry(
                                               detailId: details[i].detailId,
@@ -987,7 +977,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
             child: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(16, 5, 16, 0),
               child: Column(
-                mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -996,19 +985,20 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                       Row(
                         children: [
                           CircleAvatar(
-                            radius: 3, // Kích thước dấu chấm tròn
+                            radius: 3,
                             backgroundColor: Colors.orange,
                           ),
-                          SizedBox(width: 8.0),
+                          const SizedBox(width: 8.0),
                           Row(
-                            spacing: 8,
                             children: [
-                              Text(details[i].foodName,
-                                  style: TextStyle(fontSize: 14)),
+                              Text(
+                                details[i].foodName,
+                                style: const TextStyle(fontSize: 14),
+                              ),
                               Text(
                                 "(x${details[i].quantity})",
-                                style:
-                                    TextStyle(fontSize: 14, color: Colors.grey),
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.grey),
                               ),
                             ],
                           ),
@@ -1038,9 +1028,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
                 builder: (context) => MealLogComponentWidget(),
               ),
             ).then((result) {
-              if (result == true) {
-                _model.fetchMealLogs();
-              }
+              if (result == true) _model.fetchMealLogs();
             });
           },
         ),
@@ -1048,14 +1036,12 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
     );
   }
 
-  /// Header cho mỗi bữa (hiển thị tên bữa & tổng calo bữa)
   Widget _buildMealHeader(String category, int? mealCals) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Tên bữa (Bữa sáng, Bữa trưa, ...)
           Text(
             category,
             style: const TextStyle(
@@ -1063,7 +1049,6 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          // Nếu mealCals == null => ẩn, còn != null => hiển thị
           mealCals == null
               ? const SizedBox.shrink()
               : Text(
@@ -1090,7 +1075,7 @@ void _showLoginModal(BuildContext context) {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Đóng modal
+              Navigator.pop(context);
             },
             child: Text(
               'Hủy',
@@ -1100,16 +1085,15 @@ void _showLoginModal(BuildContext context) {
           TextButton(
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(
-                  FlutterFlowTheme.of(context).primary), // Chỉnh màu nền
+                  FlutterFlowTheme.of(context).primary),
             ),
             onPressed: () {
-              Navigator.pop(context); // Đóng modal
-              // Điều hướng tới trang đăng nhập
+              Navigator.pop(context);
               context.pushNamed('login_intro_screen');
             },
-            child: Text(
+            child: const Text(
               'Đăng nhập',
-              style: TextStyle(color: Colors.white), // Chỉnh màu chữ
+              style: TextStyle(color: Colors.white),
             ),
           ),
         ],

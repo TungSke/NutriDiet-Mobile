@@ -135,21 +135,29 @@ class WeightLineChartState extends State<WeightLineChart> {
           color: Colors.white,
           padding: const EdgeInsets.all(18),
           child: SfCartesianChart(
+            // Bật legend hiển thị
+            legend: Legend(
+              isVisible: true,
+              position: LegendPosition.bottom,
+              overflowMode: LegendItemOverflowMode.wrap,
+            ),
             primaryXAxis: DateTimeAxis(
               dateFormat: DateFormat('dd/MM'),
             ),
             primaryYAxis: NumericAxis(),
             series: <CartesianSeries>[
-              // Đường biểu diễn cân nặng thực tế
+              // Đường biểu diễn cân nặng thực tế với chú thích
               LineSeries<WeightData, DateTime>(
+                name: 'Cân nặng thực tế', // Chú thích cho biểu đồ này
                 dataSource: weightChartData,
                 xValueMapper: (WeightData data, _) => data.date,
                 yValueMapper: (WeightData data, _) => data.weight,
                 markerSettings: const MarkerSettings(isVisible: true),
                 color: Colors.blue,
               ),
-              // Đường biểu diễn trọng lượng mục tiêu
+              // Đường biểu diễn trọng lượng mục tiêu với chú thích
               LineSeries<WeightData, DateTime>(
+                name: 'Cân nặng mục tiêu', // Chú thích cho biểu đồ này
                 dataSource: targetSeriesData,
                 xValueMapper: (WeightData data, _) => data.date,
                 yValueMapper: (WeightData data, _) => data.weight,
