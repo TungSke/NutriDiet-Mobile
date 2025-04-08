@@ -673,7 +673,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget> {
                                         fontWeight: FontWeight.normal,
                                       )),
                                   Text(
-                                    "${_model.targetWeight} kg",
+                                    "${_model.targetWeight} ",
                                     style: GoogleFonts.roboto(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,

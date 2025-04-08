@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:diet_plan_app/components/activity_component_model.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_animations.dart';
 import 'package:diet_plan_app/services/health_service.dart';
@@ -9,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart'; // Để format ngày tháng
 import 'package:percent_indicator/circular_percent_indicator.dart';
+
 import '../flutter_flow/flutter_flow_model.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../services/user_service.dart';
@@ -649,6 +651,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   void _showBottomSheet(BuildContext context) async {
     double currentWeight = _model.weight;
     double currentHeight = _model.height;
+
     String currentActivityLevel = _model.activityLevel;
     List<int> currentAllergies = _model.allergies;
     List<int> currentDiseases = _model.diseases;
@@ -710,6 +713,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                   ElevatedButton(
                     onPressed: () async {
                       _model.weight = currentWeight;
+
                       await _model.updateHealthProfile(context);
                       await _model.fetchHealthProfile();
                       if (mounted) {

@@ -262,9 +262,9 @@ class UserService {
 
           height ??= double.tryParse(healthProfile['height']?.toString() ?? '');
           weight ??= double.tryParse(healthProfile['weight']?.toString() ?? '');
-          activityLevel ??= healthProfile['activityLevel']?.toString();
-          aisuggestion ??= healthProfile['aisuggestion']?.toString();
-          dietStyle ??= healthProfile['dietStyle']?.toString();
+          activityLevel ??= healthProfile['activityLevel'] ?? "";
+          aisuggestion ??= healthProfile['aisuggestion'] ?? '';
+          dietStyle ??= healthProfile['dietStyle'] ?? '';
           allergies ??= (healthProfile['allergies'] as List?)
                   ?.map((e) => int.tryParse(e['allergyId'].toString()) ?? 0)
                   .where((e) => e > 0)

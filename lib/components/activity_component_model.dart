@@ -29,6 +29,8 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
   double targetWeight = 0; // ✅ Cân nặng mục tiêu
   String weightChangeRate = '';
   int progressPercentage = 0;
+  String aisuggestion = '';
+  String dietStyle = '';
   final Map<String, String> _goalTypeMap = {
     'LoseWeight': 'Giảm cân',
     'Maintain': 'Giữ cân',
@@ -51,12 +53,26 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
     'VeryActive': 'vận động nhiều',
     'ExtraActive': 'Cường độ rất cao',
   };
+  final Map<String, String> _dietStyleMap = {
+    'HighCarbLowProtein': 'Nhiều Carb, giảm Protein',
+    'HighProteinLowCarb': 'Nhiều Protein, giảm Carb',
+    'Vegetarian': 'Ăn chay',
+    'Vegan': 'Thuần chay',
+    'Balanced': 'Cân bằng',
+  };
   final Map<String, String> _reverseActivityLevelMap = {
     'Sedentary': 'Ít vận động',
     'LightlyActive': 'Vận động nhẹ',
     'ModeratelyActive': 'Vận động vừa phải',
     'VeryActive': 'Vận động nhiều',
     'ExtraActive': 'Cường độ rất cao',
+  };
+  final Map<String, String> _reverseDietStyleMap = {
+    'HighCarbLowProtein': 'Nhiều Carb, giảm Protein',
+    'HighProteinLowCarb': 'Nhiều Protein, giảm Carb',
+    'Vegetarian': 'Ăn chay',
+    'Vegan': 'Thuần chay',
+    'Balanced': 'Cân bằng',
   };
 
   final Map<int, String> _weightChangeRateMap = {
@@ -129,9 +145,9 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
         weight = data["weight"] != null
             ? double.parse(data['weight'].toString())
             : 0.0;
-        activityLevel =
-            _reverseActivityLevelMap[data["activityLevel"]] ?? "N/A";
-
+        activityLevel = data["activityLevel"] ?? "";
+        aisuggestion = data['aisuggestion'] ?? " Chưa có lời khuyên ";
+        dietStyle = data["dietStyle"] ?? "";
         // Lấy danh sách dị ứng
         allergies = (data['allergies'] as List?)
                 ?.map((e) => int.tryParse(e['allergyId'].toString()) ?? 0)
@@ -173,15 +189,17 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
       final currentAllergies = allergies.isNotEmpty ? allergies : [];
       final currentDiseases = diseases.isNotEmpty ? diseases : [];
 
-      // Đảm bảo gửi đúng giá trị activityLevel
-      final activityLevelInEnglish =
-          _activityLevelMap[activityLevel] ?? 'Sedentary';
-
+      // // Đảm bảo gửi đúng giá trị activityLevel
+      // final activityLevelInEnglish = _activityLevelMap[activityLevel] ?? '';
+      // final dietStyleInEnglish = _dietStyleMap[dietStyle] ?? '';
       // Gửi yêu cầu cập nhật hồ sơ sức khỏe
       final response = await _userService.updateHealthProfile(
-        activityLevel: activityLevelInEnglish,
+        activityLevel: activityLevel,
         weight: weight,
         height: height,
+        dietStyle: dietStyle,
+        aisuggestion: aisuggestion,
+
         allergies: currentAllergies, // Gửi lại allergies hiện tại
         diseases: currentDiseases, // Gửi lại diseases hiện tại
       );

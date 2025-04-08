@@ -247,11 +247,11 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
     'Giữ cân': 'Maintain',
     'Tăng cân': 'GainWeight',
   };
-  int dailyCalories = 0;
-  int dailyCarb = 0;
+  double dailyCalories = 0;
+  double dailyCarb = 0;
   String avatar = '';
-  int dailyFat = 0;
-  int dailyProtein = 0;
+  double dailyFat = 0;
+  double dailyProtein = 0;
   String goalType = ''; // Mục tiêu
   double targetWeight = 0.0; // Cân nặng mục tiêu (thay đổi kiểu thành double)
   String weightChangeRate = ''; // Mức độ thay đổi cân nặng
@@ -340,6 +340,7 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
         weightChangeRate = _reverseWeightChangeRateMap[personalData['data']
                 ['weightChangeRate']] ??
             "Chưa cập nhật";
+        print("Weight Change Rate: $weightChangeRate");
 
         isLoading = false;
         notifyListeners();
