@@ -468,10 +468,6 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
                       const SizedBox(height: 12),
                       _buildNutrientProgress(),
                       const SizedBox(height: 12),
-                      Text(
-                        "Total: ${_model.getNutrientTotalsForDay(selectedDay)['calories']!.toStringAsFixed(0)} kcal",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
                       const SizedBox(height: 12),
                       Expanded(
                         child: ListView.builder(
@@ -589,17 +585,39 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
 
   Widget _buildNutrientProgress() {
     final nutrients = _model.getNutrientTotalsForDay(selectedDay);
+    final totalCalories = nutrients['calories']!;
     final carbs = nutrients['carbs']!;
     final protein = nutrients['protein']!;
     final fat = nutrients['fat']!;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildNutrientDisplay("Carbs", carbs.toStringAsFixed(0), "g"),
-        _buildNutrientDisplay("Protein", protein.toStringAsFixed(0), "g"),
-        _buildNutrientDisplay("Fat", fat.toStringAsFixed(0), "g"),
-      ],
+    return Container(
+      width: double.infinity, // Đảm bảo Row chiếm toàn bộ chiều rộng màn hình
+      padding: const EdgeInsets.symmetric(horizontal: 8), // Thêm padding ngang để tránh sát mép
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Phân bố đều các phần tử
+        children: [
+          _buildNutrientDisplay(
+            "Calories",
+            totalCalories.toStringAsFixed(0), // Chỉ hiển thị giá trị hiện tại, không có mục tiêu
+            "kcal",
+          ),
+          _buildNutrientDisplay(
+            "Carbs",
+            carbs.toStringAsFixed(0),
+            "g",
+          ),
+          _buildNutrientDisplay(
+            "Protein",
+            protein.toStringAsFixed(0),
+            "g",
+          ),
+          _buildNutrientDisplay(
+            "Fat",
+            fat.toStringAsFixed(0),
+            "g",
+          ),
+        ],
+      ),
     );
   }
 
@@ -617,17 +635,21 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14, // Giảm font size để đảm bảo hiển thị đầy đủ
                 fontWeight: FontWeight.bold,
                 color: FlutterFlowTheme.of(context).primary,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              maxLines: 2, // Cho phép xuống dòng nếu giá trị dài
+              overflow: TextOverflow.visible, // Đảm bảo không bị cắt
             ),
           ),
         ),
         const SizedBox(height: 4),
-        Text("$label ($unit)", style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          "$label ($unit)",
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        ),
       ],
     );
   }

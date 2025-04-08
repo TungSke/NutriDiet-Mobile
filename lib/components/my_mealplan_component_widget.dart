@@ -287,7 +287,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header (với hiệu ứng Fade & Slide)
             FadeTransition(
               opacity: _headerFadeAnimation,
               child: SlideTransition(
@@ -297,8 +296,8 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        theme.primary,
-                        theme.secondary,
+                        theme.primary.withOpacity(0.9),
+                        theme.tertiary.withOpacity(0.7),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -307,6 +306,13 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                       bottomLeft: Radius.circular(16.0),
                       bottomRight: Radius.circular(16.0),
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   padding: EdgeInsets.only(
                     left: 20.0,
@@ -314,19 +320,27 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                     top: MediaQuery.of(context).padding.top + 16.0,
                     bottom: 16.0,
                   ),
+                  child: Center(
                   child: Text(
                     "Quản lý thực đơn",
                     style: theme.titleLarge.copyWith(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.3),
+                          offset: const Offset(1, 1),
+                          blurRadius: 2,
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
+            ),
             const SizedBox(height: 16),
-            // Search Field & Filter Button (với Scale animation)
             ScaleTransition(
               scale: _buttonScaleAnimation,
               child: Row(
@@ -365,7 +379,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
               ),
             ),
             const SizedBox(height: 16),
-            // Row các nút lớn (với Scale animation)
             ScaleTransition(
               scale: _buttonScaleAnimation,
               child: Row(
@@ -382,7 +395,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
               ),
             ),
             const SizedBox(height: 16),
-            // Nội dung danh sách Meal Plans (với Fade animation)
             Expanded(
               child: FadeTransition(
                 opacity: _contentFadeAnimation,
@@ -483,104 +495,143 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
   void _showDeleteConfirmation(MealPlan mealPlan) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: FlutterFlowTheme.of(context).primary,
-        title:
-            const Text('Xác nhận xóa', style: TextStyle(color: Colors.white)),
-        content: Text(
-          'Bạn có chắc muốn xóa "${mealPlan.planName}" không?',
-          style: const TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy', style: TextStyle(color: Colors.white)),
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return ScaleTransition(
+          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
           ),
-          TextButton(
-            onPressed: () async {
-              debugPrint('Xóa meal plan: ${mealPlan.planName}');
-              Navigator.pop(context);
-              final success = await _model.deleteMealPlan(mealPlan.mealPlanId!);
-              if (mounted) {
-                if (success) {
-                  scaffoldMessenger.showSnackBar(
-                    const SnackBar(content: Text('Xóa Meal Plan thành công')),
-                  );
-                } else {
-                  scaffoldMessenger.showSnackBar(
-                    const SnackBar(content: Text('Lỗi khi xóa Meal Plan')),
-                  );
-                }
-              }
-            },
-            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 8,
+            title: const Text(
+              'Xác nhận xóa',
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Text(
+              'Bạn có chắc muốn xóa "${mealPlan.planName}" không?',
+              style: const TextStyle(fontSize: 16, color: Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Hủy',
+                  style: TextStyle(
+                    color: FlutterFlowTheme.of(context).primary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  final success = await _model.deleteMealPlan(mealPlan.mealPlanId!);
+                  if (mounted) {
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          success ? 'Xóa Meal Plan thành công' : 'Lỗi khi xóa Meal Plan',
+                        ),
+                        backgroundColor: success ? Colors.green : Colors.red,
+                      ),
+                    );
+                  }
+                },
+                child: const Text(
+                  'Xóa',
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   void _showFilterDialog() {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.white, // Nền trắng
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return ScaleTransition(
+          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
           ),
-          title: Text(
-            "Lọc theo mục tiêu sức khỏe",
-            style: TextStyle(
-              color: FlutterFlowTheme.of(context).primary, // Chữ xanh
-              fontWeight: FontWeight.bold,
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Wrap(
-                spacing: 10,
-                children:
-                    ["Giảm cân", "Tăng cân", "Duy trì cân nặng"].map((goal) {
-                  return ChoiceChip(
-                    label: Text(
-                      goal,
-                      style: TextStyle(
-                        color: FlutterFlowTheme.of(context).primary, // Chữ xanh
-                      ),
-                    ),
-                    selected: _model.selectedFilter == goal,
-                    onSelected: (selected) {
-                      _model.setFilter(selected ? goal : null);
-                      Navigator.pop(context);
-                    },
-                    backgroundColor: Colors.grey[200], // Nền chip nhạt
-                    selectedColor: FlutterFlowTheme.of(context)
-                        .primary
-                        .withOpacity(0.1), // Khi chọn: nền xanh nhạt
-                    side: BorderSide(
-                      color: FlutterFlowTheme.of(context).primary, // Viền xanh
-                    ),
-                  );
-                }).toList(),
+            elevation: 8,
+            title: Text(
+              "Lọc theo mục tiêu sức khỏe",
+              style: TextStyle(
+                color: FlutterFlowTheme.of(context).primary,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: ["Giảm cân", "Tăng cân", "Duy trì cân nặng"].map((goal) {
+                      return ChoiceChip(
+                        label: Text(goal, style: const TextStyle(fontSize: 16)),
+                        selected: _model.selectedFilter == goal,
+                        onSelected: (selected) {
+                          _model.setFilter(selected ? goal : null);
+                          Navigator.pop(context);
+                        },
+                        backgroundColor: Colors.grey[100],
+                        selectedColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),
+                        labelStyle: TextStyle(
+                          color: _model.selectedFilter == goal ? FlutterFlowTheme.of(context).primary : Colors.black87,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: FlutterFlowTheme.of(context).primary.withOpacity(0.5)),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  "Đóng",
+                  style: TextStyle(
+                    color: FlutterFlowTheme.of(context).primary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                "Đóng",
-                style: TextStyle(
-                  color: FlutterFlowTheme.of(context).primary, // Chữ xanh
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
         );
       },
     );
