@@ -761,7 +761,7 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                       ),
                                     ),
                                     Text(
-                                      "${_model.weightChangeRate} kg",
+                                      "${_model.weightChangeRate} ",
                                       style: GoogleFonts.lato(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
