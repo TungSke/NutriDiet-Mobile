@@ -349,26 +349,46 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Đã hoàn thành ",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: FlutterFlowTheme.of(context).primary,
-                            ),
+                          // Row hiển thị thông tin phần trăm hoàn thành
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Đã hoàn thành",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                ),
+                              ),
+                              Text(
+                                "${_model.progressPercentage}/100 %",
+                                style: TextStyle(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            "${_model.progressPercentage}/100 %",
-                            style: TextStyle(
+                          const SizedBox(
+                              height:
+                                  8), // Khoảng cách giữa text và progress bar
+                          // Progress bar trực quan
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: LinearProgressIndicator(
+                              value: _model.progressPercentage /
+                                  100.0, // Giá trị từ 0.0 đến 1.0
+                              minHeight: 10,
+                              backgroundColor: Colors.grey.shade300,
                               color: FlutterFlowTheme.of(context).primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -432,7 +452,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             animateFromLastPercent: true,
                             progressColor: FlutterFlowTheme.of(context).primary,
                             backgroundColor:
-                                FlutterFlowTheme.of(context).primary,
+                                const Color.fromRGBO(204, 129, 17, 1),
                             center: Text(
                               _model.bmi,
                               style: FlutterFlowTheme.of(context)
@@ -447,7 +467,6 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             ),
                           ),
                         ),
-                        const Text("Chỉ số cơ thể"),
                       ],
                     ),
                     Column(
@@ -470,7 +489,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             animateFromLastPercent: true,
                             progressColor: FlutterFlowTheme.of(context).primary,
                             backgroundColor:
-                                FlutterFlowTheme.of(context).primary,
+                                const Color.fromARGB(255, 4, 142, 135),
                             center: Text(
                               _model.tdee,
                               style: FlutterFlowTheme.of(context)
@@ -485,15 +504,13 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             ),
                           ),
                         ),
-                        const Text("Năng lượng cần tiêu thụ"),
                       ],
                     ),
                   ],
                 ),
 
-                // ----------- PHẦN LỊCH SỬ CÂN NẶNG -----------
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(25, 10, 25, 25),
+                  padding: const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 25),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
