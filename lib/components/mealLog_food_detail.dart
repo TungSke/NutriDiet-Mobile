@@ -149,7 +149,6 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
             const SizedBox(height: 24),
             _buildAddToMultipleDays(),
             const SizedBox(height: 24),
-            // === Pie Chart với màu của bạn ===
             SizedBox(
               height: 200,
               child: Stack(
