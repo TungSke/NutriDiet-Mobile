@@ -25,11 +25,21 @@ class HealthService {
       print("goalResponse: ${goalResponse.body}");
 
       final healthData =
-          json.decode(healthResponse.body)['data'] as Map<String, dynamic>;
+          json.decode(healthResponse.body)['data'] as Map<String, dynamic>?;
       final personalGoal =
-          json.decode(goalResponse.body)['data'] as Map<String, dynamic>;
+          json.decode(goalResponse.body)['data'] as Map<String, dynamic>?;
 
-      // Lọc chỉ số BMI & TDEE
+      // Kiểm tra dữ liệu trả về
+      if (healthData == null) {
+        print("❌ Dữ liệu sức khỏe không hợp lệ.");
+        return {
+          "healthData": null,
+          "personalGoal": null,
+          "errorMessage": "Dữ liệu sức khỏe không hợp lệ",
+        };
+      }
+
+      // Xử lý dữ liệu BMI & TDEE
       final healthcareIndicators = healthData["healthcareIndicators"] ?? [];
 
       String? parseValue(String? value) {
@@ -37,7 +47,6 @@ class HealthService {
         return double.parse(value).toStringAsFixed(2);
       }
 
-      // Tìm kiếm các chỉ số BMI và TDEE
       final bmiIndicator = healthcareIndicators.firstWhere(
         (indicator) => indicator["code"] == "BMI",
         orElse: () => null,
@@ -48,17 +57,16 @@ class HealthService {
         orElse: () => null,
       );
 
-      // Cập nhật lại healthData với BMI & TDEE (làm tròn 2 chữ số)
+      // Trả về dữ liệu hợp lệ với các giá trị BMI & TDEE
       return {
         "healthData": {
           ...healthData,
-          // Cập nhật giá trị BMI, BMIType và TDEE nếu có
           "BMI": parseValue(bmiIndicator?["currentValue"]) ?? "N/A",
-          "BMIType":
-              bmiIndicator?["type"] ?? "N/A", // Bổ sung phần kiểm tra BMIType
+          "BMIType": bmiIndicator?["type"] ?? "N/A",
           "TDEE": parseValue(tdeeIndicator?["currentValue"]) ?? "N/A",
         },
-        "personalGoal": personalGoal,
+        "personalGoal": personalGoal ??
+            {}, // Nếu personalGoal là null, trả về một đối tượng rỗng
         "errorMessage": "",
       };
     } catch (e) {
