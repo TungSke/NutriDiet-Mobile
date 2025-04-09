@@ -229,41 +229,44 @@ class _IngredientAvoidScreenWidgetState
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                      child: Expanded(
-                                                          child: Text(
-                                                              "Tránh ăn:"))),
-                                                  ..._model.allergies
-                                                      .map((allergy) {
-                                                    if (allergy.contains(':')) {
-                                                      String ingredients =
-                                                          allergy.split(':')[1];
-                                                      if (ingredients
-                                                          .isNotEmpty) {
-                                                        return Text(
-                                                            "$ingredients");
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("Tránh ăn:"),
+                                                    ..._model.allergies
+                                                        .map((allergy) {
+                                                      if (allergy
+                                                          .contains(':')) {
+                                                        String ingredients =
+                                                            allergy
+                                                                .split(':')[1];
+                                                        if (ingredients
+                                                            .isNotEmpty) {
+                                                          return Text(
+                                                              "$ingredients");
+                                                        }
                                                       }
-                                                    }
-                                                    return SizedBox();
-                                                  }).toList(),
-                                                  ..._model.diseases
-                                                      .map((disease) {
-                                                    if (disease.contains(':')) {
-                                                      String ingredients =
-                                                          disease.split(':')[1];
-                                                      if (ingredients
-                                                          .isNotEmpty) {
-                                                        return Text(
-                                                            "$ingredients");
+                                                      return SizedBox();
+                                                    }).toList(),
+                                                    ..._model.diseases
+                                                        .map((disease) {
+                                                      if (disease
+                                                          .contains(':')) {
+                                                        String ingredients =
+                                                            disease
+                                                                .split(':')[1];
+                                                        if (ingredients
+                                                            .isNotEmpty) {
+                                                          return Text(
+                                                              "$ingredients");
+                                                        }
                                                       }
-                                                    }
-                                                    return SizedBox();
-                                                  }).toList(),
-                                                ],
+                                                      return SizedBox();
+                                                    }).toList(),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
