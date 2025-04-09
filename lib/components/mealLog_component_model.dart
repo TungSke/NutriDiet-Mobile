@@ -291,6 +291,34 @@ class MealLogComponentModel extends FlutterFlowModel {
     }
   }
 
+  Future<void> cloneMealLogEntry({
+    required DateTime sourceDate,
+  }) async {
+    try {
+      final service = MeallogService();
+      // Format the source date from the parameter.
+      final String sourceDateString = DateFormat('yyyy-M-d').format(sourceDate);
+      // Use the model's selectedDate as target date.
+      final String targetDateString =
+          DateFormat('yyyy-M-d').format(selectedDate);
+
+      final bool success = await service.cloneMealLog(
+        sourceDate: sourceDateString,
+        targetDate: targetDateString,
+      );
+
+      if (success) {
+        debugPrint('Clone Meal Log successful');
+        // Optionally, refresh your meal logs to reflect the cloned data.
+        await fetchMealLogs();
+      } else {
+        debugPrint('Clone Meal Log failed');
+      }
+    } catch (e) {
+      debugPrint('Error in cloneMealLogEntry: $e');
+    }
+  }
+
   void changeDate(DateTime newDate) {
     selectedDate = newDate;
     mealLogs = [];
