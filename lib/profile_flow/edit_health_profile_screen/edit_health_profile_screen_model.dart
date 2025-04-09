@@ -267,6 +267,61 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
     }
   }
 
+  //
+  // Future<void> fetchHealthProfile() async {
+  //   try {
+  //     final response = await _userService.getHealthProfile();
+  //
+  //     if (response.statusCode == 200) {
+  //       final healthData = jsonDecode(response.body);
+  //
+  //       // Parse height and weight as double with null check
+  //       height = healthData['data']['height'] != null
+  //           ? double.tryParse(healthData['data']['height'].toString()) ?? 0.0
+  //           : 0.0;
+  //       weight = healthData['data']['weight'] != null
+  //           ? double.tryParse(healthData['data']['weight'].toString()) ?? 0.0
+  //           : 0.0;
+  //       aisuggestion = healthData['data']['aisuggestion'] ?? "Chưa cập nhật";
+  //       activityLevel =
+  //           _reverseActivityLevelMap[healthData['data']['activityLevel']] ??
+  //               "Chưa cập nhật";
+  //       dietStyle = _reverseDietStyleMap[healthData['data']['dietStyle']] ??
+  //           "Chưa cập nhật";
+  //       // Cập nhật tên dị ứng
+  //       allergies = healthData['data']["allergies"] != null
+  //           ? (healthData['data']["allergies"] as List)
+  //               .map((allergy) => allergy["allergyName"].toString())
+  //               .toList()
+  //           : [];
+  //
+  //       selectedAllergyIds = healthData['data']["allergies"] != null
+  //           ? (healthData['data']["allergies"] as List)
+  //               .map((allergy) => int.parse(allergy["allergyId"].toString()))
+  //               .toList()
+  //           : [];
+  //
+  //       diseases = healthData['data']["diseases"] != null
+  //           ? (healthData['data']["diseases"] as List)
+  //               .map((disease) => disease["diseaseName"].toString())
+  //               .toList()
+  //           : [];
+  //
+  //       selectedDiseaseIds = healthData['data']["diseases"] != null
+  //           ? (healthData['data']["diseases"] as List)
+  //               .map((disease) => int.parse(disease["diseaseId"].toString()))
+  //               .toList()
+  //           : [];
+  //
+  //       isLoading = false;
+  //       notifyListeners();
+  //     }
+  //   } catch (e) {
+  //     print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+  //     isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
   Future<void> fetchHealthProfile() async {
     try {
       final response = await _userService.getHealthProfile();
@@ -274,7 +329,15 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         final healthData = jsonDecode(response.body);
 
-        // Parse height and weight as double with null check
+        // Kiểm tra nếu dữ liệu trả về là null hoặc không có trường 'data'
+        if (healthData == null || healthData['data'] == null) {
+          print("❌ Dữ liệu trả về là null hoặc không hợp lệ.");
+          isLoading = false;
+          notifyListeners();
+          return;
+        }
+
+        // Giải mã và xử lý dữ liệu nếu hợp lệ
         height = healthData['data']['height'] != null
             ? double.tryParse(healthData['data']['height'].toString()) ?? 0.0
             : 0.0;
@@ -287,13 +350,12 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
                 "Chưa cập nhật";
         dietStyle = _reverseDietStyleMap[healthData['data']['dietStyle']] ??
             "Chưa cập nhật";
-        // Cập nhật tên dị ứng
+
         allergies = healthData['data']["allergies"] != null
             ? (healthData['data']["allergies"] as List)
                 .map((allergy) => allergy["allergyName"].toString())
                 .toList()
             : [];
-
         selectedAllergyIds = healthData['data']["allergies"] != null
             ? (healthData['data']["allergies"] as List)
                 .map((allergy) => int.parse(allergy["allergyId"].toString()))
@@ -305,7 +367,6 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
                 .map((disease) => disease["diseaseName"].toString())
                 .toList()
             : [];
-
         selectedDiseaseIds = healthData['data']["diseases"] != null
             ? (healthData['data']["diseases"] as List)
                 .map((disease) => int.parse(disease["diseaseId"].toString()))
@@ -314,9 +375,13 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
 
         isLoading = false;
         notifyListeners();
+      } else {
+        print("❌ Lỗi khi lấy hồ sơ sức khỏe, mã lỗi: ${response.statusCode}");
+        isLoading = false;
+        notifyListeners();
       }
     } catch (e) {
-      print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+      print("❌ Lỗi khi lấy thông tin sức khỏe: $e");
       isLoading = false;
       notifyListeners();
     }
