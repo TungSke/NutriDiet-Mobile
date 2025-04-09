@@ -902,6 +902,57 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   color: Colors.grey,
                 ),
               ),
+              trailing: (details[i].imageUrl != null &&
+                      details[i].imageUrl!.isNotEmpty)
+                  ? GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              insetPadding: EdgeInsets.zero,
+                              backgroundColor: Colors.black,
+                              child: Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: InteractiveViewer(
+                                      child: Center(
+                                        child: Image.network(
+                                          details[i].imageUrl!,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 30,
+                                    right: 30,
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(details[i].imageUrl!),
+                        backgroundColor: Colors.transparent,
+                      ),
+                    )
+                  : null,
             ),
           ),
           if (i < details.length - 1)
