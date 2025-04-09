@@ -92,8 +92,8 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [
-                        Color.fromARGB(255, 42, 212, 107),
-                        Color.fromARGB(255, 186, 57, 57),
+                        Color(0xFF04B155),
+                        Color(0xFF2ED47A),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,

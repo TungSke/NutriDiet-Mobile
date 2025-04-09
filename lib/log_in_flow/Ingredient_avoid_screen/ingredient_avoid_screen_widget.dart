@@ -339,11 +339,15 @@ class _IngredientAvoidScreenWidgetState
                     top: 40,
                     right: 20,
                     child: ClipOval(
-                      child: FloatingActionButton(
-                        onPressed: () =>
-                            context.pushNamed('bottom_navbar_screen'),
-                        backgroundColor: Colors.white.withOpacity(0.7),
-                        child: const Icon(Icons.close, color: Colors.black),
+                      child: Material(
+                        color: Colors.white.withOpacity(0.7), // nền tròn mờ
+                        child: InkWell(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(Icons.close, color: Colors.black),
+                          ),
+                        ),
                       ),
                     ),
                   ),
