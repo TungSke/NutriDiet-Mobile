@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../flutter_flow/flutter_flow_theme.dart';
 import 'edit_personal_goal_screen_model.dart';
 
@@ -48,17 +49,17 @@ class _EditPersonalGoalScreenWidgetState
                 borderRadius: BorderRadius.circular(0.0),
                 child: _model.avatar.isNotEmpty
                     ? Image.network(
-                  _model.avatar,
-                  width: 80.0,
-                  height: 80.0,
-                  fit: BoxFit.cover,
-                )
+                        _model.avatar,
+                        width: 80.0,
+                        height: 80.0,
+                        fit: BoxFit.cover,
+                      )
                     : Image.asset(
-                  'assets/images/dummy_profile.png',
-                  width: 80.0,
-                  height: 80.0,
-                  fit: BoxFit.cover,
-                ),
+                        'assets/images/dummy_profile.png',
+                        width: 80.0,
+                        height: 80.0,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             SizedBox(
@@ -110,14 +111,14 @@ class _EditPersonalGoalScreenWidgetState
           InkWell(
             onTap: isEdited && canUpdate
                 ? () async {
-              // Kiểm tra validation trước khi gửi API
-              if (_formKey.currentState?.validate() ?? false) {
-                await _model.updatePersonalGoal(context);
-                setState(() {
-                  isEdited = false;
-                });
-              }
-            }
+                    // Kiểm tra validation trước khi gửi API
+                    if (_formKey.currentState?.validate() ?? false) {
+                      await _model.updatePersonalGoal(context);
+                      setState(() {
+                        isEdited = false;
+                      });
+                    }
+                  }
                 : null,
             child: Icon(
               Icons.check,
@@ -145,7 +146,7 @@ class _EditPersonalGoalScreenWidgetState
               'Mục tiêu',
               _model.goalType,
               ['Giữ cân', 'Tăng cân', 'Giảm cân'],
-                  (val) {
+              (val) {
                 setState(() {
                   _model.goalType = val;
                   isEdited = true;
@@ -172,7 +173,7 @@ class _EditPersonalGoalScreenWidgetState
                   'Giảm 0.75Kg/1 tuần',
                   'Giảm 1Kg/1 tuần'
                 ],
-                    (val) {
+                (val) {
                   setState(() {
                     _model.weightChangeRate = val;
                     isEdited = true;
@@ -194,7 +195,8 @@ class _EditPersonalGoalScreenWidgetState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           InkWell(
             onTap: () =>
                 _showCupertinoPicker(title, options, value, onSelected),
@@ -202,7 +204,8 @@ class _EditPersonalGoalScreenWidgetState
               children: [
                 Text(value, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                const Icon(Icons.arrow_forward_ios,
+                    size: 16, color: Colors.grey),
               ],
             ),
           ),
@@ -219,7 +222,8 @@ class _EditPersonalGoalScreenWidgetState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           InkWell(
             onTap: () =>
                 _showCupertinoPicker(title, options, value, onSelected),
@@ -227,7 +231,8 @@ class _EditPersonalGoalScreenWidgetState
               children: [
                 Text(value, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                const Icon(Icons.arrow_forward_ios,
+                    size: 16, color: Colors.grey),
               ],
             ),
           ),
@@ -240,50 +245,54 @@ class _EditPersonalGoalScreenWidgetState
       String title, double value, Function(String) onChanged) {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    title,
-    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-    ),
-    SizedBox(
-    width: 150,
-    child: TextFormField(
-    initialValue: value.toString(),
-    textAlign: TextAlign.end,
-    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-    decoration: const InputDecoration(
-    border: InputBorder.none,
-    hintText: 'Nhập cân nặng (kg)',
-    errorStyle: TextStyle(
-    color: Colors.red,
-    fontSize: 12,
-    height: 1.2, // Điều chỉnh chiều cao dòng để tránh cắt xén
-    ),
-    errorMaxLines: 2,
-    contentPadding: EdgeInsets.symmetric(vertical: 10), // Thêm padding
-    ),
-    validator: (val) {
-    if (val == null || val.isEmpty) {
-    return 'Vui lòng nhập mục tiêu cân nặng';
-    }
-    final targetWeight = double.tryParse(val);
-    if (targetWeight == null || targetWeight < 30 || targetWeight > 250) {
-    return 'Mục tiêu cân nặng phải từ 30-250 kg';
-    }
-    return null;
-    },
-    onChanged: (val) {
-    onChanged(val);
-    _formKey.currentState?.validate(); // Kích hoạt validation ngay lập tức
-    },
-    ),
-    ),
-    ],
-    )
-    );
-    }
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            SizedBox(
+              width: 150,
+              child: TextFormField(
+                initialValue: value.toString(),
+                textAlign: TextAlign.end,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Nhập cân nặng (kg)',
+                  errorStyle: TextStyle(
+                    color: Colors.red,
+                    fontSize: 12,
+                    height: 1.2, // Điều chỉnh chiều cao dòng để tránh cắt xén
+                  ),
+                  errorMaxLines: 2,
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10), // Thêm padding
+                ),
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return 'Vui lòng nhập mục tiêu cân nặng';
+                  }
+                  final targetWeight = double.tryParse(val);
+                  if (targetWeight == null ||
+                      targetWeight < 30 ||
+                      targetWeight > 250) {
+                    return 'Mục tiêu cân nặng phải từ 30-250 kg';
+                  }
+                  return null;
+                },
+                onChanged: (val) {
+                  onChanged(val);
+                  _formKey.currentState
+                      ?.validate(); // Kích hoạt validation ngay lập tức
+                },
+              ),
+            ),
+          ],
+        ));
+  }
 
   void _showCupertinoPicker(String title, List<String> options,
       String currentValue, Function(String) onSelected) {
@@ -305,18 +314,19 @@ class _EditPersonalGoalScreenWidgetState
           children: [
             const SizedBox(height: 16),
             Text(title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Expanded(
               child: CupertinoPicker(
                 scrollController:
-                FixedExtentScrollController(initialItem: selectedIndex),
+                    FixedExtentScrollController(initialItem: selectedIndex),
                 itemExtent: 40,
                 onSelectedItemChanged: (index) {
                   _tempSelectedValue = options[index];
                 },
                 children: options
-                    .map((e) =>
-                    Center(child: Text(e, style: const TextStyle(fontSize: 16))))
+                    .map((e) => Center(
+                        child: Text(e, style: const TextStyle(fontSize: 16))))
                     .toList(),
               ),
             ),

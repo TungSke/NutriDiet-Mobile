@@ -244,23 +244,27 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
     final personalGoalProvider = context.read<PersonalGoalProvider>();
 
     if (personalGoalProvider.goalType == "LoseWeight") {
-      // Nếu chọn mục tiêu giảm cân, hiển thị các giá trị từ lớn về bé
-      kgOptionsIntLeft = List.generate(currentWeight.toInt() - 30,
-          (index) => currentWeight.toInt() - index); // Tạo danh sách giảm dần
-    } else if (personalGoalProvider.goalType == "GainWeight") {
-      // Nếu chọn mục tiêu tăng cân, cho phép chọn từ currentWeight trở lên
+      // If the goal is to lose weight, the minimum weight should be 40kg.
       kgOptionsIntLeft = List.generate(
-          50,
-          (index) =>
-              currentWeight.toInt() + index); // Số nguyên bên trái cho tăng cân
+        (currentWeight.toInt() - 40) > 0 ? (currentWeight.toInt() - 40) : 0,
+        (index) => currentWeight.toInt() - index,
+      ); // Create the list from currentWeight down to 40kg (inclusive)
+    } else if (personalGoalProvider.goalType == "GainWeight") {
+      // If the goal is to gain weight, the maximum weight should be 220kg.
+      kgOptionsIntLeft = List.generate(
+        (220 - currentWeight.toInt()) > 0 ? (220 - currentWeight.toInt()) : 0,
+        (index) => currentWeight.toInt() + index,
+      ); // Create the list from currentWeight up to 220kg (inclusive)
     } else {
-      // Nếu giữ cân, cho phép chọn từ 30 đến currentWeight
-      kgOptionsIntLeft = List.generate(currentWeight.toInt() - 30,
-          (index) => 30 + index); // Cắt giới hạn tối thiểu là 30
+      // If the goal is to maintain weight, allow values from 40kg to currentWeight.
+      kgOptionsIntLeft = List.generate(
+        (currentWeight.toInt() - 40) > 0 ? (currentWeight.toInt() - 40) : 0,
+        (index) => 40 + index,
+      ); // Create the list from 40kg up to currentWeight
     }
 
     kgOptionsIntRight = List.generate(
-        10, (index) => index); // Số nguyên từ 0 đến 9 cho bên phải
+        10, (index) => index); // Values from 0 to 9 for the right side.
 
     setState(() {});
   }
