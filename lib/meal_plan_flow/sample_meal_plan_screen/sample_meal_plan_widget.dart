@@ -19,6 +19,7 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
     Future.microtask(() => Provider.of<SampleMealPlanModel>(context, listen: false).fetchSampleMealPlans());
   }
 
+
   @override
   Widget build(BuildContext context) {
     final model = context.watch<SampleMealPlanModel>();
@@ -26,107 +27,113 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32, top: 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header giống "Quản lý thực đơn"
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.primary.withOpacity(0.9),
-                    theme.tertiary.withOpacity(0.7),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(16.0),
-                  bottomRight: Radius.circular(16.0),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header không bị giới hạn bởi Padding
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: theme.primary.withOpacity(0.9), // Chỉ dùng một màu xanh
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16.0),
+                bottomRight: Radius.circular(16.0),
               ),
-              padding: EdgeInsets.only(
-                left: 20.0,
-                right: 20.0,
-                top: MediaQuery.of(context).padding.top + 16.0,
-                bottom: 16.0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        "Thực đơn mẫu",
-                        style: theme.titleLarge.copyWith(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black.withOpacity(0.3),
-                              offset: const Offset(1, 1),
-                              blurRadius: 2,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48), // Để cân đối với IconButton bên trái
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Tìm kiếm thực đơn...',
-                      hintStyle: theme.bodyMedium,
-                      prefixIcon: const Icon(Icons.search_sharp, color: Colors.grey),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      contentPadding: const EdgeInsets.all(16),
-                    ),
-                    onChanged: model.updateSearchQuery,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: const Icon(Icons.filter_list, color: Colors.grey, size: 28),
-                  onPressed: () => _showFilterDialog(context, model),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: model.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : model.filteredMealPlans.isEmpty
-                  ? const Center(child: Text("Không có thực đơn được tìm thấy", style: TextStyle(fontSize: 16)))
-                  : ListView.builder(
-                padding: const EdgeInsets.only(top: 8),
-                itemCount: model.filteredMealPlans.length,
-                itemBuilder: (context, index) => _buildMealPlanItem(context, model.filteredMealPlans[index]),
+            padding: EdgeInsets.only(
+              left: 20.0,
+              right: 20.0,
+              top: MediaQuery.of(context).padding.top + 16.0,
+              bottom: 16.0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      "Thực đơn mẫu",
+                      style: theme.titleLarge.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.3),
+                            offset: const Offset(1, 1),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 48), // Để cân đối với IconButton bên trái
+              ],
+            ),
+          ),
+          // Phần còn lại vẫn giữ Padding
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Tìm kiếm thực đơn...',
+                            hintStyle: theme.bodyMedium,
+                            prefixIcon:
+                            const Icon(Icons.search_sharp, color: Colors.grey),
+                            border:
+                            OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.all(16),
+                          ),
+                          onChanged: model.updateSearchQuery,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      IconButton(
+                        icon: const Icon(Icons.filter_list, color: Colors.grey, size: 28),
+                        onPressed: () => _showFilterDialog(context, model),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: model.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : model.filteredMealPlans.isEmpty
+                        ? const Center(
+                        child: Text("Không có thực đơn được tìm thấy",
+                            style: TextStyle(fontSize: 16)))
+                        : ListView.builder(
+                      padding: const EdgeInsets.only(top: 8),
+                      itemCount: model.filteredMealPlans.length,
+                      itemBuilder: (context, index) =>
+                          _buildMealPlanItem(context, model.filteredMealPlans[index]),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

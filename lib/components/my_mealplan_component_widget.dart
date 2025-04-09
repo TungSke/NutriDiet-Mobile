@@ -290,145 +290,147 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
     final theme = FlutterFlowTheme.of(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32, top: 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            FadeTransition(
-              opacity: _headerFadeAnimation,
-              child: SlideTransition(
-                position: _headerSlideAnimation,
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        theme.primary.withOpacity(0.9),
-                        theme.tertiary.withOpacity(0.7),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header không bị giới hạn bởi Padding
+          FadeTransition(
+            opacity: _headerFadeAnimation,
+            child: SlideTransition(
+              position: _headerSlideAnimation,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: theme.primary.withOpacity(0.9),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16.0),
+                    bottomRight: Radius.circular(16.0),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                padding: EdgeInsets.only(
+                  left: 20.0,
+                  right: 20.0,
+                  top: MediaQuery.of(context).padding.top + 16.0,
+                  bottom: 16.0,
+                ),
+                child: Center(
+                  child: Text(
+                    "Quản lý thực đơn",
+                    style: theme.titleLarge.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.3),
+                          offset: const Offset(1, 1),
+                          blurRadius: 2,
+                        ),
                       ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(16.0),
-                      bottomRight: Radius.circular(16.0),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  padding: EdgeInsets.only(
-                    left: 20.0,
-                    right: 20.0,
-                    top: MediaQuery.of(context).padding.top + 16.0,
-                    bottom: 16.0,
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Quản lý thực đơn",
-                      style: theme.titleLarge.copyWith(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withOpacity(0.3),
-                            offset: const Offset(1, 1),
-                            blurRadius: 2,
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            ScaleTransition(
-              scale: _buttonScaleAnimation,
-              child: Row(
+          ),
+          // Phần còn lại vẫn giữ Padding
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(color: Colors.black26, blurRadius: 4)
-                        ],
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Tìm kiếm thực đơn...',
-                          hintStyle: theme.bodyMedium,
-                          prefixIcon: const Icon(Icons.search_sharp,
-                              color: Colors.grey),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(16),
+                  const SizedBox(height: 16),
+                  ScaleTransition(
+                    scale: _buttonScaleAnimation,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black26, blurRadius: 4)
+                              ],
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Tìm kiếm thực đơn...',
+                                hintStyle: theme.bodyMedium,
+                                prefixIcon: const Icon(Icons.search_sharp,
+                                    color: Colors.grey),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.all(16),
+                              ),
+                              onChanged: (value) {
+                                _model.fetchMealPlans(searchQuery: value);
+                              },
+                            ),
+                          ),
                         ),
-                        onChanged: (value) {
-                          _model.fetchMealPlans(searchQuery: value);
+                        const SizedBox(width: 10),
+                        IconButton(
+                          icon: const Icon(Icons.filter_list,
+                              color: Colors.grey, size: 28),
+                          onPressed: () => _showFilterDialog(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ScaleTransition(
+                    scale: _buttonScaleAnimation,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                            child: _buildLargeButton(
+                                "Thực đơn mẫu", _navigateToSampleMealPlan)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                            child: _buildLargeButton(
+                                "Nhận thực đơn AI", _navigateToAIMealPlan)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: FadeTransition(
+                      opacity: _contentFadeAnimation,
+                      child: Builder(
+                        builder: (context) {
+                          if (_model.isLoading) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                          if (_model.mealPlans.isEmpty) {
+                            return const Center(
+                                child: Text("Không có thực đơn được tìm thấy"));
+                          }
+                          final filteredPlans = _model.getFilteredMealPlans();
+                          return ListView.builder(
+                            padding: const EdgeInsets.only(top: 8),
+                            itemCount: filteredPlans.length,
+                            itemBuilder: (context, index) {
+                              return _buildMealPlanItem(filteredPlans[index]);
+                            },
+                          );
                         },
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    icon: const Icon(Icons.filter_list,
-                        color: Colors.grey, size: 28),
-                    onPressed: () => _showFilterDialog(),
-                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            ScaleTransition(
-              scale: _buttonScaleAnimation,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      child: _buildLargeButton(
-                          "Thực đơn mẫu", _navigateToSampleMealPlan)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: _buildLargeButton(
-                          "Nhận thực đơn AI", _navigateToAIMealPlan)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: FadeTransition(
-                opacity: _contentFadeAnimation,
-                child: Builder(
-                  builder: (context) {
-                    if (_model.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (_model.mealPlans.isEmpty) {
-                      return const Center(
-                          child: Text("Không có thực đơn được tìm thấy"));
-                    }
-                    final filteredPlans = _model.getFilteredMealPlans();
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(top: 8),
-                      itemCount: filteredPlans.length,
-                      itemBuilder: (context, index) {
-                        return _buildMealPlanItem(filteredPlans[index]);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: theme.primary,

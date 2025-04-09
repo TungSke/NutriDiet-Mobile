@@ -380,14 +380,14 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Số điện thoại',
+                                      'Tuổi',
                                       style: GoogleFonts.lato(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
                                       ),
                                     ),
                                     Text(
-                                      _model.phoneNumber,
+                                      _model.age,
                                       style: GoogleFonts.lato(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
