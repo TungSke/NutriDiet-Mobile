@@ -486,13 +486,11 @@
 //   }
 // }
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
-
 import '../../flutter_flow/flutter_flow_theme.dart';
 import 'edit_health_profile_screen_model.dart';
 
@@ -509,24 +507,19 @@ class _EditHealthProfileScreenWidgetState
   late EditHealthProfileScreenModel _model;
   bool isEdited = false;
   String _tempSelectedValue = '';
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     _model = EditHealthProfileScreenModel();
 
-    // Debugging: Kiểm tra giá trị ban đầu của selectedAllergyIds
-    print('Selected Allergies at init: ${_model.selectedAllergyIds}');
-
     Future.delayed(Duration.zero, () async {
       await _model.fetchUserProfile();
       await _model.fetchHealthProfile();
-
       await _model.fetchAllergyLevelsData();
       await _model.fetchDiseaseLevelsData();
-      // Debugging: Kiểm tra giá trị sau khi fetch dữ liệu
-      print('Selected Allergies after fetch: ${_model.selectedAllergyIds}');
-      setState(() {}); // 🚀 Cập nhật UI ngay sau khi fetch dữ liệu
+      setState(() {});
     });
   }
 
@@ -546,19 +539,17 @@ class _EditHealthProfileScreenWidgetState
                 borderRadius: BorderRadius.circular(0.0),
                 child: _model.avatar.isNotEmpty
                     ? Image.network(
-                        // Nếu có avatar từ API, sử dụng Image.network
-                        _model.avatar,
-                        width: 80.0,
-                        height: 80.0,
-                        fit: BoxFit.cover,
-                      )
+                  _model.avatar,
+                  width: 80.0,
+                  height: 80.0,
+                  fit: BoxFit.cover,
+                )
                     : Image.asset(
-                        // Nếu không có avatar, sử dụng hình mặc định
-                        'assets/images/dummy_profile.png',
-                        width: 80.0,
-                        height: 80.0,
-                        fit: BoxFit.cover,
-                      ),
+                  'assets/images/dummy_profile.png',
+                  width: 80.0,
+                  height: 80.0,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             SizedBox(
@@ -587,7 +578,7 @@ class _EditHealthProfileScreenWidgetState
 
   Widget _buildHeader() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -597,27 +588,26 @@ class _EditHealthProfileScreenWidgetState
                 Navigator.pop(context);
               }
             },
-            child: Icon(Icons.arrow_back, size: 28),
+            child: const Icon(Icons.arrow_back, size: 28),
           ),
-          Text(
+          const Text(
             'Chỉnh sửa hồ sơ sức khỏe',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           InkWell(
-            onTap: isEdited // Điều kiện bật nút màu xanh khi có thay đổi
+            onTap: isEdited && (_formKey.currentState?.validate() ?? false)
                 ? () async {
-                    await _model
-                        .updateHealthProfile(context); // Pass context here
-                    setState(() {
-                      isEdited = false;
-                    });
-                  }
+              await _model.updateHealthProfile(context);
+              setState(() {
+                isEdited = false;
+              });
+            }
                 : null,
             child: Icon(
               Icons.check,
-              color: isEdited
+              color: isEdited && (_formKey.currentState?.validate() ?? false)
                   ? Colors.green
-                  : Colors.grey, // Nút check màu xanh khi có thay đổi
+                  : Colors.grey,
               size: 28,
             ),
           ),
@@ -626,118 +616,110 @@ class _EditHealthProfileScreenWidgetState
     );
   }
 
-  // Kiểm tra trạng thái "isEdited" khi có bất kỳ thay đổi nào
-  void _handleChange() {
-    setState(() {
-      isEdited = true;
-    });
-  }
-
-  Widget _buildProfilePhoto() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.grey[300],
-            backgroundImage: _model.avatar.isNotEmpty
-                ? FileImage(File(
-                    _model.avatar)) // Sử dụng FileImage thay vì NetworkImage
-                : null,
-            child: _model.avatar.isEmpty
-                ? Icon(Icons.person, size: 50, color: Colors.white)
-                : null,
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildLoadingIndicator() {
-    return Expanded(child: Center(child: CircularProgressIndicator()));
+    return const Expanded(child: Center(child: CircularProgressIndicator()));
   }
 
   Widget _buildProfileForm() {
     return Expanded(
-      child: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        children: [
-          _buildHeightRow('Chiều cao (cm)', _model.height.toString(), (val) {
-            setState(() {
-              _model.height = double.tryParse(val) ?? 0.0;
-              isEdited = true;
-            });
-          }),
-          _buildWeightRow('Cân nặng (kg)', _model.weight.toString(), (val) {
-            setState(() {
-              _model.weight = double.tryParse(val) ?? 0.0;
-              isEdited = true;
-            });
-          }),
-          _buildPickerRow(
-            'Tần suất vận động ',
-            _model.activityLevel,
-            [
-              'Ít vận động',
-              'Vận động nhẹ',
-              'Vận động vừa phải',
-              'Vận động nhiều',
-              'Cường độ rất cao'
-            ],
-            (val) {
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          children: [
+            _buildHeightRow('Chiều cao (cm)', _model.height.toString(), (val) {
               setState(() {
-                _model.activityLevel = val;
+                _model.height = double.tryParse(val) ?? 0.0;
                 isEdited = true;
               });
-            },
-          ),
-          _buildDietStylePickerRow(
-            'Chế độ ăn ',
-            _model.dietStyle,
-            [
-              'Nhiều Carb, giảm Protein',
-              'Nhiều Protein, giảm Carb',
-              'Ăn chay',
-              'Thuần chay',
-              'Cân bằng'
-            ],
-            (val) {
+            }),
+            _buildWeightRow('Cân nặng (kg)', _model.weight.toString(), (val) {
               setState(() {
-                _model.dietStyle = val;
+                _model.weight = double.tryParse(val) ?? 0.0;
                 isEdited = true;
               });
-            },
-          ),
-          _buildAllergySelector(_model.allergyLevelsData),
-          _buildDiseaseSelector(_model.diseaseLevelsData),
-        ],
+            }),
+            _buildPickerRow(
+              'Tần suất vận động ',
+              _model.activityLevel,
+              [
+                'Ít vận động',
+                'Vận động nhẹ',
+                'Vận động vừa phải',
+                'Vận động nhiều',
+                'Cường độ rất cao'
+              ],
+                  (val) {
+                setState(() {
+                  _model.activityLevel = val;
+                  isEdited = true;
+                });
+              },
+            ),
+            _buildDietStylePickerRow(
+              'Chế độ ăn ',
+              _model.dietStyle,
+              [
+                'Nhiều Carb, giảm Protein',
+                'Nhiều Protein, giảm Carb',
+                'Ăn chay',
+                'Thuần chay',
+                'Cân bằng'
+              ],
+                  (val) {
+                setState(() {
+                  _model.dietStyle = val;
+                  isEdited = true;
+                });
+              },
+            ),
+            _buildAllergySelector(_model.allergyLevelsData),
+            _buildDiseaseSelector(_model.diseaseLevelsData),
+          ],
+        ),
       ),
     );
   }
 
-  // 🟢 Ô nhập liệu cho chiều cao
   Widget _buildHeightRow(
       String title, String value, Function(String) onChanged) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           SizedBox(
             width: 150,
             child: TextFormField(
               initialValue: value,
               textAlign: TextAlign.end,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Nhập chiều cao (cm)',
+                errorStyle: TextStyle(
+                  color: Colors.red,
+                  fontSize: 12,
+                  height: 1.2,
+                ),
+                errorMaxLines: 2,
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
               ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return 'Vui lòng nhập chiều cao';
+                }
+                final height = double.tryParse(val);
+                if (height == null || height < 100 || height > 220) {
+                  return 'Chiều cao phải từ 100-220 cm';
+                }
+                return null;
+              },
               onChanged: (val) {
                 onChanged(val);
+                _formKey.currentState?.validate(); // Hiển thị lỗi ngay lập tức
               },
             ),
           ),
@@ -746,28 +728,45 @@ class _EditHealthProfileScreenWidgetState
     );
   }
 
-  // 🟢 Ô nhập liệu cho cân nặng
   Widget _buildWeightRow(
       String title, String value, Function(String) onChanged) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           SizedBox(
             width: 150,
             child: TextFormField(
               initialValue: value,
               textAlign: TextAlign.end,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Nhập cân nặng (kg)',
+                errorStyle: TextStyle(
+                  color: Colors.red,
+                  fontSize: 12,
+                  height: 1.2,
+                ),
+                errorMaxLines: 2,
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
               ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return 'Vui lòng nhập cân nặng';
+                }
+                final weight = double.tryParse(val);
+                if (weight == null || weight < 30 || weight > 250) {
+                  return 'Cân nặng phải từ 30-250 kg';
+                }
+                return null;
+              },
               onChanged: (val) {
                 onChanged(val);
+                _formKey.currentState?.validate(); // Hiển thị lỗi ngay lập tức
               },
             ),
           ),
@@ -778,11 +777,11 @@ class _EditHealthProfileScreenWidgetState
 
   Widget _buildAllergySelector(List<Map<String, dynamic>> allergies) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Dị ứng',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
@@ -810,8 +809,7 @@ class _EditHealthProfileScreenWidgetState
                   _model.allergies = selected.map((id) {
                     return allergies
                         .firstWhere((allergy) =>
-                            int.tryParse(allergy['id'].toString()) ==
-                            id)['title']
+                    int.tryParse(allergy['id'].toString()) == id)['title']
                         .toString();
                   }).toList();
                   isEdited = true;
@@ -819,7 +817,7 @@ class _EditHealthProfileScreenWidgetState
               }
             },
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.grey),
@@ -831,10 +829,10 @@ class _EditHealthProfileScreenWidgetState
                       _model.allergies.isNotEmpty
                           ? _model.allergies.join(', ')
                           : 'Chưa chọn dị ứng',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
-                  Icon(Icons.arrow_drop_down),
+                  const Icon(Icons.arrow_drop_down),
                 ],
               ),
             ),
@@ -846,11 +844,11 @@ class _EditHealthProfileScreenWidgetState
 
   Widget _buildDiseaseSelector(List<Map<String, dynamic>> diseases) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Bệnh nền',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
@@ -878,8 +876,7 @@ class _EditHealthProfileScreenWidgetState
                   _model.diseases = selected.map((id) {
                     return diseases
                         .firstWhere((disease) =>
-                            int.tryParse(disease['id'].toString()) ==
-                            id)['title']
+                    int.tryParse(disease['id'].toString()) == id)['title']
                         .toString();
                   }).toList();
                   isEdited = true;
@@ -887,7 +884,7 @@ class _EditHealthProfileScreenWidgetState
               }
             },
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.grey),
@@ -899,10 +896,10 @@ class _EditHealthProfileScreenWidgetState
                       _model.diseases.isNotEmpty
                           ? _model.diseases.join(', ')
                           : 'Chưa chọn bệnh',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
-                  Icon(Icons.arrow_drop_down),
+                  const Icon(Icons.arrow_drop_down),
                 ],
               ),
             ),
@@ -915,20 +912,20 @@ class _EditHealthProfileScreenWidgetState
   Widget _buildPickerRow(String title, String value, List<String> options,
       Function(String) onSelected) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           InkWell(
             onTap: () =>
                 _showCupertinoPicker(title, options, value, onSelected),
             child: Row(
               children: [
-                Text(value, style: TextStyle(fontSize: 16)),
-                SizedBox(width: 8),
-                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                Text(value, style: const TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               ],
             ),
           ),
@@ -940,22 +937,22 @@ class _EditHealthProfileScreenWidgetState
   Widget _buildDietStylePickerRow(String title, String value,
       List<String> options, Function(String) onSelected) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Text(title,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
           InkWell(
             onTap: () =>
                 _showCupertinoPicker(title, options, value, onSelected),
             child: Row(
               children: [
-                Text(value, style: TextStyle(fontSize: 16)),
-                SizedBox(width: 8),
-                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                Text(value, style: const TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               ],
             ),
           ),
@@ -975,36 +972,36 @@ class _EditHealthProfileScreenWidgetState
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.4,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(title,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Expanded(
               child: CupertinoPicker(
                 scrollController:
-                    FixedExtentScrollController(initialItem: selectedIndex),
+                FixedExtentScrollController(initialItem: selectedIndex),
                 itemExtent: 40,
                 onSelectedItemChanged: (index) {
                   _tempSelectedValue = options[index];
                 },
                 children: options
                     .map((e) =>
-                        Center(child: Text(e, style: TextStyle(fontSize: 16))))
+                    Center(child: Text(e, style: const TextStyle(fontSize: 16))))
                     .toList(),
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
@@ -1015,7 +1012,7 @@ class _EditHealthProfileScreenWidgetState
                   });
                   Navigator.pop(context);
                 },
-                child: Text("Xác nhận",
+                child: const Text("Xác nhận",
                     style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
             ),

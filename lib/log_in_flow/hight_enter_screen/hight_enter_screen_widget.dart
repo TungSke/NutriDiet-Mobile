@@ -199,7 +199,7 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Text(
-                        'Nhập chiều cao của bạn:',
+                        'Nhập chiều cao của bạn(cm):',
                         style: FlutterFlowTheme.of(context).headlineMedium,
                       ),
                       const SizedBox(height: 20),
@@ -209,8 +209,7 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
                           // Height options before decimal (e.g., 160)
                           Expanded(
                             child: Container(
-                              height:
-                                  200, // Set height of picker container for scrolling
+                              height: 200,
                               child: CupertinoPicker(
                                 itemExtent: 40,
                                 onSelectedItemChanged: (index) {
@@ -231,12 +230,11 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 5), // Space between two pickers
+                          const SizedBox(width: 5),
                           // Decimal part (0-9)
                           Expanded(
                             child: Container(
-                              height:
-                                  200, // Set height of picker container for scrolling
+                              height: 200,
                               child: CupertinoPicker(
                                 itemExtent: 40,
                                 onSelectedItemChanged: (index) {
@@ -263,10 +261,17 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
                       FFButtonWidget(
                         onPressed: () {
                           double finalHeight = selectedHeightLeft +
-                              (selectedHeightRight /
-                                  10); // Combine integer part and decimal part
+                              (selectedHeightRight / 10);
+                          // Kiểm tra validation
+                          if (finalHeight < 100 || finalHeight > 220) {
+                            showSnackbar(context,
+                                'Chiều cao phải từ 100 đến 220 cm!',
+                                isError: true);
+                            return;
+                          }
+
                           Provider.of<HealthProfileProvider>(context,
-                                  listen: false)
+                              listen: false)
                               .setHeight(finalHeight);
 
                           print("🔹 Xác nhận chiều cao: $finalHeight cm");
@@ -281,11 +286,11 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
                           height: 54.0,
                           color: FlutterFlowTheme.of(context).primary,
                           textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          FlutterFlowTheme.of(context).titleSmall.copyWith(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                           elevation: 2.0,
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -302,16 +307,15 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
   }
 }
 
-void showSnackbar(BuildContext context, String message) {
+void showSnackbar(BuildContext context, String message,
+    {bool isError = false}) {
   final snackBar = SnackBar(
     content: Text(
       message,
-      style: TextStyle(
-        color: Colors.white, // Set text color to white
-      ),
+      style: const TextStyle(color: Colors.white),
     ),
-    backgroundColor: Colors.green, // Set background color to green
-    duration: Duration(seconds: 2), // Duration for the snackbar to be visible
+    backgroundColor: isError ? Colors.red : Colors.green,
+    duration: const Duration(seconds: 2),
   );
 
   ScaffoldMessenger.of(context).showSnackBar(snackBar);

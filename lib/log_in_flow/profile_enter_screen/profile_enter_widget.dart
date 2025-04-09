@@ -19,6 +19,7 @@ class ProfileEnterWidget extends StatefulWidget {
 class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
   late ProfileEnterModel _model;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String? _ageError;
 
   @override
   void initState() {
@@ -62,8 +63,15 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
                         const SizedBox(height: 30.0),
                         FFButtonWidget(
                           onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              await _model.updateUserProfile(context);
+                            if (_formKey.currentState!.validate() && _model.birthDate != null) {
+                              final int age = DateTime.now().year - _model.birthDate!.year;
+                              if (age >= 13 && age <= 100) {
+                                await _model.updateUserProfile(context);
+                              } else {
+                                setState(() {
+                                  _ageError = 'Tuổi của bạn phải từ 13 đến 100';
+                                });
+                              }
                             }
                           },
                           text: 'Tiếp tục',
@@ -210,63 +218,84 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
   }
 
   Widget _buildDatePicker(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
-          locale: const Locale('vi', 'VN'),
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-          builder: (BuildContext context, Widget? child) {
-            return Theme(
-              data: ThemeData.light().copyWith(
-                primaryColor: FlutterFlowTheme.of(context)
-                    .primary, // Màu sắc của nút chọn
-                buttonTheme: ButtonThemeData(
-                  textTheme: ButtonTextTheme.primary,
-                ),
-                textButtonTheme: TextButtonThemeData(
-                  style: TextButton.styleFrom(
-                    foregroundColor: FlutterFlowTheme.of(context)
-                        .primary, // Màu chữ của nút OK
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () async {
+            DateTime? pickedDate = await showDatePicker(
+              locale: const Locale('vi', 'VN'),
+              context: context,
+              initialDate: DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime.now(),
+              builder: (BuildContext context, Widget? child) {
+                return Theme(
+                  data: ThemeData.light().copyWith(
+                    primaryColor: FlutterFlowTheme.of(context).primary,
+                    buttonTheme: ButtonThemeData(
+                      textTheme: ButtonTextTheme.primary,
+                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: FlutterFlowTheme.of(context).primary,
+                      ),
+                    ),
+                    colorScheme: ColorScheme.fromSwatch()
+                        .copyWith(primary: FlutterFlowTheme.of(context).primary),
                   ),
-                ),
-                colorScheme: ColorScheme.fromSwatch()
-                    .copyWith(primary: FlutterFlowTheme.of(context).primary),
-              ),
-              child: child!,
+                  child: child!,
+                );
+              },
             );
+            if (pickedDate != null) {
+              final int age = DateTime.now().year - pickedDate.year;
+              setState(() {
+                _model.birthDate = pickedDate;
+                // Kiểm tra tuổi và cập nhật lỗi nếu có
+                if (age < 13 || age > 100) {
+                  _ageError = 'Tuổi của bạn phải từ 13 đến 100';
+                } else {
+                  _ageError = null; // Xóa lỗi nếu tuổi hợp lệ
+                }
+              });
+            }
           },
-        );
-        if (pickedDate != null) {
-          setState(() {
-            _model.birthDate = pickedDate;
-          });
-        }
-      },
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: 'Ngày sinh',
-          labelStyle: TextStyle(
-            color: Colors.black, // Màu chữ khi chưa focus
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: 'Ngày sinh',
+              labelStyle: TextStyle(
+                color: Colors.black,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+                borderSide: BorderSide(color: Colors.green),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              contentPadding: const EdgeInsets.all(16.0),
+            ),
+            child: Text(
+              _model.birthDate != null
+                  ? DateFormat('dd/MM/yyyy').format(_model.birthDate!)
+                  : 'Chọn ngày sinh',
+              style: const TextStyle(fontSize: 16.0),
+            ),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: Colors.green), // Màu viền khi focus
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          contentPadding: const EdgeInsets.all(16.0),
         ),
-        child: Text(
-          _model.birthDate != null
-              ? DateFormat('dd/MM/yyyy').format(_model.birthDate!)
-              : 'Chọn ngày sinh',
-          style: const TextStyle(fontSize: 16.0),
-        ),
-      ),
+        if (_ageError != null) // Hiển thị lỗi nếu có
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, left: 12.0),
+            child: Text(
+              _ageError!,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 12.0,
+              ),
+            ),
+          ),
+      ],
     );
   }
 

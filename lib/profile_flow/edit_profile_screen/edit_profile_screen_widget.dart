@@ -334,6 +334,6 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
 
   /// 🟢 Tạo danh sách tuổi từ 10 đến 100
   List<String> _generateAgeList() {
-    return List.generate(91, (index) => '${10 + index}');
+    return List.generate(88, (index) => '${13 + index}');
   }
 }
