@@ -21,12 +21,10 @@ class FoodService {
         return data.map((e) => Food.fromJson(e)).toList();
       }
 
-      if (response.statusCode == 204) return [];
-
       throw Exception(
           'Failed to load allergies: ${response.statusCode}, ${response.body}');
     } catch (e) {
-      print("Error fetching allergies: $e");
+      print("Error fetching: $e");
       return [];
     }
   }

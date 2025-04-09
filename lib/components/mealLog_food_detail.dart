@@ -102,11 +102,11 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     }
 
     // Lấy số liệu
-    final int calories = _food!.calories ?? 0;
-    final int carbs = _food!.carbs ?? 0;
-    final int fat = _food!.fat ?? 0;
-    final int protein = _food!.protein ?? 0;
-    final int totalMacro = carbs + fat + protein;
+    final num calories = _food!.calories ?? 0;
+    final num carbs = _food!.carbs ?? 0;
+    final num fat = _food!.fat ?? 0;
+    final num protein = _food!.protein ?? 0;
+    final num totalMacro = carbs + fat + protein;
     final double carbsRatio = totalMacro > 0 ? carbs / totalMacro * 100 : 0;
     final double fatRatio = totalMacro > 0 ? fat / totalMacro * 100 : 0;
     final double proteinRatio = totalMacro > 0 ? protein / totalMacro * 100 : 0;
@@ -366,7 +366,7 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     }
   }
 
-  Widget _buildMacroColumn(String label, int gram, double percent) {
+  Widget _buildMacroColumn(String label, num gram, double percent) {
     return Column(
       children: [
         Text('${percent.toStringAsFixed(0)}%',

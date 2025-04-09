@@ -6,12 +6,12 @@ class Food {
   final String? foodType;
   final String? description;
   final String? servingSize;
-  final int? calories; // Sửa thành int?
-  final int? protein; // Sửa thành int?
-  final int? carbs; // Sửa thành int?
-  final int? fat; // Sửa thành int?
-  final int? glucid; // Sửa thành int?
-  final int? fiber; // Sửa thành int?
+  final double? calories; // Sửa thành int?
+  final double? protein; // Sửa thành int?
+  final double? carbs; // Sửa thành int?
+  final double? fat; // Sửa thành int?
+  final double? glucid; // Sửa thành int?
+  final double? fiber; // Sửa thành int?
   final String? others;
   final List<String>? allergies;
   final List<String>? diseases;
@@ -43,23 +43,19 @@ class Food {
       imageUrl: json['imageUrl'] as String?,
       foodType: json['foodType'] as String?,
       description: json['description'] as String?,
-      servingSize: json['servingSize']
-          ?.toString(), // Chuyển servingSize thành String nếu cần
-      calories: json['calories'] as int?, // Sửa lại kiểu dữ liệu
-      protein: json['protein'] as int?, // Sửa lại kiểu dữ liệu
-      carbs: json['carbs'] as int?, // Sửa lại kiểu dữ liệu
-      fat: json['fat'] as int?, // Sửa lại kiểu dữ liệu
-      glucid: json['glucid'] as int?, // Sửa lại kiểu dữ liệu
-      fiber: json['fiber'] as int?, // Sửa lại kiểu dữ liệu
-      others: json['others'] as String?,
-      allergies: (json['allergies'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      diseases: (json['diseases'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
+      servingSize: json['servingSize']?.toString(),
+      calories: (json['calories'] as num?)?.toDouble(),
+      protein: (json['protein'] as num?)?.toDouble(),
+      carbs: (json['carbs'] as num?)?.toDouble(),
+      fat: (json['fat'] as num?)?.toDouble(),
+      glucid: (json['glucid'] as num?)?.toDouble(),
+      fiber: (json['fiber'] as num?)?.toDouble(),
+      others: json['others'],
+      allergies: (json['allergies'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      diseases: (json['diseases'] as List<dynamic>?)?.map((e) => e as String).toList(),
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {
