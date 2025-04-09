@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:diet_plan_app/flutter_flow/flutter_flow_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 import '../services/meallog_service.dart';
@@ -115,11 +116,15 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
       "Chất béo": fatRatio,
       "Protein": proteinRatio,
     };
-
+    final primaryColor = FlutterFlowTheme.of(context).primary;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: primaryColor,
         title: const Text('Chi tiết món ăn',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 20)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -192,11 +197,11 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
                 onPressed: _addToMealLog,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: Theme.of(context).primaryColor,
+                  foregroundColor: primaryColor,
                   minimumSize: const Size.fromHeight(48),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),
-                    side: BorderSide(color: Theme.of(context).primaryColor),
+                    side: BorderSide(color: primaryColor),
                   ),
                 ),
                 child: const Text(
@@ -312,7 +317,7 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: selected
-                        ? Theme.of(context).primaryColor // nền primary khi chọn
+                        ? FlutterFlowTheme.of(context).primary
                         : Colors.grey[200],
                     borderRadius: BorderRadius.circular(8),
                   ),

@@ -68,7 +68,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
             fontSize: 20,
           ),
         ),
-        backgroundColor: Colors.grey[200],
+        backgroundColor: primaryColor,
       ),
       body: FutureBuilder<MealLogDetail?>(
         future: mealLogService.getMealLogDetail(detailId: widget.detailId),

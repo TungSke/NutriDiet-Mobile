@@ -216,7 +216,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         for (var meal in _model.mealLogAis) {
           grouped.putIfAbsent(meal.mealType, () => []).add(meal);
         }
-        final primaryColor = Theme.of(context).primaryColor;
+        final primaryColor = FlutterFlowTheme.of(context).primary;
 
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -347,13 +347,13 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: FlutterFlowTheme.of(context).primary,
         elevation: 0,
         centerTitle: false,
         title: const Text(
           'Nhật ký',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontFamily: 'Figtree',
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -361,7 +361,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          color: Colors.black,
+          color: Colors.white,
           onPressed: () {
             context.pushNamed('bottom_navbar_screen');
           },
@@ -528,7 +528,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                     }
                                     break;
                                   case 'clone_log':
-                                    // Show a date picker so user can choose the source date to clone
                                     final DateTime? pickedDate =
                                         await showDatePicker(
                                       context: context,
@@ -645,13 +644,13 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                 width: 24,
                                 height: 24,
                                 child: CircularProgressIndicator(
-                                  color: Theme.of(context).primaryColor,
+                                  color: FlutterFlowTheme.of(context).primary,
                                   strokeWidth: 2,
                                 ),
                               ),
                             )
                           : Text(
-                              "Nhận thực đơn AI",
+                              "Thực đơn AI",
                               style: TextStyle(
                                 // fontSize vẫn 18
                                 fontSize: 18,

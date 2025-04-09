@@ -311,9 +311,11 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: primaryColor,
         title: Text(
           title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
         ),
         centerTitle: true,
       ),
