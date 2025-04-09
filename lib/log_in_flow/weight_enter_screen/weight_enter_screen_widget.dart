@@ -173,9 +173,9 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
   }
 
   void updateWeightOptions() {
-    // Generate weight options from 40 to 150 kg (can be adjusted)
+    // Generate weight options from 30 to 250 kg (theo DTO)
     weightOptionsIntLeft =
-        List.generate(111, (index) => 40 + index); // Weights from 40 to 150
+        List.generate(221, (index) => 30 + index); // Weights from 30 to 250
     setState(() {});
   }
 
@@ -200,7 +200,7 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Text(
-                        'Nhập cân nặng của bạn:',
+                        'Nhập cân nặng của bạn(kg):',
                         style: FlutterFlowTheme.of(context).headlineMedium,
                       ),
                       const SizedBox(height: 20),
@@ -210,8 +210,7 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                           // Weight options before decimal (e.g., 50)
                           Expanded(
                             child: Container(
-                              height:
-                                  200, // Set height of picker container for scrolling
+                              height: 200,
                               child: CupertinoPicker(
                                 itemExtent: 40,
                                 onSelectedItemChanged: (index) {
@@ -232,12 +231,11 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 5), // Space between two pickers
+                          const SizedBox(width: 5),
                           // Decimal part (0-9)
                           Expanded(
                             child: Container(
-                              height:
-                                  200, // Set height of picker container for scrolling
+                              height: 200,
                               child: CupertinoPicker(
                                 itemExtent: 40,
                                 onSelectedItemChanged: (index) {
@@ -264,18 +262,24 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                       FFButtonWidget(
                         onPressed: () {
                           double finalWeight = selectedWeightLeft +
-                              (selectedWeightRight /
-                                  10); // Combine integer part and decimal part
+                              (selectedWeightRight / 10);
+                          // Kiểm tra validation
+                          if (finalWeight < 30 || finalWeight > 250) {
+                            showSnackbar(context,
+                                'Cân nặng phải từ 30 đến 250 kg!',
+                                isError: true);
+                            return;
+                          }
+
                           Provider.of<HealthProfileProvider>(context,
-                                  listen: false)
+                              listen: false)
                               .setWeight(finalWeight);
 
                           print("🔹 Xác nhận cân nặng: $finalWeight kg");
 
                           showSnackbar(
                               context, 'Cập nhật cân nặng thành công!');
-                          context.pushNamed(
-                              'frequency_exercise_screen'); // Navigate to height screen
+                          context.pushNamed('frequency_exercise_screen');
                         },
                         text: 'Xác nhận',
                         options: FFButtonOptions(
@@ -283,11 +287,11 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                           height: 54.0,
                           color: FlutterFlowTheme.of(context).primary,
                           textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          FlutterFlowTheme.of(context).titleSmall.copyWith(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                           elevation: 2.0,
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -304,16 +308,15 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
   }
 }
 
-void showSnackbar(BuildContext context, String message) {
+void showSnackbar(BuildContext context, String message,
+    {bool isError = false}) {
   final snackBar = SnackBar(
     content: Text(
       message,
-      style: TextStyle(
-        color: Colors.white, // Set text color to white
-      ),
+      style: const TextStyle(color: Colors.white),
     ),
-    backgroundColor: Colors.green, // Set background color to green
-    duration: Duration(seconds: 2), // Duration for the snackbar to be visible
+    backgroundColor: isError ? Colors.red : Colors.green,
+    duration: const Duration(seconds: 2),
   );
 
   ScaffoldMessenger.of(context).showSnackBar(snackBar);

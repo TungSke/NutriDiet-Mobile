@@ -21,6 +21,12 @@ class ProfileEnterModel {
       return;
     }
 
+    final int age = DateTime.now().year - birthDate!.year;
+    if (age < 13 || age > 100) {
+      _showErrorDialog(context, "Tuổi của bạn phải từ 13 đến 100.");
+      return;
+    }
+
     try {
       final String fullName = fullNameController.text.trim();
       final String location = locationController.text.trim();
