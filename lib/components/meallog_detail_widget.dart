@@ -1,8 +1,9 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_theme.dart';
 import 'package:diet_plan_app/services/meallog_service.dart';
 import 'package:diet_plan_app/services/models/meallog.dart';
-import 'package:flutter/material.dart';
 
 class MealLogDetailWidget extends StatefulWidget {
   final int detailId;
@@ -23,6 +24,36 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
   TextEditingController? _carbsController;
   TextEditingController? _fatController;
 
+  /// Hàm upload ảnh cho meal log detail sử dụng image_picker
+  Future<void> _uploadMealLogImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final File imageFile = File(pickedFile.path);
+      final bool result = await mealLogService.addImageToMealLogDetail(
+        detailId: widget.detailId,
+        imageFile: imageFile,
+      );
+
+      if (result) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Upload ảnh thành công")),
+        );
+        setState(() {}); // Cập nhật lại giao diện sau khi upload thành công
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Lỗi upload ảnh")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Chưa chọn ảnh nào")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final primaryColor = FlutterFlowTheme.of(context).primary;
@@ -30,9 +61,9 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Chi tiết',
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -53,7 +84,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
             return const Center(child: Text("Không tìm thấy dữ liệu"));
           }
 
-          // Khởi tạo controllers
+          // Khởi tạo controllers nếu chưa có
           _calorieController ??=
               TextEditingController(text: mealDetail.calories.toString());
           _proteinController ??=
@@ -68,7 +99,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tên món và khẩu phần
+                // Hiển thị tên món và khẩu phần
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -88,10 +119,8 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 8),
-
-                // Ảnh hoặc icon upload
+                // Ảnh món ăn hoặc icon upload
                 Center(
                   child: (mealDetail.imageUrl != null &&
                           mealDetail.imageUrl!.isNotEmpty)
@@ -109,15 +138,11 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                             size: 50,
                             color: Colors.grey,
                           ),
-                          onPressed: () async {
-                            // Mở dialog / flow để upload ảnh
-                          },
+                          onPressed: _uploadMealLogImage,
                         ),
                 ),
-
                 const SizedBox(height: 16),
-
-                // Thành phần món
+                // Thành phần món ăn
                 const Text(
                   "Thành phần món",
                   style: TextStyle(
@@ -126,7 +151,6 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -136,10 +160,8 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                     _buildNutritionItem("Fat", _fatController!.text),
                   ],
                 ),
-
                 const SizedBox(height: 20),
-
-                // Form cập nhật
+                // Form cập nhật thông tin dinh dưỡng
                 Form(
                   key: _formKey,
                   child: Column(
@@ -164,10 +186,8 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                         label: "Fat (g)",
                         primaryColor: Colors.black,
                       ),
-
                       const SizedBox(height: 20),
-
-                      // Nút cập nhật dinh dưỡng full width
+                      // Nút cập nhật dinh dưỡng
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -215,29 +235,14 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                           ),
                         ),
                       ),
-
-                      // Nút upload ảnh full width
+                      // Nếu chưa có ảnh, hiển thị nút upload ảnh
                       if (mealDetail.imageUrl == null ||
                           mealDetail.imageUrl!.isEmpty) ...[
                         const SizedBox(height: 10),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () async {
-                              File imageFile = File('path/to/your/image.jpg');
-                              bool result =
-                                  await mealLogService.addImageToMealLogDetail(
-                                detailId: widget.detailId,
-                                imageFile: imageFile,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(result
-                                      ? 'Upload ảnh thành công'
-                                      : 'Upload ảnh thất bại'),
-                                ),
-                              );
-                            },
+                            onPressed: _uploadMealLogImage,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: primaryColor,
