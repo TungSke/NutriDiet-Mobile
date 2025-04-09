@@ -527,6 +527,47 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                       );
                                     }
                                     break;
+                                  case 'clone_log':
+                                    // Show a date picker so user can choose the source date to clone
+                                    final DateTime? pickedDate =
+                                        await showDatePicker(
+                                      context: context,
+                                      initialDate: _model.selectedDate,
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2040),
+                                      locale: const Locale('vi'),
+                                      builder: (BuildContext context,
+                                          Widget? child) {
+                                        return Theme(
+                                          data: Theme.of(context).copyWith(
+                                            colorScheme:
+                                                const ColorScheme.light(
+                                              primary: Colors.green,
+                                              onPrimary: Colors.white,
+                                              onSurface: Colors.black,
+                                            ),
+                                            textButtonTheme:
+                                                TextButtonThemeData(
+                                              style: TextButton.styleFrom(
+                                                  foregroundColor:
+                                                      Colors.green),
+                                            ),
+                                          ),
+                                          child: child!,
+                                        );
+                                      },
+                                    );
+                                    if (pickedDate != null) {
+                                      await _model.cloneMealLogEntry(
+                                          sourceDate: pickedDate);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text('Sao chép thành công')),
+                                      );
+                                    }
+                                    break;
                                 }
                               },
                               itemBuilder: (context) => [
@@ -537,6 +578,10 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                 const PopupMenuItem<String>(
                                   value: 'end_day',
                                   child: Text('Kết thúc ngày'),
+                                ),
+                                const PopupMenuItem<String>(
+                                  value: 'clone_log',
+                                  child: Text('Sao chép...'),
                                 ),
                               ],
                             ),
@@ -902,6 +947,57 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                   color: Colors.grey,
                 ),
               ),
+              trailing: (details[i].imageUrl != null &&
+                      details[i].imageUrl!.isNotEmpty)
+                  ? GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              insetPadding: EdgeInsets.zero,
+                              backgroundColor: Colors.black,
+                              child: Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: InteractiveViewer(
+                                      child: Center(
+                                        child: Image.network(
+                                          details[i].imageUrl!,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 30,
+                                    right: 30,
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(details[i].imageUrl!),
+                        backgroundColor: Colors.transparent,
+                      ),
+                    )
+                  : null,
             ),
           ),
           if (i < details.length - 1)

@@ -190,9 +190,7 @@
 //   }
 // }
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
 import '../../services/user_service.dart';
 
 class EditPersonalGoalScreenModel extends ChangeNotifier {
@@ -202,15 +200,13 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
   String phoneNumber = '';
   String location = '';
   String email = '';
+  String avatar = '';
 
-  double height = 0; // Chiều cao
-  double weight = 0.0; // Cân nặng (sử dụng double)
-  String activityLevel = ''; // Mức độ vận động
-
+  double height = 0;
+  double weight = 0.0;
+  String activityLevel = '';
   bool isLoading = true;
-
   String userId = '';
-
   String errorMessage = "";
 
   final Map<String, int> _weightChangeRateMap = {
@@ -223,7 +219,6 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
     'Giảm 1Kg/1 tuần': -1000,
   };
 
-  // Mảng ánh xạ giá trị số về giá trị mô tả
   final Map<int, String> _reverseWeightChangeRateMap = {
     0: 'Giữ cân',
     250: 'Tăng 0.25kg/1 tuần',
@@ -234,51 +229,44 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
     -1000: 'Giảm 1Kg/1 tuần',
   };
 
-  // Mảng ánh xạ goalType từ tiếng Anh sang tiếng Việt
   final Map<String, String> _goalTypeMap = {
     'LoseWeight': 'Giảm cân',
     'Maintain': 'Giữ cân',
     'GainWeight': 'Tăng cân',
   };
 
-  // Mảng ánh xạ từ tiếng Việt sang tiếng Anh
   final Map<String, String> _reverseGoalTypeMap = {
     'Giảm cân': 'LoseWeight',
     'Giữ cân': 'Maintain',
     'Tăng cân': 'GainWeight',
   };
+
   double dailyCalories = 0;
   double dailyCarb = 0;
-  String avatar = '';
   double dailyFat = 0;
   double dailyProtein = 0;
-  String goalType = ''; // Mục tiêu
-  double targetWeight = 0.0; // Cân nặng mục tiêu (thay đổi kiểu thành double)
-  String weightChangeRate = ''; // Mức độ thay đổi cân nặng
-
-  double currentWeight =
-      0.0; // Biến lưu trữ cân nặng hiện tại (thay đổi kiểu thành double)
-
-  // Lấy dữ liệu mục tiêu cá nhân từ API
+  String goalType = '';
+  double targetWeight = 0.0;
+  String weightChangeRate = '';
+  double currentWeight = 0.0;
 
   Future<void> fetchUserProfile() async {
     try {
       final response = await _userService.whoAmI();
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
         name = data['name'] ?? "Chưa cập nhật";
         age = data['age']?.toString() ?? "0";
         phoneNumber = data['phoneNumber'] ?? "Chưa cập nhật";
         location = data['address'] ?? "Chưa cập nhật";
         email = data["email"] ?? "Chưa cập nhật";
         userId = data['id']?.toString() ?? "";
-        avatar = data["avatar"];
-        isLoading = false; // Đặt trạng thái không còn loading
+        avatar = data["avatar"] ?? "";
+        isLoading = false;
         notifyListeners();
       }
     } catch (e) {
-      print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+      print("❌ Lỗi khi lấy thông tin người dùng: $e");
       isLoading = false;
       notifyListeners();
     }
@@ -287,42 +275,34 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
   Future<void> fetchHealthProfile() async {
     try {
       final response = await UserService().getHealthProfile();
-
       if (response.statusCode == 200) {
         final healthData = jsonDecode(response.body);
-
-        // Parse height and weight as integers
         height = healthData['data']['height'] != null
             ? double.parse(healthData['data']['height'].toString())
             : 0;
         weight = healthData['data']['weight'] != null
-            ? double.parse(
-                healthData['data']['weight'].toString()) // Chuyển sang double
+            ? double.parse(healthData['data']['weight'].toString())
             : 0.0;
-
         isLoading = false;
         notifyListeners();
       }
     } catch (e) {
-      print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
+      print("❌ Lỗi khi lấy thông tin hồ sơ sức khỏe: $e");
     }
   }
 
   Future<void> fetchPersonalGoal() async {
     try {
       final healthProfileResponse = await UserService().getHealthProfile();
-
       if (healthProfileResponse.statusCode == 200) {
         final healthProfileData = jsonDecode(healthProfileResponse.body);
         currentWeight = healthProfileData['data']['weight'] != null
-            ? double.parse(healthProfileData['data']['weight']
-                .toString()) // Cập nhật thành double
-            : 0.0; // Lấy trọng lượng từ hồ sơ sức khỏe
-
+            ? double.parse(healthProfileData['data']['weight'].toString())
+            : 0.0;
         print("Current Weight: $currentWeight");
       } else {
         print("❌ Lỗi khi lấy health profile: ${healthProfileResponse.body}");
-        currentWeight = 70.0; // Cân nặng mặc định khi có lỗi
+        currentWeight = 70.0;
       }
 
       final response = await UserService().getPersonalGoal();
@@ -345,11 +325,10 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
         dailyProtein = personalData['data']['dailyProtein'] != null
             ? double.parse(personalData['data']['dailyProtein'].toString())
             : 0.0;
-        weightChangeRate = _reverseWeightChangeRateMap[personalData['data']
-                ['weightChangeRate']] ??
+        weightChangeRate = _reverseWeightChangeRateMap[
+        personalData['data']['weightChangeRate']] ??
             "Chưa cập nhật";
         print("Weight Change Rate: $weightChangeRate");
-
         isLoading = false;
         notifyListeners();
       }
@@ -360,9 +339,30 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
 
   Future<void> updatePersonalGoal(BuildContext context) async {
     try {
-      // Khi chọn mục tiêu "Giữ cân", sử dụng cân nặng hiện tại
+      // Validation cục bộ trước khi gửi API
+      if (goalType != 'Giữ cân') {
+        if (targetWeight < 30 || targetWeight > 250) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Mục tiêu cân nặng phải từ 30-250 kg'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+        if (weightChangeRate.isEmpty || _weightChangeRateMap[weightChangeRate] == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Vui lòng chọn mức độ thay đổi cân nặng'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+      }
+
       if (goalType == 'Giữ cân') {
-        targetWeight = currentWeight; // Gửi cân nặng hiện tại
+        targetWeight = currentWeight;
         weightChangeRate = 'Giữ cân';
       }
 
@@ -372,25 +372,41 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
 
       final response = await UserService().updatePersonalGoal(
         goalType: goalTypeInEnglish,
-        targetWeight: targetWeight, // Sử dụng targetWeight kiểu double
+        targetWeight: targetWeight,
         weightChangeRate: weightChangeRateNumber.toString(),
-
         context: context,
       );
 
       if (response.statusCode == 200) {
         print('✅ Update successful!');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cập nhật mục tiêu thành công!'),
+            backgroundColor: Colors.green,
+          ),
+        );
         await fetchPersonalGoal();
         Navigator.pop(context, true);
       } else {
         final responseData = jsonDecode(response.body);
         final errorMessage =
             responseData['message'] ?? 'Có lỗi xảy ra, vui lòng thử lại';
-
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+          ),
+        );
         print("❌ Error from API: $errorMessage");
       }
     } catch (e) {
       print("❌ Exception caught: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Có lỗi xảy ra, vui lòng thử lại'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 }

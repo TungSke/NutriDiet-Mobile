@@ -500,4 +500,37 @@ class MeallogService {
       return false;
     }
   }
+
+  Future<bool> cloneMealLog({
+    required String sourceDate,
+    required String targetDate,
+  }) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      // Build the form data fields (matching the cURL -F parameters)
+      Map<String, String> formData = {
+        'SourceDate': sourceDate,
+        'TargetDate': targetDate,
+      };
+
+      // POST the multipart form-data request using your ApiService
+      final response = await _apiService.postMultipart("api/meal-log/clone",
+          body: formData, token: token);
+
+      debugPrint(
+          "API cloneMealLog: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception(
+            'Error cloning Meal Log: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("Error calling API cloneMealLog: $e");
+      return false;
+    }
+  }
 }
