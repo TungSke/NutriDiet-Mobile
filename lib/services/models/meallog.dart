@@ -24,9 +24,9 @@ class MealLog {
       mealLogId: json['mealLogId'] ?? 0,
       logDate: DateTime.parse(json['logDate']),
       totalCalories: json['totalCalories'] ?? 0,
-      totalProtein: json['totalProtein'] ?? 0,
-      totalCarbs: json['totalCarbs'] ?? 0,
-      totalFat: json['totalFat'] ?? 0,
+      totalProtein: (json['totalProtein'] as num?)?.toInt() ?? 0,
+      totalCarbs: (json['totalCarbs'] as num?)?.toInt() ?? 0,
+      totalFat: (json['totalFat'] as num?)?.toInt() ?? 0,
       dailyCalories: json['dailyCalories'] ?? 0,
       mealLogDetails: (json['mealLogDetails'] as List<dynamic>? ?? [])
           .map((e) => MealLogDetail.fromJson(e as Map<String, dynamic>))
@@ -62,15 +62,15 @@ class MealLogDetail {
 
   factory MealLogDetail.fromJson(Map<String, dynamic> json) {
     return MealLogDetail(
-      detailId: json['detailId'] ?? 0,
+      detailId: (json['detailId'] as num?)?.toInt() ?? 0,
       foodName: json['foodName'] ?? '',
       mealType: json['mealType'] ?? '',
       servingSize: json['servingSize']?.toString(),
-      quantity: json['quantity'] ?? 0,
-      calories: json['calories'] ?? 0,
-      protein: json['protein'] ?? 0,
-      carbs: json['carbs'] ?? 0,
-      fat: json['fat'] ?? 0,
+      quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+      calories: (json['calories'] as num?)?.toInt() ?? 0,
+      protein: (json['protein'] as num?)?.toInt() ?? 0,
+      carbs: (json['carbs'] as num?)?.toInt() ?? 0,
+      fat: (json['fat'] as num?)?.toInt() ?? 0,
       imageUrl: json['imageUrl'] ?? '',
     );
   }
