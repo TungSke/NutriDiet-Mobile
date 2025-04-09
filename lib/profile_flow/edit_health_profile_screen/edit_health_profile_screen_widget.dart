@@ -663,13 +663,13 @@ class _EditHealthProfileScreenWidgetState
       child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20),
         children: [
-          _buildHeightRow('Chiều cao (cm)', _model.height.toString(), (val) {
+          _buildHeightRow('Chiều cao (cm)', _model.height, (val) {
             setState(() {
               _model.height = double.tryParse(val) ?? 0.0;
               isEdited = true;
             });
           }),
-          _buildWeightRow('Cân nặng (kg)', _model.weight.toString(), (val) {
+          _buildWeightRow('Cân nặng (kg)', _model.weight, (val) {
             setState(() {
               _model.weight = double.tryParse(val) ?? 0.0;
               isEdited = true;
@@ -716,9 +716,9 @@ class _EditHealthProfileScreenWidgetState
     );
   }
 
-  // 🟢 Ô nhập liệu cho chiều cao
+// 🟢 Ô nhập liệu cho chiều cao
   Widget _buildHeightRow(
-      String title, String value, Function(String) onChanged) {
+      String title, double value, Function(String) onChanged) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -728,17 +728,34 @@ class _EditHealthProfileScreenWidgetState
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           SizedBox(
             width: 150,
-            child: TextFormField(
-              initialValue: value,
-              textAlign: TextAlign.end,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Nhập chiều cao (cm)',
-              ),
-              onChanged: (val) {
-                onChanged(val);
-              },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                TextFormField(
+                  initialValue: value.toString(),
+                  textAlign: TextAlign.end,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Nhập chiều cao (cm)',
+                  ),
+                  onChanged: (val) {
+                    onChanged(val);
+                  },
+                ),
+                // Display error text if height is out of range
+                if (value < 100 || value > 220)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      'Chiều cao phải trong khoảng 100-220 cm',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
@@ -746,9 +763,9 @@ class _EditHealthProfileScreenWidgetState
     );
   }
 
-  // 🟢 Ô nhập liệu cho cân nặng
+// 🟢 Ô nhập liệu cho cân nặng
   Widget _buildWeightRow(
-      String title, String value, Function(String) onChanged) {
+      String title, double value, Function(String) onChanged) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -758,23 +775,100 @@ class _EditHealthProfileScreenWidgetState
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           SizedBox(
             width: 150,
-            child: TextFormField(
-              initialValue: value,
-              textAlign: TextAlign.end,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Nhập cân nặng (kg)',
-              ),
-              onChanged: (val) {
-                onChanged(val);
-              },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                TextFormField(
+                  initialValue: value.toString(),
+                  textAlign: TextAlign.end,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Nhập cân nặng (kg)',
+                  ),
+                  onChanged: (val) {
+                    onChanged(val);
+                  },
+                ),
+                // Display error text if weight is out of range
+                if (value < 40 || value > 220)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      'Cân nặng phải trong khoảng 40-220 kg',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+
+  // 🟢 Ô nhập liệu cho chiều cao
+  // Widget _buildHeightRow(
+  //     String title, String value, Function(String) onChanged) {
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(vertical: 10),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(title,
+  //             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+  //         SizedBox(
+  //           width: 150,
+  //           child: TextFormField(
+  //             initialValue: value,
+  //             textAlign: TextAlign.end,
+  //             keyboardType: TextInputType.numberWithOptions(decimal: true),
+  //             decoration: InputDecoration(
+  //               border: InputBorder.none,
+  //               hintText: 'Nhập chiều cao (cm)',
+  //             ),
+  //             onChanged: (val) {
+  //               onChanged(val);
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+  //
+  // // 🟢 Ô nhập liệu cho cân nặng
+  // Widget _buildWeightRow(
+  //     String title, String value, Function(String) onChanged) {
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(vertical: 10),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(title,
+  //             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+  //         SizedBox(
+  //           width: 150,
+  //           child: TextFormField(
+  //             initialValue: value,
+  //             textAlign: TextAlign.end,
+  //             keyboardType: TextInputType.numberWithOptions(decimal: true),
+  //             decoration: InputDecoration(
+  //               border: InputBorder.none,
+  //               hintText: 'Nhập cân nặng (kg)',
+  //             ),
+  //             onChanged: (val) {
+  //               onChanged(val);
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildAllergySelector(List<Map<String, dynamic>> allergies) {
     return Padding(

@@ -547,7 +547,6 @@ class _EditPersonalGoalScreenWidgetState
 
   Widget _buildTargetWeightRow(
       String title, double value, Function(String) onChanged) {
-    // Chỉnh sửa thành double
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -556,25 +555,83 @@ class _EditPersonalGoalScreenWidgetState
           Text(title,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           SizedBox(
-            width: 150,
-            child: TextFormField(
-              initialValue: value.toString(),
-              textAlign: TextAlign.end,
-              keyboardType: TextInputType.numberWithOptions(
-                  decimal: true), // Cho phép nhập số thập phân
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Nhập cân nặng (kg) ',
-              ),
-              onChanged: (val) {
-                onChanged(val);
-              },
+            width: 150, // Make sure the input field has enough space
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                TextFormField(
+                  initialValue: value.toString(),
+                  textAlign: TextAlign.end,
+                  keyboardType: TextInputType.numberWithOptions(
+                      decimal: true), // Allow decimal numbers
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Nhập cân nặng (kg) ',
+                  ),
+                  onChanged: (val) {
+                    double newWeight = double.tryParse(val) ?? 0.0;
+                    if (newWeight >= 40 && newWeight <= 220) {
+                      // If valid weight (between 40kg and 220kg), update the targetWeight
+                      onChanged(val);
+                    } else {
+                      // If invalid weight, don't update the targetWeight
+                      setState(() {
+                        _model.targetWeight = 0.0; // Reset invalid value
+                      });
+                    }
+                  },
+                ),
+                // Display errorText only if the weight is out of range
+                if (_model.targetWeight < 40 || _model.targetWeight > 220)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      'Cân nặng phải trong khoảng 40kg đến 220kg',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+
+  // Widget _buildTargetWeightRow(
+  //     String title, double value, Function(String) onChanged)
+  // {
+  //   // Chỉnh sửa thành double
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(vertical: 10),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(title,
+  //             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+  //         SizedBox(
+  //           width: 150,
+  //           child: TextFormField(
+  //             initialValue: value.toString(),
+  //             textAlign: TextAlign.end,
+  //             keyboardType: TextInputType.numberWithOptions(
+  //                 decimal: true), // Cho phép nhập số thập phân
+  //             decoration: InputDecoration(
+  //               border: InputBorder.none,
+  //               hintText: 'Nhập cân nặng (kg) ',
+  //             ),
+  //             onChanged: (val) {
+  //               onChanged(val);
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   void _showCupertinoPicker(String title, List<String> options,
       String currentValue, Function(String) onSelected) {
