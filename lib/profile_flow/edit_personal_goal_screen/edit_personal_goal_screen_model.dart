@@ -333,10 +333,18 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
         targetWeight = personalData['data']['targetWeight'] != null
             ? double.parse(personalData['data']['targetWeight'].toString())
             : 0.0;
-        dailyCalories = personalData['data']['dailyCalories'] ?? 0;
-        dailyCarb = personalData['data']['dailyCarb'] ?? 0;
-        dailyFat = personalData['data']['dailyFat'] ?? 0;
-        dailyProtein = personalData['data']['dailyProtein'] ?? 0;
+        dailyCalories = personalData['data']['dailyCalories'] != null
+            ? double.parse(personalData['data']['dailyCalories'].toString())
+            : 0.0;
+        dailyCarb = personalData['data']['dailyCarb'] != null
+            ? double.parse(personalData['data']['dailyCarb'].toString())
+            : 0.0;
+        dailyFat = personalData['data']['dailyFat'] != null
+            ? double.parse(personalData['data']['dailyFat'].toString())
+            : 0.0;
+        dailyProtein = personalData['data']['dailyProtein'] != null
+            ? double.parse(personalData['data']['dailyProtein'].toString())
+            : 0.0;
         weightChangeRate = _reverseWeightChangeRateMap[personalData['data']
                 ['weightChangeRate']] ??
             "Chưa cập nhật";
