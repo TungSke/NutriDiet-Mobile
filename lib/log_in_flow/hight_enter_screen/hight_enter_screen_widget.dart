@@ -158,7 +158,7 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   double selectedHeightLeft =
-      160.0; // Default height in centimeters (whole number part)
+      100.0; // Default height in centimeters (whole number part)
   double selectedHeightRight = 0.0; // Decimal part (0-9)
 
   List<int> heightOptionsIntLeft = []; // List of whole number heights
@@ -260,18 +260,18 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
                       const SizedBox(height: 20),
                       FFButtonWidget(
                         onPressed: () {
-                          double finalHeight = selectedHeightLeft +
-                              (selectedHeightRight / 10);
+                          double finalHeight =
+                              selectedHeightLeft + (selectedHeightRight / 10);
                           // Kiểm tra validation
                           if (finalHeight < 100 || finalHeight > 220) {
-                            showSnackbar(context,
-                                'Chiều cao phải từ 100 đến 220 cm!',
+                            showSnackbar(
+                                context, 'Chiều cao phải từ 100 đến 220 cm!',
                                 isError: true);
                             return;
                           }
 
                           Provider.of<HealthProfileProvider>(context,
-                              listen: false)
+                                  listen: false)
                               .setHeight(finalHeight);
 
                           print("🔹 Xác nhận chiều cao: $finalHeight cm");
@@ -286,11 +286,11 @@ class _HeightEnterScreenWidgetState extends State<HightEnterScreenWidget> {
                           height: 54.0,
                           color: FlutterFlowTheme.of(context).primary,
                           textStyle:
-                          FlutterFlowTheme.of(context).titleSmall.copyWith(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              FlutterFlowTheme.of(context).titleSmall.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                           elevation: 2.0,
                           borderRadius: BorderRadius.circular(12),
                         ),

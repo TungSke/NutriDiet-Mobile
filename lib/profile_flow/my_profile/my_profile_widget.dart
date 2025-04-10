@@ -827,14 +827,14 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                               },
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 10),
-                                child: Text(
-                                  "Cập nhật",
-                                  style: GoogleFonts.lato(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: FlutterFlowTheme.of(context).primary,
-                                  ),
-                                ),
+                                // child: Text(
+                                //   "Cập nhật",
+                                //   style: GoogleFonts.lato(
+                                //     fontSize: 14,
+                                //     fontWeight: FontWeight.bold,
+                                //     color: FlutterFlowTheme.of(context).primary,
+                                //   ),
+                                // ),
                               ),
                             ),
                           ],
