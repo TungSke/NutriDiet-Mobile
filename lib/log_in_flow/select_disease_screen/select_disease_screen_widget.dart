@@ -83,7 +83,7 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                       child: Column(
                         children: [
                           FFButtonWidget(
-                            onPressed: () {
+                            onPressed: () async {
                               if (model.selectedDiseaseIds.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -103,11 +103,22 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                                     "Bệnh đã lưu vào HealthProfileProvider: ${context.read<HealthProfileProvider>().diseases}");
 
                                 // Cập nhật bệnh và gửi lên API
-                                model.updateDisease(
-                                    context); // Gọi updateDisease để gửi dữ liệu lên API
+                                await model.updateDisease(
+                                    context); // Đợi updateDisease thực thi xong
 
-                                // Chuyển đến màn hình tiếp theo
-                                context.pushNamed("Whats_your_goal");
+                                // Kiểm tra xem quá trình gửi bệnh có thành công không (isLoading == false)
+                                if (!model.isLoading) {
+                                  if (model.isDiseaseUpdated) {
+                                    // Kiểm tra xem cập nhật bệnh có thành công không
+                                    showSnackbar(
+                                        context, 'Cập nhật bệnh thành công!');
+                                    // Chuyển sang màn hình Whats Your Goal sau khi cập nhật thành công
+                                    context.pushNamed("Whats_your_goal");
+                                  } else {
+                                    showSnackbar(
+                                        context, 'Cập nhật bệnh thất bại!');
+                                  }
+                                }
                               }
                             },
                             text: 'Tiếp tục',
@@ -130,18 +141,28 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
 
                           const SizedBox(height: 10.0), // Khoảng cách giữa nút
                           TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               // Cập nhật diseases vào provider (sử dụng List<int> thay vì List<String>)
                               context
                                   .read<HealthProfileProvider>()
                                   .setDiseases(model.selectedDiseaseIds);
 
                               // Cập nhật bệnh và gửi lên API
-                              model.updateDisease(
-                                  context); // Gọi updateDisease để gửi dữ liệu lên API
+                              await model.updateDisease(
+                                  context); // Đợi updateDisease thực thi xong
 
-                              // Chuyển đến màn hình tiếp theo
-                              context.pushNamed("Whats_your_goal");
+                              // Kiểm tra xem quá trình gửi bệnh có thành công không (isLoading == false)
+                              if (!model.isLoading) {
+                                if (model.isDiseaseUpdated) {
+                                  // Kiểm tra xem cập nhật bệnh có thành công không
+
+                                  // Chuyển sang màn hình Whats Your Goal sau khi cập nhật thành công
+                                  context.pushNamed("Whats_your_goal");
+                                } else {
+                                  showSnackbar(
+                                      context, 'Cập nhật bệnh thất bại!');
+                                }
+                              }
                             },
                             child: Text(
                               'Bỏ qua',
@@ -151,7 +172,7 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
+                          )
                         ],
                       ),
                     ),
@@ -163,5 +184,19 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
         },
       ),
     );
+  }
+
+  void showSnackbar(BuildContext context, String message,
+      {bool isError = false}) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(color: Colors.white),
+      ),
+      backgroundColor: isError ? Colors.red : Colors.green,
+      duration: const Duration(seconds: 2),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

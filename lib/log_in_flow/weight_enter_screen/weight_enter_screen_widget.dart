@@ -159,7 +159,7 @@ class WeightEnterScreenWidget extends StatefulWidget {
 class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  double selectedWeightLeft = 50.0; // Default weight (whole number part)
+  double selectedWeightLeft = 30.0; // Default weight (whole number part)
   double selectedWeightRight = 0.0; // Decimal part (0-9)
 
   List<int> weightOptionsIntLeft = []; // List of whole number weights
@@ -261,18 +261,18 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                       const SizedBox(height: 20),
                       FFButtonWidget(
                         onPressed: () {
-                          double finalWeight = selectedWeightLeft +
-                              (selectedWeightRight / 10);
+                          double finalWeight =
+                              selectedWeightLeft + (selectedWeightRight / 10);
                           // Kiểm tra validation
                           if (finalWeight < 30 || finalWeight > 250) {
-                            showSnackbar(context,
-                                'Cân nặng phải từ 30 đến 250 kg!',
+                            showSnackbar(
+                                context, 'Cân nặng phải từ 30 đến 250 kg!',
                                 isError: true);
                             return;
                           }
 
                           Provider.of<HealthProfileProvider>(context,
-                              listen: false)
+                                  listen: false)
                               .setWeight(finalWeight);
 
                           print("🔹 Xác nhận cân nặng: $finalWeight kg");
@@ -287,11 +287,11 @@ class _WeightEnterScreenWidgetState extends State<WeightEnterScreenWidget> {
                           height: 54.0,
                           color: FlutterFlowTheme.of(context).primary,
                           textStyle:
-                          FlutterFlowTheme.of(context).titleSmall.copyWith(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              FlutterFlowTheme.of(context).titleSmall.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                           elevation: 2.0,
                           borderRadius: BorderRadius.circular(12),
                         ),

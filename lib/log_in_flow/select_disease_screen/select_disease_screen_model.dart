@@ -125,6 +125,7 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
   /// Dữ liệu bệnh từ API
   List<Map<String, dynamic>> diseaseLevelsData = [];
   bool isLoading = true;
+  bool isDiseaseUpdated = false;
 
   /// Model cho AppBar
   late AppbarModel appbarModel;
@@ -166,62 +167,116 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
   }
 
   /// 🔹 Cập nhật bệnh lên HealthProfileProvider và API
+//   Future<void> updateDisease(BuildContext context) async {
+//     try {
+//       // Lấy thông tin sức khỏe từ HealthProfileProvider
+//       final healthProfileProvider = context.read<HealthProfileProvider>();
+//
+//       // Lấy height, weight, và activityLevel từ HealthProfileProvider
+//       double height =
+//           healthProfileProvider.height ?? 0.0; // Cập nhật thành double
+//       double weight =
+//           healthProfileProvider.weight ?? 0.0; // Cập nhật thành double
+//       String aisuggestion = healthProfileProvider.aisuggestion ?? "string";
+//       String activityLevel = healthProfileProvider.activityLevel ?? "";
+//       String dietStyle = healthProfileProvider.dietStyle ?? "";
+//       // Kiểm tra xem có đầy đủ thông tin không
+//       if (height == 0.0 || weight == 0.0 || activityLevel.isEmpty) {
+//         showSnackbar(context, '⚠️ Thông tin sức khỏe chưa đầy đủ.');
+//         return;
+//       }
+//
+//       // Cập nhật danh sách bệnh vào HealthProfileProvider
+//       healthProfileProvider.setDiseases(
+//           selectedDiseaseIds); // Chắc chắn rằng `selectedDiseaseIds` là List<int>
+//
+//       // Lấy allergy và disease từ HealthProfileProvider
+//       List<int> allergies = healthProfileProvider.allergies;
+//       List<int> diseases = healthProfileProvider
+//           .diseases; // Lấy diseases từ HealthProfileProvider
+//
+//       // Kiểm tra và hiển thị thông tin bệnh và dị ứng
+//       print("📌 Allergies: $allergies");
+//       print("📌 Diseases: $diseases");
+//
+//       // Gửi thông tin lên API
+//       final response = await UserService().updateHealthProfile(
+//         height: height,
+//         weight: weight,
+//         activityLevel: activityLevel,
+//         dietStyle: dietStyle,
+//         aisuggestion: "",
+//         allergies: allergies, // Gửi allergy
+//         diseases: diseases, // Gửi disease
+//       );
+//
+//       print("🔹 Response status code: ${response.statusCode}");
+//       print("🔹 Response body: ${response.body}");
+//       if (response.statusCode == 200) {
+//         FFAppState().diseaseIds =
+//             diseases.toString(); // Lưu disease thay allergy
+//         FFAppState().update(() {});
+//         showSnackbar(context, 'Cập nhật bệnh thành công!');
+//       } else {
+//         showSnackbar(context, 'Cập nhật thất bại: ${response.body}');
+//       }
+//     } catch (e) {
+//       print("❌ Lỗi xảy ra: $e");
+//       showSnackbar(context, 'Lỗi: $e');
+//     }
+//   }
+// }
+  /// 🔹 Cập nhật bệnh lên HealthProfileProvider và API
   Future<void> updateDisease(BuildContext context) async {
     try {
-      // Lấy thông tin sức khỏe từ HealthProfileProvider
+      isLoading = true; // Bắt đầu quá trình gửi dữ liệu bệnh lên API
+      notifyListeners();
+
       final healthProfileProvider = context.read<HealthProfileProvider>();
 
-      // Lấy height, weight, và activityLevel từ HealthProfileProvider
-      double height =
-          healthProfileProvider.height ?? 0.0; // Cập nhật thành double
-      double weight =
-          healthProfileProvider.weight ?? 0.0; // Cập nhật thành double
+      double height = healthProfileProvider.height ?? 0.0;
+      double weight = healthProfileProvider.weight ?? 0.0;
       String aisuggestion = healthProfileProvider.aisuggestion ?? "string";
       String activityLevel = healthProfileProvider.activityLevel ?? "";
       String dietStyle = healthProfileProvider.dietStyle ?? "";
-      // Kiểm tra xem có đầy đủ thông tin không
+
       if (height == 0.0 || weight == 0.0 || activityLevel.isEmpty) {
         showSnackbar(context, '⚠️ Thông tin sức khỏe chưa đầy đủ.');
         return;
       }
 
-      // Cập nhật danh sách bệnh vào HealthProfileProvider
-      healthProfileProvider.setDiseases(
-          selectedDiseaseIds); // Chắc chắn rằng `selectedDiseaseIds` là List<int>
+      healthProfileProvider.setDiseases(selectedDiseaseIds);
 
-      // Lấy allergy và disease từ HealthProfileProvider
       List<int> allergies = healthProfileProvider.allergies;
-      List<int> diseases = healthProfileProvider
-          .diseases; // Lấy diseases từ HealthProfileProvider
+      List<int> diseases = healthProfileProvider.diseases;
 
-      // Kiểm tra và hiển thị thông tin bệnh và dị ứng
-      print("📌 Allergies: $allergies");
-      print("📌 Diseases: $diseases");
-
-      // Gửi thông tin lên API
       final response = await UserService().updateHealthProfile(
         height: height,
         weight: weight,
         activityLevel: activityLevel,
         dietStyle: dietStyle,
         aisuggestion: "",
-        allergies: allergies, // Gửi allergy
-        diseases: diseases, // Gửi disease
+        allergies: allergies,
+        diseases: diseases,
       );
 
-      print("🔹 Response status code: ${response.statusCode}");
-      print("🔹 Response body: ${response.body}");
       if (response.statusCode == 200) {
-        FFAppState().diseaseIds =
-            diseases.toString(); // Lưu disease thay allergy
+        FFAppState().diseaseIds = diseases.toString();
         FFAppState().update(() {});
-        showSnackbar(context, 'Cập nhật bệnh thành công!');
+        // showSnackbar(context, 'Cập nhật bệnh thành công!');
+        isDiseaseUpdated = true; // Đánh dấu bệnh đã được cập nhật thành công
       } else {
         showSnackbar(context, 'Cập nhật thất bại: ${response.body}');
+        isDiseaseUpdated = false; // Nếu có lỗi, đánh dấu là chưa thành công
       }
     } catch (e) {
       print("❌ Lỗi xảy ra: $e");
       showSnackbar(context, 'Lỗi: $e');
+      isDiseaseUpdated = false; // Nếu xảy ra lỗi, đánh dấu là chưa thành công
+    } finally {
+      isLoading =
+          false; // Đảm bảo luôn thay đổi trạng thái loading sau khi gửi xong
+      notifyListeners();
     }
   }
 }

@@ -244,27 +244,28 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
     final personalGoalProvider = context.read<PersonalGoalProvider>();
 
     if (personalGoalProvider.goalType == "LoseWeight") {
-      // If the goal is to lose weight, the minimum weight should be 40kg.
+      // Nếu mục tiêu là giảm cân, giới hạn cân nặng từ 30kg đến currentWeight.
       kgOptionsIntLeft = List.generate(
-        (currentWeight.toInt() - 40) > 0 ? (currentWeight.toInt() - 40) : 0,
+        (currentWeight.toInt() - 30) > 0 ? (currentWeight.toInt() - 30) : 0,
         (index) => currentWeight.toInt() - index,
-      ); // Create the list from currentWeight down to 40kg (inclusive)
+      ); // Tạo danh sách từ currentWeight xuống 30kg (bao gồm)
     } else if (personalGoalProvider.goalType == "GainWeight") {
-      // If the goal is to gain weight, the maximum weight should be 220kg.
+      // Nếu mục tiêu là tăng cân, giới hạn cân nặng từ currentWeight đến 250kg.
       kgOptionsIntLeft = List.generate(
-        (220 - currentWeight.toInt()) > 0 ? (220 - currentWeight.toInt()) : 0,
+        (250 - currentWeight.toInt()) > 0 ? (250 - currentWeight.toInt()) : 0,
         (index) => currentWeight.toInt() + index,
-      ); // Create the list from currentWeight up to 220kg (inclusive)
+      ); // Tạo danh sách từ currentWeight lên đến 250kg (bao gồm)
     } else {
-      // If the goal is to maintain weight, allow values from 40kg to currentWeight.
+      // Nếu mục tiêu là duy trì cân nặng, cho phép từ 30kg đến currentWeight.
       kgOptionsIntLeft = List.generate(
-        (currentWeight.toInt() - 40) > 0 ? (currentWeight.toInt() - 40) : 0,
-        (index) => 40 + index,
-      ); // Create the list from 40kg up to currentWeight
+        (currentWeight.toInt() - 30) > 0 ? (currentWeight.toInt() - 30) : 0,
+        (index) => 30 + index,
+      ); // Tạo danh sách từ 30kg đến currentWeight
     }
 
+    // Giới hạn thập phân từ 0 đến 9
     kgOptionsIntRight = List.generate(
-        10, (index) => index); // Values from 0 to 9 for the right side.
+        10, (index) => index); // Giá trị từ 0 đến 9 cho phần thập phân.
 
     setState(() {});
   }
@@ -392,46 +393,63 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
                     ),
                     const SizedBox(height: 20),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: FFButtonWidget(
-                        onPressed: () {
-                          // Tính toán kết quả cuối cùng: Kết hợp số nguyên bên trái và số nguyên bên phải
-                          double finalWeight = selectedKgLeft +
-                              (selectedKgRight / 10); // 71 + 2/10 = 71.2
-                          personalGoalProvider.setTargetWeight(finalWeight);
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: FFButtonWidget(
+                          onPressed: () {
+                            // Tính toán kết quả cuối cùng: Kết hợp số nguyên bên trái và số nguyên bên phải
+                            double finalWeight = selectedKgLeft +
+                                (selectedKgRight / 10); // 71 + 2/10 = 71.2
+                            personalGoalProvider.setTargetWeight(finalWeight);
 
-                          print(
-                              "🔹 Xác nhận targetWeight: ${personalGoalProvider.targetWeight?.toStringAsFixed(1)}");
-
-                          if (personalGoalProvider.goalType == "GainWeight") {
-                            context.pushNamed(
-                                'increase_weight_change_rate_screen');
-                          } else if (personalGoalProvider.goalType ==
-                              "LoseWeight") {
-                            context.pushNamed(
-                                'decrease_weight_change_rate_screen');
-                          } else {
-                            showSnackbar(
-                                context, 'Lỗi: Mục tiêu không hợp lệ.');
-                          }
-                        },
-                        text: 'Xác nhận',
-                        options: FFButtonOptions(
-                          width: double.infinity,
-                          height: 54.0,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          color: FlutterFlowTheme.of(context).primary,
-                          textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                          elevation: 2.0,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
+                            // Validate weight for GainWeight and LoseWeight
+                            if (personalGoalProvider.goalType == "GainWeight" &&
+                                finalWeight <= 30.0) {
+                              showSnackbar(
+                                context,
+                                "Bạn không thể chọn cân nặng nhỏ hơn hoặc bằng 30kg khi tăng cân.",
+                                isError: true,
+                              );
+                            } else if (personalGoalProvider.goalType ==
+                                    "LoseWeight" &&
+                                finalWeight >= 250.0) {
+                              showSnackbar(
+                                context,
+                                "Bạn không thể chọn cân nặng lớn hơn hoặc bằng 250kg khi giảm cân.",
+                                isError: true,
+                              );
+                            } else {
+                              // Nếu không có lỗi, tiếp tục với mục tiêu đã chọn
+                              if (personalGoalProvider.goalType ==
+                                  "GainWeight") {
+                                context.pushNamed(
+                                    'increase_weight_change_rate_screen');
+                              } else if (personalGoalProvider.goalType ==
+                                  "LoseWeight") {
+                                context.pushNamed(
+                                    'decrease_weight_change_rate_screen');
+                              } else {
+                                showSnackbar(
+                                    context, 'Lỗi: Mục tiêu không hợp lệ.');
+                              }
+                            }
+                          },
+                          text: 'Xác nhận',
+                          options: FFButtonOptions(
+                            width: double.infinity,
+                            height: 54.0,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            color: FlutterFlowTheme.of(context).primary,
+                            textStyle: FlutterFlowTheme.of(context)
+                                .titleSmall
+                                .copyWith(
+                                  color: Colors.white,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            elevation: 2.0,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        )),
                   ],
                 ),
               ),
@@ -440,5 +458,19 @@ class _TargetWeightScreenWidgetState extends State<TargetWeightScreenWidget> {
         ),
       ),
     );
+  }
+
+  void showSnackbar(BuildContext context, String message,
+      {bool isError = false}) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(color: Colors.white),
+      ),
+      backgroundColor: isError ? Colors.red : Colors.green,
+      duration: const Duration(seconds: 2),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

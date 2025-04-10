@@ -38,6 +38,37 @@ final List<Map<String, String>> goalLevels = [
 
 class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
   int? selectedGoalIndex;
+  double currentWeight = 0.0;
+
+  // Hàm này sẽ gọi API để lấy thông tin cân nặng
+  Future<void> fetchHealthProfile() async {
+    try {
+      final response = await UserService().getHealthProfile();
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final Map<String, dynamic> healthData = responseData['data'];
+
+        currentWeight = double.tryParse(healthData['weight'].toString()) ?? 0.0;
+
+        if (currentWeight == 0.0) {
+          showSnackbar(context, "⚠️ Không thể lấy cân nặng hiện tại.");
+        }
+        setState(() {}); // Cập nhật lại UI khi có dữ liệu
+      } else {
+        print("❌ Lỗi khi lấy hồ sơ sức khỏe, mã lỗi: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi lấy thông tin sức khỏe: $e");
+      showSnackbar(context, "⚠️ Lỗi khi lấy thông tin sức khỏe.");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchHealthProfile(); // Gọi API để lấy thông tin cân nặng khi widget được khởi tạo
+  }
 
   Future<void> handleMaintainWeight(BuildContext context) async {
     final personalGoalProvider = context.read<PersonalGoalProvider>();
@@ -188,42 +219,55 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-              child: FFButtonWidget(
-                onPressed: () async {
-                  final personalGoalProvider =
-                      context.read<PersonalGoalProvider>();
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 16.0),
+                child: FFButtonWidget(
+                  onPressed: () async {
+                    final personalGoalProvider =
+                        context.read<PersonalGoalProvider>();
 
-                  if (personalGoalProvider.goalType == null) {
-                    showSnackbar(context, 'Vui lòng chọn một mục tiêu.');
-                    return;
-                  }
+                    if (personalGoalProvider.goalType == null) {
+                      showSnackbar(context, 'Vui lòng chọn một mục tiêu.');
+                      return;
+                    }
 
-                  // ✅ Nếu chọn "Giữ cân", gọi API khi bấm "Tiếp tục"
-                  if (personalGoalProvider.goalType == "Maintain") {
-                    await handleMaintainWeight(context);
-                  } else {
-                    // ✅ Nếu chọn "Tăng cân" hoặc "Giảm cân", chuyển màn hình tiếp theo
-                    context.pushNamed('target_weight_screen');
-                  }
-                },
-                text: 'Tiếp tục',
-                options: FFButtonOptions(
-                  width: double.infinity,
-                  height: 54.0,
-                  color: FlutterFlowTheme.of(context).primary,
-                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                        fontFamily: 'figtree',
-                        color: Colors.white,
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        useGoogleFonts: false,
-                      ),
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-              ),
-            ),
+                    // Đảm bảo rằng dữ liệu đã có trước khi tiếp tục
+                    if (personalGoalProvider.goalType == "LoseWeight" &&
+                        currentWeight == 30) {
+                      showSnackbar(
+                          context, "Bạn đang 30kg, không thể giảm cân.",
+                          isError: true);
+                    } else if (personalGoalProvider.goalType == "GainWeight" &&
+                        currentWeight == 250) {
+                      showSnackbar(
+                          context, "Bạn đang 250kg, không thể tăng cân.",
+                          isError: true);
+                    } else {
+                      // Nếu không có lỗi, tiếp tục với mục tiêu đã chọn
+                      if (personalGoalProvider.goalType == "Maintain") {
+                        await handleMaintainWeight(
+                            context); // Đảm bảo đã gọi API trước khi tiếp tục
+                      } else {
+                        // Chuyển đến màn hình tiếp theo
+                        context.pushNamed('target_weight_screen');
+                      }
+                    }
+                  },
+                  text: 'Tiếp tục',
+                  options: FFButtonOptions(
+                    width: double.infinity,
+                    height: 54.0,
+                    color: FlutterFlowTheme.of(context).primary,
+                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                          fontFamily: 'figtree',
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          useGoogleFonts: false,
+                        ),
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                )),
           ],
         ),
       ),
@@ -231,16 +275,15 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
   }
 }
 
-void showSnackbar(BuildContext context, String message) {
+void showSnackbar(BuildContext context, String message,
+    {bool isError = false}) {
   final snackBar = SnackBar(
     content: Text(
       message,
-      style: TextStyle(
-        color: Colors.white, // Set text color to white
-      ),
+      style: const TextStyle(color: Colors.white),
     ),
-    backgroundColor: Colors.green, // Set background color to green
-    duration: Duration(seconds: 2), // Duration for the snackbar to be visible
+    backgroundColor: isError ? Colors.red : Colors.green,
+    duration: const Duration(seconds: 2),
   );
 
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
