@@ -425,7 +425,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         style: GoogleFonts.roboto(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: FlutterFlowTheme.of(context).primary,
+                          color: _getBmiTypeColor(_model.bmiType),
                         ),
                       ),
                     ],
@@ -469,6 +469,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             ),
                           ),
                         ),
+                        Text("Chỉ số BMI ")
                       ],
                     ),
                     Column(
@@ -506,6 +507,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             ),
                           ),
                         ),
+                        Text("Chỉ số TDEE ")
                       ],
                     ),
                   ],
@@ -749,6 +751,25 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
         );
       },
     );
+  }
+}
+
+Color _getBmiTypeColor(String bmiType) {
+  switch (bmiType) {
+    case 'Gầy':
+      return Colors.blue; // Màu xanh dương cho Gầy
+    case 'Bình thường':
+      return Colors.green; // Màu xanh lá cho Bình thường
+    case 'Thừa cân':
+      return Colors.orange.shade300; // Màu vàng cho Thừa cân
+    case 'Béo phì độ 1':
+      return Colors.orange.shade500; // Màu cam nhạt cho Béo phì độ 1
+    case 'Béo phì độ 2':
+      return Colors.orange.shade900; // Màu cam đậm cho Béo phì độ 2
+    case 'Béo phì độ 3':
+      return Colors.red; // Màu đỏ cho Béo phì độ 3
+    default:
+      return Colors.black; // Nếu không xác định được, mặc định màu đen
   }
 }
 

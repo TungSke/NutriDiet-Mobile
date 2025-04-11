@@ -19,27 +19,32 @@ class FrequencyExerciseScreenWidget extends StatefulWidget {
 final List<Map<String, String>> exerciseLevels = [
   {
     'title': 'Ít vận động',
-    'description': 'Công việc văn phòng, ít tập thể dục.',
+    'description':
+        'Mô tả: Đây là lối sống chủ yếu dành cho những người có công việc văn phòng, ít phải di chuyển và không thực hiện các hoạt động thể chất thường xuyên.',
     'image': 'assets/images/exercise-2.png'
   },
   {
     'title': 'Vận động nhẹ',
-    'description': 'Tập thể dục nhẹ hoặc đi bộ mỗi ngày 30 phút.',
+    'description':
+        'Mô tả: Chế độ vận động này bao gồm các hoạt động thể dục nhẹ nhàng như đi bộ đều đặn mỗi ngày từ 30 phút. ',
     'image': 'assets/images/exercise-6.png'
   },
   {
     'title': 'Vận động vừa phải',
-    'description': 'Tập thể dục 1 giờ (3-5 lần/tuần).',
+    'description':
+        'Mô tả: Chế độ vận động này bao gồm việc tập thể dục khoảng 1 giờ mỗi lần, 3-5 lần mỗi tuần. Các hoạt động có thể bao gồm đi bộ nhanh, chạy nhẹ, bơi lội hoặc tập thể dục nhẹ nhàng khác.',
     'image': 'assets/images/exercise-3.png'
   },
   {
     'title': 'Vận động nhiều',
-    'description': 'Tập luyện cường độ cao 5-7 lần/tuần.',
+    'description':
+        'Mô tả: Chế độ này yêu cầu tập luyện cường độ cao từ 5-7 lần mỗi tuần. Các hoạt động có thể bao gồm chạy, đạp xe, hoặc tập gym với cường độ mạnh.',
     'image': 'assets/images/exercise-4.png'
   },
   {
-    'title': 'Cường độ rất cao',
-    'description': 'Thể thao chuyên nghiệp hoặc tập luyện cường độ rất cao.',
+    'title': 'Cường độ cao',
+    'description':
+        'Mô tả: Đây là chế độ dành cho những người thực hiện các hoạt động thể thao chuyên nghiệp hoặc các bài tập luyện cường độ rất cao, hoặc thi đấu thể thao. ',
     'image': 'assets/images/exercise-5.png'
   }
 ];
