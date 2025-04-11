@@ -31,11 +31,23 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
   int selectedDay = 1;
   bool isPremium = false;
 
-  final Map<String, String> mealTypeTranslations = {
-    'Breakfast': 'Bữa sáng',
-    'Lunch': 'Bữa trưa',
-    'Dinner': 'Bữa tối',
-    'Snacks': 'Bữa phụ',
+  final Map<String, Map<String, String>> mealTypeTranslations = {
+    'Breakfast': {
+      'name': 'Bữa sáng',
+      'time': '6:00 - 8:00 sáng',
+    },
+    'Lunch': {
+      'name': 'Bữa trưa',
+      'time': '12:00 - 14:00 chiều',
+    },
+    'Dinner': {
+      'name': 'Bữa tối',
+      'time': '18:00 - 20:00 tối',
+    },
+    'Snacks': {
+      'name': 'Bữa phụ',
+      'time': '15:00 - 16:00 chiều',
+    },
   };
 
   @override
@@ -893,12 +905,16 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     }
   }
   Widget _buildMealCard(String mealType, List<MealPlanDetail> meals) {
-    final vietnameseMealType = mealTypeTranslations[mealType] ?? mealType;
+    final vietnameseMealInfo = mealTypeTranslations[mealType] ?? {
+      'name': mealType,
+      'time': '',
+    };
+    final vietnameseMealType = vietnameseMealInfo['name']!;
+    final mealTime = vietnameseMealInfo['time']!;
     String foodNames;
     if (meals.isEmpty) {
       foodNames = "Chưa có món ăn";
     } else {
-      // Yêu cầu 2: Xử lý món ăn trùng lặp với quantity
       final foodMap = <String, double>{};
       for (var meal in meals) {
         final name = meal.foodName ?? "Chưa có món ăn";
@@ -944,15 +960,41 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    vietnameseMealType,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: hasMeals ? Colors.black : Colors.grey.shade700,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      Text(
+                        vietnameseMealType,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: hasMeals ? Colors.black : Colors.grey.shade700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (mealTime.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '($mealTime)',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
