@@ -48,13 +48,13 @@ class _IncreaseWeightChangeRateScreenWidgetState
 
     try {
       final response = await UserService().createPersonalGoal(
-        goalType: personalGoalProvider.goalType!,
-        targetWeight: personalGoalProvider.targetWeight!,
-        weightChangeRate: personalGoalProvider.weightChangeRate!,
-        goalDescription:
-            personalGoalProvider.goalDescription ?? "Mục tiêu mặc định",
-        notes: personalGoalProvider.notes ?? "Không có ghi chú",
-      );
+          goalType: personalGoalProvider.goalType!,
+          targetWeight: personalGoalProvider.targetWeight!,
+          weightChangeRate: personalGoalProvider.weightChangeRate!,
+          goalDescription:
+              personalGoalProvider.goalDescription ?? "Mục tiêu mặc định",
+          notes: personalGoalProvider.notes ?? "Không có ghi chú",
+          context: context);
 
       print("🔹 API Response: ${response.body}");
 
@@ -62,7 +62,14 @@ class _IncreaseWeightChangeRateScreenWidgetState
         showSnackbar(context, "🎉 Gửi mục tiêu thành công!");
         context.pushNamed('health_indicator_screen');
       } else {
-        showSnackbar(context, "⚠️ Gửi thất bại: ${response.body}");
+        final responseData = jsonDecode(response.body);
+        final errorMessage = responseData['Message'] ?? 'Cập nhật thất bại';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage, style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.red, // Nền đỏ
+          ),
+        );
       }
     } catch (e) {
       print("❌ Lỗi khi gửi API: $e");

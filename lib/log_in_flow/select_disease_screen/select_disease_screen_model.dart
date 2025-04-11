@@ -239,6 +239,14 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
       String aisuggestion = healthProfileProvider.aisuggestion ?? "string";
       String activityLevel = healthProfileProvider.activityLevel ?? "";
       String dietStyle = healthProfileProvider.dietStyle ?? "";
+      String profileOption = healthProfileProvider.profileOption;
+
+      print("🔹 Dữ liệu sẽ được gửi:");
+      print("Height: $height, Weight: $weight");
+      print("Activity Level: $activityLevel, Diet Style: $dietStyle");
+      print("Profile Option: $profileOption, Aisuggestion: $aisuggestion");
+      print("Allergies: ${healthProfileProvider.allergies}");
+      print("Diseases: ${selectedDiseaseIds}");
 
       if (height == 0.0 || weight == 0.0 || activityLevel.isEmpty) {
         showSnackbar(context, '⚠️ Thông tin sức khỏe chưa đầy đủ.');
@@ -255,10 +263,14 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
         weight: weight,
         activityLevel: activityLevel,
         dietStyle: dietStyle,
+        profileOption: profileOption,
         aisuggestion: "",
         allergies: allergies,
         diseases: diseases,
       );
+      // Kiểm tra phản hồi
+      print("🔹 Response status: ${response.statusCode}");
+      print("🔹 Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         FFAppState().diseaseIds = diseases.toString();

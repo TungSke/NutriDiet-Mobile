@@ -190,7 +190,9 @@
 //   }
 // }
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
+
 import '../../services/user_service.dart';
 
 class EditPersonalGoalScreenModel extends ChangeNotifier {
@@ -247,6 +249,8 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
   double dailyProtein = 0;
   String goalType = '';
   double targetWeight = 0.0;
+  String notes = '';
+  String goalDescription = '';
   String weightChangeRate = '';
   double currentWeight = 0.0;
 
@@ -325,8 +329,8 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
         dailyProtein = personalData['data']['dailyProtein'] != null
             ? double.parse(personalData['data']['dailyProtein'].toString())
             : 0.0;
-        weightChangeRate = _reverseWeightChangeRateMap[
-        personalData['data']['weightChangeRate']] ??
+        weightChangeRate = _reverseWeightChangeRateMap[personalData['data']
+                ['weightChangeRate']] ??
             "Chưa cập nhật";
         print("Weight Change Rate: $weightChangeRate");
         isLoading = false;
@@ -350,7 +354,8 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
           );
           return;
         }
-        if (weightChangeRate.isEmpty || _weightChangeRateMap[weightChangeRate] == null) {
+        if (weightChangeRate.isEmpty ||
+            _weightChangeRateMap[weightChangeRate] == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Vui lòng chọn mức độ thay đổi cân nặng'),
@@ -370,42 +375,40 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
           _weightChangeRateMap[weightChangeRate] ?? 0;
       final goalTypeInEnglish = _reverseGoalTypeMap[goalType] ?? 'LoseWeight';
 
-      final response = await UserService().updatePersonalGoal(
-        goalType: goalTypeInEnglish,
-        targetWeight: targetWeight,
-        weightChangeRate: weightChangeRateNumber.toString(),
-        context: context,
-      );
+      final response = await UserService().createPersonalGoal(
+          goalType: goalTypeInEnglish,
+          targetWeight: targetWeight,
+          weightChangeRate: weightChangeRateNumber.toString(),
+          notes: notes,
+          goalDescription: goalDescription,
+          context: context);
 
-      if (response.statusCode == 200) {
-        print('✅ Update successful!');
+      if (response.statusCode == 201) {
+        print('✅ Cập nhật thành công!');
+        await fetchHealthProfile(); // Fetch updated data
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cập nhật mục tiêu thành công!'),
+          SnackBar(
+            content: Text('Cập nhật thành công!',
+                style: TextStyle(color: Colors.white)),
             backgroundColor: Colors.green,
           ),
         );
-        await fetchPersonalGoal();
         Navigator.pop(context, true);
-      } else {
+      } else if (response.statusCode == 500) {
         final responseData = jsonDecode(response.body);
-        final errorMessage =
-            responseData['message'] ?? 'Có lỗi xảy ra, vui lòng thử lại';
+        final errorMessage = responseData['Message'] ?? 'Cập nhật thất bại';
+        print('❌ Lỗi: $errorMessage');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Colors.red,
+            content: Text(errorMessage, style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.red, // Nền đỏ
           ),
         );
-        print("❌ Error from API: $errorMessage");
       }
     } catch (e) {
-      print("❌ Exception caught: $e");
+      print("❌ Lỗi khi cập nhật mục tiêu sức khoẻ: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Có lỗi xảy ra, vui lòng thử lại'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Đã xảy ra lỗi, vui lòng thử lại.')),
       );
     }
   }

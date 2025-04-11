@@ -70,6 +70,97 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     }
   }
 
+  void _checkTodayUpdate() async {
+    try {
+      // Call checkTodayUpdate to see if the profile was updated today
+      bool isUpdatedToday = await _model.checkTodayUpdate();
+
+      if (isUpdatedToday) {
+        // Show confirmation modal
+        _showConfirmationModal();
+      } else {
+        // Not updated today, directly update health profile
+        await _updateHealthProfile("ADD");
+        await _model.fetchHealthProfile();
+        if (mounted) {
+          _refreshChart(); // Làm mới biểu đồ
+          // Gọi lại fetchWeightHistory để cập nhật danh sách
+          await _fetchWeightHistory();
+        }
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      print("❌ Lỗi khi kiểm tra: $e");
+      // Handle errors if necessary
+    }
+  }
+
+  void _showConfirmationModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Thông báo'),
+          content: Text(
+              'Bạn đã cập nhật hồ sơ sức khỏe hôm nay. Bạn vẫn muốn cập nhật không?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close modal when choosing "Cancel"
+              },
+              child: Text(
+                'Hủy',
+                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+              ),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor:
+                    FlutterFlowTheme.of(context).primary, // Màu chữ
+              ),
+              onPressed: () async {
+                Navigator.pop(context);
+                await _updateHealthProfile("REPLACE");
+                // Not updated today, directly update health profile
+
+                await _model.fetchHealthProfile();
+                if (mounted) {
+                  _refreshChart(); // Làm mới biểu đồ
+                  // Gọi lại fetchWeightHistory để cập nhật danh sách
+                  await _fetchWeightHistory();
+                }
+              },
+              child: Text('Thay thế'),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor:
+                    FlutterFlowTheme.of(context).primary, // Màu chữ
+              ),
+              onPressed: () async {
+                Navigator.pop(context);
+                await _updateHealthProfile("ADD");
+                await _model.fetchHealthProfile();
+                if (mounted) {
+                  _refreshChart(); // Làm mới biểu đồ
+                  // Gọi lại fetchWeightHistory để cập nhật danh sách
+                  await _fetchWeightHistory();
+                }
+              },
+              child: Text('Thêm mới'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updateHealthProfile(String profileOption) async {
+    await _model.updateHealthProfile(context, profileOption);
+  }
+
   Future<void> _deletePhoto(int profileId) async {
     bool success =
         await HealthService().deleteHealthProfileImage(profileId: profileId);
@@ -431,6 +522,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     ],
                   ),
                 ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -512,7 +604,18 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                     ),
                   ],
                 ),
-
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 15),
+                  child: Text(
+                    (_model.evaluate),
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: FlutterFlowTheme.of(context).primary,
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 25),
                   child: Column(
@@ -677,6 +780,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
       builder: (BuildContext context) {
         return Padding(
           padding: const EdgeInsets.all(20.0),
@@ -693,57 +797,109 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    '${currentWeight.toStringAsFixed(1)} kg',
-                    style: const TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
+                  // const SizedBox(height: 20),
+                  // Text(
+                  //   '${currentWeight.toStringAsFixed(1)} kg',
+                  //   style: const TextStyle(
+                  //     fontSize: 32.0,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Colors.black,
+                  //   ),
+                  // ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 20,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed: () {
-                          setStateForBottomSheet(() {
-                            currentWeight -= 0.1;
-                            currentWeight =
-                                double.parse(currentWeight.toStringAsFixed(1));
-                          });
-                        },
+                      Container(
+                        width:
+                            30, // Set width to control the size of the button
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context)
+                              .primary, // Set background color to green
+                          shape: BoxShape.circle, // Circular button shape
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.remove,
+                              color: Colors.white), // White icon
+                          onPressed: () {
+                            setStateForBottomSheet(() {
+                              currentWeight -= 0.1;
+                              currentWeight = double.parse(
+                                  currentWeight.toStringAsFixed(1));
+                            });
+                          },
+                          iconSize: 20, // Smaller icon size
+                          padding:
+                              EdgeInsets.zero, // Remove any default padding
+                        ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () {
-                          setStateForBottomSheet(() {
-                            currentWeight += 0.1;
-                            currentWeight =
-                                double.parse(currentWeight.toStringAsFixed(1));
-                          });
-                        },
+                      Text(
+                        '${currentWeight.toStringAsFixed(1)} kg',
+                        style: const TextStyle(
+                          fontSize: 32.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
+                      Container(
+                        width:
+                            30, // Set width to control the size of the button
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context)
+                              .primary, // Set background color to green
+                          shape: BoxShape.circle, // Circular button shape
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.add,
+                              color: Colors.white), // White icon
+                          onPressed: () {
+                            setStateForBottomSheet(() {
+                              currentWeight += 0.1;
+                              currentWeight = double.parse(
+                                  currentWeight.toStringAsFixed(1));
+                            });
+                          },
+                          iconSize: 20, // Smaller icon size
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                      // IconButton(
+                      //   icon: const Icon(Icons.add),
+                      //   onPressed: () {
+                      //     setStateForBottomSheet(() {
+                      //       currentWeight += 0.1;
+                      //       currentWeight =
+                      //           double.parse(currentWeight.toStringAsFixed(1));
+                      //     });
+                      //   },
+                      // ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () async {
-                      _model.weight = currentWeight;
+                      onPressed: () async {
+                        _model.weight = currentWeight;
 
-                      await _model.updateHealthProfile(context);
-                      await _model.fetchHealthProfile();
-                      if (mounted) {
-                        _refreshChart(); // Làm mới biểu đồ
-                        // Gọi lại fetchWeightHistory để cập nhật danh sách
-                        await _fetchWeightHistory();
-                      }
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Lưu'),
-                  ),
+                        _checkTodayUpdate();
+                        // await _model.fetchHealthProfile();
+                        // if (mounted) {
+                        //   _refreshChart(); // Làm mới biểu đồ
+                        //   // Gọi lại fetchWeightHistory để cập nhật danh sách
+                        //   await _fetchWeightHistory();
+                        // }
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: FlutterFlowTheme.of(context)
+                            .primary, // Text color (white)
+                      ),
+                      child: const Text(
+                        'Lưu',
+                      ))
                 ],
               );
             },
