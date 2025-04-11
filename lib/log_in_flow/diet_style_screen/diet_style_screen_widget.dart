@@ -19,31 +19,31 @@ final List<Map<String, String>> dietStyles = [
   {
     'title': 'Nhiều Carb, giảm Protein',
     'description':
-        'Cung cấp năng lượng từ các nguồn tinh bột như gạo, bánh mì, khoai tây.',
+        'Mô tả: Chế độ ăn này tập trung vào việc cung cấp năng lượng chủ yếu từ các nguồn tinh bột như gạo, bánh mì, khoai tây, thay vì từ các nguồn protein. Đây là một lựa chọn phù hợp cho những ai muốn tăng cường năng lượng nhanh chóng mà không quá chú trọng đến việc bổ sung nhiều protein.',
     'image': 'assets/images/46.png'
   },
   {
     'title': 'Nhiều Protein, giảm Carb',
     'description':
-        'Ưu tiên nguồn protein dồi dào từ thịt, cá, trứng, và các sản phẩm từ sữa, đồng thời hạn chế lượng carbohydrate.',
+        'Mô tả: Chế độ ăn này ưu tiên nguồn protein dồi dào từ các thực phẩm như thịt, cá, trứng, và các sản phẩm từ sữa. Đồng thời hạn chế việc tiêu thụ carbohydrate (tinh bột). Phù hợp cho những ai muốn xây dựng cơ bắp, giảm mỡ và duy trì cảm giác no lâu mà không cần quá nhiều carbs.',
     'image': 'assets/images/47.png'
   },
   {
     'title': 'Ăn chay',
     'description':
-        'Loại bỏ thịt và cá nhưng vẫn có thể bao gồm các sản phẩm từ sữa, trứng hoặc mật ong..',
+        'Mô tả: Chế độ ăn chay loại bỏ thịt và cá khỏi khẩu phần ăn nhưng vẫn cho phép tiêu thụ các sản phẩm từ sữa, trứng hoặc mật ong. Đây là một lựa chọn cho những ai muốn giảm thiểu việc sử dụng thực phẩm động vật mà vẫn bổ sung đủ protein từ các nguồn thực vật và sữa.',
     'image': 'assets/images/45.png'
   },
   {
     'title': 'Thuần chay',
     'description':
-        'Loại bỏ hoàn toàn tất cả sản phẩm có nguồn gốc từ động vật,...tập trung vào thực phẩm từ thực vật như rau củ, quả, ngũ cốc và các loại hạt.',
+        'Mô tả: Chế độ ăn thuần chay loại bỏ hoàn toàn tất cả các sản phẩm có nguồn gốc từ động vật. Tập trung vào thực phẩm từ thực vật như rau củ, quả, ngũ cốc và các loại hạt. Đây là chế độ ăn dành cho những ai hoàn toàn không sử dụng thực phẩm có nguồn gốc động vật và muốn một chế độ ăn lành mạnh, tự nhiên.',
     'image': 'assets/images/44.png'
   },
   {
     'title': 'Cân bằng',
     'description':
-        'Cung cấp đầy đủ các nhóm chất dinh dưỡng: carbohydrate, protein, và chất béo, cùng với vitamin và khoáng chất.',
+        'Mô tả: Chế độ ăn cân bằng cung cấp đầy đủ các nhóm chất dinh dưỡng cần thiết cho cơ thể: carbohydrate, protein, chất béo, vitamin và khoáng chất. Đây là một chế độ ăn lý tưởng cho những ai muốn duy trì sức khỏe tổng thể, không thiếu hụt bất kỳ dưỡng chất nào.',
     'image': 'assets/images/include--3.png'
   }
 ];

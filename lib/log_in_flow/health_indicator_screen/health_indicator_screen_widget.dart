@@ -58,10 +58,11 @@ class _HealthIndicatorScreenWidgetState
       return const Center(child: Text("Không có dữ liệu."));
     }
 
-    String bmi = "N/A";
-    String tdee = "N/A";
-    String bmiType = "N/A";
-
+    String bmi = "";
+    String tdee = "";
+    String bmiType = "";
+    String bmiDescription = "";
+    Color bmiColor = Colors.black;
     for (var indicator in healthData!['healthcareIndicators']) {
       if (indicator['code'] == 'BMI') {
         bmi = double.parse(indicator['currentValue']).toStringAsFixed(1);
@@ -70,7 +71,35 @@ class _HealthIndicatorScreenWidgetState
         tdee = double.parse(indicator['currentValue']).toStringAsFixed(1);
       }
     }
-
+    switch (bmiType) {
+      case 'Gầy':
+        bmiDescription = "BMI của bạn thấp hơn 18.5";
+        bmiColor = Colors.blue; // Màu xanh dương cho Gầy
+        break;
+      case 'Thừa cân':
+        bmiDescription = "BMI của bạn trong khoảng từ 25 đến 29.9";
+        bmiColor = Colors.orange.shade300; // Màu vàng cho Thừa cân
+        break;
+      case 'Bình thường':
+        bmiDescription = "BMI của bạn trong khoảng từ 18.5 đến 24.9";
+        bmiColor = Colors.green; // Màu xanh lá cho Bình thường
+        break;
+      case 'Béo phì độ 1':
+        bmiDescription = "BMI của bạn trong khoảng từ 30 đến 34.9";
+        bmiColor = Colors.orange.shade500; // Màu cam nhạt cho Béo phì độ 1
+        break;
+      case 'Béo phì độ 2':
+        bmiDescription = "BMI của bạn trong khoảng từ 35 đến 39.9";
+        bmiColor = Colors.orange.shade900; // Màu cam đậm cho Béo phì độ 2
+        break;
+      case 'Béo phì độ 3':
+        bmiDescription = "BMI của bạn lớn hơn 40";
+        bmiColor = Colors.red; // Màu đỏ cho Béo phì độ 3
+        break;
+      default:
+        bmiDescription = "Không có thông tin BMI hợp lệ.";
+        bmiColor = Colors.black; // Nếu không có loại nào, để màu đen
+    }
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -81,24 +110,33 @@ class _HealthIndicatorScreenWidgetState
             const SizedBox(height: 20),
             Text("Chỉ số của bạn:",
                 style: GoogleFonts.roboto(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
+                    fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Tình trạng:  ",
+                Text("Tình trạng: ",
                     style: GoogleFonts.roboto(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     )),
                 Text(bmiType,
                     style: GoogleFonts.roboto(
-                        fontSize: 16,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: FlutterFlowTheme.of(context).primary)),
+                        color: bmiColor)),
               ],
             ),
-
+            const SizedBox(height: 10),
+            Text(
+              ('($bmiDescription)'), // Hiển thị mô tả về tình trạng BMI
+              textAlign: TextAlign.center,
+              style: GoogleFonts.roboto(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: Colors.black87,
+              ),
+            ),
             const SizedBox(height: 10),
             _buildIndicator("BMI", bmi, "Chỉ số BMI của bạn"),
             _buildIndicator("TDEE", tdee, "Tổng năng lượng tiêu hao mỗi ngày"),

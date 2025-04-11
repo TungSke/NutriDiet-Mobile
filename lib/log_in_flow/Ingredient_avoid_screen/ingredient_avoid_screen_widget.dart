@@ -199,7 +199,7 @@ class _IngredientAvoidScreenWidgetState
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      "Lời khuyên dinh dưỡng",
+                                                      "Nguyên liệu cần tránh ",
                                                       style: GoogleFonts.roboto(
                                                         color: Colors.black,
                                                         fontSize: 18,
@@ -208,15 +208,17 @@ class _IngredientAvoidScreenWidgetState
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Tạo lời khuyên dựa vào bệnh dị ứng để giúp bạn cải thiện bệnh",
+                                                      "Tạo nguyên liệu cần tránh dựa vào bệnh dị ứng để giúp bạn cải thiện bệnh",
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                             ],
                                           ),
+
                                           Container(
-                                            width: 500,
+                                            width: double
+                                                .infinity, // Đảm bảo container không bị giới hạn chiều rộng
                                             height: 200,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -230,46 +232,88 @@ class _IngredientAvoidScreenWidgetState
                                               padding:
                                                   const EdgeInsets.all(8.0),
                                               child: SingleChildScrollView(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text("Tránh ăn:"),
-                                                    ..._model.allergies
-                                                        .map((allergy) {
-                                                      if (allergy
-                                                          .contains(':')) {
-                                                        String ingredients =
-                                                            allergy
-                                                                .split(':')[1];
-                                                        if (ingredients
-                                                            .isNotEmpty) {
-                                                          return Text(
-                                                              "$ingredients");
-                                                        }
+                                                  child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text("Tránh ăn:"),
+                                                  // Hiển thị từng nguyên liệu cần tránh với dấu gạch đầu dòng
+                                                  ..._model.allergies
+                                                      .map((allergy) {
+                                                    if (allergy.contains(':')) {
+                                                      String ingredients =
+                                                          allergy.split(':')[1];
+                                                      if (ingredients
+                                                          .isNotEmpty) {
+                                                        return Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  bottom: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                  Icons
+                                                                      .close_outlined,
+                                                                  color: Colors
+                                                                      .red,
+                                                                  size: 20),
+                                                              SizedBox(
+                                                                  width: 5),
+                                                              Expanded(
+                                                                // Sử dụng Expanded để tránh tràn ngang
+                                                                child: Text(
+                                                                  "$ingredients",
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
                                                       }
-                                                      return SizedBox();
-                                                    }).toList(),
-                                                    ..._model.diseases
-                                                        .map((disease) {
-                                                      if (disease
-                                                          .contains(':')) {
-                                                        String ingredients =
-                                                            disease
-                                                                .split(':')[1];
-                                                        if (ingredients
-                                                            .isNotEmpty) {
-                                                          return Text(
-                                                              "$ingredients");
-                                                        }
+                                                    }
+                                                    return SizedBox();
+                                                  }).toList(),
+                                                  ..._model.diseases
+                                                      .map((disease) {
+                                                    if (disease.contains(':')) {
+                                                      String ingredients =
+                                                          disease.split(':')[1];
+                                                      if (ingredients
+                                                          .isNotEmpty) {
+                                                        return Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  bottom: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                  Icons
+                                                                      .close_outlined,
+                                                                  color: Colors
+                                                                      .red,
+                                                                  size: 20),
+                                                              SizedBox(
+                                                                  width: 5),
+                                                              Expanded(
+                                                                // Sử dụng Expanded để tránh tràn ngang
+                                                                child: Text(
+                                                                  "$ingredients",
+                                                                  // Đảm bảo không tràn
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
                                                       }
-                                                      return SizedBox();
-                                                    }).toList(),
-                                                  ],
-                                                ),
-                                              ),
+                                                    }
+                                                    return SizedBox();
+                                                  }).toList(),
+                                                ],
+                                              )),
                                             ),
                                           ),
+
                                           // FFButtonWidget(
                                           //   onPressed: () async {
                                           //     if (!isPremium) {
