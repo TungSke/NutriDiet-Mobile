@@ -103,12 +103,12 @@ class _WhatsYourGoalWidgetState extends State<WhatsYourGoalWidget> {
 
         // ✅ Gửi API khi bấm "Tiếp tục"
         final updateResponse = await UserService().createPersonalGoal(
-          goalType: personalGoalProvider.goalType!,
-          targetWeight: personalGoalProvider.targetWeight!,
-          weightChangeRate: personalGoalProvider.weightChangeRate!,
-          goalDescription: "Duy trì cân nặng hiện tại",
-          notes: "Không có ghi chú",
-        );
+            goalType: personalGoalProvider.goalType!,
+            targetWeight: personalGoalProvider.targetWeight!,
+            weightChangeRate: personalGoalProvider.weightChangeRate!,
+            goalDescription: "Duy trì cân nặng hiện tại",
+            notes: "Không có ghi chú",
+            context: context);
 
         if (updateResponse.statusCode == 201 ||
             updateResponse.statusCode == 204) {

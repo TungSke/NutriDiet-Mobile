@@ -204,6 +204,31 @@ class UserService {
     }
   }
 
+  Future<http.Response> getTodayCheck() async {
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+    }
+
+    try {
+      final response =
+          await _apiService.get("api/health-profile/today-check", token: token);
+
+      if (response.statusCode == 200) {
+        return response; // Trả về response để check trong hàm checkTodayUpdate
+      } else {
+        print('Lỗi lấy kiểm tra hôm nay health profile: ${response.body}');
+        throw Exception(
+            'Lỗi lấy kiểm tra health profile: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Lỗi kết nối API: $e');
+      throw Exception("Không thể kết nối đến server.");
+    }
+  }
+
   Future<http.Response> getHealthProfile() async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
@@ -232,8 +257,10 @@ class UserService {
     double? height, // Use double instead of int
     double? weight, // Use double instead of int
     String? activityLevel,
+    String? profileOption,
     String? aisuggestion,
     String? dietStyle,
+    String? evaluate,
     List<dynamic>? allergies,
     List<dynamic>? diseases,
   }) async {
@@ -245,12 +272,15 @@ class UserService {
     }
 
     try {
+      // Nếu profileOption là null, gán giá trị mặc định là 'ADD'
+      profileOption ??= 'ADD';
       // If any value is null, fetch data from health-profile
       if ([
         height,
         weight,
         activityLevel,
         dietStyle,
+        profileOption,
         aisuggestion,
         allergies,
         diseases
@@ -265,6 +295,7 @@ class UserService {
           activityLevel ??= healthProfile['activityLevel'] ?? "";
           aisuggestion ??= healthProfile['aisuggestion'] ?? '';
           dietStyle ??= healthProfile['dietStyle'] ?? '';
+
           allergies ??= (healthProfile['allergies'] as List?)
                   ?.map((e) => int.tryParse(e['allergyId'].toString()) ?? 0)
                   .where((e) => e > 0)
@@ -293,6 +324,8 @@ class UserService {
       if (activityLevel != null)
         request.fields['ActivityLevel'] = activityLevel;
       if (dietStyle != null) request.fields['DietStyle'] = dietStyle;
+      if (profileOption != null)
+        request.fields['ProfileOption'] = profileOption;
       if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
 
       // Add allergies and diseases if not empty
@@ -328,12 +361,74 @@ class UserService {
     }
   }
 
+  // Future<http.Response> createPersonalGoal({
+  //   required String goalType,
+  //   required double targetWeight,
+  //   required String weightChangeRate,
+  //   String goalDescription = "Mục tiêu mặc định",
+  //   String notes = "Không có ghi chú",
+  // }) async {
+  //   final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+  //   final String? token = await flutterSecureStorage.read(key: 'accessToken');
+  //
+  //   if (token == null || token.isEmpty) {
+  //     throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+  //   }
+  //
+  //   try {
+  //     var request = http.MultipartRequest(
+  //       'POST', // ✅ Chuyển từ POST sang PUT
+  //
+  //       Uri.parse("${_apiService.baseUrl}/api/personal-goal"),
+  //     );
+  //
+  //     request.headers['Authorization'] = 'Bearer $token';
+  //
+  //     // ✅ Thêm dữ liệu vào Form-Data
+  //     request.fields['GoalType'] = goalType;
+  //     request.fields['TargetWeight'] = targetWeight.toString();
+  //     request.fields['WeightChangeRate'] = weightChangeRate;
+  //
+  //     // ✅ Kiểm tra và gửi `GoalDescription` và `Notes`
+  //     if (goalDescription.isNotEmpty) {
+  //       request.fields['GoalDescription'] = goalDescription;
+  //     } else {
+  //       request.fields['GoalDescription'] = "Mục tiêu mặc định";
+  //     }
+  //
+  //     if (notes.isNotEmpty) {
+  //       request.fields['Notes'] = notes;
+  //     } else {
+  //       request.fields['Notes'] = "Không có ghi chú";
+  //     }
+  //
+  //     print(
+  //         "🔹 Sending updatePersonalGoal request: ${jsonEncode(request.fields)}");
+  //
+  //     final response = await request.send();
+  //     final httpResponse = await http.Response.fromStream(response);
+  //
+  //     print("🔹 Response status: ${httpResponse.statusCode}");
+  //     print("🔹 Response body: ${httpResponse.body}");
+  //
+  //     if (httpResponse.statusCode == 201 || httpResponse.statusCode == 204) {
+  //       return httpResponse;
+  //     } else {
+  //       throw Exception(
+  //           "Cập nhật mục tiêu cá nhân thất bại: ${httpResponse.body}");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Lỗi khi cập nhật mục tiêu cá nhân: $e");
+  //     throw Exception("Không thể cập nhật mục tiêu cá nhân.");
+  //   }
+  // }
   Future<http.Response> createPersonalGoal({
-    required String goalType,
-    required double targetWeight,
-    required String weightChangeRate,
-    String goalDescription = "Mục tiêu mặc định",
-    String notes = "Không có ghi chú",
+    String? goalType,
+    double? targetWeight,
+    String? weightChangeRate,
+    String? goalDescription = "Mục tiêu mặc định",
+    String? notes = "Không có ghi chú",
+    required BuildContext context, // Thêm context vào tham số
   }) async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
@@ -343,34 +438,48 @@ class UserService {
     }
 
     try {
-      var request = http.MultipartRequest(
-        'POST', // ✅ Chuyển từ POST sang PUT
+      // If any value is null, fetch data from personal-goal
+      if ([goalType, targetWeight, weightChangeRate].any((e) => e == null)) {
+        final goalResponse = await getPersonalGoal();
+        if (goalResponse.statusCode == 200) {
+          final Map<String, dynamic> personalGoal =
+              jsonDecode(goalResponse.body);
 
+          goalType ??= personalGoal['goalType'] ?? '';
+          targetWeight ??=
+              double.tryParse(personalGoal['targetWeight']?.toString() ?? '');
+          weightChangeRate ??= personalGoal['weightChangeRate'] ?? '';
+        }
+      }
+
+      // Create the update request
+      var request = http.MultipartRequest(
+        'POST', // ✅ Changed to PUT for updating the goal
         Uri.parse("${_apiService.baseUrl}/api/personal-goal"),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
 
-      // ✅ Thêm dữ liệu vào Form-Data
-      request.fields['GoalType'] = goalType;
-      request.fields['TargetWeight'] = targetWeight.toString();
-      request.fields['WeightChangeRate'] = weightChangeRate;
-
-      // ✅ Kiểm tra và gửi `GoalDescription` và `Notes`
-      if (goalDescription.isNotEmpty) {
-        request.fields['GoalDescription'] = goalDescription;
-      } else {
-        request.fields['GoalDescription'] = "Mục tiêu mặc định";
+      // Add fields if not null
+      if (goalType != null) request.fields['GoalType'] = goalType.toString();
+      if (targetWeight != null) {
+        request.fields['TargetWeight'] = targetWeight.toString();
+      }
+      if (goalDescription != null) {
+        request.fields['GoalDescription'] =
+            goalDescription.isNotEmpty ? goalDescription : "Mục tiêu mặc định";
+      }
+      if (weightChangeRate != null) {
+        request.fields['WeightChangeRate'] = weightChangeRate.toString();
       }
 
-      if (notes.isNotEmpty) {
-        request.fields['Notes'] = notes;
-      } else {
-        request.fields['Notes'] = "Không có ghi chú";
+      if (notes != null) {
+        request.fields['Notes'] = notes.isNotEmpty ? notes : "Không có ghi chú";
       }
 
+      // Debug log before sending request
       print(
-          "🔹 Sending updatePersonalGoal request: ${jsonEncode(request.fields)}");
+          "🔹 Sending createPersonalGoal request: ${jsonEncode(request.fields)}");
 
       final response = await request.send();
       final httpResponse = await http.Response.fromStream(response);
@@ -381,96 +490,8 @@ class UserService {
       if (httpResponse.statusCode == 201 || httpResponse.statusCode == 204) {
         return httpResponse;
       } else {
-        throw Exception(
-            "Cập nhật mục tiêu cá nhân thất bại: ${httpResponse.body}");
-      }
-    } catch (e) {
-      print("❌ Lỗi khi cập nhật mục tiêu cá nhân: $e");
-      throw Exception("Không thể cập nhật mục tiêu cá nhân.");
-    }
-  }
-
-  // Cập nhật mục tiêu cá nhân
-  Future<http.Response> updatePersonalGoal({
-    required String goalType,
-    required double targetWeight, // Sử dụng double thay vì int
-    required String weightChangeRate,
-    String goalDescription = "Mục tiêu mặc định",
-    String notes = "Không có ghi chú",
-    required BuildContext context, // Thêm context vào tham số
-  }) async {
-    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await flutterSecureStorage.read(key: 'accessToken');
-
-    if (token == null || token.isEmpty) {
-      print("❌ Access token không hợp lệ, vui lòng đăng nhập lại.");
-      // Hiển thị snackbar khi token không hợp lệ, và không cần ném lỗi nữa
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Access token không hợp lệ, vui lòng đăng nhập lại."),
-          duration: Duration(seconds: 3),
-        ),
-      );
-      return http.Response('', 400); // Trả về HTTP response lỗi
-    }
-
-    try {
-      var request = http.MultipartRequest(
-        'PUT', // Sử dụng PUT để cập nhật
-        Uri.parse("${_apiService.baseUrl}/api/personal-goal"),
-      );
-
-      request.headers['Authorization'] = 'Bearer $token';
-
-      // Thêm dữ liệu vào Form-Data
-      request.fields['GoalType'] = goalType;
-      request.fields['TargetWeight'] =
-          targetWeight.toString(); // Chuyển double thành String
-      request.fields['WeightChangeRate'] = weightChangeRate;
-
-      // Kiểm tra và gửi `GoalDescription` và `Notes`
-      request.fields['GoalDescription'] =
-          goalDescription.isNotEmpty ? goalDescription : "Mục tiêu mặc định";
-      request.fields['Notes'] = notes.isNotEmpty ? notes : "Không có ghi chú";
-
-      print(
-          "🔹 Sending updatePersonalGoal request: ${jsonEncode(request.fields)}");
-
-      final response = await request.send();
-      final httpResponse = await http.Response.fromStream(response);
-
-      print("🔹 Response status: ${httpResponse.statusCode}");
-      print("🔹 Response body: ${httpResponse.body}");
-
-      // Kiểm tra trạng thái mã phản hồi
-      if (httpResponse.statusCode == 200 || httpResponse.statusCode == 204) {
-        // Hiển thị SnackBar thông báo thành công
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text("Cập nhật thành công!"), // Hiển thị thông báo thành công
-            backgroundColor: Colors.green, // Màu xanh cho thành công
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return httpResponse;
-      } else {
         // Xử lý lỗi khi mã lỗi không phải là 200 hoặc 204
         final responseBody = jsonDecode(httpResponse.body);
-        String errorMessage = responseBody["message"] ?? "Cập nhật thất bại.";
-        print("❌ Lỗi khi cập nhật mục tiêu cá nhân: $errorMessage");
-
-        // Hiển thị Snackbar với thông báo lỗi từ API
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              errorMessage,
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.red, // Hiển thị thông báo lỗi từ API
-            duration: Duration(seconds: 3),
-          ),
-        );
 
         return httpResponse; // Trả về HTTP response lỗi mà không cần ném lỗi
       }
@@ -479,18 +500,113 @@ class UserService {
       print("❌ Lỗi khi cập nhật mục tiêu cá nhân: $e");
 
       // Chỉ hiển thị thông báo lỗi mặc định nếu không có lỗi từ API
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              "Đã xảy ra lỗi, vui lòng thử lại."), // Thông báo lỗi mặc định
-          duration: Duration(seconds: 3),
-        ),
-      );
 
       return http.Response("Không thể cập nhật mục tiêu cá nhân.",
           500); // Trả về HTTP response lỗi
     }
   }
+
+  // // Cập nhật mục tiêu cá nhân
+  // Future<http.Response> updatePersonalGoal({
+  //   required String goalType,
+  //   required double targetWeight, // Sử dụng double thay vì int
+  //   required String weightChangeRate,
+  //   String goalDescription = "Mục tiêu mặc định",
+  //   String notes = "Không có ghi chú",
+  //   required BuildContext context, // Thêm context vào tham số
+  // }) async {
+  //   final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+  //   final String? token = await flutterSecureStorage.read(key: 'accessToken');
+  //
+  //   if (token == null || token.isEmpty) {
+  //     print("❌ Access token không hợp lệ, vui lòng đăng nhập lại.");
+  //     // Hiển thị snackbar khi token không hợp lệ, và không cần ném lỗi nữa
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("Access token không hợp lệ, vui lòng đăng nhập lại."),
+  //         duration: Duration(seconds: 3),
+  //       ),
+  //     );
+  //     return http.Response('', 400); // Trả về HTTP response lỗi
+  //   }
+  //
+  //   try {
+  //     var request = http.MultipartRequest(
+  //       'PUT', // Sử dụng PUT để cập nhật
+  //       Uri.parse("${_apiService.baseUrl}/api/personal-goal"),
+  //     );
+  //
+  //     request.headers['Authorization'] = 'Bearer $token';
+  //
+  //     // Thêm dữ liệu vào Form-Data
+  //     request.fields['GoalType'] = goalType;
+  //     request.fields['TargetWeight'] =
+  //         targetWeight.toString(); // Chuyển double thành String
+  //     request.fields['WeightChangeRate'] = weightChangeRate;
+  //
+  //     // Kiểm tra và gửi `GoalDescription` và `Notes`
+  //     request.fields['GoalDescription'] =
+  //         goalDescription.isNotEmpty ? goalDescription : "Mục tiêu mặc định";
+  //     request.fields['Notes'] = notes.isNotEmpty ? notes : "Không có ghi chú";
+  //
+  //     print(
+  //         "🔹 Sending updatePersonalGoal request: ${jsonEncode(request.fields)}");
+  //
+  //     final response = await request.send();
+  //     final httpResponse = await http.Response.fromStream(response);
+  //
+  //     print("🔹 Response status: ${httpResponse.statusCode}");
+  //     print("🔹 Response body: ${httpResponse.body}");
+  //
+  //     // Kiểm tra trạng thái mã phản hồi
+  //     if (httpResponse.statusCode == 200 || httpResponse.statusCode == 204) {
+  //       // Hiển thị SnackBar thông báo thành công
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content:
+  //               Text("Cập nhật thành công!"), // Hiển thị thông báo thành công
+  //           backgroundColor: Colors.green, // Màu xanh cho thành công
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //       return httpResponse;
+  //     } else {
+  //       // Xử lý lỗi khi mã lỗi không phải là 200 hoặc 204
+  //       final responseBody = jsonDecode(httpResponse.body);
+  //       String errorMessage = responseBody["message"] ?? "Cập nhật thất bại.";
+  //       print("❌ Lỗi khi cập nhật mục tiêu cá nhân: $errorMessage");
+  //
+  //       // Hiển thị Snackbar với thông báo lỗi từ API
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text(
+  //             errorMessage,
+  //             style: TextStyle(color: Colors.white),
+  //           ),
+  //           backgroundColor: Colors.red, // Hiển thị thông báo lỗi từ API
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //
+  //       return httpResponse; // Trả về HTTP response lỗi mà không cần ném lỗi
+  //     }
+  //   } catch (e) {
+  //     // In ra lỗi chi tiết nếu có
+  //     print("❌ Lỗi khi cập nhật mục tiêu cá nhân: $e");
+  //
+  //     // Chỉ hiển thị thông báo lỗi mặc định nếu không có lỗi từ API
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(
+  //             "Đã xảy ra lỗi, vui lòng thử lại."), // Thông báo lỗi mặc định
+  //         duration: Duration(seconds: 3),
+  //       ),
+  //     );
+  //
+  //     return http.Response("Không thể cập nhật mục tiêu cá nhân.",
+  //         500); // Trả về HTTP response lỗi
+  //   }
+  // }
 
   Future<http.Response> getPersonalGoal() async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
@@ -507,7 +623,7 @@ class UserService {
         return response;
       } else {
         print('Lỗi lấy personal-goal: ${response.body}');
-        throw Exception('Lỗi lấy health profile: ${response.statusCode}');
+        throw Exception('Lỗi lấy personal-goal: ${response.statusCode}');
       }
     } catch (e) {
       print('Lỗi kết nối API: $e');

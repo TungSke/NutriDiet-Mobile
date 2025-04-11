@@ -485,12 +485,12 @@
 //     return List.generate(91, (index) => '${10 + index}');
 //   }
 // }
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
+
 import '../../flutter_flow/flutter_flow_theme.dart';
 import 'edit_health_profile_screen_model.dart';
 
@@ -523,6 +523,80 @@ class _EditHealthProfileScreenWidgetState
     });
   }
 
+  void _checkTodayUpdate() async {
+    try {
+      // Call checkTodayUpdate to see if the profile was updated today
+      bool isUpdatedToday = await _model.checkTodayUpdate();
+
+      if (isUpdatedToday) {
+        // Show confirmation modal
+        _showConfirmationModal();
+      } else {
+        // Not updated today, directly update health profile
+        await _updateHealthProfile("ADD");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi kiểm tra: $e");
+      // Handle errors if necessary
+    }
+  }
+
+  void _showConfirmationModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text('Thông báo'),
+          content: Text(
+              'Bạn đã cập nhật hồ sơ sức khỏe hôm nay. Bạn vẫn muốn cập nhật?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close modal when choosing "Cancel"
+              },
+              child: Text(
+                'Hủy',
+                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+              ),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor:
+                    FlutterFlowTheme.of(context).primary, // Màu chữ
+              ),
+              onPressed: () async {
+                Navigator.pop(context);
+                await _updateHealthProfile("REPLACE");
+              },
+              child: Text('Cập nhật'),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor:
+                    FlutterFlowTheme.of(context).primary, // Màu chữ
+              ),
+              onPressed: () async {
+                Navigator.pop(context);
+                await _updateHealthProfile("ADD");
+              },
+              child: Text('Thêm mới'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updateHealthProfile(String profileOption) async {
+    await _model.updateHealthProfile(context, profileOption);
+    setState(() {
+      isEdited = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -539,17 +613,17 @@ class _EditHealthProfileScreenWidgetState
                 borderRadius: BorderRadius.circular(0.0),
                 child: _model.avatar.isNotEmpty
                     ? Image.network(
-                  _model.avatar,
-                  width: 80.0,
-                  height: 80.0,
-                  fit: BoxFit.cover,
-                )
+                        _model.avatar,
+                        width: 80.0,
+                        height: 80.0,
+                        fit: BoxFit.cover,
+                      )
                     : Image.asset(
-                  'assets/images/dummy_profile.png',
-                  width: 80.0,
-                  height: 80.0,
-                  fit: BoxFit.cover,
-                ),
+                        'assets/images/dummy_profile.png',
+                        width: 80.0,
+                        height: 80.0,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             SizedBox(
@@ -594,14 +668,31 @@ class _EditHealthProfileScreenWidgetState
             'Chỉnh sửa hồ sơ sức khỏe',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
+          // InkWell(
+          //   onTap: isEdited && (_formKey.currentState?.validate() ?? false)
+          //       ? () async {
+          //           await _model.updateHealthProfile(context);
+          //           setState(() {
+          //             isEdited = false;
+          //           });
+          //         }
+          //       : null,
+          //   child: Icon(
+          //     Icons.check,
+          //     color: isEdited && (_formKey.currentState?.validate() ?? false)
+          //         ? Colors.green
+          //         : Colors.grey,
+          //     size: 28,
+          //   ),
+          // ),
           InkWell(
             onTap: isEdited && (_formKey.currentState?.validate() ?? false)
                 ? () async {
-              await _model.updateHealthProfile(context);
-              setState(() {
-                isEdited = false;
-              });
-            }
+                    _checkTodayUpdate(); // Check if profile is updated today (no await needed here)
+                    setState(() {
+                      isEdited = false;
+                    });
+                  }
                 : null,
             child: Icon(
               Icons.check,
@@ -649,7 +740,7 @@ class _EditHealthProfileScreenWidgetState
                 'Vận động nhiều',
                 'Cường độ rất cao'
               ],
-                  (val) {
+              (val) {
                 setState(() {
                   _model.activityLevel = val;
                   isEdited = true;
@@ -666,7 +757,7 @@ class _EditHealthProfileScreenWidgetState
                 'Thuần chay',
                 'Cân bằng'
               ],
-                  (val) {
+              (val) {
                 setState(() {
                   _model.dietStyle = val;
                   isEdited = true;
@@ -689,13 +780,15 @@ class _EditHealthProfileScreenWidgetState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           SizedBox(
             width: 150,
             child: TextFormField(
               initialValue: value,
               textAlign: TextAlign.end,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Nhập chiều cao (cm)',
@@ -736,13 +829,15 @@ class _EditHealthProfileScreenWidgetState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           SizedBox(
             width: 150,
             child: TextFormField(
               initialValue: value,
               textAlign: TextAlign.end,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Nhập cân nặng (kg)',
@@ -809,7 +904,8 @@ class _EditHealthProfileScreenWidgetState
                   _model.allergies = selected.map((id) {
                     return allergies
                         .firstWhere((allergy) =>
-                    int.tryParse(allergy['id'].toString()) == id)['title']
+                            int.tryParse(allergy['id'].toString()) ==
+                            id)['title']
                         .toString();
                   }).toList();
                   isEdited = true;
@@ -876,7 +972,8 @@ class _EditHealthProfileScreenWidgetState
                   _model.diseases = selected.map((id) {
                     return diseases
                         .firstWhere((disease) =>
-                    int.tryParse(disease['id'].toString()) == id)['title']
+                            int.tryParse(disease['id'].toString()) ==
+                            id)['title']
                         .toString();
                   }).toList();
                   isEdited = true;
@@ -917,7 +1014,8 @@ class _EditHealthProfileScreenWidgetState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           InkWell(
             onTap: () =>
                 _showCupertinoPicker(title, options, value, onSelected),
@@ -925,7 +1023,8 @@ class _EditHealthProfileScreenWidgetState
               children: [
                 Text(value, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                const Icon(Icons.arrow_forward_ios,
+                    size: 16, color: Colors.grey),
               ],
             ),
           ),
@@ -943,7 +1042,8 @@ class _EditHealthProfileScreenWidgetState
         children: [
           Expanded(
             child: Text(title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
           InkWell(
             onTap: () =>
@@ -952,7 +1052,8 @@ class _EditHealthProfileScreenWidgetState
               children: [
                 Text(value, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                const Icon(Icons.arrow_forward_ios,
+                    size: 16, color: Colors.grey),
               ],
             ),
           ),
@@ -981,18 +1082,19 @@ class _EditHealthProfileScreenWidgetState
           children: [
             const SizedBox(height: 16),
             Text(title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Expanded(
               child: CupertinoPicker(
                 scrollController:
-                FixedExtentScrollController(initialItem: selectedIndex),
+                    FixedExtentScrollController(initialItem: selectedIndex),
                 itemExtent: 40,
                 onSelectedItemChanged: (index) {
                   _tempSelectedValue = options[index];
                 },
                 children: options
-                    .map((e) =>
-                    Center(child: Text(e, style: const TextStyle(fontSize: 16))))
+                    .map((e) => Center(
+                        child: Text(e, style: const TextStyle(fontSize: 16))))
                     .toList(),
               ),
             ),

@@ -147,7 +147,6 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                                   .read<HealthProfileProvider>()
                                   .setDiseases(model.selectedDiseaseIds);
 
-                              // Cập nhật bệnh và gửi lên API
                               await model.updateDisease(
                                   context); // Đợi updateDisease thực thi xong
 

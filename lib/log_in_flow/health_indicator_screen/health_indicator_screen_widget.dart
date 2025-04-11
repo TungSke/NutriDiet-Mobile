@@ -137,6 +137,15 @@ class _HealthIndicatorScreenWidgetState
                 color: Colors.black87,
               ),
             ),
+            Text(
+              (healthData?['evaluate'].toString() ?? "N/A"),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.roboto(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: FlutterFlowTheme.of(context).primary,
+              ),
+            ),
             const SizedBox(height: 10),
             _buildIndicator("BMI", bmi, "Chỉ số BMI của bạn"),
             _buildIndicator("TDEE", tdee, "Tổng năng lượng tiêu hao mỗi ngày"),
