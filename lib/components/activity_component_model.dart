@@ -10,11 +10,13 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
   String bmi = '';
   String bmiType = '';
   String tdee = '';
+  String evaluate = '';
   String name = '';
   String age = '';
   String phoneNumber = '';
   String gender = '';
   String location = '';
+  String profileOption = '';
   String email = '';
   double height = 0.0;
   double weight = 0.0;
@@ -137,6 +139,7 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
         bmi = data["BMI"] ?? "N/A";
         bmiType = data["BMIType"] ?? "N/A";
         tdee = data["TDEE"] ?? "N/A";
+        evaluate = data["evaluate"] ?? '';
         // height = data["height"];
         height = data["height"] != null
             ? double.parse(data['height'].toString())
@@ -183,23 +186,40 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
     }
   }
 
-  Future<void> updateHealthProfile(BuildContext context) async {
+  Future<bool> checkTodayUpdate() async {
+    try {
+      final response = await _userService.getTodayCheck(); // Call API
+
+      if (response.statusCode == 200) {
+        // Directly parse the response body as a boolean
+        final bool isUpdatedToday = jsonDecode(response.body);
+
+        return isUpdatedToday ??
+            false; // If the response is true, return true, else return false
+      } else {
+        throw Exception("Lỗi khi lấy kiểm tra hôm nay");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi kiểm tra: $e");
+      return false; // Return false if there's an error
+    }
+  }
+
+  Future<void> updateHealthProfile(
+      BuildContext context, String profileOption) async {
     try {
       // Giữ lại allergies và diseases hiện tại từ hồ sơ sức khỏe
       final currentAllergies = allergies.isNotEmpty ? allergies : [];
       final currentDiseases = diseases.isNotEmpty ? diseases : [];
 
-      // // Đảm bảo gửi đúng giá trị activityLevel
-      // final activityLevelInEnglish = _activityLevelMap[activityLevel] ?? '';
-      // final dietStyleInEnglish = _dietStyleMap[dietStyle] ?? '';
-      // Gửi yêu cầu cập nhật hồ sơ sức khỏe
       final response = await _userService.updateHealthProfile(
         activityLevel: activityLevel,
         weight: weight,
         height: height,
+
         dietStyle: dietStyle,
         aisuggestion: aisuggestion,
-
+        profileOption: profileOption,
         allergies: currentAllergies, // Gửi lại allergies hiện tại
         diseases: currentDiseases, // Gửi lại diseases hiện tại
       );

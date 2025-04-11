@@ -717,6 +717,13 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     }
   }
 
+  final Map<String, String> mealTimeTranslations = {
+    'Breakfast': '6:00 - 8:00 sáng',
+    'Lunch': '12:00 - 14:00 chiều',
+    'Dinner': '18:00 - 20:00 tối',
+    'Snacks': '15:00 - 16:00 chiều',
+  };
+
   Widget _buildMealCategoryCard(BuildContext context, String category) {
     final vietnameseCategory = _mapCategoryToVietnamese(category);
     final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
@@ -748,7 +755,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMealHeader(vietnameseCategory, null),
+          _buildMealHeader(category, vietnameseCategory, null),
           ListTile(
             title: Text(
               'Thêm',
@@ -836,7 +843,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildMealHeader(vietnameseCategory, hasAnyFood ? mealCals : null),
+        _buildMealHeader(category, vietnameseCategory, hasAnyFood ? mealCals : null),
         if (hasAnyFood)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -1073,30 +1080,58 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  Widget _buildMealHeader(String category, int? mealCals) {
+  Widget _buildMealHeader(String category, String vietnameseCategory, int? mealCals) {
+    final mealTime = mealTimeTranslations[category] ?? '';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            category,
-            style: const TextStyle(
-              fontFamily: 'Figtree',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            children: [
+              Text(
+                vietnameseCategory, // Hiển thị tên tiếng Việt
+                style: const TextStyle(
+                  fontFamily: 'Figtree',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (mealTime.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.access_time,
+                        size: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '($mealTime)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
           mealCals == null
               ? const SizedBox.shrink()
               : Text(
-                  mealCals.toString(),
-                  style: const TextStyle(
-                    fontFamily: 'Figtree',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+            mealCals.toString(),
+            style: const TextStyle(
+              fontFamily: 'Figtree',
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
