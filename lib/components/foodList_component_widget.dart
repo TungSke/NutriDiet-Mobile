@@ -310,8 +310,7 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                                 ),
                                 const SizedBox(width: 4.0),
                                 AutoSizeText(
-                                  // Lấy calories từ foodServingSizes đầu tiên, hoặc hiển thị '0' nếu không có
-                                  '${food.foodServingSizes.isNotEmpty ? food.foodServingSizes[0].calories.toStringAsFixed(0) : '0'} kcal',
+                                  '${food.calories ?? '0'} kcal',
                                   maxLines: 1,
                                   minFontSize: 9,
                                   maxFontSize: 11,
@@ -332,10 +331,7 @@ class _FoodListComponentWidgetState extends State<FoodListComponentWidget> {
                                 const SizedBox(width: 4.0),
                                 Expanded(
                                   child: AutoSizeText(
-                                    // Hiển thị quantity từ foodServingSizes đầu tiên, hoặc 'Không rõ' nếu không có
-                                    food.foodServingSizes.isNotEmpty
-                                        ? '${food.foodServingSizes[0].quantity} khẩu phần'
-                                        : 'Không rõ',
+                                    food.servingSize ?? 'Không rõ',
                                     maxLines: 1,
                                     minFontSize: 7,
                                     maxFontSize: 10,

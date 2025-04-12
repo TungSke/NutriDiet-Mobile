@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_theme.dart';
-import 'package:diet_plan_app/services/models/foodservingsize.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 import '../services/meallog_service.dart';
@@ -23,7 +22,6 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
   final MeallogService _meallogService = MeallogService();
   Food? _food;
   bool _isLoading = false;
-  int? _selectedServingSizeId; // Lưu servingSizeId được chọn
 
   // Màu cho chart
   final Color accent1 = const Color(0xFFF04770);
@@ -56,14 +54,7 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
       final response = await _foodService.getFoodById(foodId: widget.foodId);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body)['data'];
-        setState(() {
-          _food = Food.fromJson(data);
-          // Chọn servingSizeId mặc định: ưu tiên food.servingSizeId, nếu không thì lấy phần tử đầu tiên
-          _selectedServingSizeId = _food!.servingSizeId ??
-              (_food!.foodServingSizes?.isNotEmpty == true
-                  ? _food!.foodServingSizes![0].servingSizeId
-                  : null);
-        });
+        setState(() => _food = Food.fromJson(data));
       }
     } catch (e) {
       debugPrint("Lỗi tải chi tiết món ăn: $e");
@@ -81,7 +72,7 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
       dates: selectedDates,
       foodId: widget.foodId,
       quantity: _numberOfServings.toDouble(),
-      mealType: _selectedMeal,
+      mealType: _selectedMeal, // giữ tiếng Anh gọi API
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -111,29 +102,12 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
       );
     }
 
-    // Lấy thông tin từ foodServingSizes dựa trên servingSizeId
-    final servingSize = _food!.foodServingSizes?.firstWhere(
-          (s) => s.servingSizeId == _selectedServingSizeId,
-      orElse: () => _food!.foodServingSizes!.isNotEmpty
-          ? _food!.foodServingSizes![0]
-          : FoodServingSize(
-        servingSizeId: 0,
-        quantity: 1,
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fat: 0,
-        glucid: 0,
-        fiber: 0,
-      ),
-    );
-
-    // Lấy số liệu dinh dưỡng
-    final double calories = (servingSize?.calories ?? 0) * _numberOfServings;
-    final double carbs = (servingSize?.carbs ?? 0) * _numberOfServings;
-    final double fat = (servingSize?.fat ?? 0) * _numberOfServings;
-    final double protein = (servingSize?.protein ?? 0) * _numberOfServings;
-    final double totalMacro = carbs + fat + protein;
+    // Lấy số liệu
+    final num calories = _food!.calories ?? 0;
+    final num carbs = _food!.carbs ?? 0;
+    final num fat = _food!.fat ?? 0;
+    final num protein = _food!.protein ?? 0;
+    final num totalMacro = carbs + fat + protein;
     final double carbsRatio = totalMacro > 0 ? carbs / totalMacro * 100 : 0;
     final double fatRatio = totalMacro > 0 ? fat / totalMacro * 100 : 0;
     final double proteinRatio = totalMacro > 0 ? protein / totalMacro * 100 : 0;
@@ -142,16 +116,15 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
       "Chất béo": fatRatio,
       "Protein": proteinRatio,
     };
-
     final primaryColor = FlutterFlowTheme.of(context).primary;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
-        title: const Text(
-          'Chi tiết món ăn',
-          style: TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
-        ),
+        title: const Text('Chi tiết món ăn',
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 20)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -165,10 +138,10 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                    _food!.foodName,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
+                  _food!.foodName,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 const Icon(Icons.check_circle, color: Colors.green),
               ],
             ),
@@ -191,7 +164,7 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
                     chartType: ChartType.ring,
                     baseChartColor: Colors.grey[300]!,
                     chartValuesOptions:
-                    const ChartValuesOptions(showChartValues: false),
+                        const ChartValuesOptions(showChartValues: false),
                     colorList: [accent1, accent3, accent5],
                     ringStrokeWidth: 24,
                     legendOptions: const LegendOptions(showLegends: false),
@@ -199,11 +172,9 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        calories.toStringAsFixed(0),
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
+                      Text('$calories',
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
                       const Text('Cal'),
                     ],
                   ),
@@ -249,18 +220,10 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: (food.imageUrl != null && food.imageUrl!.isNotEmpty)
-          ? Image.network(
-        food.imageUrl!,
-        height: 200,
-        width: double.infinity,
-        fit: BoxFit.cover,
-      )
-          : Image.asset(
-        'assets/placeholder_food.png',
-        height: 200,
-        width: double.infinity,
-        fit: BoxFit.cover,
-      ),
+          ? Image.network(food.imageUrl!,
+              height: 200, width: double.infinity, fit: BoxFit.cover)
+          : Image.asset('assets/placeholder_food.png',
+              height: 200, width: double.infinity, fit: BoxFit.cover),
     );
   }
 
@@ -268,10 +231,8 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Bữa ăn',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        const Text('Bữa ăn',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         DropdownButton<String>(
           value: _selectedMeal,
           items: const [
@@ -292,17 +253,13 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Số khẩu phần',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        const Text('Số khẩu phần',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         Row(
           children: [
             IconButton(
               onPressed: () {
-                if (_numberOfServings > 1) {
-                  setState(() => _numberOfServings--);
-                }
+                if (_numberOfServings > 1) setState(() => _numberOfServings--);
               },
               icon: const Icon(Icons.remove_circle_outline),
             ),
@@ -321,25 +278,10 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Khối lượng khẩu phần',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        DropdownButton<int>(
-          value: _selectedServingSizeId,
-          items: food.foodServingSizes?.map((serving) {
-            return DropdownMenuItem<int>(
-              value: serving.servingSizeId,
-              child: Text('${serving.quantity} khẩu phần'),
-            );
-          }).toList() ??
-              [],
-          onChanged: (val) {
-            setState(() {
-              _selectedServingSizeId = val;
-            });
-          },
-        ),
+        const Text('Khối lượng khẩu phần',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        Text(food.servingSize ?? '1 khẩu phần',
+            style: const TextStyle(fontSize: 16)),
       ],
     );
   }
@@ -348,10 +290,8 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Thêm vào nhiều ngày',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        const Text('Thêm vào nhiều ngày',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
         SizedBox(
           height: 50,
@@ -366,16 +306,15 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
               return GestureDetector(
                 onTap: () {
                   setState(() {
-                    if (selected) {
+                    if (selected)
                       _selectedDaysIndex.remove(index);
-                    } else {
+                    else
                       _selectedDaysIndex.add(index);
-                    }
                   });
                 },
                 child: Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: selected
                         ? FlutterFlowTheme.of(context).primary
@@ -389,7 +328,9 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
                         '${day.day}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: selected ? Colors.white : Colors.black,
+                          color: selected
+                              ? Colors.white
+                              : Colors.black, // chữ trắng khi chọn
                         ),
                       ),
                       Text(
@@ -430,21 +371,13 @@ class _MealLogFoodDetailWidgetState extends State<MealLogFoodDetailWidget> {
     }
   }
 
-  Widget _buildMacroColumn(String label, double gram, double percent) {
+  Widget _buildMacroColumn(String label, num gram, double percent) {
     return Column(
       children: [
-        Text(
-          '${percent.toStringAsFixed(0)}%',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          '${gram.toStringAsFixed(1)} g',
-          style: const TextStyle(fontSize: 14),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14),
-        ),
+        Text('${percent.toStringAsFixed(0)}%',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('$gram g', style: const TextStyle(fontSize: 14)),
+        Text(label, style: const TextStyle(fontSize: 14)),
       ],
     );
   }

@@ -50,12 +50,13 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
 
   void _showQuantityDialog(Food food) {
     final TextEditingController _quantityController =
-    TextEditingController(text: "1");
+        TextEditingController(text: "1");
     final primaryColor = FlutterFlowTheme.of(context).primary;
 
     showDialog(
       context: context,
       builder: (context) {
+        // Dùng StatefulBuilder để có thể cập nhật UI bên trong dialog
         return StatefulBuilder(
           builder: (context, setState) {
             int quantity = int.tryParse(_quantityController.text) ?? 1;
@@ -63,7 +64,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
             void updateQuantity(int newQty) {
               if (newQty < 1) return;
               _quantityController.text = newQty.toString();
-              setState(() {});
+              setState(() {}); // rebuild phần UI số lượng
             }
 
             return AlertDialog(
@@ -74,14 +75,15 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (food.foodServingSizes != null &&
-                      food.foodServingSizes!.isNotEmpty)
-                    Text(
-                        "Khẩu phần: ${food.foodServingSizes![0].quantity} khẩu phần"),
+                  if (food.servingSize != null && food.servingSize!.isNotEmpty)
+                    Text("Serving Size: ${food.servingSize}"),
                   const SizedBox(height: 12),
+
+                  // === Thay đổi UI ở đây ===
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // Nút trừ
                       InkWell(
                         onTap: () => updateQuantity(quantity - 1),
                         borderRadius: BorderRadius.circular(5),
@@ -94,7 +96,10 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                           child: Icon(Icons.remove, color: primaryColor),
                         ),
                       ),
+
                       const SizedBox(width: 16),
+
+                      // Hiển thị số lượng
                       Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 8, horizontal: 16),
@@ -111,7 +116,10 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                           ),
                         ),
                       ),
+
                       const SizedBox(width: 16),
+
+                      // Nút cộng
                       InkWell(
                         onTap: () => updateQuantity(quantity + 1),
                         borderRadius: BorderRadius.circular(5),
@@ -126,13 +134,14 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                       ),
                     ],
                   ),
+                  // ===========================
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.black,
+                    foregroundColor: Colors.black, // màu chữ
                   ),
                   child: const Text('Hủy'),
                 ),
@@ -146,12 +155,11 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                     ),
                   ),
                   onPressed: () async {
+                    // Lấy lại quantity từ controller
                     final int qty = int.tryParse(_quantityController.text) ?? 1;
-                    final double calories = food.foodServingSizes != null &&
-                        food.foodServingSizes!.isNotEmpty
-                        ? food.foodServingSizes![0].calories
-                        : 0.0;
-                    final int additionalCalories = (calories * qty).toInt();
+                    // --- giữ nguyên toàn bộ logic cũ từ đây ---
+                    final int additionalCalories =
+                        ((food.calories ?? 0) * qty).toInt();
 
                     final bool exceeds = await _meallogService.calorieEstimator(
                       logDate: widget.selectedDate.toIso8601String(),
@@ -173,7 +181,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
                               style: TextButton.styleFrom(
-                                foregroundColor: Colors.black,
+                                foregroundColor: Colors.black, // màu chữ
                               ),
                               child: const Text('Hủy'),
                             ),
@@ -221,6 +229,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                                   foregroundColor: primaryColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5),
+                                    side: BorderSide(color: primaryColor),
                                   ),
                                 ),
                                 onPressed: () => Navigator.pop(context, true),
@@ -236,10 +245,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                     final success = await _meallogService.createMealLog(
                       logDate: widget.selectedDate.toIso8601String(),
                       mealType: widget.mealName,
-                      servingSize: food.foodServingSizes != null &&
-                          food.foodServingSizes!.isNotEmpty
-                          ? food.foodServingSizes![0].quantity.toString()
-                          : "1",
+                      servingSize: food.servingSize ?? "",
                       foodId: food.foodId,
                       quantity: qty,
                     );
@@ -258,7 +264,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content:
-                          Text("Lỗi khi thêm món ăn. Vui lòng thử lại!"),
+                              Text("Lỗi khi thêm món ăn. Vui lòng thử lại!"),
                         ),
                       );
                     }
@@ -315,6 +321,7 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
       ),
       body: Column(
         children: [
+          // Search bar
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -343,6 +350,8 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
               ),
             ),
           ),
+
+          // Danh sách món ăn
           Expanded(
             child: FutureBuilder<List<Food>>(
               future: _foodFuture,
@@ -364,17 +373,17 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundImage:
-                        (food.imageUrl != null && food.imageUrl!.isNotEmpty)
-                            ? NetworkImage(food.imageUrl!)
-                            : null,
+                            (food.imageUrl != null && food.imageUrl!.isNotEmpty)
+                                ? NetworkImage(food.imageUrl!)
+                                : null,
                         child: (food.imageUrl == null || food.imageUrl!.isEmpty)
                             ? const Icon(Icons.fastfood)
                             : null,
                       ),
                       title: Text(food.foodName),
                       subtitle: Text(
-                        '${food.foodServingSizes != null && food.foodServingSizes!.isNotEmpty ? food.foodServingSizes![0].calories.toStringAsFixed(0) : "0"} cal • '
-                            '${food.foodServingSizes != null && food.foodServingSizes!.isNotEmpty ? "${food.foodServingSizes![0].quantity} khẩu phần" : "1 khẩu phần"}',
+                        '${food.calories?.toStringAsFixed(0) ?? "0"} cal • '
+                        '${food.servingSize ?? "1 serving"}',
                       ),
                       trailing: IconButton(
                         icon: Icon(Icons.add, color: primaryColor),
