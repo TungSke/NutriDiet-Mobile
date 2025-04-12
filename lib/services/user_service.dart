@@ -767,4 +767,46 @@ class UserService {
       return false;
     }
   }
+
+  Future<http.Response> forgotPassword(String email) async {
+    try {
+      final response = await _apiService.post(
+        "api/user/forgot-password?email=$email",
+        body: {},
+      );
+      return response;
+    } catch (e) {
+      throw Exception("Lỗi khi gửi yêu cầu quên mật khẩu: $e");
+    }
+  }
+
+  Future<http.Response> resetPassword(ResetPasswordRequest request) async {
+    try {
+      final response = await _apiService.put(
+        "api/user/reset-password",
+        body: request.toJson(),
+      );
+      return response;
+    } catch (e) {
+      throw Exception("Lỗi khi đặt lại mật khẩu: $e");
+    }
+  }
+}
+
+class ResetPasswordRequest {
+  final String email;
+  final String otp;
+  final String newPassword;
+
+  ResetPasswordRequest({
+    required this.email,
+    required this.otp,
+    required this.newPassword,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'email': email,
+    'otp': otp,
+    'newPassword': newPassword,
+  };
 }

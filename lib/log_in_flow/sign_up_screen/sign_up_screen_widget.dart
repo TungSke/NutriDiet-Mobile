@@ -373,7 +373,7 @@ class _SignUpScreenWidgetState extends State<SignUpScreenWidget>
                               await _model.handleSignUp(context);
                             },
                             text:
-                                _model.isLoading ? 'Signing up...' : 'Sign up',
+                                _model.isLoading ? 'Đang đăng ký...' : 'Đăng ký',
                             options: FFButtonOptions(
                               width: double.infinity,
                               height: 54.0,

@@ -19,11 +19,11 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
 
   String? _textController1Validator(BuildContext context, String? val) {
     if (val == null || val.isEmpty) {
-      return 'Please enter valid email address';
+      return 'Yêu cầu nhập địa chỉ email hợp lệ';
     }
 
     if (!RegExp(kTextValidatorEmailRegex).hasMatch(val)) {
-      return 'Please enter valid email address';
+      return 'Yêu cầu nhập địa chỉ email hợp lệ';
     }
     return null;
   }
@@ -35,7 +35,7 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
   String? Function(BuildContext, String?)? textController2Validator;
   String? _textController2Validator(BuildContext context, String? val) {
     if (val == null || val.isEmpty) {
-      return 'Please enter valid password';
+      return 'Yêu cầu nhập mật khẩu hợp lệ';
     }
 
     return null;
@@ -87,7 +87,7 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
           final userDataJson = jsonDecode(userData.body);
           final String? email = userDataJson["email"];
           if (email == null || email.isEmpty) {
-            throw Exception("User email not found.");
+            throw Exception("Địa chỉ email không tồn tại");
           }
 
           FFAppState().email = email;
@@ -165,7 +165,7 @@ class LoginScreenModel extends FlutterFlowModel<LoginScreenWidget> {
         final userDataJson = jsonDecode(userData.body);
         final String? email = userDataJson["email"];
         if (email == null || email.isEmpty) {
-          throw Exception("User email not found.");
+          throw Exception("Địa chỉ email không tồn tại");
         }
 
         FFAppState().email = email;
