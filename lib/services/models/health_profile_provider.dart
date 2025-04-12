@@ -69,11 +69,11 @@ class HealthProfileProvider extends ChangeNotifier {
   double? weight; // Đổi từ int? thành double?
   String? activityLevel;
   String? dietStyle;
-  String aisuggestion = "string"; // ✅ Giá trị mặc định
+  String aisuggestion = ""; // ✅ Giá trị mặc định
 
   List<int> allergies = []; // List để chứa các dị ứng
   List<int> diseases = []; // List để chứa các bệnh lý
-
+  String profileOption = 'ADD';
   // Cập nhật chiều cao (height)
   void setHeight(double value) {
     // Cập nhật kiểu dữ liệu là double
@@ -96,6 +96,11 @@ class HealthProfileProvider extends ChangeNotifier {
 
   void setDietStyle(String value) {
     dietStyle = value;
+    notifyListeners();
+  }
+
+  void setProfileOption(String value) {
+    profileOption = value;
     notifyListeners();
   }
 
@@ -132,6 +137,7 @@ class HealthProfileProvider extends ChangeNotifier {
       'Weight': weight,
       'ActivityLevel': activityLevel,
       'DietStyle': dietStyle,
+      'ProfileOption': profileOption,
       'Aisuggestion': aisuggestion,
       'Allergies': allergies,
       'Diseases': diseases,

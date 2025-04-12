@@ -23,6 +23,29 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
   late AIMealPlanDetailModel _model;
   int selectedDay = 1;
 
+  // Ánh xạ tên bữa ăn sang tiếng Việt
+  String _mapCategoryToVietnamese(String category) {
+    switch (category.toLowerCase()) {
+      case 'breakfast':
+        return 'Bữa sáng';
+      case 'lunch':
+        return 'Bữa trưa';
+      case 'dinner':
+        return 'Bữa tối';
+      case 'snacks':
+        return 'Bữa phụ';
+      default:
+        return category;
+    }
+  }
+
+  final Map<String, String> mealTimeTranslations = {
+    'Breakfast': '6:00 - 8:00 sáng',
+    'Lunch': '12:00 - 14:00 chiều',
+    'Dinner': '18:00 - 20:00 tối',
+    'Snacks': '15:00 - 16:00 chiều',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -655,6 +678,9 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
   }
 
   Widget _buildMealCard(String mealType, List<MealPlanDetail> meals) {
+    final vietnameseMealType = _mapCategoryToVietnamese(mealType);
+    final mealTime = mealTimeTranslations[mealType] ?? '';
+
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -663,11 +689,32 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              mealType,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            Row(
+              children: [
+                Text(
+                  vietnameseMealType,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (mealTime.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.access_time,
+                    size: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '($mealTime)',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 4),
             ...meals.map((meal) => Padding(

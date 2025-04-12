@@ -206,6 +206,7 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
   String activityLevel = ''; // Mức độ vận động
   String dietStyle = '';
   String aisuggestion = '';
+  String profileOption = '';
   List<String> allergies = []; // ✅ Dị ứng
   List<String> diseases = [];
   bool isLoading = true;
@@ -415,7 +416,27 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateHealthProfile(BuildContext context) async {
+  Future<bool> checkTodayUpdate() async {
+    try {
+      final response = await _userService.getTodayCheck(); // Call API
+
+      if (response.statusCode == 200) {
+        // Directly parse the response body as a boolean
+        final bool isUpdatedToday = jsonDecode(response.body);
+
+        return isUpdatedToday ??
+            false; // If the response is true, return true, else return false
+      } else {
+        throw Exception("Lỗi khi lấy kiểm tra hôm nay");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi kiểm tra: $e");
+      return false; // Return false if there's an error
+    }
+  }
+
+  Future<void> updateHealthProfile(
+      BuildContext context, String profileOption) async {
     try {
       // Nếu không có dị ứng được chọn, vẫn tiếp tục cập nhật mà không gửi danh sách dị ứng
       final activityLevelInEnglish =
@@ -425,6 +446,7 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
       final response = await _userService.updateHealthProfile(
           activityLevel: activityLevelInEnglish,
           dietStyle: dietStyleInEnglish,
+          profileOption: profileOption,
           weight: weight, // Cập nhật cân nặng kiểu double
           height: height, // Cập nhật chiều cao kiểu double
           allergies: selectedAllergyIds.isEmpty
@@ -437,7 +459,11 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
         print('✅ Cập nhật thành công!');
         await fetchHealthProfile(); // Fetch updated data
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Cập nhật thành công!')),
+          SnackBar(
+            content: Text('Cập nhật thành công!',
+                style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.green, // Nền xanh
+          ),
         );
         Navigator.pop(context, true);
       } else {
@@ -445,7 +471,10 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
         final errorMessage = responseData['message'] ?? 'Cập nhật thất bại';
         print('❌ Lỗi: $errorMessage');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+          SnackBar(
+            content: Text(errorMessage, style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.red, // Nền đỏ
+          ),
         );
       }
     } catch (e) {
