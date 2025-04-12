@@ -110,7 +110,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                             textInputAction: TextInputAction.next,
                             obscureText: false,
                             decoration: InputDecoration(
-                              labelText: 'Email address',
+                              labelText: 'Địa chỉ email',
                               labelStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -120,7 +120,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                     letterSpacing: 0.0,
                                     useGoogleFonts: false,
                                   ),
-                              hintText: 'Enter your email address',
+                              hintText: 'Nhập địa chỉ email của bạn',
                               hintStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -186,7 +186,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                             textInputAction: TextInputAction.done,
                             obscureText: !_model.passwordVisibility,
                             decoration: InputDecoration(
-                              labelText: 'Password',
+                              labelText: 'Mật khẩu',
                               labelStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -196,7 +196,7 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget>
                                     letterSpacing: 0.0,
                                     useGoogleFonts: false,
                                   ),
-                              hintText: 'Enter your password',
+                              hintText: 'Nhập mật khẩu của bạn',
                               hintStyle: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(

@@ -22,15 +22,11 @@ class _ForgetScreenWidgetState extends State<ForgetScreenWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => ForgetScreenModel());
-
-    _model.textController ??= TextEditingController();
-    _model.textFieldFocusNode ??= FocusNode();
   }
 
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
   }
 
@@ -50,7 +46,7 @@ class _ForgetScreenWidgetState extends State<ForgetScreenWidget> {
                 model: _model.appbarModel,
                 updateCallback: () => safeSetState(() {}),
                 child: const AppbarWidget(
-                  title: 'Forget password',
+                  title: 'Quên mật khẩu',
                 ),
               ),
               Expanded(
@@ -58,33 +54,25 @@ class _ForgetScreenWidgetState extends State<ForgetScreenWidget> {
                   key: _model.formKey,
                   autovalidateMode: AutovalidateMode.disabled,
                   child: Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
                     child: ListView(
-                      padding: const EdgeInsets.fromLTRB(
-                        0,
-                        16.0,
-                        0,
-                        0,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
                       scrollDirection: Axis.vertical,
                       children: [
                         Text(
-                          'Type your email, we will send you verification code via email',
+                          'Nhập email của bạn, chúng tôi sẽ gửi mã xác nhận đến email của bạn!',
                           textAlign: TextAlign.start,
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'figtree',
-                                    fontSize: 16.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.normal,
-                                    useGoogleFonts: false,
-                                    lineHeight: 1.5,
-                                  ),
+                          style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            fontFamily: 'figtree',
+                            fontSize: 16.0,
+                            letterSpacing: 0.0,
+                            fontWeight: FontWeight.normal,
+                            useGoogleFonts: false,
+                            lineHeight: 1.5,
+                          ),
                         ),
                         Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 40.0, 0.0, 48.0),
+                          padding: const EdgeInsetsDirectional.fromSTEB(0.0, 40.0, 0.0, 48.0),
                           child: TextFormField(
                             controller: _model.textController,
                             focusNode: _model.textFieldFocusNode,
@@ -92,38 +80,32 @@ class _ForgetScreenWidgetState extends State<ForgetScreenWidget> {
                             textInputAction: TextInputAction.done,
                             obscureText: false,
                             decoration: InputDecoration(
-                              labelText: 'Email address',
-                              labelStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    fontSize: 13.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                  ),
-                              hintText: 'Enter your email address',
-                              hintStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'figtree',
-                                    color: FlutterFlowTheme.of(context).grey,
-                                    fontSize: 16.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: false,
-                                  ),
+                              labelText: 'Địa chỉ email',
+                              labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
+                                fontFamily: 'figtree',
+                                color: FlutterFlowTheme.of(context).grey,
+                                fontSize: 13.0,
+                                letterSpacing: 0.0,
+                                useGoogleFonts: false,
+                              ),
+                              hintText: 'Nhập địa chỉ email của bạn',
+                              hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
+                                fontFamily: 'figtree',
+                                color: FlutterFlowTheme.of(context).grey,
+                                fontSize: 16.0,
+                                letterSpacing: 0.0,
+                                useGoogleFonts: false,
+                              ),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color:
-                                      FlutterFlowTheme.of(context).borderColor,
+                                  color: FlutterFlowTheme.of(context).borderColor,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
+                                  color: FlutterFlowTheme.of(context).primaryText,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
@@ -143,48 +125,40 @@ class _ForgetScreenWidgetState extends State<ForgetScreenWidget> {
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                             ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'figtree',
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: false,
-                                ),
-                            cursorColor:
-                                FlutterFlowTheme.of(context).primaryText,
-                            validator: _model.textControllerValidator
-                                .asValidator(context),
+                            style: FlutterFlowTheme.of(context).bodyMedium.override(
+                              fontFamily: 'figtree',
+                              fontSize: 16.0,
+                              letterSpacing: 0.0,
+                              useGoogleFonts: false,
+                            ),
+                            cursorColor: FlutterFlowTheme.of(context).primaryText,
+                            validator: _model.textControllerValidator.asValidator(context),
                           ),
                         ),
                         FFButtonWidget(
-                          onPressed: () async {
-                            if (_model.formKey.currentState == null ||
-                                !_model.formKey.currentState!.validate()) {
-                              return;
+                          onPressed: _model.isLoading
+                              ? null
+                              : () async {
+                            final success = await _model.sendForgotPasswordRequest(context);
+                            if (success) {
+                              context.pushNamed('reset_password_screen');
                             }
-
-                            context.pushNamed('verification_screen');
                           },
-                          text: 'Contiune',
+                          text: _model.isLoading ? 'Đang gửi...' : 'Tiếp tục',
                           options: FFButtonOptions(
                             width: double.infinity,
                             height: 54.0,
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                24.0, 0.0, 24.0, 0.0),
-                            iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 0.0),
+                            padding: const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                            iconPadding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
                             color: FlutterFlowTheme.of(context).primary,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  fontFamily: 'figtree',
-                                  color: Colors.white,
-                                  fontSize: 18.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.bold,
-                                  useGoogleFonts: false,
-                                ),
+                            textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                              fontFamily: 'figtree',
+                              color: Colors.white,
+                              fontSize: 18.0,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.bold,
+                              useGoogleFonts: false,
+                            ),
                             elevation: 0.0,
                             borderSide: const BorderSide(
                               color: Colors.transparent,

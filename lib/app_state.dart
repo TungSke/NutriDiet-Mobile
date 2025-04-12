@@ -170,6 +170,12 @@ class FFAppState extends ChangeNotifier {
     prefs.setString('ff_email', value);
   }
 
+  void clearEmail() {
+    _email = '';
+    prefs.remove('ff_email');
+    notifyListeners();
+  }
+
   int _selected = 0;
   int get selected => _selected;
   set selected(int value) {

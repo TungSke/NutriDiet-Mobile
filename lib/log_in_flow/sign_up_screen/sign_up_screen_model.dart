@@ -36,7 +36,9 @@ class SignUpScreenModel extends FlutterFlowModel<SignUpScreenWidget> {
     if (val == null || val.isEmpty) {
       return 'Yêu cầu nhập mật khẩu hợp lệ';
     }
-
+    if (val.length < 6) {
+      return 'Mật khẩu phải có ít nhất 6 ký tự';
+    }
     return null;
   }
 
