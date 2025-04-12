@@ -69,10 +69,10 @@ class AIMealPlanDetailModel extends ChangeNotifier {
             _foodCache[detail.foodId!] = food;
             detail.foodName = food.foodName;
             final quantity = detail.quantity ?? 1;
-            detail.totalCalories = (food.calories ?? 0) * quantity;
-            detail.totalCarbs = (food.carbs ?? 0) * quantity;
-            detail.totalFat = (food.fat ?? 0) * quantity;
-            detail.totalProtein = (food.protein ?? 0) * quantity;
+            // detail.totalCalories = (food.calories ?? 0) * quantity;
+            // detail.totalCarbs = (food.carbs ?? 0) * quantity;
+            // detail.totalFat = (food.fat ?? 0) * quantity;
+            // detail.totalProtein = (food.protein ?? 0) * quantity;
           } else {
             detail.foodName = "Món ăn ID: ${detail.foodId} (Không tải được)";
           }
@@ -80,10 +80,10 @@ class AIMealPlanDetailModel extends ChangeNotifier {
           final food = _foodCache[detail.foodId!]!;
           detail.foodName = food.foodName;
           final quantity = detail.quantity ?? 1;
-          detail.totalCalories = (food.calories ?? 0) * quantity;
-          detail.totalCarbs = (food.carbs ?? 0) * quantity;
-          detail.totalFat = (food.fat ?? 0) * quantity;
-          detail.totalProtein = (food.protein ?? 0) * quantity;
+          // detail.totalCalories = (food.calories ?? 0) * quantity;
+          // detail.totalCarbs = (food.carbs ?? 0) * quantity;
+          // detail.totalFat = (food.fat ?? 0) * quantity;
+          // detail.totalProtein = (food.protein ?? 0) * quantity;
         }
       }
     } catch (e) {
