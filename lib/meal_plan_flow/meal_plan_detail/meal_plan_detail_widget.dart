@@ -421,20 +421,34 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.warning_amber_rounded,
-                    color: isPremium ? Colors.yellow : Colors.grey,
-                    size: 30,
-                  ),
-                  onPressed: () async {
-                    if (!isPremium) {
-                      await _showPremiumRequiredDialog();
-                      return;
-                    }
-                    _showAIWarningDialog();
-                  },
-                  tooltip: "Xem cảnh báo AI",
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.warning_amber_rounded,
+                        color: isPremium ? Colors.yellow : Colors.grey,
+                        size: 30,
+                      ),
+                      onPressed: () async {
+                        if (!isPremium) {
+                          await _showPremiumRequiredDialog();
+                          return;
+                        }
+                        _showAIWarningDialog();
+                      },
+                      tooltip: "Xem cảnh báo AI",
+                    ),
+                    Text(
+                      "Cảnh báo thực đơn",
+                      style: GoogleFonts.montserrat(
+                        fontSize: 10,
+                        color: isPremium ? Colors.yellow.shade700 : Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
           ],
@@ -632,38 +646,60 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     final userGoals = _model.userGoals ?? {'calories': 2000.0, 'carbs': 250.0, 'fat': 70.0, 'protein': 100.0};
 
     return Container(
-      width: double.infinity, // Đảm bảo Row chiếm toàn bộ chiều rộng màn hình
-      padding: const EdgeInsets.symmetric(horizontal: 8), // Thêm padding ngang để tránh sát mép
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Phân bố đều các phần tử
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _buildNutrientDisplay(
-            "Calories",
-            widget.source == MealPlanSource.myMealPlan
-                ? "${totalCalories.toStringAsFixed(0)}/${userGoals['calories']!.toStringAsFixed(0)}"
-                : totalCalories.toStringAsFixed(0),
-            "kcal",
+          // Chú thích hiển thị theo source
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Text(
+              widget.source == MealPlanSource.myMealPlan
+                  ? "Tổng Dinh Dưỡng Ngày $selectedDay/Mục Tiêu Cần Nạp Mỗi Ngày"
+                  : "Tổng Dinh Dưỡng Ngày $selectedDay",
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: FlutterFlowTheme.of(context).tertiary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          _buildNutrientDisplay(
-            "Carbs",
-            widget.source == MealPlanSource.myMealPlan
-                ? "${carbs.toStringAsFixed(0)}/${userGoals['carbs']!.toStringAsFixed(0)}"
-                : carbs.toStringAsFixed(0),
-            "g",
-          ),
-          _buildNutrientDisplay(
-            "Protein",
-            widget.source == MealPlanSource.myMealPlan
-                ? "${protein.toStringAsFixed(0)}/${userGoals['protein']!.toStringAsFixed(0)}"
-                : protein.toStringAsFixed(0),
-            "g",
-          ),
-          _buildNutrientDisplay(
-            "Fat",
-            widget.source == MealPlanSource.myMealPlan
-                ? "${fat.toStringAsFixed(0)}/${userGoals['fat']!.toStringAsFixed(0)}"
-                : fat.toStringAsFixed(0),
-            "g",
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildNutrientDisplay(
+                "Calories",
+                widget.source == MealPlanSource.myMealPlan
+                    ? "${totalCalories.toStringAsFixed(0)}/${userGoals['calories']!.toStringAsFixed(0)}"
+                    : totalCalories.toStringAsFixed(0),
+                "kcal",
+              ),
+              _buildNutrientDisplay(
+                "Carbs",
+                widget.source == MealPlanSource.myMealPlan
+                    ? "${carbs.toStringAsFixed(0)}/${userGoals['carbs']!.toStringAsFixed(0)}"
+                    : carbs.toStringAsFixed(0),
+                "g",
+              ),
+              _buildNutrientDisplay(
+                "Protein",
+                widget.source == MealPlanSource.myMealPlan
+                    ? "${protein.toStringAsFixed(0)}/${userGoals['protein']!.toStringAsFixed(0)}"
+                    : protein.toStringAsFixed(0),
+                "g",
+              ),
+              _buildNutrientDisplay(
+                "Fat",
+                widget.source == MealPlanSource.myMealPlan
+                    ? "${fat.toStringAsFixed(0)}/${userGoals['fat']!.toStringAsFixed(0)}"
+                    : fat.toStringAsFixed(0),
+                "g",
+              ),
+            ],
           ),
         ],
       ),
@@ -926,6 +962,9 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     }
     final hasMeals = meals.isNotEmpty;
 
+    // Lấy giá trị calories cho bữa ăn
+    final calories = _model.getCaloriesForMealType(selectedDay, mealType);
+
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(
@@ -1010,37 +1049,55 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                 ],
               ),
             ),
-            if (widget.source == MealPlanSource.myMealPlan)
-              IconButton(
-                icon: Icon(
-                  Icons.more_horiz,
-                  color: FlutterFlowTheme.of(context).primary,
-                  size: 24,
-                ),
-                onPressed: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SelectFoodWidget(
-                        mealPlanId: widget.mealPlanId,
-                        mealType: mealType,
-                        dayNumber: selectedDay,
-                        existingMeals: meals,
+            // Hiển thị calories và icon '...' trong một Row
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (hasMeals && widget.source == MealPlanSource.myMealPlan)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Text(
+                      "${calories.toStringAsFixed(0)} kcal",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: FlutterFlowTheme.of(context).primary,
                       ),
                     ),
-                  );
-                  if (result == true && mounted) {
-                    await _model.fetchMealPlanById(widget.mealPlanId);
-                    if (_model.isDayEmpty(selectedDay) && selectedDay > 1) {
-                      setState(() {
-                        selectedDay = _model.getActiveDays().lastWhere((day) => day < selectedDay, orElse: () => 1);
-                      });
-                    }
-                  }
-                },
-                splashRadius: 24,
-                tooltip: 'Thêm món ăn',
-              ),
+                  ),
+                if (widget.source == MealPlanSource.myMealPlan)
+                  IconButton(
+                    icon: Icon(
+                      Icons.more_horiz,
+                      color: FlutterFlowTheme.of(context).primary,
+                      size: 24,
+                    ),
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SelectFoodWidget(
+                            mealPlanId: widget.mealPlanId,
+                            mealType: mealType,
+                            dayNumber: selectedDay,
+                            existingMeals: meals,
+                          ),
+                        ),
+                      );
+                      if (result == true && mounted) {
+                        await _model.fetchMealPlanById(widget.mealPlanId);
+                        if (_model.isDayEmpty(selectedDay) && selectedDay > 1) {
+                          setState(() {
+                            selectedDay = _model.getActiveDays().lastWhere((day) => day < selectedDay, orElse: () => 1);
+                          });
+                        }
+                      }
+                    },
+                    splashRadius: 24,
+                    tooltip: 'Thêm món ăn',
+                  ),
+              ],
+            ),
           ],
         ),
       ),

@@ -212,15 +212,32 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
   }
 
   Widget _buildMealPlanItem(BuildContext context, MealPlan mealPlan) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: const Color(0xFFF5F5F5),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(mealPlan.planName ?? "Không có tên", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        subtitle: Text("${mealPlan.healthGoal ?? "Không có mục tiêu"} - Số ngày: ${mealPlan.duration ?? 0}"),
+    final theme = FlutterFlowTheme.of(context);
+
+    // Màu sắc dựa trên mục tiêu sức khỏe
+    Color accentColor;
+    IconData goalIcon;
+    switch (mealPlan.healthGoal) {
+      case 'Giảm cân':
+        accentColor = Colors.green.shade400;
+        goalIcon = Icons.fitness_center;
+        break;
+      case 'Tăng cân':
+        accentColor = Colors.orange.shade400;
+        goalIcon = Icons.restaurant;
+        break;
+      case 'Duy trì cân nặng':
+        accentColor = Colors.blue.shade400;
+        goalIcon = Icons.balance;
+        break;
+      default:
+        accentColor = Colors.grey.shade400;
+        goalIcon = Icons.help_outline;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: InkWell(
         onTap: () async {
           final result = await Navigator.push(
             context,
@@ -235,6 +252,128 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
             Navigator.pop(context, true);
           }
         },
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: accentColor.withOpacity(0.3),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Cột thông tin chính
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Tiêu đề
+                          Text(
+                            mealPlan.planName ?? "Không có tên",
+                            style: theme.titleMedium.copyWith(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: theme.primaryText,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          // Phụ đề
+                          Text(
+                            mealPlan.healthGoal ?? "Không có mục tiêu",
+                            style: theme.bodyMedium.copyWith(
+                              fontSize: 14,
+                              color: theme.secondaryText,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          // Thông tin bổ sung
+                          Text(
+                            "Thời gian: ${mealPlan.duration ?? 0} ngày",
+                            style: theme.bodySmall.copyWith(
+                              fontSize: 12,
+                              color: theme.secondaryText.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Cột biểu tượng/icon
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: accentColor.withOpacity(0.1),
+                      ),
+                      child: Icon(
+                        goalIcon,
+                        color: accentColor,
+                        size: 30,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Badge số ngày
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: accentColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "${mealPlan.duration ?? 0} ngày",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              // Điểm nhấn viền trái
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 4,
+                  decoration: BoxDecoration(
+                    color: accentColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

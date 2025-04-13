@@ -39,11 +39,23 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
     }
   }
 
-  final Map<String, String> mealTimeTranslations = {
-    'Breakfast': '6:00 - 8:00 sáng',
-    'Lunch': '12:00 - 14:00 chiều',
-    'Dinner': '18:00 - 20:00 tối',
-    'Snacks': '15:00 - 16:00 chiều',
+  final Map<String, Map<String, String>> mealTypeTranslations = {
+    'Breakfast': {
+      'name': 'Bữa sáng',
+      'time': '6:00 - 8:00 sáng',
+    },
+    'Lunch': {
+      'name': 'Bữa trưa',
+      'time': '12:00 - 14:00 chiều',
+    },
+    'Dinner': {
+      'name': 'Bữa tối',
+      'time': '18:00 - 20:00 tối',
+    },
+    'Snacks': {
+      'name': 'Bữa phụ',
+      'time': '15:00 - 16:00 chiều',
+    },
   };
 
   @override
@@ -614,30 +626,49 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
     final fat = nutrients['fat']!;
 
     return Container(
-      width: double.infinity, // Đảm bảo Row chiếm toàn bộ chiều rộng màn hình
-      padding: const EdgeInsets.symmetric(horizontal: 8), // Thêm padding ngang để tránh sát mép
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Phân bố đều các phần tử
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _buildNutrientDisplay(
-            "Calories",
-            totalCalories.toStringAsFixed(0), // Chỉ hiển thị giá trị hiện tại, không có mục tiêu
-            "kcal",
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Text(
+              "Tổng Dinh Dưỡng Ngày $selectedDay",
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: FlutterFlowTheme.of(context).tertiary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          _buildNutrientDisplay(
-            "Carbs",
-            carbs.toStringAsFixed(0),
-            "g",
-          ),
-          _buildNutrientDisplay(
-            "Protein",
-            protein.toStringAsFixed(0),
-            "g",
-          ),
-          _buildNutrientDisplay(
-            "Fat",
-            fat.toStringAsFixed(0),
-            "g",
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildNutrientDisplay(
+                "Calories",
+                totalCalories.toStringAsFixed(0),
+                "kcal",
+              ),
+              _buildNutrientDisplay(
+                "Carbs",
+                carbs.toStringAsFixed(0),
+                "g",
+              ),
+              _buildNutrientDisplay(
+                "Protein",
+                protein.toStringAsFixed(0),
+                "g",
+              ),
+              _buildNutrientDisplay(
+                "Fat",
+                fat.toStringAsFixed(0),
+                "g",
+              ),
+            ],
           ),
         ],
       ),
@@ -678,54 +709,127 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
   }
 
   Widget _buildMealCard(String mealType, List<MealPlanDetail> meals) {
-    final vietnameseMealType = _mapCategoryToVietnamese(mealType);
-    final mealTime = mealTimeTranslations[mealType] ?? '';
+    final vietnameseMealInfo = mealTypeTranslations[mealType] ?? {
+      'name': mealType,
+      'time': '',
+    };
+    final vietnameseMealType = vietnameseMealInfo['name']!;
+    final mealTime = vietnameseMealInfo['time']!;
+    String foodNames;
+    if (meals.isEmpty) {
+      foodNames = "Chưa có món ăn";
+    } else {
+      final foodMap = <String, double>{};
+      for (var meal in meals) {
+        final name = meal.foodName ?? "Chưa có món ăn";
+        foodMap[name] = (foodMap[name] ?? 0) + (meal.quantity ?? 1);
+      }
+      foodNames = foodMap.entries
+          .map((entry) => entry.value > 1 ? "${entry.key} x ${entry.value.toInt()}" : entry.key)
+          .join(", ");
+    }
+    final hasMeals = meals.isNotEmpty;
+    final totalCalories = meals.fold<double>(
+      0,
+          (sum, meal) => sum + (meal.totalCalories ?? 0),
+    );
 
     return Card(
       color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: hasMeals ? FlutterFlowTheme.of(context).primary : Colors.grey.shade300,
+          width: hasMeals ? 2 : 1,
+        ),
+      ),
+      elevation: hasMeals ? 4 : 1,
+      margin: const EdgeInsets.symmetric(vertical: 6),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Text(
-                  vietnameseMealType,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+            if (!hasMeals)
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  shape: BoxShape.circle,
                 ),
-                if (mealTime.isNotEmpty) ...[
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.access_time,
-                    size: 12,
-                    color: Colors.grey.shade600,
+                child: Icon(
+                  Icons.add_circle_outline,
+                  color: Colors.grey.shade600,
+                  size: 24,
+                ),
+              ),
+            if (!hasMeals) const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        vietnameseMealType,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: hasMeals ? Colors.black : Colors.grey.shade700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (mealTime.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '($mealTime)',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    '($mealTime)',
+                    foodNames,
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade600,
-                      fontStyle: FontStyle.italic,
+                      fontSize: 14,
+                      color: hasMeals ? Colors.black87 : Colors.grey.shade500,
+                      fontStyle: hasMeals ? FontStyle.normal : FontStyle.italic,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
-              ],
-            ),
-            const SizedBox(height: 4),
-            ...meals.map((meal) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2.0),
-              child: Text(
-                meal.foodName ?? "Chưa có món ăn",
-                style: const TextStyle(fontSize: 14),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-            )).toList(),
+            ),
+            if (hasMeals)
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Text(
+                  "${totalCalories.toStringAsFixed(0)} kcal",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

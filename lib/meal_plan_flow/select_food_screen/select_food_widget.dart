@@ -30,7 +30,6 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
   final TextEditingController _searchController = TextEditingController();
   Map<int, Food> _foodCache = {};
 
-  // Map ánh xạ mealType sang tiếng Việt
   final Map<String, String> _mealTypeTranslations = {
     'Breakfast': 'Bữa sáng',
     'Lunch': 'Bữa trưa',
@@ -39,7 +38,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
   };
 
   String _getMealTypeInVietnamese(String mealType) {
-    return _mealTypeTranslations[mealType] ?? mealType; // Trả về gốc nếu không khớp
+    return _mealTypeTranslations[mealType] ?? mealType;
   }
 
   @override
@@ -47,11 +46,12 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
     super.initState();
     _model = SelectFoodModel();
     _model.setExistingMeals(widget.existingMeals);
-    _initData(); // Tách logic khởi tạo thành hàm riêng
+    _initData();
   }
 
   Future<void> _initData() async {
-    await _model.fetchFoods(); // Tải trang đầu tiên (20 món)
+    await _model.fetchFoods();
+    await _model.fetchMealTotals(widget.mealPlanId, widget.dayNumber, widget.mealType); // Tải totalByMealType
     if (widget.existingMeals.isNotEmpty) {
       await _fetchFoodDetailsForExistingMeals();
     }
@@ -106,7 +106,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
   }
 
   void _fetchFoods({String? search}) {
-    _model.fetchFoods(search: search); // Tải lại từ trang 1
+    _model.fetchFoods(search: search);
   }
 
   void _addToMealPlan(Food food) {
@@ -114,10 +114,10 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
   }
 
   void _showQuantityDialog(Food food) {
-    int quantity = 1; // Giá trị khởi tạo
+    int quantity = 1;
 
     showDialog(
-      context: context, // Dùng context từ build
+      context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -134,7 +134,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
             children: [
               if (food.servingSize != null && food.servingSize!.isNotEmpty)
                 Text(
-                  "Serving Size: ${food.servingSize}",
+                  "Khẩu phần: ${food.servingSize}",
                   style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
                 ),
               const SizedBox(height: 8),
@@ -185,24 +185,21 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onPressed: () async {
-                Navigator.pop(dialogContext); // Đóng dialog số lượng
+                Navigator.pop(dialogContext);
 
-                // Gọi API kiểm tra tránh thức ăn
                 final response = await _model.foodService.checkFoodAvoidance(
                   foodId: food.foodId!,
-                  context: context, // Dùng context từ build
+                  context: context,
                 );
                 final statusCode = response.statusCode;
                 final responseData = jsonDecode(response.body);
                 final message = responseData['message'] as String?;
 
-                if (!mounted) return; // Kiểm tra widget còn tồn tại
+                if (!mounted) return;
 
                 if (statusCode == 200) {
-                  // Hiển thị dialog cảnh báo
                   await _showWarningDialog(food, message, quantity);
                 } else if (statusCode == 400) {
-                  // Thêm món ăn trực tiếp nếu không có cảnh báo
                   await _addFoodDirectly(food, quantity);
                 } else {
                   _showErrorSnackBar();
@@ -354,15 +351,16 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () async {
-              final success = await _model.removeFoodFromMealPlan(meal.mealPlanDetailId!);
+              final success = await _model.removeFoodFromMealPlan(
+                meal.mealPlanDetailId!, widget.mealPlanId, widget.dayNumber, widget.mealType,
+              );
 
-              Navigator.pop(context); // Đóng dialog xác nhận xóa
+              Navigator.pop(context);
 
               if (!mounted) return;
 
               if (success) {
                 if (_model.existingMeals.isEmpty) {
-                  // Trường hợp không còn món ăn nào
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
@@ -382,8 +380,8 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                       actions: [
                         TextButton(
                           onPressed: () {
-                            Navigator.pop(context); // Đóng dialog thông báo
-                            Navigator.pop(context, true); // Thoát về trang trước
+                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           },
                           child: Text(
                             "OK",
@@ -394,7 +392,6 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                     ),
                   );
                 } else {
-                  // Trường hợp vẫn còn món ăn
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
@@ -413,7 +410,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                       ),
                       actions: [
                         TextButton(
-                          onPressed: () => Navigator.pop(context), // Chỉ đóng dialog, không thoát trang
+                          onPressed: () => Navigator.pop(context),
                           child: Text(
                             "OK",
                             style: TextStyle(color: FlutterFlowTheme.of(context).primary),
@@ -436,6 +433,38 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
           ),
         ],
       ),
+    );
+  }
+
+  // Widget hiển thị thông số dinh dưỡng
+  Widget _buildNutrientDisplay(String label, String value, String unit) {
+    return Column(
+      children: [
+        Container(
+          width: 70,
+          height: 70,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
+          ),
+          child: Center(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: FlutterFlowTheme.of(context).primary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "$label ($unit)",
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 12),
+        ),
+      ],
     );
   }
 
@@ -468,6 +497,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
       body: ListenableBuilder(
         listenable: _model,
         builder: (context, child) {
+          final nutrients = _model.getNutrientTotals(); // Lấy thông số dinh dưỡng
           return Column(
             children: [
               Container(
@@ -534,6 +564,33 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                                 ),
                               ),
                               const SizedBox(height: 8),
+                              // Hiển thị thông số dinh dưỡng
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  _buildNutrientDisplay(
+                                    "Calories",
+                                    "${nutrients['calories']!.toStringAsFixed(0)}",
+                                    "kcal",
+                                  ),
+                                  _buildNutrientDisplay(
+                                    "Carbs",
+                                    "${nutrients['carbs']!.toStringAsFixed(0)}",
+                                    "g",
+                                  ),
+                                  _buildNutrientDisplay(
+                                    "Protein",
+                                    "${nutrients['protein']!.toStringAsFixed(0)}",
+                                    "g",
+                                  ),
+                                  _buildNutrientDisplay(
+                                    "Fat",
+                                    "${nutrients['fat']!.toStringAsFixed(0)}",
+                                    "g",
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
                               ListView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
@@ -547,6 +604,18 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     margin: const EdgeInsets.symmetric(vertical: 4),
                                     child: ListTile(
+                                      onTap: () {
+                                        if (meal.foodId != null) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => BrekFastIIngredientsWidget(
+                                                foodId: meal.foodId!,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
                                       leading: CircleAvatar(
                                         radius: 25,
                                         backgroundImage: food != null &&
@@ -640,8 +709,7 @@ class _SelectFoodWidgetState extends State<SelectFoodWidget> {
                               ),
                               subtitle: Text(
                                 '${food.calories?.toStringAsFixed(0) ?? "0"} cal • ${food.servingSize ?? "1 serving"}',
-                                style:
-                                TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
+                                style: TextStyle(color: FlutterFlowTheme.of(context).secondaryText),
                               ),
                               trailing: IconButton(
                                 icon: Icon(Icons.add, color: FlutterFlowTheme.of(context).primary),
