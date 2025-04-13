@@ -15,6 +15,7 @@ class SelectFoodModel extends ChangeNotifier {
   int currentPage = 1; // Trang hiện tại
   int pageSize = 10;
   bool hasMore = true; // Còn dữ liệu để tải không
+  Map<String, dynamic>? mealTotals;
 
   void setExistingMeals(List<MealPlanDetail> meals) {
     existingMeals = meals;
@@ -69,13 +70,47 @@ class SelectFoodModel extends ChangeNotifier {
     await fetchFoods(search: search, pageIndex: currentPage, loadMore: true);
   }
 
+  // Hàm mới để lấy totalByMealType
+  Future<void> fetchMealTotals(int mealPlanId, int dayNumber, String mealType) async {
+    try {
+      final totals = await _mealPlanService.getMealPlanDetailTotals(mealPlanId);
+      if (totals != null && totals['totalByMealType'] != null) {
+        final mealTotals = (totals['totalByMealType'] as List).firstWhere(
+              (meal) => meal['dayNumber'] == dayNumber && meal['mealType'] == mealType,
+          orElse: () => null,
+        );
+        this.mealTotals = mealTotals;
+      } else {
+        this.mealTotals = null;
+      }
+      notifyListeners();
+    } catch (e) {
+      errorMessage = "Lỗi khi tải thông số dinh dưỡng: $e";
+      this.mealTotals = null;
+      notifyListeners();
+    }
+  }
+
+  // Hàm lấy giá trị dinh dưỡng cụ thể
+  Map<String, double> getNutrientTotals() {
+    if (mealTotals == null) {
+      return {'calories': 0.0, 'carbs': 0.0, 'fat': 0.0, 'protein': 0.0};
+    }
+    return {
+      'calories': (mealTotals!['totalCalories'] ?? 0.0).toDouble(),
+      'carbs': (mealTotals!['totalCarbs'] ?? 0.0).toDouble(),
+      'fat': (mealTotals!['totalFat'] ?? 0.0).toDouble(),
+      'protein': (mealTotals!['totalProtein'] ?? 0.0).toDouble(),
+    };
+  }
+
   Future<bool> addFoodToMealPlan({
     required int mealPlanId,
     required int dayNumber,
     required String mealType,
     required int foodId,
     required double quantity,
-    required BuildContext context, // thêm context để thực hiện cho check avoidance
+    required BuildContext context,
   }) async {
     try {
       isLoading = true;
@@ -91,10 +126,8 @@ class SelectFoodModel extends ChangeNotifier {
       );
 
       if (success) {
-        // Lấy thông tin MealPlan từ server để đồng bộ existingMeals
         final mealPlan = await _mealPlanService.getMealPlanById(mealPlanId);
         if (mealPlan != null && mealPlan.mealPlanDetails != null) {
-          // Lọc các MealPlanDetail theo mealType và dayNumber
           existingMeals = mealPlan.mealPlanDetails!
               .where((detail) => detail.mealType == mealType && detail.dayNumber == dayNumber)
               .toList();
@@ -104,6 +137,8 @@ class SelectFoodModel extends ChangeNotifier {
           notifyListeners();
           return false;
         }
+        // Cập nhật lại mealTotals sau khi thêm món ăn
+        await fetchMealTotals(mealPlanId, dayNumber, mealType);
       }
 
       isLoading = false;
@@ -117,7 +152,7 @@ class SelectFoodModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> removeFoodFromMealPlan(int mealPlanDetailId) async {
+  Future<bool> removeFoodFromMealPlan(int mealPlanDetailId, int mealPlanId, int dayNumber, String mealType) async {
     try {
       isLoading = true;
       errorMessage = null;
@@ -127,6 +162,8 @@ class SelectFoodModel extends ChangeNotifier {
 
       if (success) {
         existingMeals.removeWhere((meal) => meal.mealPlanDetailId == mealPlanDetailId);
+        // Cập nhật lại mealTotals sau khi xóa món ăn
+        await fetchMealTotals(mealPlanId, dayNumber, mealType);
       }
 
       isLoading = false;

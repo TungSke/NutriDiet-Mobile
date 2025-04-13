@@ -102,8 +102,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
       final proceedToPremium = await showDialog<bool>(
         context: context,
         builder: (context) => Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -125,19 +124,19 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                 Text(
                   'Yêu cầu Premium',
                   style: FlutterFlowTheme.of(context).titleLarge.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                      ),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Để nhận thực đơn AI, bạn cần nâng cấp lên tài khoản Premium.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
+                    color: Colors.white70,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -188,101 +187,166 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
           builder: (context) => const BuyPremiumPackageScreenWidget(),
         ),
       );
+      await _checkPremiumStatus(); // Cập nhật trạng thái premium
       return; // Dừng lại nếu không phải premium
     }
 
     // Nếu là premium, hiển thị dialog xác nhận
-    final confirmed = await showDialog<bool>(
+    showGeneralDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: Text(
-          'Thực đơn AI',
-          style: TextStyle(color: FlutterFlowTheme.of(context).primary),
-        ),
-        content: Text(
-          'Nhận thực đơn 1 tuần từ AI',
-          style: TextStyle(color: FlutterFlowTheme.of(context).primary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'Đóng',
-              style: TextStyle(color: FlutterFlowTheme.of(context).primary),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              'Xác nhận',
-              style: TextStyle(color: FlutterFlowTheme.of(context).primary),
-            ),
-          ),
-        ],
-      ),
-    );
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        bool isLoading = false;
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            return ScaleTransition(
+              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+              ),
+              child: AlertDialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 8,
+                contentPadding: const EdgeInsets.all(24),
+                title: Row(
+                  children: [
+                    Icon(
+                      Icons.restaurant_menu,
+                      color: FlutterFlowTheme.of(context).primary,
+                      size: 28,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Thực đơn AI',
+                        style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                          color: FlutterFlowTheme.of(context).primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bạn có muốn AI tạo thực đơn 1 tuần phù hợp với mục tiêu sức khỏe của bạn?',
+                      style: TextStyle(
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                    if (isLoading) ...[
+                      const SizedBox(height: 16),
+                      Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            FlutterFlowTheme.of(context).primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
+                    child: Text(
+                      'Hủy',
+                      style: TextStyle(
+                        color: isLoading
+                            ? Colors.grey
+                            : FlutterFlowTheme.of(context).primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: FlutterFlowTheme.of(context).primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                      setDialogState(() {
+                        isLoading = true;
+                      });
 
-    if (confirmed != true || !mounted) return;
+                      try {
+                        // Gọi API tạo meal plan
+                        final result = await _model.createSuitableMealPlanByAI();
 
-    // Hiển thị loading dialog
-    BuildContext? loadingContext;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        loadingContext = dialogContext;
-        return const Center(child: CircularProgressIndicator());
+                        if (!mounted) return;
+
+                        if (result['success']) {
+                          final mealPlan = result['mealPlan'] as MealPlan;
+                          Navigator.pop(dialogContext); // Đóng dialog
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AIMealPlanDetailWidget(
+                                initialMealPlan: mealPlan,
+                              ),
+                            ),
+                          );
+                          if (mounted) {
+                            await _model.fetchMealPlans();
+                          }
+                        } else {
+                          setDialogState(() {
+                            isLoading = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  result['message'] ?? 'Lỗi khi tạo thực đơn AI'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        setDialogState(() {
+                          isLoading = false;
+                        });
+                        if (mounted) {
+                          debugPrint("Error in _navigateToAIMealPlan: $e");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Lỗi không xác định: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: Text(
+                      'Xác nhận',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       },
     );
-
-    try {
-      // Gọi API tạo meal plan
-      final result = await _model.createSuitableMealPlanByAI();
-
-      // Đóng loading dialog
-      if (loadingContext != null && Navigator.canPop(loadingContext!)) {
-        Navigator.pop(loadingContext!);
-      }
-
-      if (result['success'] && mounted) {
-        final mealPlan = result['mealPlan'] as MealPlan;
-        debugPrint("Navigating to AI Meal Plan Detail with temporary MealPlan");
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AIMealPlanDetailWidget(
-              initialMealPlan: mealPlan,
-            ),
-          ),
-        );
-        if (mounted) {
-          await _model.fetchMealPlans();
-        }
-      } else if (mounted) {
-        // Nếu backend trả về lỗi (ví dụ: 403), hiển thị SnackBar
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Lỗi khi tạo thực đơn AI'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      // Đóng loading dialog nếu có lỗi
-      if (loadingContext != null && Navigator.canPop(loadingContext!)) {
-        Navigator.pop(loadingContext!);
-      }
-      if (mounted) {
-        debugPrint("Error in _navigateToAIMealPlan: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi không xác định: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
   }
 
   @override
@@ -441,63 +505,206 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
   }
 
   Widget _buildMealPlanItem(MealPlan mealPlan) {
+    final theme = FlutterFlowTheme.of(context);
     bool isActive = mealPlan.status == 'Active';
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: isActive ? Colors.green[100] : const Color(0xFFF5F5F5),
-      child: Stack(
-        children: [
-          ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            title: Text(
-              mealPlan.planName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              "${mealPlan.healthGoal ?? 'Không có mục tiêu'} - Số ngày: ${mealPlan.duration ?? 'Không xác định'}",
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MealPlanDetailWidget(
-                    mealPlanId: mealPlan.mealPlanId!,
-                    source: MealPlanSource.myMealPlan,
-                  ),
-                ),
-              );
-              if (mounted) {
-                await _model.fetchMealPlans();
-              }
-            },
-            trailing: PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              onSelected: (value) {
-                if (value == 'delete') {
-                  _showDeleteConfirmation(mealPlan);
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Text('Xóa'),
-                ),
-              ],
-            ),
-          ),
-          if (isActive)
-            Positioned(
-              bottom: 8,
-              right: 16,
-              child: Text(
-                "Thực đơn đang được áp dụng từ ngày ${mealPlan.startAt != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(mealPlan.startAt!)) : 'Không xác định'}",
-                style: const TextStyle(fontSize: 12, color: Colors.red),
+
+    // Màu sắc dựa trên mục tiêu sức khỏe và trạng thái
+    Color accentColor;
+    IconData goalIcon;
+    switch (mealPlan.healthGoal) {
+      case 'Giảm cân':
+        accentColor = Colors.green.shade400;
+        goalIcon = Icons.fitness_center;
+        break;
+      case 'Tăng cân':
+        accentColor = Colors.orange.shade400;
+        goalIcon = Icons.restaurant;
+        break;
+      case 'Duy trì cân nặng':
+        accentColor = Colors.blue.shade400;
+        goalIcon = Icons.balance;
+        break;
+      default:
+        accentColor = Colors.grey.shade400;
+        goalIcon = Icons.help_outline;
+    }
+
+    // Màu viền cho trạng thái Active
+    Color borderColor = isActive ? theme.primary : accentColor.withOpacity(0.3);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: InkWell(
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MealPlanDetailWidget(
+                mealPlanId: mealPlan.mealPlanId!,
+                source: MealPlanSource.myMealPlan,
               ),
             ),
-        ],
+          );
+          if (mounted) {
+            await _model.fetchMealPlans();
+          }
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            color: isActive ? Colors.white : Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: borderColor,
+              width: isActive ? 2 : 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Cột thông tin chính
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Tiêu đề
+                          Text(
+                            mealPlan.planName,
+                            style: theme.titleMedium.copyWith(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: theme.primaryText,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          // Phụ đề
+                          Text(
+                            mealPlan.healthGoal ?? 'Không có mục tiêu',
+                            style: theme.bodyMedium.copyWith(
+                              fontSize: 14,
+                              color: theme.secondaryText,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          // Thông tin bổ sung
+                          Text(
+                            isActive
+                                ? 'Đang áp dụng'
+                                : 'Thời gian: ${mealPlan.duration ?? 0} ngày',
+                            style: theme.bodySmall.copyWith(
+                              fontSize: 12,
+                              color: isActive
+                                  ? theme.primary
+                                  : theme.secondaryText.withOpacity(0.7),
+                            ),
+                          ),
+                          if (isActive && mealPlan.startAt != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              'Từ: ${DateFormat('dd/MM').format(DateTime.parse(mealPlan.startAt!))}',
+                              style: theme.bodySmall.copyWith(
+                                fontSize: 12,
+                                color: theme.secondaryText.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    // Cột biểu tượng
+                    Container(
+                      width: 48,
+                      height: 48,
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: accentColor.withOpacity(0.1),
+                      ),
+                      child: Icon(
+                        isActive ? Icons.check_circle : goalIcon,
+                        color: isActive ? theme.primary : accentColor,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Badge số ngày
+              Positioned(
+                top: 8,
+                right: 36,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isActive ? theme.primary : accentColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "${mealPlan.duration ?? 0} ngày",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              // Điểm nhấn viền trái
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 4,
+                  decoration: BoxDecoration(
+                    color: borderColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                    ),
+                  ),
+                ),
+              ),
+              // Nút ba chấm
+              Positioned(
+                top: 8,
+                right: 8,
+                child: PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert, color: theme.primary, size: 24),
+                  onSelected: (value) {
+                    if (value == 'delete') {
+                      _showDeleteConfirmation(mealPlan);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Text('Xóa'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

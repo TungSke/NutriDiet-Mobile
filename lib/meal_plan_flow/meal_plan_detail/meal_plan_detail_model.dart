@@ -213,6 +213,19 @@ class MealPlanDetailModel extends ChangeNotifier {
     };
   }
 
+  double getCaloriesForMealType(int dayNumber, String mealType) {
+    if (mealPlanTotals == null || mealPlanTotals!['totalByMealType'] == null) {
+      return 0.0;
+    }
+
+    final mealTotals = (mealPlanTotals!['totalByMealType'] as List).firstWhere(
+          (meal) => meal['dayNumber'] == dayNumber && meal['mealType'] == mealType,
+      orElse: () => null,
+    );
+
+    return mealTotals != null ? (mealTotals['totalCalories'] ?? 0.0).toDouble() : 0.0;
+  }
+
   Map<String, List<MealPlanDetail>> getMealsForDay(int dayNumber) {
     if (mealPlan == null) return {};
 
