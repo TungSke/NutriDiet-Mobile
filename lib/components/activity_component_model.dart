@@ -33,11 +33,7 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
   int progressPercentage = 0;
   String aisuggestion = '';
   String dietStyle = '';
-  final Map<String, String> _goalTypeMap = {
-    'LoseWeight': 'Giảm cân',
-    'Maintain': 'Giữ cân',
-    'GainWeight': 'Tăng cân',
-  };
+
   final Map<String, String> _genderMap = {
     'Nam': 'Male',
     'Nữ': 'Female',
@@ -76,7 +72,11 @@ class ActivityComponentModel extends FlutterFlowModel<ActivityComponentWidget> {
     'Vegan': 'Thuần chay',
     'Balanced': 'Cân bằng',
   };
-
+  final Map<String, String> _goalTypeMap = {
+    'LoseWeight': 'Giảm cân',
+    'Maintain': 'Giữ cân',
+    'GainWeight': 'Tăng cân',
+  };
   final Map<int, String> _weightChangeRateMap = {
     0: 'Giữ cân',
     250: 'Tăng 0.25kg/1 tuần',
