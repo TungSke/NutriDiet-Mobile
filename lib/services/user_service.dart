@@ -204,6 +204,31 @@ class UserService {
     }
   }
 
+  Future<http.Response> getPersonalReport() async {
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+    }
+
+    try {
+      final response =
+          await _apiService.get("api/personal-goal/list", token: token);
+
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        print('Lỗi lấy health profile report: ${response.body}');
+        throw Exception(
+            'Lỗi lấy health profile report: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Lỗi kết nối API: $e');
+      throw Exception("Không thể kết nối đến server.");
+    }
+  }
+
   Future<http.Response> getTodayCheck() async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
@@ -726,10 +751,12 @@ class UserService {
     }
   }
 
-  Future<http.Response> createAiSuggestion(String token) async {
+  Future<http.Response> createAiSuggestion(
+      String token, String category) async {
     try {
       final response = await http.post(
-        Uri.parse("${_apiService.baseUrl}/api/health-profile/ai-suggestion"),
+        Uri.parse(
+            "${_apiService.baseUrl}/api/health-profile/ai-suggestion?cate=$category"),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -805,8 +832,8 @@ class ResetPasswordRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'email': email,
-    'otp': otp,
-    'newPassword': newPassword,
-  };
+        'email': email,
+        'otp': otp,
+        'newPassword': newPassword,
+      };
 }

@@ -33,7 +33,7 @@ class AiSuggestionScreenModel extends FlutterFlowModel<AiSuggestionScreenWidget>
     }
   }
 
-  Future<void> createAiSuggestion() async {
+  Future<void> createAiSuggestion(String category) async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
     final String? token = await flutterSecureStorage.read(key: 'accessToken');
 
@@ -42,7 +42,11 @@ class AiSuggestionScreenModel extends FlutterFlowModel<AiSuggestionScreenWidget>
     }
 
     try {
-      final response = await _userService.createAiSuggestion(token);
+      // Gọi API với tham số cate từ category
+      final response = await _userService.createAiSuggestion(
+        token,
+        category, // Truyền category vào API
+      );
 
       if (response.statusCode == 200) {
         print("Lời khuyên AI đã được tạo thành công.");

@@ -20,13 +20,20 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
   bool isLoading = true; // Biến để theo dõi trạng thái loading của trang
   bool isCreating =
       false; // Biến để theo dõi trạng thái loading của nút "Tạo lại"
-
+  String selectedCategory = "All";
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => AiSuggestionScreenModel());
     _fetchData(); // Gọi hàm fetch dữ liệu khi màn hình được mở
   }
+
+  final Map<String, String> categoryNames = {
+    'All': 'Tất cả',
+    'DinhDuong': 'Dinh dưỡng',
+    'LuyenTap': 'Luyện tập',
+    'LoiSong': 'Lối sống',
+  };
 
   // Hàm fetch dữ liệu
   Future<void> _fetchData() async {
@@ -47,11 +54,10 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
     return Scaffold(
       body: isLoading
           ? const Center(
-              child:
-                  CircularProgressIndicator()) // Hiển thị loading nếu đang fetch
+              child: CircularProgressIndicator(),
+            ) // Hiển thị loading nếu đang fetch
           : Stack(
               children: [
-                // Hình ảnh package.png phóng to khi cuộn (Lớp dưới cùng)
                 Positioned(
                   top: 0,
                   left: 0,
@@ -68,192 +74,256 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
                     SliverList(
                       delegate: SliverChildListDelegate(
                         [
-                          Container(
-                            height: 800, // Nội dung dưới hình ảnh
-                            color: Colors.white.withOpacity(0.3),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                spacing: 20,
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(16),
-                                        color: Colors.white),
-                                    child: Image.asset(
-                                      'assets/images/app_launcher_icon.png',
-                                      width: 200,
-                                      height: 200,
-                                    ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              spacing: 20,
+                              children: [
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                      color: Colors.white),
+                                  child: Image.asset(
+                                    'assets/images/app_launcher_icon.png',
+                                    width: 200,
+                                    height: 200,
                                   ),
-                                  Column(
+                                ),
+                                Column(
+                                  children: [
+                                    Text("Lời khuyên AI !",
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 24,
+                                    right: 24,
+                                    top: 70,
+                                  ),
+                                  child: Column(
+                                    spacing: 20,
                                     children: [
-                                      Text("Lời khuyên AI !",
-                                          style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 24,
-                                        right: 24,
-                                        top: 36,
-                                        bottom: 20),
-                                    child: Column(
-                                      spacing: 20,
-                                      children: [
-                                        Row(
-                                          spacing: 10,
-                                          children: [
-                                            Container(
-                                              width: 60,
-                                              height: 60,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.green,
-                                                  width: 1,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                              ),
-                                              child: Image.asset(
-                                                'assets/images/ai.png',
-                                                width: 200,
-                                                height: 200,
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text("Lời khuyên AI",
-                                                      style: GoogleFonts.roboto(
-                                                          color: Colors.black,
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                  Text(
-                                                      "Tạo lời khuyên dựa vào bệnh dị ứng để giúp bạn cải thiện bệnh"),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          width: 500,
-                                          height: 300,
-                                          decoration: BoxDecoration(
+                                      Row(
+                                        spacing: 10,
+                                        children: [
+                                          Container(
+                                            width: 60,
+                                            height: 60,
+                                            decoration: BoxDecoration(
                                               border: Border.all(
                                                 color: Colors.green,
                                                 width: 1,
                                               ),
                                               borderRadius:
-                                                  BorderRadius.circular(12)),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                                  BorderRadius.circular(50),
+                                            ),
+                                            child: Image.asset(
+                                              'assets/images/ai.png',
+                                              width: 200,
+                                              height: 200,
+                                            ),
+                                          ),
+                                          Expanded(
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text(
-                                                  "Lời khuyên:",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                Column(
+                                                  children: [
+                                                    Text("Lời khuyên AI",
+                                                        style:
+                                                            GoogleFonts.roboto(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                    Text(
+                                                        "Tạo lời khuyên dựa vào bệnh dị ứng để giúp bạn cải thiện bệnh"),
+                                                  ],
                                                 ),
-                                                Expanded(
-                                                  child: SingleChildScrollView(
-                                                      // child:
-                                                      //   Text(
-                                                      //       _model.aisuggestion),
-                                                      // ),
-                                                      child: MarkdownBody(
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, right: 8, top: 15),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary, // Màu nền xanh
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0), // Bo góc cho dropdown
+                                                  ),
+                                                  child: DropdownButton<String>(
+                                                    value: selectedCategory,
+                                                    onChanged:
+                                                        (String? newValue) {
+                                                      setState(() {
+                                                        selectedCategory =
+                                                            newValue!;
+                                                      });
+                                                    },
+                                                    items: <String>[
+                                                      'All',
+                                                      'DinhDuong',
+                                                      'LuyenTap',
+                                                      'LoiSong'
+                                                    ].map<
+                                                            DropdownMenuItem<
+                                                                String>>(
+                                                        (String value) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: value,
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Text(
+                                                            categoryNames[
+                                                                    value] ??
+                                                                value,
+                                                            style: TextStyle(
+                                                              color: Colors
+                                                                  .white, // Chữ màu trắng
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    dropdownColor:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .primary,
+                                                    // Màu nền của menu dropdown
+                                                    style: TextStyle(
+                                                      color: Colors
+                                                          .white, // Chữ trên dropdown button
+                                                    ),
+                                                    iconEnabledColor:
+                                                        Colors.white,
+                                                    // Màu của icon
+                                                    iconSize:
+                                                        24, // Kích thước của icon
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Container(
+                                        width: 500,
+                                        height: 300,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.green,
+                                              width: 1,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(12)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Lời khuyên:",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Expanded(
+                                                child: SingleChildScrollView(
+                                                  child: MarkdownBody(
                                                     data: _model.aisuggestion,
                                                     styleSheet:
                                                         MarkdownStyleSheet(
                                                       p: const TextStyle(
                                                           fontSize: 16),
-                                                      // Bạn có thể tuỳ chỉnh màu, kích cỡ chữ, v.v. cho từng phần
                                                       strong: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold),
-                                                      // Đặt style cho bullet points, headings, links, v.v. nếu cần
                                                     ),
-                                                  )),
+                                                  ),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        Text(
-                                            "Nếu bạn cảm thấy chưa phù hợp, hãy tạo lại! "),
-                                        FFButtonWidget(
-                                          onPressed: () async {
-                                            setState(() {
-                                              isCreating =
-                                                  true; // Hiển thị loading cho nút "Tạo lại"
-                                            });
+                                      ),
+                                      Text(
+                                          "Nếu bạn cảm thấy chưa phù hợp, hãy tạo lại! "),
+                                      FFButtonWidget(
+                                        onPressed: () async {
+                                          setState(() {
+                                            isCreating = true;
+                                          });
 
-                                            // Gọi hàm tạo lời khuyên AI mới
-                                            await _model.createAiSuggestion();
+                                          await _model.createAiSuggestion(
+                                              selectedCategory);
+                                          await _model.fetchHealthProfile();
 
-                                            // Sau khi tạo xong, fetch lại dữ liệu
-                                            await _model.fetchHealthProfile();
-
-                                            setState(() {
-                                              isCreating =
-                                                  false; // Tắt trạng thái loading cho nút "Tạo lại"
-                                            });
-                                          },
-                                          text: isCreating
-                                              ? 'Đang tạo lại...'
-                                              : 'Tạo lại', // Thay đổi text của nút
-                                          options: FFButtonOptions(
-                                            width: double.infinity,
-                                            height: 54.0,
-                                            color: Colors.red,
-                                            textStyle: GoogleFonts.roboto(
-                                              fontSize: 18.0,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(16.0),
+                                          setState(() {
+                                            isCreating = false;
+                                          });
+                                        },
+                                        text: isCreating
+                                            ? 'Đang tạo lại...'
+                                            : 'Tạo lại',
+                                        options: FFButtonOptions(
+                                          width: double.infinity,
+                                          height: 54.0,
+                                          color: Colors.red,
+                                          textStyle: GoogleFonts.roboto(
+                                            fontSize: 18.0,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
                                           ),
+                                          borderRadius:
+                                              BorderRadius.circular(16.0),
                                         ),
-                                        FFButtonWidget(
-                                          onPressed: () => context.pushNamed(
-                                              'bottom_navbar_screen'),
-                                          text: 'Tiếp tục',
-                                          options: FFButtonOptions(
-                                            width: double.infinity,
-                                            height: 54.0,
-                                            color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                            textStyle: GoogleFonts.roboto(
-                                              fontSize: 18.0,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(16.0),
+                                      ),
+                                      FFButtonWidget(
+                                        onPressed: () => context
+                                            .pushNamed('bottom_navbar_screen'),
+                                        text: 'Tiếp tục',
+                                        options: FFButtonOptions(
+                                          width: double.infinity,
+                                          height: 54.0,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          textStyle: GoogleFonts.roboto(
+                                            fontSize: 18.0,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
                                           ),
+                                          borderRadius:
+                                              BorderRadius.circular(16.0),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -268,8 +338,8 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
                     child: Material(
                       color: Colors.white.withOpacity(0.7), // nền tròn mờ
                       child: InkWell(
-                        onTap: () =>
-                            Navigator.of(context).pop(), // <-- trả về màn trước
+                        onTap: () => Navigator.of(context).pop(),
+                        // <-- trả về màn trước
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Icon(Icons.close, color: Colors.black),

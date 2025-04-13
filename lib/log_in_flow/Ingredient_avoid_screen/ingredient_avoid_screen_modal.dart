@@ -1,6 +1,5 @@
 import 'package:diet_plan_app/log_in_flow/Ingredient_avoid_screen/ingredient_avoid_screen_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../components/appbar_model.dart';
 import '../../flutter_flow/flutter_flow_model.dart';
@@ -75,29 +74,29 @@ class IngredientAvoidScreenModel
     }
   }
 
-  Future<void> createAiSuggestion() async {
-    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
-    final String? token = await flutterSecureStorage.read(key: 'accessToken');
-
-    if (token == null || token.isEmpty) {
-      throw Exception("⚠ Access token không hợp lệ, vui lòng đăng nhập lại.");
-    }
-
-    try {
-      final response = await _userService.createAiSuggestion(token);
-
-      if (response.statusCode == 200) {
-        print("Lời khuyên AI đã được tạo thành công.");
-        await fetchHealthProfile();
-      } else {
-        print('Lỗi khi tạo lời khuyên AI: ${response.body}');
-        throw Exception('Lỗi khi tạo lời khuyên AI: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error creating AI suggestion: $e');
-      throw Exception("Không thể kết nối đến server.");
-    }
-  }
+  // Future<void> createAiSuggestion() async {
+  //   final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+  //   final String? token = await flutterSecureStorage.read(key: 'accessToken');
+  //
+  //   if (token == null || token.isEmpty) {
+  //     throw Exception("⚠ Access token không hợp lệ, vui lòng đăng nhập lại.");
+  //   }
+  //
+  //   try {
+  //     final response = await _userService.createAiSuggestion(token);
+  //
+  //     if (response.statusCode == 200) {
+  //       print("Lời khuyên AI đã được tạo thành công.");
+  //       await fetchHealthProfile();
+  //     } else {
+  //       print('Lỗi khi tạo lời khuyên AI: ${response.body}');
+  //       throw Exception('Lỗi khi tạo lời khuyên AI: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Error creating AI suggestion: $e');
+  //     throw Exception("Không thể kết nối đến server.");
+  //   }
+  // }
 
   Future<bool> checkPremiumStatus() async {
     return await _userService.isPremium();
