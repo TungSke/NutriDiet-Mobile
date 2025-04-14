@@ -272,7 +272,7 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget>
                 backgroundColor: Colors.white,
                 onRefresh: () async {
                   await loadData();
-                  await _model.fetchMealLogs();
+                  _model.changeDate(_model.selectedDate);
                   await _model.fetchUserProfile();
                   setState(() {});
                 },

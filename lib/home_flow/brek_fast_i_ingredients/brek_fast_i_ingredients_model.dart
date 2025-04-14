@@ -1,3 +1,4 @@
+import 'package:diet_plan_app/flutter_flow/flutter_flow_theme.dart';
 import 'package:diet_plan_app/services/cusinetype_service.dart';
 import 'package:diet_plan_app/services/food_service.dart';
 
@@ -86,61 +87,154 @@ class BrekFastIIngredientsModel extends FlutterFlowModel<BrekFastIIngredientsWid
 
   void showRejectDialog(int foodId, BuildContext context) {
     TextEditingController reasonController = TextEditingController();
+    bool isLoading = false;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            height: MediaQuery.of(context).size.height * 0.3,
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Lý do từ chối",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Expanded(
-                  child: TextField(
-                    controller: reasonController,
-                    maxLines: null,
-                    expands: true,
-                    textAlignVertical: TextAlignVertical.top,
-                    decoration: InputDecoration(
-                      hintText: "Nhập lý do...",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+              backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text("Hủy"),
+                    // Tiêu đề
+                    Text(
+                      "Lý do từ chối",
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                        fontFamily: 'figtree',
+                        fontSize: 18.0,
+                        letterSpacing: 0.0,
+                        fontWeight: FontWeight.bold,
+                        useGoogleFonts: false,
+                      ),
                     ),
-                    SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        String reason = reasonController.text.trim();
-                        if (reason.isNotEmpty) {
-                          await _rejectRecipe(foodId, reason, context);
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: Text("Gửi"),
+                    const SizedBox(height: 16.0),
+
+                    // TextField nhập lý do
+                    TextField(
+                      controller: reasonController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: "Nhập lý do từ chối...",
+                        hintStyle: FlutterFlowTheme.of(context).bodyMedium.override(
+                          fontFamily: 'figtree',
+                          color: FlutterFlowTheme.of(context).grey,
+                          fontSize: 14.0,
+                          letterSpacing: 0.0,
+                          useGoogleFonts: false,
+                        ),
+                        filled: true,
+                        fillColor: FlutterFlowTheme.of(context).lightGrey,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                        fontFamily: 'figtree',
+                        fontSize: 14.0,
+                        letterSpacing: 0.0,
+                        useGoogleFonts: false,
+                      ),
+                    ),
+                    const SizedBox(height: 24.0),
+
+                    // Nút hành động
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // Nút Hủy
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            "Hủy",
+                            style: FlutterFlowTheme.of(context).bodyMedium.override(
+                              fontFamily: 'figtree',
+                              color: FlutterFlowTheme.of(context).grey,
+                              fontSize: 16.0,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.w500,
+                              useGoogleFonts: false,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16.0),
+
+                        // Nút Gửi
+                        ElevatedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                            String reason = reasonController.text.trim();
+                            if (reason.isNotEmpty) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              await _rejectRecipe(foodId, reason, context);
+                              setState(() {
+                                isLoading = false;
+                              });
+                              Navigator.pop(context);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Vui lòng nhập lý do!",
+                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                      fontFamily: 'figtree',
+                                      color: Colors.white,
+                                      fontSize: 14.0,
+                                      useGoogleFonts: false,
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: FlutterFlowTheme.of(context).primary,
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            elevation: 3.0,
+                          ),
+                          child: isLoading
+                              ? SizedBox(
+                            width: 24.0,
+                            height: 24.0,
+                            child: CircularProgressIndicator(
+                              color: FlutterFlowTheme.of(context).secondaryBackground,
+                              strokeWidth: 2.0,
+                            ),
+                          )
+                              : Text(
+                            "Gửi",
+                            style: FlutterFlowTheme.of(context).bodyMedium.override(
+                              fontFamily: 'figtree',
+                              color: FlutterFlowTheme.of(context).secondaryBackground,
+                              fontSize: 16.0,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.w600,
+                              useGoogleFonts: false,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
