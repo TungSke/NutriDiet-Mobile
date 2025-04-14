@@ -21,13 +21,20 @@ class QuickAddWidget extends StatefulWidget {
 
 class _QuickAddWidgetState extends State<QuickAddWidget> {
   final MeallogService _mealLogService = MeallogService();
-  final List<String> _mealTypes = const ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
+  final List<String> _mealTypes = const [
+    'Breakfast',
+    'Lunch',
+    'Dinner',
+    'Snacks'
+  ];
   late String _selectedMeal;
 
   final TextEditingController _caloriesController = TextEditingController();
   final TextEditingController _fatController = TextEditingController();
   final TextEditingController _carbsController = TextEditingController();
   final TextEditingController _proteinController = TextEditingController();
+  // Thêm controller cho foodName
+  final TextEditingController _foodNameController = TextEditingController();
 
   @override
   void initState() {
@@ -48,6 +55,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     _fatController.dispose();
     _carbsController.dispose();
     _proteinController.dispose();
+    _foodNameController.dispose(); // dispose controller foodName
     super.dispose();
   }
 
@@ -115,6 +123,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     final success = await _mealLogService.quickAddMeal(
       logDate: widget.selectedDate,
       mealType: _selectedMeal,
+      foodName: _foodNameController.text, // truyền giá trị foodName vào API
       calories: finalCalories,
       carbohydrates: carbs,
       fats: fats,
@@ -158,24 +167,42 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
 
     try {
       FoodService _foodService = FoodService();
-      final foodData = await _foodService.searchFoodBarCode(barcode: barcode, context: context);
+      final foodData = await _foodService.searchFoodBarCode(
+          barcode: barcode, context: context);
       if (foodData != null && mounted) {
         final responseBody = jsonDecode(foodData.body);
         final data = responseBody["data"] as Map<String, dynamic>?;
 
         if (data != null) {
           setState(() {
-            _caloriesController.text = (double.tryParse(data['calories']?.toString() ?? '0') ?? 0).round().toString();
+            _caloriesController.text =
+                (double.tryParse(data['calories']?.toString() ?? '0') ?? 0)
+                    .round()
+                    .toString();
             // Lấy fat, mặc định là 0 nếu không parse được
-            _fatController.text = (double.tryParse(data['fat']?.toString() ?? '0') ?? 0).round().toString();
+            _fatController.text =
+                (double.tryParse(data['fat']?.toString() ?? '0') ?? 0)
+                    .round()
+                    .toString();
             // Lấy carbs, mặc định là 0 nếu không parse được
-            _carbsController.text = (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0).round().toString();
+            _carbsController.text =
+                (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0)
+                    .round()
+                    .toString();
             // Lấy protein, mặc định là 0 nếu không parse được
-            _proteinController.text = (double.tryParse(data['protein']?.toString() ?? '0') ?? 0).round().toString();
+            _proteinController.text =
+                (double.tryParse(data['protein']?.toString() ?? '0') ?? 0)
+                    .round()
+                    .toString();
+            // Nếu có dữ liệu food name, có thể cập nhật ở đây (nếu API trả về trường name)
+            if (data.containsKey('foodName')) {
+              _foodNameController.text = data['foodName'].toString();
+            }
           });
         } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Không có dữ liệu món ăn trong phản hồi!')),
+            const SnackBar(
+                content: Text('Không có dữ liệu món ăn trong phản hồi!')),
           );
         }
       } else if (mounted) {
@@ -224,6 +251,8 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         children: [
           _buildMealRow(),
+          const Divider(),
+          _buildFoodNameRow(), // Hiển thị trường nhập foodName
           const Divider(),
           _buildCaloriesRow(macroCals, typedCals),
           const Divider(),
@@ -290,6 +319,30 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
+  // Widget mới để nhập Food Name
+  Widget _buildFoodNameRow() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Tên món ăn',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        TextField(
+          controller: _foodNameController,
+          decoration: const InputDecoration(
+            hintText: 'Nhập tên món ăn',
+            border: UnderlineInputBorder(),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCaloriesRow(double macroCals, int typedCals) {
     bool hasMacros = macroCals > 0;
     bool userTyped = typedCals > 0;
@@ -298,7 +351,8 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       subLabel = 'Tính toán dựa trên giá trị dinh dưỡng.';
     } else if (userTyped && hasMacros && (typedCals != macroCals.round())) {
       final diff = typedCals - macroCals.round();
-      subLabel = "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
+      subLabel =
+          "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
     }
 
     return Column(

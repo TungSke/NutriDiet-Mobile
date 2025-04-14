@@ -67,6 +67,7 @@ class MeallogService {
       Map<String, String> formData = {
         'LogDate': logDate,
         'MealType': mealType,
+        'FoodName': "string",
         'ServingSize': servingSize,
         'FoodId': foodId.toString(),
         'Quantity': quantity.toString(),
@@ -118,6 +119,7 @@ class MeallogService {
     required DateTime logDate,
     required String mealType,
     required int calories,
+    required String foodName,
     required int carbohydrates,
     required int fats,
     required int protein,
@@ -131,6 +133,7 @@ class MeallogService {
         'LogDate': logDate.toIso8601String(), // "2025-03-19T05:37:48.444Z"
         'MealType': mealType, // "Breakfast", "Lunch", ...
         'Calories': calories.toString(),
+        'FoodName': foodName,
         'Carbohydrates': carbohydrates.toString(),
         'Fats': fats.toString(),
         'Protein': protein.toString(),
