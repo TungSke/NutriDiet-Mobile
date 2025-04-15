@@ -297,6 +297,10 @@ class PersonalGoalChartState extends State<PersonalGoalChart> {
                   enablePanning: true,
                   enablePinching: false,
                 ),
+                tooltipBehavior: TooltipBehavior(
+                  enable: true,
+                  format: 'Ngày: point.x\nCân nặng: point.y kg\n', // Custom tooltip format
+                ), // Enable tooltips
                 legend: Legend(
                   isVisible: true,
                   position: LegendPosition.bottom,

@@ -188,9 +188,16 @@
 //       print("❌ Exception caught: $e");
 //     }
 //   }
+// }ử lại';
+//
+//         print("❌ Error from API: $errorMessage");
+//       }
+//     } catch (e) {
+//       print("❌ Exception caught: $e");
+//     }
+//   }
 // }
-import 'dart:convert';
-
+import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/user_service.dart';
@@ -253,7 +260,7 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
   String goalDescription = '';
   String weightChangeRate = '';
   double currentWeight = 0.0;
-
+  String evaluate = '';
   Future<void> fetchUserProfile() async {
     try {
       final response = await _userService.whoAmI();
@@ -287,6 +294,7 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
         weight = healthData['data']['weight'] != null
             ? double.parse(healthData['data']['weight'].toString())
             : 0.0;
+        evaluate = healthData['data']['evaluate'] ?? '';
         isLoading = false;
         notifyListeners();
       }
@@ -393,7 +401,7 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.pop(context, true);
+        context.pushNamed('my_profile');
       } else if (response.statusCode == 500) {
         final responseData = jsonDecode(response.body);
         final errorMessage = responseData['Message'] ?? 'Cập nhật thất bại';

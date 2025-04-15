@@ -135,6 +135,10 @@ class WeightLineChartState extends State<WeightLineChart> {
           color: Colors.white,
           padding: const EdgeInsets.all(18),
           child: SfCartesianChart(
+            tooltipBehavior: TooltipBehavior(
+              enable: true,
+              format: 'Ngày: point.x\nCân nặng: point.y kg\n', // Custom tooltip format
+            ),
             // Bật legend hiển thị
             legend: Legend(
               isVisible: true,

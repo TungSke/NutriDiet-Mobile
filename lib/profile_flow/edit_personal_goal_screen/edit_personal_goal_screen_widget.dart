@@ -80,6 +80,18 @@ class _EditPersonalGoalScreenWidgetState
               ),
             ),
             _model.isLoading ? _buildLoadingIndicator() : _buildProfileForm(),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 15),
+              child: Text(
+                (_model.evaluate),
+                textAlign: TextAlign.center,
+                style: GoogleFonts.roboto(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+              ),
+            ),
           ],
         ),
       ),
