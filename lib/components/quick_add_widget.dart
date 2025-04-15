@@ -123,7 +123,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     final success = await _mealLogService.quickAddMeal(
       logDate: widget.selectedDate,
       mealType: _selectedMeal,
-      foodName: _foodNameController.text, // truyền giá trị foodName vào API
+      foodName: _foodNameController.text,
       calories: finalCalories,
       carbohydrates: carbs,
       fats: fats,

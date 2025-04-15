@@ -536,4 +536,30 @@ class MeallogService {
       return false;
     }
   }
+
+  Future<bool> isMealPlanApplied({required String date}) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final String? token = await secureStorage.read(key: 'accessToken');
+
+    try {
+      final String endpoint = 'api/meal-log/plan-applied?date=$date';
+      final response = await _apiService.get(endpoint, token: token);
+      debugPrint(
+          'API isMealPlanApplied: Status ${response.statusCode}, Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        // API trả về: { "isApplied": true }
+        return jsonResponse['isApplied'] as bool;
+      } else {
+        // Không tìm thấy hoặc lỗi, coi như chưa áp dụng
+        debugPrint(
+            'Lỗi isMealPlanApplied: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Exception in isMealPlanApplied: $e');
+      return false;
+    }
+  }
 }
