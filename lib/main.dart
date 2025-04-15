@@ -63,18 +63,13 @@ Future<void> setupPermissions() async {
     announcement: false,
   );
 
-  // Lắng nghe thông báo khi ứng dụng đang hoạt động (foreground)
+  // Lắng nghe thông báo khi ứng dụng đang hoạt động
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print("Nhận thông báo khi đang hoạt động: ${message.notification?.title}");
   });
 
   // Đăng ký hàm xử lý khi ứng dụng nhận thông báo ở chế độ nền
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  // Lắng nghe khi ứng dụng mở từ thông báo
-  // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-  //   print("Ứng dụng mở từ thông báo: ${message.notification?.title}");
-  // });
 
   // Kiểm tra trạng thái quyền thông báo
   if (settings.authorizationStatus == AuthorizationStatus.denied) {
@@ -85,18 +80,12 @@ Future<void> setupPermissions() async {
     print("Quyền thông báo được cấp tạm thời.");
   }
 
-  // Yêu cầu quyền Activity Recognition (chỉ áp dụng với Android API >= 29)
-  if (defaultTargetPlatform == TargetPlatform.android &&
-      Platform.version.contains('29')) {
+  // Yêu cầu quyền Activity Recognition
+  if (defaultTargetPlatform == TargetPlatform.android) {
     PermissionStatus activityRecognitionStatus =
     await Permission.activityRecognition.request();
     if (!activityRecognitionStatus.isGranted) {
       print("Quyền Activity Recognition không được cấp.");
-    }
-    // Yêu cầu quyền vị trí
-    PermissionStatus locationStatus = await Permission.location.request();
-    if (!locationStatus.isGranted) {
-      print("Quyền vị trí không được cấp.");
     }
   }
 }
