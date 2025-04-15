@@ -1,35 +1,33 @@
+import 'dart:async';
 import 'package:diet_plan_app/services/gg_fit_service.dart';
 import 'package:flutter/material.dart';
-
+import 'package:table_calendar/table_calendar.dart';
 import '/flutter_flow/flutter_flow_calendar.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../services/meallog_service.dart';
 import '../services/models/meallog.dart';
 import '../services/user_service.dart';
 import 'home_componet_widget.dart' show HomeComponetWidget;
+import 'dart:convert';
 
 class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
-  ///  State fields for stateful widgets in this component.
   DateTime selectedDate = DateTime.now();
-
-  // State field(s) for Calendar widget.
   DateTimeRange? calendarSelectedDay;
-
-  // Dữ liệu lấy từ API
   List<MealLog> mealLogs = [];
   bool isLoading = true;
-  int calorieGoal = 1300; // Giá trị mặc định, sẽ được cập nhật từ API
+  int calorieGoal = 1300;
   int foodCalories = 0;
-  int steps = 0; // Số bước chân
-  int caloriesBurned = 0; // Calories đốt cháy
-  String? activityError; // Lưu thông báo lỗi từ GGFitService
+  int steps = 0;
+  int caloriesBurned = 0;
+  String? activityError;
+  bool isRunning = false;
   final UserService _userService = UserService();
-  final GGFitService _ggFitService = GGFitService();
+  StreamSubscription<int>? _stepsSubscription;
+  StreamSubscription<bool>? _runningSubscription;
 
-  double stepProgress = 50;
-  double caloriesBurnedProgress = 10;
+  double stepProgress = 0.0;
+  double caloriesBurnedProgress = 0.0;
 
-  // Các bữa
   final List<String> mealCategories = [
     'Breakfast',
     'Lunch',
@@ -38,15 +36,17 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   ];
 
   VoidCallback? _updateCallback;
+  bool _isMounted = true;
 
   void setUpdateCallback(VoidCallback callback) {
     _updateCallback = callback;
+    print("Update callback set");
   }
 
   int get remainingCalories => calorieGoal - foodCalories;
 
-  String name = "Chưa đăng nhập"; // Giá trị mặc định
-  String email = "@gmail.com"; // Giá trị mặc định
+  String name = "Chưa đăng nhập";
+  String email = "@gmail.com";
   String avatar = "";
 
   Future<void> fetchUserProfile() async {
@@ -63,17 +63,16 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     } catch (e) {
       debugPrint("Lỗi khi lấy thông tin người dùng: $e");
     }
-
     isLoading = false;
+    if (_isMounted) _updateCallback?.call();
   }
 
   Future<void> fetchMealLogs() async {
     try {
       isLoading = true;
       final dateString = DateFormat('yyyy-MM-dd').format(selectedDate);
-
       final service = MeallogService();
-      _updateCallback?.call();
+      if (_isMounted) _updateCallback?.call();
       mealLogs = await service.getMealLogs(logDate: dateString);
 
       int sumCalories = 0;
@@ -87,72 +86,129 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
       foodCalories = 0;
     } finally {
       isLoading = false;
-      _updateCallback?.call();
+      if (_isMounted) _updateCallback?.call();
     }
   }
 
-  // Sửa phương thức để lấy dữ liệu từ GGFitService
   Future<void> fetchActivityData() async {
+    if (!_isMounted) return;
     try {
-      // Xác định khoảng thời gian cho ngày được chọn
       final startDate =
-          DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+      DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
       final endDate =
-          DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
+      DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
 
-      // Gọi GGFitService để lấy dữ liệu
-      final result =
-          await _ggFitService.fetchStepsAndHealthData(startDate, endDate);
-      print(result);
+      final result = await GGFitService().fetchStepsAndHealthData(startDate, endDate);
       steps = (result['steps'] is int)
           ? result['steps'] as int
           : (result['steps'] as double).toInt();
-
       caloriesBurned = (result['caloriesBurned'] is double)
           ? (result['caloriesBurned'] as double).toInt()
           : result['caloriesBurned'] as int;
       activityError = result['error'] as String?;
+
+      stepProgress = (steps / 10000).clamp(0.0, 1.0);
+      caloriesBurnedProgress = (caloriesBurned / 500).clamp(0.0, 1.0);
     } catch (e) {
       debugPrint('Lỗi khi fetch Activity Data: $e');
-      steps = 0;
+      steps = GGFitService().getRealTimeSteps();
       caloriesBurned = 0;
       activityError = "Đã xảy ra lỗi khi lấy dữ liệu hoạt động: $e";
+      stepProgress = (steps / 10000).clamp(0.0, 1.0);
+      caloriesBurnedProgress = 0.0;
     } finally {
-      _updateCallback?.call();
+      if (_isMounted) _updateCallback?.call();
+    }
+  }
+
+  void startListeningToSteps() {
+    if (!_isMounted) return;
+    _stepsSubscription?.cancel();
+    _runningSubscription?.cancel();
+    print("Starting step and running subscriptions");
+    try {
+      _stepsSubscription = GGFitService().stepsStream.listen(
+            (newSteps) {
+          if (!_isMounted) return;
+          steps = newSteps;
+          stepProgress = (steps / 10000).clamp(0.0, 1.0);
+          print("Steps updated: $steps");
+          if (_isMounted) {
+            _updateCallback?.call();
+          }
+        },
+        onError: (error) {
+          if (!_isMounted) return;
+          print("Steps Stream Error: $error");
+          activityError = "Không thể lấy dữ liệu bước chân thời gian thực: $error";
+          if (_isMounted) _updateCallback?.call();
+        },
+      );
+
+      _runningSubscription = GGFitService().runningStream.listen(
+            (isRunningNow) {
+          if (!_isMounted) return;
+          isRunning = isRunningNow;
+          print("Running status updated: $isRunning");
+          if (_isMounted) {
+            _updateCallback?.call();
+          }
+        },
+        onError: (error) {
+          if (!_isMounted) return;
+          print("Running Stream Error: $error");
+          isRunning = false;
+          activityError = "Không thể lấy dữ liệu trạng thái chạy: $error";
+          if (_isMounted) _updateCallback?.call();
+        },
+      );
+    } catch (e) {
+      print("Error starting subscriptions: $e");
+      activityError = "Không thể khởi tạo dữ liệu hoạt động: $e";
+      isRunning = false;
+      if (_isMounted) _updateCallback?.call();
     }
   }
 
   void changeDate(DateTime newDate) async {
+    if (!_isMounted) return;
     selectedDate = newDate;
     calendarSelectedDay = DateTimeRange(
       start: newDate.startOfDay,
       end: newDate.endOfDay,
     );
 
-    // Reset dữ liệu trước khi fetch
     mealLogs = [];
     foodCalories = 0;
     steps = 0;
     caloriesBurned = 0;
     activityError = null;
+    isRunning = false;
+
+    if (!isSameDay(newDate, DateTime.now())) {
+      GGFitService().resetSteps();
+      print("Steps reset for new date: $newDate");
+    } else {
+      startListeningToSteps();
+    }
 
     isLoading = true;
-    _updateCallback?.call();
+    if (_isMounted) _updateCallback?.call();
 
-    // Fetch dữ liệu đồng bộ
     await Future.wait([
       fetchMealLogs(),
       fetchActivityData(),
     ]);
 
     isLoading = false;
-    _updateCallback?.call(); // Cập nhật giao diện sau khi fetch xong
+    if (_isMounted) _updateCallback?.call();
   }
 
   Future<void> transferMealLogDetailEntry({
     required int detailId,
     required String targetMealType,
   }) async {
+    if (!_isMounted) return;
     try {
       final service = MeallogService();
       final bool success = await service.transferMealLogDetail(
@@ -172,11 +228,15 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   }
 
   void updateCalorieGoal(int newGoal) {
+    if (!_isMounted) return;
     calorieGoal = newGoal;
+    if (_isMounted) _updateCallback?.call();
   }
 
   void updateFoodCalories(int newCalories) {
+    if (!_isMounted) return;
     foodCalories = newCalories;
+    if (_isMounted) _updateCallback?.call();
   }
 
   @override
@@ -188,17 +248,19 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     fetchUserProfile();
     fetchMealLogs();
     fetchActivityData();
+    startListeningToSteps();
   }
 
   @override
   void dispose() {
-    // Hủy callback để tránh leak bộ nhớ
+    _isMounted = false;
     _updateCallback = null;
-
+    _stepsSubscription?.cancel();
+    _runningSubscription?.cancel();
     mealLogs = [];
     steps = 0;
     caloriesBurned = 0;
     foodCalories = 0;
+    print("Model disposed");
   }
-
 }
