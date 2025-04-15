@@ -191,5 +191,14 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   }
 
   @override
-  void dispose() {}
+  void dispose() {
+    // Hủy callback để tránh leak bộ nhớ
+    _updateCallback = null;
+
+    mealLogs = [];
+    steps = 0;
+    caloriesBurned = 0;
+    foodCalories = 0;
+  }
+
 }
