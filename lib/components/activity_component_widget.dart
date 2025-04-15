@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:diet_plan_app/components/activity_component_model.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_animations.dart';
+import 'package:diet_plan_app/profile_flow/edit_personal_goal_screen/edit_personal_goal_screen_widget.dart';
 import 'package:diet_plan_app/services/health_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -112,6 +113,98 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     }
   }
 
+  // void checkProgressPercanatge() async {
+  //   // Check if progressPercentage is 100 and show the modal
+  //   if (_model.progressPercentage == 100) {
+  //     // Make sure you're showing the modal in the correct context
+  //     _showSuccesfull(context);
+  //   }
+  // }
+  bool _isDialogShown = false;
+  void _showSuccesfull(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(20), // Rounded corners for modal
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                color: Colors.green,
+                size: 30,
+              ),
+              SizedBox(width: 10),
+              Text(
+                'Chúc mừng!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+              ),
+            ],
+          ),
+          content: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Bạn đã hoàn thành mục tiêu cân nặng! Chúc mừng sự nỗ lực không ngừng nghỉ của bạn. Bạn có muốn cập nhật mục tiêu mới?',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close modal when choosing "Hủy"
+                // No changes to the goal, keep the current goal.
+              },
+              child: Text(
+                'Hủy',
+                style: TextStyle(
+                  color: FlutterFlowTheme.of(context).primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor:
+                    FlutterFlowTheme.of(context).primary, // Màu chữ
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30), // Rounded button
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(
+                    context); // Close the modal on pressing "Tiếp tục"
+                // Chuyển đến widget chỉnh sửa mục tiêu
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => EditPersonalGoalScreenWidget()),
+                );
+              },
+              child: Text(
+                'Tiếp tục',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showConfirmationModal() {
     showDialog(
       context: context,
@@ -131,26 +224,25 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
               ),
             ),
             TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor:
-                    FlutterFlowTheme.of(context).primary, // Màu chữ
-              ),
-              onPressed: () async {
-                Navigator.pop(context);
-                await _updateHealthProfile("REPLACE");
-                // Not updated today, directly update health profile
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor:
+                      FlutterFlowTheme.of(context).primary, // Màu chữ
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await _updateHealthProfile("REPLACE");
+                  // Not updated today, directly update health profile
 
-                await _model.fetchHealthProfile();
-                if (mounted) {
-                  _refreshChart(); // Làm mới biểu đồ
-                  // Gọi lại fetchWeightHistory để cập nhật danh sách
-                  await _fetchWeightHistory();
-                  await _fetchPersonalGoalHistory();
-                }
-              },
-              child: Text('Thay thế'),
-            ),
+                  await _model.fetchHealthProfile();
+                  if (mounted) {
+                    _refreshChart(); // Làm mới biểu đồ
+                    // Gọi lại fetchWeightHistory để cập nhật danh sách
+                    await _fetchWeightHistory();
+                    await _fetchPersonalGoalHistory();
+                  }
+                },
+                child: Text('Cập nhật')),
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
@@ -314,6 +406,13 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure context is used properly for modal dialog
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_model.progressPercentage == 100 && !_isDialogShown) {
+        _isDialogShown = true; // Set the flag to true
+        _showSuccesfull(context); // Pass the correct context to the modal
+      }
+    });
     return Container(
       decoration: BoxDecoration(
         color: FlutterFlowTheme.of(context).secondaryBackground,
