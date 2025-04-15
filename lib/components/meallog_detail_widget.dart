@@ -24,57 +24,29 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
   TextEditingController? _carbsController;
   TextEditingController? _fatController;
 
-  bool _isUploading = false; // trạng thái loading cho nút "AI Phân tích ảnh"
-
-  /// Hiển thị dialog cho phép người dùng chọn nguồn ảnh: "Chụp ảnh mới" hoặc "Chọn từ thư viện"
-  Future<XFile?> _pickImage() async {
-    return await showDialog<XFile>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Chọn ảnh"),
-          content:
-              const Text("Bạn muốn chụp ảnh mới hay chọn ảnh từ thư viện?"),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                final picked =
-                    await ImagePicker().pickImage(source: ImageSource.camera);
-                Navigator.of(context).pop(picked);
-              },
-              child: const Text("Chụp ảnh mới"),
-            ),
-            TextButton(
-              onPressed: () async {
-                final picked =
-                    await ImagePicker().pickImage(source: ImageSource.gallery);
-                Navigator.of(context).pop(picked);
-              },
-              child: const Text("Chọn từ thư viện"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  bool _isUploading = false; // trạng thái loading cho nút AI phân tích ảnh
 
   /// Hàm upload ảnh cho meal log detail sử dụng image_picker.
-  /// Trong quá trình xử lý, hiển thị loading.
+  /// Trong quá trình xử lý, nút sẽ hiển thị loading.
   Future<void> _uploadMealLogImage() async {
     setState(() {
       _isUploading = true;
     });
     try {
-      final XFile? pickedFile = await _pickImage();
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedFile =
+          await picker.pickImage(source: ImageSource.gallery);
+
       if (pickedFile == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Không có ảnh nào được chọn")),
+          const SnackBar(content: Text("Chưa chọn ảnh nào")),
         );
         setState(() {
           _isUploading = false;
         });
         return;
       }
+
       final File imageFile = File(pickedFile.path);
       final bool result = await mealLogService.addImageToMealLogDetail(
         detailId: widget.detailId,
@@ -168,7 +140,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                // Ảnh món ăn hoặc icon upload
+                // Ảnh món ăn hoặc icon upload (nếu ảnh chưa có)
                 Center(
                   child: (mealDetail.imageUrl != null &&
                           mealDetail.imageUrl!.isNotEmpty)
@@ -292,7 +264,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                           ),
                         ),
                       ),
-                      // Nếu chưa có ảnh, hiển thị nút "AI Phân tích ảnh" với loading tương tự
+                      // Nếu chưa có ảnh, hiển thị nút upload ảnh (với loading)
                       if (mealDetail.imageUrl == null ||
                           mealDetail.imageUrl!.isEmpty) ...[
                         const SizedBox(height: 10),
