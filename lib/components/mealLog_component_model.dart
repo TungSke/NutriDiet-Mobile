@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 
 class MealLogComponentModel extends FlutterFlowModel {
   DateTime selectedDate = DateTime.now();
-
+  bool isPlanApplied = false;
   // Dữ liệu lấy từ API
   List<MealLog> mealLogs = [];
   List<MealLogDetail> mealLogAis = [];
@@ -288,6 +288,25 @@ class MealLogComponentModel extends FlutterFlowModel {
     } catch (e) {
       debugPrint('Error in fetchAnalyzeMealLog: $e');
       return null;
+    }
+  }
+
+  Future<bool> checkPlanApplied() async {
+    try {
+      final service = MeallogService();
+      final dateParam = DateFormat('yyyy-M-d').format(selectedDate);
+      final applied = await service.isMealPlanApplied(date: dateParam);
+
+      isPlanApplied = applied;
+      debugPrint('Plan applied on $dateParam: $isPlanApplied');
+      // Cập nhật UI nếu có callback
+      _updateCallback?.call();
+      return applied;
+    } catch (e) {
+      debugPrint('Error in checkPlanApplied: $e');
+      isPlanApplied = false;
+      _updateCallback?.call();
+      return false;
     }
   }
 

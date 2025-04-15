@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:diet_plan_app/components/mealLog_list_food.dart';
 import 'package:diet_plan_app/components/mealLog_nutrition.dart';
 import 'package:diet_plan_app/services/models/meallog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:intl/intl.dart';
 import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 import '/components/mealLog_component_model.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -19,8 +21,9 @@ class MealLogComponentWidget extends StatefulWidget {
 
 class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
   late MealLogComponentModel _model;
-  bool isPremium = false; // Biến trạng thái premium
+  bool isPremium = false; // trạng thái premium
   bool _isLoadingAI = false;
+
   @override
   void initState() {
     super.initState();
@@ -32,7 +35,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     });
     _model.fetchMealLogs();
     _model.fetchPersonalGoal();
-    _checkPremiumStatus(); // Kiểm tra premium khi khởi tạo
+    _checkPremiumStatus();
   }
 
   @override
@@ -49,6 +52,38 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         isPremium = premiumStatus;
       });
     }
+  }
+
+  /// Hàm hiển thị hộp thoại xác nhận nếu vào ngày đã áp dụng mealplan.
+  /// Nếu đã áp dụng, yêu cầu người dùng xác nhận tiếp tục.
+  /// Trả về true nếu người dùng cho phép, ngược lại false.
+  Future<bool> _confirmProceedIfMealPlanApplied() async {
+    bool applied = await _model.checkPlanApplied();
+    if (applied) {
+      bool? proceed = await showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Cảnh báo"),
+            content: const Text(
+              "Bạn đang áp dụng thực đơn. Bạn có chắc chắn muốn tiếp tục?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Hủy"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Tiếp tục"),
+              ),
+            ],
+          );
+        },
+      );
+      return proceed ?? false;
+    }
+    return true;
   }
 
   /// Hàm format ngày hiển thị
@@ -94,12 +129,14 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     }
   }
 
+  /// Hàm xử lý cho nút "Thực đơn AI"
   Future<void> _navigateToAIMealLog() async {
-    if (!mounted) return;
+    // Kiểm tra xem ngày đã áp dụng mealplan chưa
+    if (!await _confirmProceedIfMealPlanApplied()) return;
 
-    // Kiểm tra trạng thái premium trước
-    final isPremium = await _model.checkPremiumStatus();
-    if (!isPremium) {
+    // Kiểm tra trạng thái premium
+    final premiumStatus = await _model.checkPremiumStatus();
+    if (!premiumStatus) {
       final proceedToPremium = await showDialog<bool>(
         context: context,
         builder: (context) => Dialog(
@@ -198,7 +235,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           builder: (context) => const BuyPremiumPackageScreenWidget(),
         ),
       );
-      return; // Dừng lại nếu không phải premium
+      return;
     }
 
     // Nếu là premium, tiếp tục lấy thực đơn AI
@@ -229,8 +266,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 ? ListView(
                     shrinkWrap: true,
                     children: grouped.entries.map((entry) {
-                      // entry.key là mealType (tiếng Anh), entry.value là list
-                      // Bạn có thể dịch sang tiếng Việt nếu muốn
                       String header;
                       switch (entry.key.toLowerCase()) {
                         case 'breakfast':
@@ -251,7 +286,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Tiêu đề nhóm
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
@@ -263,13 +297,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                               ),
                             ),
                           ),
-                          // Danh sách món trong nhóm
                           ...entry.value.map((meal) => ListTile(
                                 contentPadding: EdgeInsets.zero,
                                 title: Text(
                                   meal.foodName,
                                   style: const TextStyle(
-                                    fontWeight: FontWeight.bold, // in đậm
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 subtitle: Text(
@@ -286,7 +319,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.black, // chữ màu primary
+                foregroundColor: Colors.black,
               ),
               child: const Text("Reject"),
             ),
@@ -457,24 +490,27 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                               onSelected: (value) async {
                                 switch (value) {
                                   case 'delete_log':
-                                    if (_model.mealLogs.isNotEmpty) {
-                                      int mealLogId =
-                                          _model.mealLogs[0].mealLogId;
-                                      await _model.deleteMealLogEntry(
-                                          mealLogId: mealLogId);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content:
-                                                Text('Xóa nhật ký thành công')),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                'Không có nhật ký để xóa')),
-                                      );
+                                    // Kiểm tra trước khi xóa nhật ký
+                                    if (await _confirmProceedIfMealPlanApplied()) {
+                                      if (_model.mealLogs.isNotEmpty) {
+                                        int mealLogId =
+                                            _model.mealLogs[0].mealLogId;
+                                        await _model.deleteMealLogEntry(
+                                            mealLogId: mealLogId);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Xóa nhật ký thành công')),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Không có nhật ký để xóa')),
+                                        );
+                                      }
                                     }
                                     break;
                                   case 'end_day':
@@ -482,12 +518,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                     final String? analysis =
                                         await _model.fetchAnalyzeMealLog();
                                     if (analysis != null) {
-                                      // Tạo tiêu đề hiển thị ngày
                                       final String formattedDate =
                                           DateFormat('dd/MM/yyyy')
                                               .format(_model.selectedDate);
-
-                                      // Hiển thị kết quả phân tích dưới dạng Markdown
                                       showDialog(
                                         context: context,
                                         builder: (context) => AlertDialog(
@@ -625,11 +658,14 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12.0, vertical: 16.0),
                     child: ElevatedButton(
-                      onPressed: _navigateToAIMealLog,
+                      onPressed: () async {
+                        // Kiểm tra trước khi gọi "Thực đơn AI"
+                        if (await _confirmProceedIfMealPlanApplied()) {
+                          _navigateToAIMealLog();
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
-                        // Nền trắng
                         backgroundColor: Colors.white,
-                        // Chữ màu primary
                         foregroundColor: FlutterFlowTheme.of(context).primary,
                         minimumSize: const Size.fromHeight(55),
                         shape: RoundedRectangleBorder(
@@ -652,10 +688,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                           : Text(
                               "Thực đơn AI",
                               style: TextStyle(
-                                // fontSize vẫn 18
                                 fontSize: 18,
-                                // màu chữ dùng foregroundColor nên không cần khai báo ở đây,
-                                // nhưng nếu bạn muốn override:
                                 color: FlutterFlowTheme.of(context).primary,
                               ),
                             ),
@@ -751,6 +784,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     String category,
     String vietnameseCategory,
   ) {
+    // Nếu chưa có mealLog -> hiển thị option "Thêm"
     if (mealLog == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -770,22 +804,23 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ),
               icon: const Icon(Icons.more_horiz),
               onSelected: (String value) async {
-                // Thêm async
                 switch (value) {
                   case 'quick_add':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => QuickAddWidget(
-                          mealName: category,
-                          selectedDate: _model.selectedDate,
+                    if (await _confirmProceedIfMealPlanApplied()) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuickAddWidget(
+                            mealName: category,
+                            selectedDate: _model.selectedDate,
+                          ),
                         ),
-                      ),
-                    ).then((result) {
-                      if (result == true) {
-                        _model.fetchMealLogs();
-                      }
-                    });
+                      ).then((result) {
+                        if (result == true) {
+                          _model.fetchMealLogs();
+                        }
+                      });
+                    }
                     break;
                   case 'reminders':
                     await _model.toggleReminder(context);
@@ -805,26 +840,29 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 ];
               },
             ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MealLogListFoodWidget(
-                    selectedDate: _model.selectedDate,
-                    mealName: category,
+            onTap: () async {
+              if (await _confirmProceedIfMealPlanApplied()) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MealLogListFoodWidget(
+                      selectedDate: _model.selectedDate,
+                      mealName: category,
+                    ),
                   ),
-                ),
-              ).then((result) {
-                if (result == true) {
-                  _model.fetchMealLogs();
-                }
-              });
+                ).then((result) {
+                  if (result == true) {
+                    _model.fetchMealLogs();
+                  }
+                });
+              }
             },
           ),
           const Divider(),
         ],
       );
     }
+
     final details = mealLog.mealLogDetails
         .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
         .toList();
@@ -843,7 +881,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildMealHeader(category, vietnameseCategory, hasAnyFood ? mealCals : null),
+        _buildMealHeader(
+            category, vietnameseCategory, hasAnyFood ? mealCals : null),
         if (hasAnyFood)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -871,7 +910,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                 _model.fetchMealLogs();
               }
             },
-            onLongPress: () {
+            onLongPress: () async {
+              // Kiểm tra trước khi xóa món
+              if (!await _confirmProceedIfMealPlanApplied()) return;
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -925,10 +966,13 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                           title: const Text('Xóa món'),
                           onTap: () async {
                             Navigator.pop(context);
-                            await _model.deleteMealLogDetailEntry(
-                              mealLogId: mealLog.mealLogId,
-                              detailId: details[i].detailId,
-                            );
+                            // Kiểm tra trước khi xóa món
+                            if (await _confirmProceedIfMealPlanApplied()) {
+                              await _model.deleteMealLogDetailEntry(
+                                mealLogId: mealLog.mealLogId,
+                                detailId: details[i].detailId,
+                              );
+                            }
                           },
                         ),
                       ],
@@ -1024,22 +1068,23 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             ),
             icon: const Icon(Icons.more_horiz),
             onSelected: (String value) async {
-              // Thêm async
               switch (value) {
                 case 'quick_add':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuickAddWidget(
-                        mealName: category,
-                        selectedDate: _model.selectedDate,
+                  if (await _confirmProceedIfMealPlanApplied()) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QuickAddWidget(
+                          mealName: category,
+                          selectedDate: _model.selectedDate,
+                        ),
                       ),
-                    ),
-                  ).then((result) {
-                    if (result == true) {
-                      _model.fetchMealLogs();
-                    }
-                  });
+                    ).then((result) {
+                      if (result == true) {
+                        _model.fetchMealLogs();
+                      }
+                    });
+                  }
                   break;
                 case 'reminders':
                   await _model.toggleReminder(context);
@@ -1059,20 +1104,22 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               ];
             },
           ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MealLogListFoodWidget(
-                  selectedDate: _model.selectedDate,
-                  mealName: category,
+          onTap: () async {
+            if (await _confirmProceedIfMealPlanApplied()) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MealLogListFoodWidget(
+                    selectedDate: _model.selectedDate,
+                    mealName: category,
+                  ),
                 ),
-              ),
-            ).then((result) {
-              if (result == true) {
-                _model.fetchMealLogs();
-              }
-            });
+              ).then((result) {
+                if (result == true) {
+                  _model.fetchMealLogs();
+                }
+              });
+            }
           },
         ),
         const Divider(),
@@ -1080,9 +1127,9 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  Widget _buildMealHeader(String category, String vietnameseCategory, int? mealCals) {
+  Widget _buildMealHeader(
+      String category, String vietnameseCategory, int? mealCals) {
     final mealTime = mealTimeTranslations[category] ?? '';
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
@@ -1091,7 +1138,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           Row(
             children: [
               Text(
-                vietnameseCategory, // Hiển thị tên tiếng Việt
+                vietnameseCategory,
                 style: const TextStyle(
                   fontFamily: 'Figtree',
                   fontSize: 20,
@@ -1125,13 +1172,13 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           mealCals == null
               ? const SizedBox.shrink()
               : Text(
-            mealCals.toString(),
-            style: const TextStyle(
-              fontFamily: 'Figtree',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+                  mealCals.toString(),
+                  style: const TextStyle(
+                    fontFamily: 'Figtree',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ],
       ),
     );

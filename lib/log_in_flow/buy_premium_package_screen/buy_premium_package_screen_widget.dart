@@ -92,7 +92,9 @@ class _BuyPremiumPackageScreenWidgetState
       print("❌ Lỗi khi thanh toán: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Có lỗi xảy ra trong quá trình thanh toán")),
+          content: Text("Bạn đã là thành viên trả phí!"),
+          backgroundColor: Colors.amber,
+        ),
       );
       Navigator.pushNamed(context, '/checkoutFailScreen');
     }
