@@ -57,10 +57,10 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Upload ảnh thành công")),
         );
-        setState(() {}); // Cập nhật lại giao diện sau khi upload thành công
+        setState(() {});
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Lỗi upload ảnh")),
+          const SnackBar(content: Text("Không thể phân tích món ăn")),
         );
       }
     } catch (e) {
@@ -140,7 +140,6 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                // Ảnh món ăn hoặc icon upload (nếu ảnh chưa có)
                 Center(
                   child: (mealDetail.imageUrl != null &&
                           mealDetail.imageUrl!.isNotEmpty)

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 
@@ -12,8 +13,7 @@ class FoodService {
   Future<List<Food>> getAllFoods(
       {required int pageIndex, required int pageSize, String? search}) async {
     try {
-      final response = await _apiService
-          .get(
+      final response = await _apiService.get(
           "api/food?pageIndex=$pageIndex&pageSize=$pageSize&search=$search");
 
       if (response.statusCode == 200) {
@@ -38,13 +38,14 @@ class FoodService {
       {required int foodId, required BuildContext context}) async {
     String? accessToken = await _apiService.getAccessToken(context);
     final response =
-    await _apiService.get("api/food/recipe/$foodId", token: accessToken);
+        await _apiService.get("api/food/recipe/$foodId", token: accessToken);
     return response;
   }
 
-  Future<http.Response> createFoodRecipeAI({required int foodId,
-    required int cusineId,
-    required BuildContext context}) async {
+  Future<http.Response> createFoodRecipeAI(
+      {required int foodId,
+      required int cusineId,
+      required BuildContext context}) async {
     String? accessToken = await _apiService.getAccessToken(context);
 
     final response = await _apiService.post("api/food/recipe/$foodId/$cusineId",
@@ -53,7 +54,9 @@ class FoodService {
   }
 
   Future<http.Response> RejectRecipeAI(
-      {required int foodId, required String rejectionReason, required BuildContext context}) async {
+      {required int foodId,
+      required String rejectionReason,
+      required BuildContext context}) async {
     String? accessToken = await _apiService.getAccessToken(context);
 
     final response = await _apiService.post("api/food/reject-recipe",
@@ -92,17 +95,17 @@ class FoodService {
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         final data = jsonData['data'] as List<dynamic>;
-        return data.map((e) =>
-            Food(
-              foodId: e['foodId'],
-              foodName: e['foodName'],
-            )).toList();
+        return data
+            .map((e) => Food(
+                  foodId: e['foodId'],
+                  foodName: e['foodName'],
+                ))
+            .toList();
       } else if (response.statusCode == 404) {
         return [];
       } else {
         throw Exception(
-            'Failed to load favorite foods: ${response.statusCode}, ${response
-                .body}');
+            'Failed to load favorite foods: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
       print("Error fetching favorite foods: $e");
@@ -153,15 +156,50 @@ class FoodService {
     }
   }
 
-  Future<http.Response> searchFoodBarCode({required String barcode, required BuildContext context,}) async{
+  Future<http.Response> searchFoodBarCode({
+    required String barcode,
+    required BuildContext context,
+  }) async {
+    String? accessToken = await _apiService.getAccessToken(context);
+    if (accessToken == null) {
+      throw Exception("No access token available");
+    }
+    final response = await _apiService.get(
+      "api/barcode/$barcode",
+      token: accessToken,
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>?> scanFoodImage({
+    required File imageFile,
+    required BuildContext context,
+  }) async {
+    try {
       String? accessToken = await _apiService.getAccessToken(context);
       if (accessToken == null) {
         throw Exception("No access token available");
       }
-      final response = await _apiService.get(
-        "api/barcode/$barcode",
+      final response = await _apiService.postMultipartWithFile(
+        "api/food/scan-image",
+        fields: {},
+        fileFieldName: 'file',
+        filePath: imageFile.path,
         token: accessToken,
       );
-      return response;
+
+      debugPrint(
+          "API scanFoodImage: Status ${response.statusCode}, Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+            "Lỗi scanFoodImage: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      print("Error in scanFoodImage: $e");
+      return null;
+    }
   }
 }

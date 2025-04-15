@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:diet_plan_app/components/barcode_scanner_widget.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:diet_plan_app/services/food_service.dart';
+import 'package:diet_plan_app/services/meallog_service.dart';
 import 'package:flutter/material.dart';
-import '../services/meallog_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class QuickAddWidget extends StatefulWidget {
   final String mealName;
@@ -33,7 +36,6 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
   final TextEditingController _fatController = TextEditingController();
   final TextEditingController _carbsController = TextEditingController();
   final TextEditingController _proteinController = TextEditingController();
-  // Thêm controller cho foodName
   final TextEditingController _foodNameController = TextEditingController();
 
   @override
@@ -55,7 +57,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     _fatController.dispose();
     _carbsController.dispose();
     _proteinController.dispose();
-    _foodNameController.dispose(); // dispose controller foodName
+    _foodNameController.dispose();
     super.dispose();
   }
 
@@ -157,6 +159,61 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
+  /// Hàm _onAddImage sẽ mở file picker để người dùng chọn ảnh,
+  /// sau đó gọi FoodService.scanFoodImage để xử lý và lấy dữ liệu trả về từ AI,
+  /// cuối cùng cập nhật các trường calories, fat, carbs, protein và foodName.
+  Future<void> _onAddImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) return; // Người dùng hủy chọn ảnh
+
+    final File imageFile = File(pickedFile.path);
+    try {
+      FoodService foodService = FoodService();
+      final result = await foodService.scanFoodImage(
+          imageFile: imageFile, context: context);
+      if (result != null) {
+        // API trả về dữ liệu ở field "data"
+        final data = result['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          setState(() {
+            _caloriesController.text =
+                (double.tryParse(data['calories']?.toString() ?? '0') ?? 0)
+                    .round()
+                    .toString();
+            _fatController.text =
+                (double.tryParse(data['fat']?.toString() ?? '0') ?? 0)
+                    .round()
+                    .toString();
+            _carbsController.text =
+                (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0)
+                    .round()
+                    .toString();
+            _proteinController.text =
+                (double.tryParse(data['protein']?.toString() ?? '0') ?? 0)
+                    .round()
+                    .toString();
+            _foodNameController.text = data['foodName']?.toString() ?? '';
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Không nhận được dữ liệu từ API.')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Scan ảnh thất bại!')),
+        );
+      }
+    } catch (e) {
+      print('Error in _onAddImage: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi scan ảnh: $e')),
+      );
+    }
+  }
+
   Future<void> _fetchDataFromBarcode(String barcode) async {
     if (!mounted) return;
 
@@ -179,22 +236,18 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
                 (double.tryParse(data['calories']?.toString() ?? '0') ?? 0)
                     .round()
                     .toString();
-            // Lấy fat, mặc định là 0 nếu không parse được
             _fatController.text =
                 (double.tryParse(data['fat']?.toString() ?? '0') ?? 0)
                     .round()
                     .toString();
-            // Lấy carbs, mặc định là 0 nếu không parse được
             _carbsController.text =
                 (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0)
                     .round()
                     .toString();
-            // Lấy protein, mặc định là 0 nếu không parse được
             _proteinController.text =
                 (double.tryParse(data['protein']?.toString() ?? '0') ?? 0)
                     .round()
                     .toString();
-            // Nếu có dữ liệu food name, có thể cập nhật ở đây (nếu API trả về trường name)
             if (data.containsKey('foodName')) {
               _foodNameController.text = data['foodName'].toString();
             }
@@ -241,6 +294,11 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
             onPressed: _onScanBarcode,
           ),
           IconButton(
+            icon: const Icon(Icons.image),
+            tooltip: 'Thêm ảnh',
+            onPressed: _onAddImage,
+          ),
+          IconButton(
             icon: const Icon(Icons.check),
             onPressed: _onSave,
           ),
@@ -252,7 +310,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
         children: [
           _buildMealRow(),
           const Divider(),
-          _buildFoodNameRow(), // Hiển thị trường nhập foodName
+          _buildFoodNameRow(),
           const Divider(),
           _buildCaloriesRow(macroCals, typedCals),
           const Divider(),
@@ -319,7 +377,6 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
-  // Widget mới để nhập Food Name
   Widget _buildFoodNameRow() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
