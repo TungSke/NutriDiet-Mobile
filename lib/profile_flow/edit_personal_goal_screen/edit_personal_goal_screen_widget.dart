@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../flutter_flow/flutter_flow_theme.dart';
+import '../../services/systemconfiguration_service.dart';
 import 'edit_personal_goal_screen_model.dart';
 
 class EditPersonalGoalScreenWidget extends StatefulWidget {
@@ -29,8 +30,28 @@ class _EditPersonalGoalScreenWidgetState
       await _model.fetchUserProfile();
       await _model.fetchPersonalGoal();
       await _model.fetchHealthProfile();
+      await _getConfigValuesFromApi();
       setState(() {});
     });
+  }
+
+  late double minTargetWeight = 30.0; // Mặc định minHeight
+  late double maxTargetWeight = 250.0; // Mặc định maxHeight
+
+  final SystemConfigurationService _systemConfigService =
+      SystemConfigurationService();
+  Future<void> _getConfigValuesFromApi() async {
+    try {
+      // Lấy min/max height từ API
+      final responseHeight = await _systemConfigService.getSystemConfigById(4);
+      final targetWeightConfig = responseHeight['data'];
+      minTargetWeight = targetWeightConfig['minValue']?.toDouble() ?? 30.0;
+      maxTargetWeight = targetWeightConfig['maxValue']?.toDouble() ?? 250.0;
+
+      setState(() {}); // Cập nhật UI sau khi lấy dữ liệu
+    } catch (e) {
+      print("❌ Lỗi khi lấy cấu hình: $e");
+    }
   }
 
   @override
@@ -289,9 +310,9 @@ class _EditPersonalGoalScreenWidgetState
                   }
                   final targetWeight = double.tryParse(val);
                   if (targetWeight == null ||
-                      targetWeight < 30 ||
-                      targetWeight > 250) {
-                    return 'Mục tiêu cân nặng phải từ 30-250 kg';
+                      targetWeight < minTargetWeight ||
+                      targetWeight > maxTargetWeight) {
+                    return 'Mục tiêu cân nặng phải từ $minTargetWeight - $maxTargetWeight kg';
                   }
                   return null;
                 },

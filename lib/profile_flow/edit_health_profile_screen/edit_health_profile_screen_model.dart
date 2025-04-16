@@ -268,61 +268,6 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
     }
   }
 
-  //
-  // Future<void> fetchHealthProfile() async {
-  //   try {
-  //     final response = await _userService.getHealthProfile();
-  //
-  //     if (response.statusCode == 200) {
-  //       final healthData = jsonDecode(response.body);
-  //
-  //       // Parse height and weight as double with null check
-  //       height = healthData['data']['height'] != null
-  //           ? double.tryParse(healthData['data']['height'].toString()) ?? 0.0
-  //           : 0.0;
-  //       weight = healthData['data']['weight'] != null
-  //           ? double.tryParse(healthData['data']['weight'].toString()) ?? 0.0
-  //           : 0.0;
-  //       aisuggestion = healthData['data']['aisuggestion'] ?? "Chưa cập nhật";
-  //       activityLevel =
-  //           _reverseActivityLevelMap[healthData['data']['activityLevel']] ??
-  //               "Chưa cập nhật";
-  //       dietStyle = _reverseDietStyleMap[healthData['data']['dietStyle']] ??
-  //           "Chưa cập nhật";
-  //       // Cập nhật tên dị ứng
-  //       allergies = healthData['data']["allergies"] != null
-  //           ? (healthData['data']["allergies"] as List)
-  //               .map((allergy) => allergy["allergyName"].toString())
-  //               .toList()
-  //           : [];
-  //
-  //       selectedAllergyIds = healthData['data']["allergies"] != null
-  //           ? (healthData['data']["allergies"] as List)
-  //               .map((allergy) => int.parse(allergy["allergyId"].toString()))
-  //               .toList()
-  //           : [];
-  //
-  //       diseases = healthData['data']["diseases"] != null
-  //           ? (healthData['data']["diseases"] as List)
-  //               .map((disease) => disease["diseaseName"].toString())
-  //               .toList()
-  //           : [];
-  //
-  //       selectedDiseaseIds = healthData['data']["diseases"] != null
-  //           ? (healthData['data']["diseases"] as List)
-  //               .map((disease) => int.parse(disease["diseaseId"].toString()))
-  //               .toList()
-  //           : [];
-  //
-  //       isLoading = false;
-  //       notifyListeners();
-  //     }
-  //   } catch (e) {
-  //     print("❌ Lỗi khi lấy thông tin mục tiêu cá nhân: $e");
-  //     isLoading = false;
-  //     notifyListeners();
-  //   }
-  // }
   Future<void> fetchHealthProfile() async {
     try {
       final response = await _userService.getHealthProfile();
