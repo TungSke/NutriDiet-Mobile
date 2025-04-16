@@ -31,4 +31,21 @@ class SystemConfigurationService {
       throw Exception('Error fetching system configurations: $e');
     }
   }
+
+  Future<Map<String, dynamic>> getSystemConfigById(int configId) async {
+    try {
+      final response = await _apiService.get('api/system-configuration/$configId');
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        return jsonData as Map<String, dynamic>;
+      } else {
+        throw Exception(
+            'Không thể tải cấu hình hệ thống: ${response.statusCode}, ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Lỗi khi lấy cấu hình hệ thống: $e');
+    }
+  }
+
 }
