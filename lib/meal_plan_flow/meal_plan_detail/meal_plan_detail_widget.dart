@@ -1049,11 +1049,10 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                 ],
               ),
             ),
-            // Hiển thị calories và icon '...' trong một Row
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (hasMeals && widget.source == MealPlanSource.myMealPlan)
+                if (hasMeals) // Hiển thị calories nếu có món ăn
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: Text(

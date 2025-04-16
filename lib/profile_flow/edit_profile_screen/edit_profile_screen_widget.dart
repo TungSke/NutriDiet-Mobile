@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../services/systemconfiguration_service.dart';
 import 'edit_profile_screen_model.dart';
 
 class EditProfileScreenWidget extends StatefulWidget {
@@ -18,6 +19,26 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
   late EditProfileScreenModel _model;
   bool isEdited = false;
   String _tempSelectedValue = '';
+  late int minAge = 13; // Mặc định minWeight
+  late int maxAge = 100; // Mặc định maxWeight
+  final SystemConfigurationService _systemConfigService =
+      SystemConfigurationService();
+
+  Future<void> _getConfigValuesFromApi() async {
+    try {
+      // Lấy min/max height từ API
+      final responseHeight = await _systemConfigService.getSystemConfigById(1);
+      final ageConfig = responseHeight['data'];
+      minAge = ageConfig['minValue'] ?? 13;
+      maxAge = ageConfig['maxValue'] ?? 100;
+
+      // Lấy min/max weight từ API
+
+      setState(() {}); // Cập nhật UI sau khi lấy dữ liệu
+    } catch (e) {
+      print("❌ Lỗi khi lấy cấu hình: $e");
+    }
+  }
 
   @override
   @override
@@ -27,6 +48,7 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
 
     Future.delayed(Duration.zero, () async {
       await _model.fetchUserProfile();
+      await _getConfigValuesFromApi();
       setState(() {}); // 🚀 Cập nhật UI ngay sau khi fetch dữ liệu
     });
   }
@@ -334,6 +356,6 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
 
   /// 🟢 Tạo danh sách tuổi từ 10 đến 100
   List<String> _generateAgeList() {
-    return List.generate(88, (index) => '${13 + index}');
+    return List.generate((maxAge - minAge + 1), (index) => '${minAge + index}');
   }
 }

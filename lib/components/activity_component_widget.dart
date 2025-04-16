@@ -14,6 +14,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../flutter_flow/flutter_flow_model.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
+import '../services/systemconfiguration_service.dart';
 import '../services/user_service.dart';
 import 'chart_targetWeight_widget.dart';
 import 'chart_weight_widget.dart';
@@ -317,7 +318,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     _model = createModel(context, () => ActivityComponentModel());
     _model.fetchUserProfile();
     _model.fetchHealthProfile();
-
+    _getConfigValuesFromApi();
     // Gọi API lấy lịch sử cân nặng
     _fetchWeightHistory();
     _fetchPersonalGoalHistory();
@@ -965,6 +966,27 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     );
   }
 
+  late double minWeight = 30; // Mặc định minWeight
+  late double maxWeight = 250; // Mặc định maxWeight
+  final SystemConfigurationService _systemConfigService =
+      SystemConfigurationService();
+
+  Future<void> _getConfigValuesFromApi() async {
+    try {
+      // Lấy min/max height từ API
+      final responseHeight = await _systemConfigService.getSystemConfigById(3);
+      final weightConfig = responseHeight['data'];
+      minWeight = weightConfig['minValue']?.toDouble() ?? 30;
+      maxWeight = weightConfig['maxValue']?.toDouble() ?? 250;
+
+      // Lấy min/max weight từ API
+
+      setState(() {}); // Cập nhật UI sau khi lấy dữ liệu
+    } catch (e) {
+      print("❌ Lỗi khi lấy cấu hình: $e");
+    }
+  }
+
   // Thêm hàm hiển thị bottom sheet khi long press
   void _showEntryMenu(Map<String, dynamic> item) {
     // Lấy thông tin cần thiết
@@ -1137,16 +1159,34 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                       onPressed: () async {
-                        _model.weight = currentWeight;
+                        if (currentWeight < minWeight ||
+                            currentWeight > maxWeight) {
+                          // Hiển thị snackbar khi cân nặng không hợp lệ
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Cảnh báo'),
+                                content: Text(
+                                    "Cân nặng phải nằm trong khoảng $minWeight - $maxWeight"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(); // Đóng modal
+                                    },
+                                    child: Text('Đóng'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else {
+                          // Lưu cân nặng hợp lệ và cập nhật UI
+                          _model.weight = currentWeight;
 
-                        _checkTodayUpdate();
-                        // await _model.fetchHealthProfile();
-                        // if (mounted) {
-                        //   _refreshChart(); // Làm mới biểu đồ
-                        //   // Gọi lại fetchWeightHistory để cập nhật danh sách
-                        //   await _fetchWeightHistory();
-                        // }
-                        Navigator.pop(context);
+                          _checkTodayUpdate();
+                          Navigator.pop(context); // Đóng BottomSheet
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,

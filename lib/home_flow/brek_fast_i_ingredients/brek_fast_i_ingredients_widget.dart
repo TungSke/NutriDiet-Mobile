@@ -35,12 +35,6 @@ class _BrekFastIIngredientsWidgetState
   }
 
   @override
-  void dispose() {
-    _model.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
     if (_model.food == null) {
@@ -166,13 +160,13 @@ class _BrekFastIIngredientsWidgetState
                     _model.food?["foodName"],
                     maxLines: 1,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          fontFamily: 'figtree',
-                          fontSize: 22.0,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.bold,
-                          useGoogleFonts: false,
-                          lineHeight: 1.5,
-                        ),
+                      fontFamily: 'figtree',
+                      fontSize: 22.0,
+                      letterSpacing: 0.0,
+                      fontWeight: FontWeight.bold,
+                      useGoogleFonts: false,
+                      lineHeight: 1.5,
+                    ),
                   ),
                 ),
                 Padding(
@@ -182,13 +176,13 @@ class _BrekFastIIngredientsWidgetState
                     _model.food?["servingSize"],
                     maxLines: 1,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          fontFamily: 'figtree',
-                          fontSize: 22.0,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.bold,
-                          useGoogleFonts: false,
-                          lineHeight: 1.5,
-                        ),
+                      fontFamily: 'figtree',
+                      fontSize: 22.0,
+                      letterSpacing: 0.0,
+                      fontWeight: FontWeight.bold,
+                      useGoogleFonts: false,
+                      lineHeight: 1.5,
+                    ),
                   ),
                 ),
               ],
@@ -199,19 +193,15 @@ class _BrekFastIIngredientsWidgetState
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Expanded(
-                    // child: custom_widgets.Readmore(
-                    //   width: double.infinity,
-                    //   height: 72.0,
-                    // ),
                     child:
-                        Text(_model.food!["description"] ?? "Không có mô tả"),
+                    Text(_model.food!["description"] ?? "Không có mô tả"),
                   ),
                 ],
               ),
             ),
             Padding(
               padding:
-                  const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
+              const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 0.0),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -235,22 +225,22 @@ class _BrekFastIIngredientsWidgetState
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
-                                    fontFamily: 'figtree',
-                                    color: _model.tabar == 0
-                                        ? FlutterFlowTheme.of(context).primary
-                                        : FlutterFlowTheme.of(context).grey,
-                                    fontSize: _model.tabar == 0 ? 18.0 : 16.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.w500,
-                                    useGoogleFonts: false,
-                                  ),
+                                fontFamily: 'figtree',
+                                color: _model.tabar == 0
+                                    ? FlutterFlowTheme.of(context).primary
+                                    : FlutterFlowTheme.of(context).grey,
+                                fontSize: _model.tabar == 0 ? 18.0 : 16.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.w500,
+                                useGoogleFonts: false,
+                              ),
                             ),
                             Divider(
                               thickness: 2.0,
                               color: _model.tabar == 0
                                   ? FlutterFlowTheme.of(context).primary
                                   : FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  .secondaryBackground,
                             ),
                           ],
                         ),
@@ -273,26 +263,26 @@ class _BrekFastIIngredientsWidgetState
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             Text(
-                              'Recipe',
+                              'Công thức',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
-                                    fontFamily: 'figtree',
-                                    color: _model.tabar == 1
-                                        ? FlutterFlowTheme.of(context).primary
-                                        : FlutterFlowTheme.of(context).grey,
-                                    fontSize: _model.tabar == 1 ? 18.0 : 16.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.w500,
-                                    useGoogleFonts: false,
-                                  ),
+                                fontFamily: 'figtree',
+                                color: _model.tabar == 1
+                                    ? FlutterFlowTheme.of(context).primary
+                                    : FlutterFlowTheme.of(context).grey,
+                                fontSize: _model.tabar == 1 ? 18.0 : 16.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.w500,
+                                useGoogleFonts: false,
+                              ),
                             ),
                             Divider(
                               thickness: 2.0,
                               color: _model.tabar == 1
                                   ? FlutterFlowTheme.of(context).primary
                                   : FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  .secondaryBackground,
                             ),
                           ],
                         ),
@@ -328,20 +318,20 @@ class _BrekFastIIngredientsWidgetState
                                 Expanded(
                                   child: Padding(
                                     padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 0.0, 0.0, 0.0),
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'Calories',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                            fontFamily: 'figtree',
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            useGoogleFonts: false,
-                                          ),
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -351,14 +341,14 @@ class _BrekFastIIngredientsWidgetState
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
-                                        fontFamily: 'figtree',
-                                        color:
-                                            FlutterFlowTheme.of(context).grey,
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                    fontFamily: 'figtree',
+                                    color:
+                                    FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
                                 ),
                               ],
                             ),
@@ -382,20 +372,20 @@ class _BrekFastIIngredientsWidgetState
                                 Expanded(
                                   child: Padding(
                                     padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 0.0, 0.0, 0.0),
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       'Protein',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                            fontFamily: 'figtree',
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            useGoogleFonts: false,
-                                          ),
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -405,14 +395,14 @@ class _BrekFastIIngredientsWidgetState
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
-                                        fontFamily: 'figtree',
-                                        color:
-                                            FlutterFlowTheme.of(context).grey,
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                    fontFamily: 'figtree',
+                                    color:
+                                    FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
                                 ),
                               ],
                             ),
@@ -436,20 +426,20 @@ class _BrekFastIIngredientsWidgetState
                                 Expanded(
                                   child: Padding(
                                     padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 0.0, 0.0, 0.0),
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'carbs',
+                                      'Carbs',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                            fontFamily: 'figtree',
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            useGoogleFonts: false,
-                                          ),
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -459,14 +449,14 @@ class _BrekFastIIngredientsWidgetState
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
-                                        fontFamily: 'figtree',
-                                        color:
-                                            FlutterFlowTheme.of(context).grey,
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                    fontFamily: 'figtree',
+                                    color:
+                                    FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
                                 ),
                               ],
                             ),
@@ -490,20 +480,20 @@ class _BrekFastIIngredientsWidgetState
                                 Expanded(
                                   child: Padding(
                                     padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 0.0, 0.0, 0.0),
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'fat',
+                                      'Fat',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                            fontFamily: 'figtree',
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            useGoogleFonts: false,
-                                          ),
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -513,14 +503,14 @@ class _BrekFastIIngredientsWidgetState
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
-                                        fontFamily: 'figtree',
-                                        color:
-                                            FlutterFlowTheme.of(context).grey,
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                    fontFamily: 'figtree',
+                                    color:
+                                    FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
                                 ),
                               ],
                             ),
@@ -544,20 +534,20 @@ class _BrekFastIIngredientsWidgetState
                                 Expanded(
                                   child: Padding(
                                     padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 0.0, 0.0, 0.0),
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'glucid',
+                                      'Glucid',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                            fontFamily: 'figtree',
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            useGoogleFonts: false,
-                                          ),
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -567,14 +557,14 @@ class _BrekFastIIngredientsWidgetState
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
-                                        fontFamily: 'figtree',
-                                        color:
-                                            FlutterFlowTheme.of(context).grey,
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                    fontFamily: 'figtree',
+                                    color:
+                                    FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
                                 ),
                               ],
                             ),
@@ -598,20 +588,20 @@ class _BrekFastIIngredientsWidgetState
                                 Expanded(
                                   child: Padding(
                                     padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 0.0, 0.0, 0.0),
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      'fiber',
+                                      'Fiber',
                                       maxLines: 1,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                            fontFamily: 'figtree',
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            useGoogleFonts: false,
-                                          ),
+                                        fontFamily: 'figtree',
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        useGoogleFonts: false,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -621,45 +611,132 @@ class _BrekFastIIngredientsWidgetState
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
-                                        fontFamily: 'figtree',
-                                        color:
-                                            FlutterFlowTheme.of(context).grey,
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.normal,
-                                        useGoogleFonts: false,
-                                      ),
+                                    fontFamily: 'figtree',
+                                    color:
+                                    FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      // SizedBox(height: 20),
-                      // Text("Nguyên liệu:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
-                      // SizedBox(height: 10),
-                      // ..._model.food!["ingredients"].map<Widget>((ingredient) =>
-                      //     Card(
-                      //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      //       child: Container(
-                      //         decoration: BoxDecoration(
-                      //           borderRadius: BorderRadius.circular(10),
-                      //           color: Colors.white, // Đặt màu nền trắng
-                      //           border: Border.all(color: Colors.black, width: 1.0,),
-                      //         ),
-                      //         child: ListTile(
-                      //           title: Text(
-                      //             ingredient["ingredientName"],
-                      //             style: TextStyle(fontWeight: FontWeight.bold),
-                      //           ),
-                      //           trailing: Text(
-                      //             "${ingredient["calories"]} kcal",
-                      //             style: TextStyle(color: Colors.grey[600]),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      // ),
+                      // Hiển thị danh sách nguyên liệu
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(20.0, 24.0, 20.0, 24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Nguyên liệu",
+                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'figtree',
+                                fontSize: 20.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.w600,
+                                color: FlutterFlowTheme.of(context).primary,
+                                useGoogleFonts: false,
+                              ),
+                            ),
+                            const SizedBox(height: 16.0),
+                            if (_model.food!["ingredients"] != null &&
+                                (_model.food!["ingredients"] as List).isNotEmpty)
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                  borderRadius: BorderRadius.circular(16.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 10.0,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: _model.food!["ingredients"]
+                                      .asMap()
+                                      .entries
+                                      .map<Widget>((entry) {
+                                    final index = entry.key;
+                                    final ingredient = entry.value;
+                                    return Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0, vertical: 12.0),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: 8.0,
+                                                height: 8.0,
+                                                decoration: BoxDecoration(
+                                                  color: FlutterFlowTheme.of(context).primary,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12.0),
+                                              Expanded(
+                                                child: Text(
+                                                  ingredient["ingredientName"],
+                                                  style: FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .override(
+                                                    fontFamily: 'figtree',
+                                                    fontSize: 16.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: FlutterFlowTheme.of(context)
+                                                        .primaryText,
+                                                    useGoogleFonts: false,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        if (index <
+                                            _model.food!["ingredients"].length - 1)
+                                          Divider(
+                                            height: 1.0,
+                                            thickness: 1.0,
+                                            color: FlutterFlowTheme.of(context)
+                                                .lightGrey
+                                                .withOpacity(0.5),
+                                          ),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ),
+                              )
+                            else
+                              Container(
+                                padding: const EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context).lightGrey,
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: Text(
+                                  "Không có nguyên liệu được liệt kê",
+                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'figtree',
+                                    color: FlutterFlowTheme.of(context).grey,
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    useGoogleFonts: false,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ],
                   );
                 } else {
@@ -669,7 +746,6 @@ class _BrekFastIIngredientsWidgetState
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Dropdown chọn loại ẩm thực
                         DropdownButton<int>(
                           value: _model.cusinetypelist.any((c) =>
                           c["cuisineId"] == _model.selectedCuisineId)
@@ -681,11 +757,14 @@ class _BrekFastIIngredientsWidgetState
                             return DropdownMenuItem<int>(
                               value: cuisine["cuisineId"],
                               child: Container(
-                                color: Colors.transparent, // Đặt màu nền trong suốt
-                                padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                                color: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 5.0, horizontal: 10.0),
                                 child: Text(
                                   cuisine["cuisineName"],
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
                                     fontFamily: 'figtree',
                                     fontSize: 15.0,
                                     letterSpacing: 0.0,
@@ -701,19 +780,18 @@ class _BrekFastIIngredientsWidgetState
                               _model.selectedCuisineId = value!;
                             });
                           },
-                          dropdownColor: Colors.white, // Đặt màu nền menu
-                          style: const TextStyle(color: Colors.black), // Màu chữ mặc định
+                          dropdownColor: Colors.white,
+                          style: const TextStyle(color: Colors.black),
                         ),
                         SizedBox(height: 16),
-
-                        // Nút Tạo công thức bằng AI
                         GestureDetector(
                           onTap: () async {
                             await _model.createFoodRecipeAI(widget.foodId, context);
                             setState(() {});
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12.0, horizontal: 20.0),
                             decoration: BoxDecoration(
                               color: Colors.blue,
                               borderRadius: BorderRadius.circular(10.0),
@@ -741,7 +819,9 @@ class _BrekFastIIngredientsWidgetState
                                   Icon(Icons.auto_awesome, color: Colors.white),
                                 SizedBox(width: 8),
                                 Text(
-                                  _model.isLoading ? "Đang tạo..." : "Tạo công thức bằng AI",
+                                  _model.isLoading
+                                      ? "Đang tạo..."
+                                      : "Tạo công thức bằng AI",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
@@ -753,8 +833,6 @@ class _BrekFastIIngredientsWidgetState
                           ),
                         ),
                         SizedBox(height: 16),
-
-                        // Nội dung phản hồi (response)
                         if (_model.foodRecipe != null) ...[
                           Column(
                             children: [
@@ -767,15 +845,15 @@ class _BrekFastIIngredientsWidgetState
                               SizedBox(height: 16),
                               Text(
                                 "Bạn có muốn thử công thức khác?",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
                           SizedBox(height: 16),
-
-                          // Nút Từ chối công thức (chỉ hiển thị khi có response)
                           ElevatedButton(
-                            onPressed: () => _model.showRejectDialog(widget.foodId, context),
+                            onPressed: () =>
+                                _model.showRejectDialog(widget.foodId, context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
                               padding: EdgeInsets.all(20),
@@ -785,8 +863,7 @@ class _BrekFastIIngredientsWidgetState
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
-                        ]
-                        else
+                        ] else
                           Column(
                             children: [
                               Image.asset(
@@ -798,13 +875,15 @@ class _BrekFastIIngredientsWidgetState
                               SizedBox(height: 16),
                               Text(
                                 'Bạn chưa có công thức nấu ăn này',
-                                style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 22.0, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 8),
                               Text(
                                 'Tạo công thức của riêng bạn',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.grey),
                               ),
                             ],
                           ),
