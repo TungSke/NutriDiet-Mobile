@@ -310,154 +310,149 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget>
                             ),
                           ),
                         ),
-
-                        if (_model.activityError == null &&
-                            !kIsWeb)
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 24.0),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .lightGrey,
-                                          borderRadius:
-                                          BorderRadius.circular(16.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 16.0),
-                                          child: Column(
-                                            children: [
-                                              CircularPercentIndicator(
-                                                percent: _model.stepProgress
-                                                    .clamp(0.0, 1.0),
-                                                radius: 50.0,
-                                                lineWidth: 8.0,
-                                                animation: true,
-                                                animateFromLastPercent: true,
-                                                progressColor: Colors.blueAccent,
-                                                backgroundColor:
-                                                Colors.grey[300]!,
-                                                center: Column(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.directions_walk,
+                        // Hiển thị số bước chân bất kể _model.activityError
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 0.0, 0.0, 24.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .lightGrey,
+                                        borderRadius:
+                                        BorderRadius.circular(16.0),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 16.0),
+                                        child: Column(
+                                          children: [
+                                            CircularPercentIndicator(
+                                              percent: _model.stepProgress
+                                                  .clamp(0.0, 1.0),
+                                              radius: 50.0,
+                                              lineWidth: 8.0,
+                                              animation: true,
+                                              animateFromLastPercent: true,
+                                              progressColor: Colors.blueAccent,
+                                              backgroundColor:
+                                              Colors.grey[300]!,
+                                              center: Column(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.directions_walk,
+                                                    color: Colors.blueAccent,
+                                                    size: 24.0,
+                                                  ),
+                                                  Text(
+                                                    '${_model.steps}',
+                                                    style: const TextStyle(
                                                       color: Colors.blueAccent,
-                                                      size: 24.0,
+                                                      fontWeight:
+                                                      FontWeight.bold,
+                                                      fontSize: 20.0,
                                                     ),
-                                                    Text(
-                                                      '${_model.steps}',
-                                                      style: const TextStyle(
-                                                        color: Colors.blueAccent,
-                                                        fontWeight:
-                                                        FontWeight.bold,
-                                                        fontSize: 20.0,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
-                                              Text(
-                                                'Bước chân',
-                                                style: FlutterFlowTheme.of(
-                                                    context)
-                                                    .bodyMedium
-                                                    .override(
-                                                  fontFamily: 'figtree',
-                                                  fontSize: 18.0,
-                                                  fontWeight: FontWeight.w500,
-                                                  useGoogleFonts: false,
-                                                ),
+                                            ),
+                                            Text(
+                                              'Bước chân',
+                                              style: FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .override(
+                                                fontFamily: 'figtree',
+                                                fontSize: 18.0,
+                                                fontWeight: FontWeight.w500,
+                                                useGoogleFonts: false,
                                               ),
-                                            ].divide(const SizedBox(height: 8.0)),
-                                          ),
+                                            ),
+                                          ].divide(const SizedBox(height: 8.0)),
                                         ),
                                       ),
                                     ),
-                                    Expanded(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .lightGrey,
-                                          borderRadius:
-                                          BorderRadius.circular(16.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 16.0),
-                                          child: Column(
-                                            children: [
-                                              CircularPercentIndicator(
-                                                percent: _model
-                                                    .caloriesBurnedProgress
-                                                    .clamp(0.0, 1.0),
-                                                radius: 50.0,
-                                                lineWidth: 8.0,
-                                                animation: true,
-                                                animateFromLastPercent: true,
-                                                progressColor: Colors.redAccent,
-                                                backgroundColor:
-                                                Colors.grey[300]!,
-                                                center: Column(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      Icons
-                                                          .local_fire_department,
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .lightGrey,
+                                        borderRadius:
+                                        BorderRadius.circular(16.0),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 16.0),
+                                        child: Column(
+                                          children: [
+                                            CircularPercentIndicator(
+                                              percent: _model
+                                                  .caloriesBurnedProgress
+                                                  .clamp(0.0, 1.0),
+                                              radius: 50.0,
+                                              lineWidth: 8.0,
+                                              animation: true,
+                                              animateFromLastPercent: true,
+                                              progressColor: Colors.redAccent,
+                                              backgroundColor:
+                                              Colors.grey[300]!,
+                                              center: Column(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons
+                                                        .local_fire_department,
+                                                    color: Colors.redAccent,
+                                                    size: 24.0,
+                                                  ),
+                                                  Text(
+                                                    '${_model.caloriesBurned}',
+                                                    style: const TextStyle(
                                                       color: Colors.redAccent,
-                                                      size: 24.0,
+                                                      fontWeight:
+                                                      FontWeight.bold,
+                                                      fontSize: 20.0,
                                                     ),
-                                                    Text(
-                                                      '${_model.caloriesBurned}',
-                                                      style: const TextStyle(
-                                                        color: Colors.redAccent,
-                                                        fontWeight:
-                                                        FontWeight.bold,
-                                                        fontSize: 20.0,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
-                                              Text(
-                                                'Calories đốt cháy',
-                                                style: FlutterFlowTheme.of(
-                                                    context)
-                                                    .bodyMedium
-                                                    .override(
-                                                  fontFamily: 'figtree',
-                                                  fontSize: 15.0,
-                                                  fontWeight: FontWeight.w500,
-                                                  useGoogleFonts: false,
-                                                ),
+                                            ),
+                                            Text(
+                                              'Calories đốt cháy',
+                                              style: FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .override(
+                                                fontFamily: 'figtree',
+                                                fontSize: 15.0,
+                                                fontWeight: FontWeight.w500,
+                                                useGoogleFonts: false,
                                               ),
-                                            ].divide(const SizedBox(height: 8.0)),
-                                          ),
+                                            ),
+                                          ].divide(const SizedBox(height: 8.0)),
                                         ),
                                       ),
                                     ),
-                                  ].divide(const SizedBox(width: 16.0))
-                                      .addToStart(const SizedBox(width: 20.0))
-                                      .addToEnd(const SizedBox(width: 20.0)),
-                                ),
+                                  ),
+                                ].divide(const SizedBox(width: 16.0))
+                                    .addToStart(const SizedBox(width: 20.0))
+                                    .addToEnd(const SizedBox(width: 20.0)),
+                              ),
+                              // Hiển thị thông báo lỗi nếu có
+                              if (_model.activityError != null)
                                 Padding(
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       20.0, 16.0, 20.0, 0.0),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
+                                  child: Container(
                                     decoration: BoxDecoration(
-                                      color: _model.isRunning
-                                          ? Colors.green[100]
-                                          : Colors.grey[100],
+                                      color: Colors.red[100],
                                       borderRadius: BorderRadius.circular(16.0),
                                     ),
                                     child: Padding(
@@ -467,23 +462,19 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget>
                                         MainAxisAlignment.center,
                                         children: [
                                           Icon(
-                                            Icons.directions_run,
-                                            color: _model.isRunning
-                                                ? Colors.green
-                                                : Colors.grey,
+                                            Icons.error,
+                                            color: Colors.red,
                                             size: 24.0,
                                           ),
                                           const SizedBox(width: 8.0),
-                                          Text(
-                                            _model.isRunning
-                                                ? 'Đang chạy'
-                                                : 'Không chạy',
-                                            style: TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.w500,
-                                              color: _model.isRunning
-                                                  ? Colors.green
-                                                  : Colors.grey,
+                                          Expanded(
+                                            child: Text(
+                                              _model.activityError!,
+                                              style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.red,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -491,9 +482,51 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget>
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    20.0, 16.0, 20.0, 0.0),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  decoration: BoxDecoration(
+                                    color: _model.isRunning
+                                        ? Colors.green[100]
+                                        : Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(16.0),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.directions_run,
+                                          color: _model.isRunning
+                                              ? Colors.green
+                                              : Colors.grey,
+                                          size: 24.0,
+                                        ),
+                                        const SizedBox(width: 8.0),
+                                        Text(
+                                          _model.isRunning
+                                              ? 'Đang chạy'
+                                              : 'Không chạy',
+                                          style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.w500,
+                                            color: _model.isRunning
+                                                ? Colors.green
+                                                : Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                        ),
                         Opacity(
                           opacity: FFAppState().isLogin ? 1.0 : 0.3,
                           child: GestureDetector(

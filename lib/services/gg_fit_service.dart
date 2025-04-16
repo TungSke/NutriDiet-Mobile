@@ -10,7 +10,6 @@ class GGFitService {
   static final GGFitService _instance = GGFitService._internal();
   factory GGFitService() => _instance;
   GGFitService._internal() {
-    // Không gọi resetSteps() ở đây, sẽ khởi tạo _realTimeSteps từ Health Connect trong _initPedometer
     print("GGFitService instance created");
   }
 
@@ -19,12 +18,14 @@ class GGFitService {
   Stream<PedestrianStatus>? _pedestrianStatusStream;
   int _realTimeSteps = 0;
   int _lastReportedSteps = 0;
+  int? _initialPedometerSteps;
   StreamController<int>? _stepsController;
   StreamController<bool>? _runningController;
   DateTime? _lastStepTime;
-  DateTime? _lastProcessedDate; // Lưu ngày cuối cùng để kiểm tra ngày thay đổi
+  DateTime? _lastProcessedDate;
   bool _isInitialized = false;
   bool _isDisposed = false;
+  bool _isRunning = false;
 
   Future<bool> _checkActivityRecognitionPermission() async {
     if (kIsWeb || !Platform.isAndroid) return true;
@@ -81,16 +82,16 @@ class GGFitService {
     }
 
     try {
-      // Kiểm tra quyền Activity Recognition
       bool granted = await _checkActivityRecognitionPermission();
       if (!granted) {
         print("Quyền Activity Recognition không được cấp.");
+        _stepsController ??= StreamController<int>.broadcast();
+        _runningController ??= StreamController<bool>.broadcast();
         if (!_stepsController!.isClosed) _stepsController?.add(0);
         if (!_runningController!.isClosed) _runningController?.add(false);
         return;
       }
 
-      // Khởi tạo StreamController
       _stepsController ??= StreamController<int>.broadcast();
       _runningController ??= StreamController<bool>.broadcast();
 
@@ -99,9 +100,7 @@ class GGFitService {
       final startOfDay = DateTime(now.year, now.month, now.day);
       final stepsFromHealth = await _fetchStepsFromHealthConnect(startOfDay, now);
 
-      // Khởi tạo _realTimeSteps và _lastReportedSteps từ Health Connect
       _realTimeSteps = stepsFromHealth;
-      _lastReportedSteps = stepsFromHealth;
       _lastProcessedDate = now;
 
       if (!_stepsController!.isClosed) {
@@ -115,7 +114,6 @@ class GGFitService {
 
       _isInitialized = true;
 
-      // Khởi tạo stream bước chân
       _stepCountStream = Pedometer.stepCountStream;
       if (_stepCountStream == null) {
         print("Pedometer.stepCountStream không khả dụng trên thiết bị này.");
@@ -124,22 +122,22 @@ class GGFitService {
         return;
       }
 
-      // Lắng nghe bước chân
       _stepCountStream!.listen(
-            (StepCount event) async{
+            (StepCount event) async {
           if (_isDisposed) return;
           int currentSteps = event.steps;
           DateTime currentTime = event.timeStamp;
           print("Pedometer step event: steps=$currentSteps, time=$currentTime");
 
           // Kiểm tra ngày thay đổi
-          if (_lastProcessedDate != null &&
-              (_lastProcessedDate!.year != currentTime.year ||
-                  _lastProcessedDate!.month != currentTime.month ||
-                  _lastProcessedDate!.day != currentTime.day)) {
-            final startOfNewDay = DateTime(currentTime.year, currentTime.month, currentTime.day);
-            final newStepsFromHealth = await _fetchStepsFromHealthConnect(startOfNewDay, currentTime);
+          final startOfCurrentDay = DateTime(currentTime.year, currentTime.month, currentTime.day);
+          if (_lastProcessedDate == null ||
+              _lastProcessedDate!.year != currentTime.year ||
+              _lastProcessedDate!.month != currentTime.month ||
+              _lastProcessedDate!.day != currentTime.day) {
+            final newStepsFromHealth = await _fetchStepsFromHealthConnect(startOfCurrentDay, currentTime);
             _realTimeSteps = newStepsFromHealth;
+            _initialPedometerSteps = currentSteps;
             _lastReportedSteps = currentSteps;
             _lastProcessedDate = currentTime;
             if (!_stepsController!.isClosed) {
@@ -150,16 +148,31 @@ class GGFitService {
           }
           _lastProcessedDate = currentTime;
 
-          // Cập nhật bước chân: cộng dồn từ giá trị khởi tạo
-          if (currentSteps >= _lastReportedSteps) {
-            int stepsDelta = currentSteps - _lastReportedSteps;
-            _realTimeSteps += stepsDelta;
+          if (_initialPedometerSteps == null) {
+            _initialPedometerSteps = currentSteps;
+            _lastReportedSteps = currentSteps;
+            print("Initial pedometer steps set: $_initialPedometerSteps");
+          }
+
+          int stepsDelta = currentSteps - _initialPedometerSteps!;
+          if (_isRunning) {
+            _realTimeSteps = stepsFromHealth + stepsDelta;
             _lastReportedSteps = currentSteps;
             _lastStepTime = currentTime;
             if (!_stepsController!.isClosed) {
               _stepsController?.add(_realTimeSteps);
-              print("Steps updated: delta=$stepsDelta, total=$_realTimeSteps");
+              print("Steps updated (isRunning=true): delta=$stepsDelta, total=$_realTimeSteps");
             }
+            // Ghi bước chân mới vào Health Connect
+            await writeHealthData(
+              HealthDataType.STEPS,
+              _realTimeSteps.toDouble(),
+              startOfCurrentDay,
+              currentTime,
+            );
+          } else {
+            _lastReportedSteps = currentSteps;
+            print("Steps not updated (isRunning=false): lastReportedSteps=$_lastReportedSteps, total=$_realTimeSteps");
           }
         },
         onError: (error) {
@@ -169,7 +182,6 @@ class GGFitService {
         },
       );
 
-      // Khởi tạo stream trạng thái di chuyển
       _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
       if (_pedestrianStatusStream == null) {
         print("Pedometer.pedestrianStatusStream không khả dụng trên thiết bị này.");
@@ -177,20 +189,20 @@ class GGFitService {
         return;
       }
 
-      // Lắng nghe trạng thái di chuyển
       _pedestrianStatusStream!.listen(
             (PedestrianStatus event) {
           if (_isDisposed) return;
-          bool isRunning = event.status == 'walking';
-          print("Pedestrian status: ${event.status}, isRunning=$isRunning");
+          _isRunning = event.status == 'walking';
+          print("Pedestrian status: ${event.status}, isRunning=$_isRunning");
           if (!_runningController!.isClosed) {
-            _runningController?.add(isRunning);
+            _runningController?.add(_isRunning);
           }
         },
         onError: (error) {
           if (_isDisposed) return;
           print("Pedometer Status Stream Error: $error");
           if (!_runningController!.isClosed) _runningController?.add(false);
+          _isRunning = false;
         },
       );
     } catch (e) {
@@ -199,6 +211,7 @@ class GGFitService {
       _runningController ??= StreamController<bool>.broadcast();
       if (!_stepsController!.isClosed) _stepsController?.add(0);
       if (!_runningController!.isClosed) _runningController?.add(false);
+      _isRunning = false;
     }
   }
 
@@ -220,9 +233,24 @@ class GGFitService {
     return _runningController!.stream;
   }
 
-  Future<bool> writeStepsToHealthConnect(int steps, DateTime startTime, DateTime endTime) async {
+  Future<bool> writeHealthData(
+      HealthDataType type,
+      double value,
+      DateTime startTime,
+      DateTime endTime,
+      ) async {
     if (_isDisposed) return false;
     try {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final startDay = DateTime(startTime.year, startTime.month, startTime.day);
+      final endDay = DateTime(endTime.year, endTime.month, endTime.day);
+
+      if (startDay != today || endDay != today) {
+        print("Dữ liệu không thuộc ngày hôm nay, không ghi vào Health Connect.");
+        return false;
+      }
+
       if (!kIsWeb && Platform.isAndroid) {
         final status = await _health.getHealthConnectSdkStatus();
         if (status != HealthConnectSdkStatus.sdkAvailable) {
@@ -233,29 +261,29 @@ class GGFitService {
 
       await _health.configure();
 
-      final types = [HealthDataType.STEPS];
+      final types = [type];
       final permissions = [HealthDataAccess.READ_WRITE];
       bool? hasPermission = await _health.hasPermissions(types, permissions: permissions);
 
       if (hasPermission == null || !hasPermission) {
         final authorized = await _health.requestAuthorization(types, permissions: permissions);
         if (!authorized) {
-          print("Không có quyền ghi vào Health Connect.");
+          print("Không có quyền ghi vào Health Connect cho $type.");
           return false;
         }
       }
 
       final success = await _health.writeHealthData(
-        value: steps.toDouble(),
-        type: HealthDataType.STEPS,
+        value: value,
+        type: type,
         startTime: startTime,
         endTime: endTime,
       );
 
-      print("Wrote $steps steps to Health Connect from $startTime to $endTime: $success");
+      print("Wrote $value $type to Health Connect from $startTime to $endTime: $success");
       return success ?? false;
     } catch (e) {
-      print("Lỗi khi ghi dữ liệu vào Health Connect: $e");
+      print("Lỗi khi ghi dữ liệu $type vào Health Connect: $e");
       return false;
     }
   }
@@ -265,6 +293,8 @@ class GGFitService {
       return {
         "steps": 0,
         "caloriesBurned": 0,
+        "distance": 0,
+        "activeEnergyBurned": 0,
         "error": "Dịch vụ đã bị dispose",
       };
     }
@@ -283,8 +313,9 @@ class GGFitService {
         final types = [
           HealthDataType.STEPS,
           HealthDataType.TOTAL_CALORIES_BURNED,
+          HealthDataType.ACTIVE_ENERGY_BURNED,
         ];
-        final permissions = [HealthDataAccess.READ_WRITE, HealthDataAccess.READ_WRITE];
+        final permissions = List.filled(types.length, HealthDataAccess.READ_WRITE);
         bool? hasPermission = await _health.hasPermissions(types, permissions: permissions);
 
         if (hasPermission == null || !hasPermission) {
@@ -293,64 +324,78 @@ class GGFitService {
             return {
               "steps": _realTimeSteps,
               "caloriesBurned": 0,
+              "distance": 0,
+              "activeEnergyBurned": 0,
               "error": "Người dùng từ chối cấp quyền Health Connect. Dữ liệu từ cảm biến sẽ được sử dụng.",
             };
           }
         }
 
-        // Đọc dữ liệu bước chân từ Health Connect trước
+        // Đọc bước chân
         int steps = await _health.getTotalStepsInInterval(startDate, endDate) ?? 0;
         print("Steps from Health Connect for $startDate to $endDate: $steps");
 
-        // Kiểm tra xem ngày có phải là ngày hiện tại không
         final now = DateTime.now();
         final isToday = startDate.year == now.year &&
             startDate.month == now.month &&
             startDate.day == now.day;
 
-        // Nếu là ngày hiện tại, đồng bộ _realTimeSteps từ pedometer
-        if (isToday && _realTimeSteps > steps) {
-          // Ghi _realTimeSteps vào Health Connect nếu nó lớn hơn dữ liệu hiện có
-          await writeStepsToHealthConnect(_realTimeSteps, startDate, endDate);
-          steps = _realTimeSteps; // Cập nhật steps để trả về
+        if (isToday) {
+          _realTimeSteps = steps;
           if (!_stepsController!.isClosed) {
             _stepsController?.add(_realTimeSteps);
-            print("Synced pedometer steps to Health Connect: $_realTimeSteps");
+            print("Synced _realTimeSteps with Health Connect for today: $_realTimeSteps");
           }
-        } else if (!isToday) {
-          // Nếu không phải ngày hiện tại, đặt lại _realTimeSteps để tránh sử dụng dữ liệu cũ
+        } else {
           _realTimeSteps = steps;
-          _lastReportedSteps = steps;
+          _initialPedometerSteps = null;
           if (!_stepsController!.isClosed) {
             _stepsController?.add(_realTimeSteps);
             print("Reset pedometer steps to Health Connect data: $_realTimeSteps");
           }
         }
 
-        // Đọc dữ liệu calories burned
-        final caloriesBurnedData = await _health.getHealthDataFromTypes(
-          types: [HealthDataType.TOTAL_CALORIES_BURNED],
+        // Đọc dữ liệu khác
+        final healthData = await _health.getHealthDataFromTypes(
+          types: [
+            HealthDataType.TOTAL_CALORIES_BURNED,
+            HealthDataType.ACTIVE_ENERGY_BURNED,
+          ],
           startTime: startDate,
           endTime: endDate,
         );
 
         double caloriesBurned = 0;
-        if (caloriesBurnedData.isNotEmpty) {
-          caloriesBurned = caloriesBurnedData
-              .map((data) => (data.value as NumericHealthValue).numericValue)
-              .reduce((a, b) => a + b)
-              .toDouble();
+        double distance = 0;
+        double activeEnergyBurned = 0;
+
+        for (var data in healthData) {
+          final value = (data.value as NumericHealthValue).numericValue.toDouble();
+          switch (data.type) {
+            case HealthDataType.TOTAL_CALORIES_BURNED:
+              caloriesBurned += value;
+              break;
+            case HealthDataType.ACTIVE_ENERGY_BURNED:
+              activeEnergyBurned += value;
+              break;
+            default:
+              break;
+          }
         }
 
         return {
           "steps": steps,
           "caloriesBurned": caloriesBurned,
+          "distance": distance,
+          "activeEnergyBurned": activeEnergyBurned,
           "error": null,
         };
       } else {
         return {
           "steps": _realTimeSteps,
           "caloriesBurned": 0,
+          "distance": 0,
+          "activeEnergyBurned": 0,
           "error": "Health Connect không khả dụng, sử dụng dữ liệu từ cảm biến.",
         };
       }
@@ -359,6 +404,8 @@ class GGFitService {
       return {
         "steps": _realTimeSteps,
         "caloriesBurned": 0,
+        "distance": 0,
+        "activeEnergyBurned": 0,
         "error": "Đã xảy ra lỗi khi lấy dữ liệu: $e",
       };
     }
@@ -368,27 +415,49 @@ class GGFitService {
 
   void resetSteps() {
     if (_isDisposed) return;
-    _realTimeSteps = 0;
-    _lastReportedSteps = 0;
-    _lastStepTime = null;
-    _lastProcessedDate = null;
-    if (!_stepsController!.isClosed) {
-      _stepsController?.add(_realTimeSteps);
-      print("Steps reset: $_realTimeSteps");
-    }
-    if (!_runningController!.isClosed) {
-      _runningController?.add(false);
-      print("Running status reset");
-    }
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    _fetchStepsFromHealthConnect(startOfDay, now).then((stepsFromHealth) {
+      _realTimeSteps = stepsFromHealth;
+      _initialPedometerSteps = null;
+      _lastReportedSteps = 0;
+      _lastStepTime = null;
+      _lastProcessedDate = now;
+      _isRunning = false;
+      if (!_stepsController!.isClosed) {
+        _stepsController?.add(_realTimeSteps);
+        print("Steps reset to Health Connect value: $_realTimeSteps");
+      }
+      if (!_runningController!.isClosed) {
+        _runningController?.add(false);
+        print("Running status reset");
+      }
+    }).catchError((e) {
+      print("Error resetting steps from Health Connect: $e");
+      _realTimeSteps = 0;
+      _initialPedometerSteps = null;
+      _lastReportedSteps = 0;
+      _lastStepTime = null;
+      _lastProcessedDate = null;
+      _isRunning = false;
+      if (!_stepsController!.isClosed) {
+        _stepsController?.add(_realTimeSteps);
+        print("Steps reset to 0 due to error: $_realTimeSteps");
+      }
+      if (!_runningController!.isClosed) {
+        _runningController?.add(false);
+        print("Running status reset");
+      }
+    });
   }
 
   void dispose() {
     if (_isDisposed) return;
     _stepsController?.close();
     _runningController?.close();
-    resetSteps(); // Đặt lại bước chân khi dispose
+    resetSteps();
     _isInitialized = false;
     _isDisposed = true;
-    print("GGFitService disposed, steps reset to 0");
+    print("GGFitService disposed, steps reset to Health Connect value");
   }
 }
