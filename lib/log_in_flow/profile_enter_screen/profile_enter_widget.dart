@@ -25,6 +25,7 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
   void initState() {
     super.initState();
     _model = ProfileEnterModel();
+    _model.init(context);
   }
 
   @override
@@ -65,11 +66,11 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
                           onPressed: () async {
                             if (_formKey.currentState!.validate() && _model.birthDate != null) {
                               final int age = DateTime.now().year - _model.birthDate!.year;
-                              if (age >= 13 && age <= 100) {
+                              if (age >= _model.minAge! && age <= _model.maxAge!) {
                                 await _model.updateUserProfile(context);
                               } else {
                                 setState(() {
-                                  _ageError = 'Tuổi của bạn phải từ 13 đến 100';
+                                  _ageError = 'Tuổi của bạn phải từ ${_model.minAge!.toInt()} đến ${_model.maxAge!.toInt()}';
                                 });
                               }
                             }
@@ -252,11 +253,10 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
               final int age = DateTime.now().year - pickedDate.year;
               setState(() {
                 _model.birthDate = pickedDate;
-                // Kiểm tra tuổi và cập nhật lỗi nếu có
-                if (age < 13 || age > 100) {
-                  _ageError = 'Tuổi của bạn phải từ 13 đến 100';
+                if (age < _model.minAge! || age > _model.maxAge!) {
+                  _ageError = 'Tuổi của bạn phải từ ${_model.minAge!.toInt()} đến ${_model.maxAge!.toInt()}';
                 } else {
-                  _ageError = null; // Xóa lỗi nếu tuổi hợp lệ
+                  _ageError = null;
                 }
               });
             }
@@ -284,7 +284,7 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
             ),
           ),
         ),
-        if (_ageError != null) // Hiển thị lỗi nếu có
+        if (_ageError != null)
           Padding(
             padding: const EdgeInsets.only(top: 8.0, left: 12.0),
             child: Text(
