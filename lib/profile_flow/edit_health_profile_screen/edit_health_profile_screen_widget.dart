@@ -492,6 +492,7 @@ import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 import '../../flutter_flow/flutter_flow_theme.dart';
+import '../../services/systemconfiguration_service.dart';
 import 'edit_health_profile_screen_model.dart';
 
 class EditHealthProfileScreenWidget extends StatefulWidget {
@@ -508,6 +509,31 @@ class _EditHealthProfileScreenWidgetState
   bool isEdited = false;
   String _tempSelectedValue = '';
   final _formKey = GlobalKey<FormState>();
+  late double minHeight = 100.0; // Mặc định minHeight
+  late double maxHeight = 220.0; // Mặc định maxHeight
+  late double minWeight = 30.0; // Mặc định minWeight
+  late double maxWeight = 250.0; // Mặc định maxWeight
+  final SystemConfigurationService _systemConfigService =
+      SystemConfigurationService();
+  Future<void> _getConfigValuesFromApi() async {
+    try {
+      // Lấy min/max height từ API
+      final responseHeight = await _systemConfigService.getSystemConfigById(2);
+      final heightConfig = responseHeight['data'];
+      minHeight = heightConfig['minValue']?.toDouble() ?? 100.0;
+      maxHeight = heightConfig['maxValue']?.toDouble() ?? 220.0;
+
+      // Lấy min/max weight từ API
+      final responseWeight = await _systemConfigService.getSystemConfigById(3);
+      final weightConfig = responseWeight['data'];
+      minWeight = weightConfig['minValue']?.toDouble() ?? 30.0;
+      maxWeight = weightConfig['maxValue']?.toDouble() ?? 250.0;
+
+      setState(() {}); // Cập nhật UI sau khi lấy dữ liệu
+    } catch (e) {
+      print("❌ Lỗi khi lấy cấu hình: $e");
+    }
+  }
 
   @override
   void initState() {
@@ -517,8 +543,10 @@ class _EditHealthProfileScreenWidgetState
     Future.delayed(Duration.zero, () async {
       await _model.fetchUserProfile();
       await _model.fetchHealthProfile();
+
       await _model.fetchAllergyLevelsData();
       await _model.fetchDiseaseLevelsData();
+      await _getConfigValuesFromApi();
       setState(() {});
     });
   }
@@ -805,8 +833,10 @@ class _EditHealthProfileScreenWidgetState
                   return 'Vui lòng nhập chiều cao';
                 }
                 final height = double.tryParse(val);
-                if (height == null || height < 100 || height > 220) {
-                  return 'Chiều cao phải từ 100-220 cm';
+                if (height == null ||
+                    height < minHeight ||
+                    height > maxHeight) {
+                  return 'Chiều cao phải từ $minHeight - $maxHeight cm';
                 }
                 return null;
               },
@@ -821,6 +851,54 @@ class _EditHealthProfileScreenWidgetState
     );
   }
 
+  // Widget _buildHeightRow(
+  //     String title, String value, Function(String) onChanged) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 10),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(title,
+  //             style:
+  //                 const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+  //         SizedBox(
+  //           width: 150,
+  //           child: TextFormField(
+  //             initialValue: value,
+  //             textAlign: TextAlign.end,
+  //             keyboardType:
+  //                 const TextInputType.numberWithOptions(decimal: true),
+  //             decoration: const InputDecoration(
+  //               border: InputBorder.none,
+  //               hintText: 'Nhập chiều cao (cm)',
+  //               errorStyle: TextStyle(
+  //                 color: Colors.red,
+  //                 fontSize: 12,
+  //                 height: 1.2,
+  //               ),
+  //               errorMaxLines: 2,
+  //               contentPadding: EdgeInsets.symmetric(vertical: 10),
+  //             ),
+  //             validator: (val) {
+  //               if (val == null || val.isEmpty) {
+  //                 return 'Vui lòng nhập chiều cao';
+  //               }
+  //               final height = double.tryParse(val);
+  //               if (height == null || height < 100 || height > 220) {
+  //                 return 'Chiều cao phải từ 100-220 cm';
+  //               }
+  //               return null;
+  //             },
+  //             onChanged: (val) {
+  //               onChanged(val);
+  //               _formKey.currentState?.validate(); // Hiển thị lỗi ngay lập tức
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget _buildWeightRow(
       String title, String value, Function(String) onChanged) {
     return Padding(
@@ -854,8 +932,10 @@ class _EditHealthProfileScreenWidgetState
                   return 'Vui lòng nhập cân nặng';
                 }
                 final weight = double.tryParse(val);
-                if (weight == null || weight < 30 || weight > 250) {
-                  return 'Cân nặng phải từ 30-250 kg';
+                if (weight == null ||
+                    weight < minWeight ||
+                    weight > maxWeight) {
+                  return 'Cân nặng phải từ $minWeight - $maxWeight kg';
                 }
                 return null;
               },
@@ -869,6 +949,55 @@ class _EditHealthProfileScreenWidgetState
       ),
     );
   }
+
+  // Widget _buildWeightRow(
+  //     String title, String value, Function(String) onChanged) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 10),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(title,
+  //             style:
+  //                 const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+  //         SizedBox(
+  //           width: 150,
+  //           child: TextFormField(
+  //             initialValue: value,
+  //             textAlign: TextAlign.end,
+  //             keyboardType:
+  //                 const TextInputType.numberWithOptions(decimal: true),
+  //             decoration: const InputDecoration(
+  //               border: InputBorder.none,
+  //               hintText: 'Nhập cân nặng (kg)',
+  //               errorStyle: TextStyle(
+  //                 color: Colors.red,
+  //                 fontSize: 12,
+  //                 height: 1.2,
+  //               ),
+  //               errorMaxLines: 2,
+  //               contentPadding: EdgeInsets.symmetric(vertical: 10),
+  //             ),
+  //             validator: (val) {
+  //               if (val == null || val.isEmpty) {
+  //                 return 'Vui lòng nhập cân nặng';
+  //               }
+  //               final weight = double.tryParse(val);
+  //               if (weight == null || weight < 30 || weight > 250) {
+  //                 return 'Cân nặng phải từ 30-250 kg';
+  //               }
+  //               return null;
+  //             },
+  //             onChanged: (val) {
+  //               onChanged(val);
+  //               _formKey.currentState?.validate(); // Hiển thị lỗi ngay lập tức
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildAllergySelector(List<Map<String, dynamic>> allergies) {
     return Padding(
