@@ -122,7 +122,11 @@ class _EditPersonalGoalScreenWidgetState
   Widget _buildHeader() {
     bool canUpdate = _model.goalType.isNotEmpty &&
         (_model.goalType == 'Giữ cân' ||
-            (_model.targetWeight != 0 && _model.weightChangeRate.isNotEmpty));
+            (_model.targetWeight != 0 &&
+                _model.weightChangeRate.isNotEmpty &&
+                _model.targetWeight >= minTargetWeight &&
+                _model.targetWeight <=
+                    maxTargetWeight)); // Thêm điều kiện check valid target weight
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
