@@ -13,12 +13,27 @@ class SampleMealPlanWidget extends StatefulWidget {
 }
 
 class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() => Provider.of<SampleMealPlanModel>(context, listen: false).fetchSampleMealPlans());
+
+    // Lắng nghe cuộn để tải thêm
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 &&
+          !Provider.of<SampleMealPlanModel>(context, listen: false).isLoadingMore) {
+        Provider.of<SampleMealPlanModel>(context, listen: false).fetchSampleMealPlans();
+      }
+    });
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +45,10 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header không bị giới hạn bởi Padding
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: theme.primary.withOpacity(0.9), // Chỉ dùng một màu xanh
+              color: theme.primary.withOpacity(0.9),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(16.0),
                 bottomRight: Radius.circular(16.0),
@@ -79,11 +93,10 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 48), // Để cân đối với IconButton bên trái
+                const SizedBox(width: 48),
               ],
             ),
           ),
-          // Phần còn lại vẫn giữ Padding
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
@@ -98,10 +111,8 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
                           decoration: InputDecoration(
                             hintText: 'Tìm kiếm thực đơn...',
                             hintStyle: theme.bodyMedium,
-                            prefixIcon:
-                            const Icon(Icons.search_sharp, color: Colors.grey),
-                            border:
-                            OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            prefixIcon: const Icon(Icons.search_sharp, color: Colors.grey),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             contentPadding: const EdgeInsets.all(16),
                           ),
                           onChanged: model.updateSearchQuery,
@@ -120,13 +131,17 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
                         ? const Center(child: CircularProgressIndicator())
                         : model.filteredMealPlans.isEmpty
                         ? const Center(
-                        child: Text("Không có thực đơn được tìm thấy",
-                            style: TextStyle(fontSize: 16)))
+                        child: Text("Không có thực đơn được tìm thấy", style: TextStyle(fontSize: 16)))
                         : ListView.builder(
+                      controller: _scrollController,
                       padding: const EdgeInsets.only(top: 8),
-                      itemCount: model.filteredMealPlans.length,
-                      itemBuilder: (context, index) =>
-                          _buildMealPlanItem(context, model.filteredMealPlans[index]),
+                      itemCount: model.filteredMealPlans.length + (model.isLoadingMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == model.filteredMealPlans.length) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        return _buildMealPlanItem(context, model.filteredMealPlans[index]);
+                      },
                     ),
                   ),
                 ],
@@ -174,7 +189,7 @@ class _SampleMealPlanWidgetState extends State<SampleMealPlanWidget> {
                         selected: isSelected,
                         onSelected: (selected) {
                           model.updateFilter(selected ? goal : null);
-                          Navigator.pop(context); // Đóng dialog sau khi chọn
+                          Navigator.pop(context);
                         },
                         backgroundColor: Colors.grey[100],
                         selectedColor: FlutterFlowTheme.of(context).primary.withOpacity(0.2),

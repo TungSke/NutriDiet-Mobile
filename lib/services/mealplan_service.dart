@@ -71,16 +71,20 @@ class MealPlanService{
 
   Future<Map<String, dynamic>?> getMealPlanDetailTotals(int mealPlanId) async {
     try {
+      final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
       String endpoint = "api/meal-plan-detail/meal-plan-detail-total/$mealPlanId";
-      final response = await _apiService.get(endpoint);
+      final response = await _apiService.get(endpoint, token: token);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['data']; // Trả về phần "data" chứa totalByMealType và totalByDayNumber
+        return data['data'];
       }
       if (response.statusCode == 404) {
         return null;
       }
+      throw Exception("Unexpected status code: ${response.statusCode}");
     } catch (e) {
+      print("Error in getMealPlanDetailTotals: $e"); // Log lỗi
       return null;
     }
   }
