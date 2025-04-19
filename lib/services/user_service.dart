@@ -306,7 +306,7 @@ class UserService {
         activityLevel,
         dietStyle,
         profileOption,
-        aisuggestion,
+        // aisuggestion,
         allergies,
         diseases
       ].any((e) => e == null)) {
@@ -318,7 +318,7 @@ class UserService {
           height ??= double.tryParse(healthProfile['height']?.toString() ?? '');
           weight ??= double.tryParse(healthProfile['weight']?.toString() ?? '');
           activityLevel ??= healthProfile['activityLevel'] ?? "";
-          aisuggestion ??= healthProfile['aisuggestion'] ?? '';
+          // aisuggestion ??= healthProfile['aisuggestion'] ?? '';
           dietStyle ??= healthProfile['dietStyle'] ?? '';
 
           allergies ??= (healthProfile['allergies'] as List?)
@@ -351,7 +351,7 @@ class UserService {
       if (dietStyle != null) request.fields['DietStyle'] = dietStyle;
       if (profileOption != null)
         request.fields['ProfileOption'] = profileOption;
-      if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
+      // if (aisuggestion != null) request.fields['Aisuggestion'] = aisuggestion;
 
       // Add allergies and diseases if not empty
       if (allergies != null && allergies.isNotEmpty) {

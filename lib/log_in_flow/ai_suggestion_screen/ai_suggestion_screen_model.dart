@@ -8,10 +8,28 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../components/appbar_model.dart';
 import '../../flutter_flow/flutter_flow_model.dart';
 
+class AiSuggestion {
+  final String content;
+  final String type;
+  final String createdAt;
+
+  AiSuggestion(
+      {required this.content, required this.createdAt, required this.type});
+
+  // Phương thức để khởi tạo đối tượng từ dữ liệu JSON
+  factory AiSuggestion.fromJson(Map<String, dynamic> json) {
+    return AiSuggestion(
+        content: json['content'],
+        type: json['type'],
+        createdAt: json['createdAt']);
+  }
+}
+
 class AiSuggestionScreenModel extends FlutterFlowModel<AiSuggestionScreenWidget>
     with ChangeNotifier {
   final UserService _userService = UserService();
   String aisuggestion = '';
+  List<AiSuggestion> aisuggestions = [];
 
   late AppbarModel appbarModel;
 
@@ -23,8 +41,12 @@ class AiSuggestionScreenModel extends FlutterFlowModel<AiSuggestionScreenWidget>
       final response = await _userService.getHealthProfile();
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        aisuggestion = data['data']["aisuggestion"] ?? '';
-        print(data);
+        // Ánh xạ aisuggestions từ dữ liệu JSON
+        aisuggestions = (data['data']['aisuggestions'] as List)
+            .map((item) => AiSuggestion.fromJson(item))
+            .toList();
+
+        print(aisuggestions);
       } else {
         throw Exception('Failed to load target weight');
       }

@@ -264,7 +264,7 @@ class SelectDiseaseScreenModel extends ChangeNotifier {
         activityLevel: activityLevel,
         dietStyle: dietStyle,
         profileOption: profileOption,
-        aisuggestion: "",
+        // aisuggestion: "",
         allergies: allergies,
         diseases: diseases,
       );
