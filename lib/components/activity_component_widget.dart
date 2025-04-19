@@ -935,22 +935,71 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                   item['progressPercentage'];
                               final weightChangeRate = _weightChangeRateMap[
                                   item['weightChangeRate']];
+
                               return GestureDetector(
                                 // Gọi popup khi long press
                                 child: ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   title: Text(
-                                    '$formattedDate - Hoàn thành: $progressPercentage% ',
+                                    formattedDate,
                                     style: GoogleFonts.roboto(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  subtitle: Text(
-                                    '$goalType - Mục tiêu: $targetWeight kg - Mức độ: $weightChangeRate ',
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14,
-                                    ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '$goalType - Mục tiêu: $targetWeight kg - Mức độ: $weightChangeRate ',
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      // Row hiển thị thông tin phần trăm hoàn thành
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Đã hoàn thành",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                            ),
+                                          ),
+                                          Text(
+                                            "$progressPercentage/100 %",
+                                            style: TextStyle(
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                          height:
+                                              8), // Khoảng cách giữa text và progress bar
+                                      // Progress bar trực quan
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: LinearProgressIndicator(
+                                          value: progressPercentage /
+                                              100.0, // Giá trị từ 0.0 đến 1.0
+                                          minHeight: 10,
+                                          backgroundColor: Colors.grey.shade300,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );
