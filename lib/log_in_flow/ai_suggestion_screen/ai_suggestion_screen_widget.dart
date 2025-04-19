@@ -34,12 +34,23 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
     'LuyenTap': 'Luyện tập',
     'LoiSong': 'Lối sống',
   };
-
-  // Hàm fetch dữ liệu
+  List<AiSuggestion> filteredSuggestions = [];
   Future<void> _fetchData() async {
-    await _model.fetchHealthProfile();
+    await _model.fetchHealthProfile(); // Lấy dữ liệu từ API
     setState(() {
-      isLoading = false; // Cập nhật trạng thái khi dữ liệu đã được tải
+      isLoading = false;
+      // Lọc aisuggestions dựa trên selectedCategory
+      if (selectedCategory == 'All') {
+        // Hiển thị chỉ những suggestion có type = 'All'
+        filteredSuggestions = _model.aisuggestions
+            .where((suggestion) => suggestion.type == 'All')
+            .toList();
+      } else {
+        // Hiển thị những suggestion có type tương ứng với selectedCategory
+        filteredSuggestions = _model.aisuggestions
+            .where((suggestion) => suggestion.type == selectedCategory)
+            .toList();
+      }
     });
   }
 
@@ -162,74 +173,70 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
                                             child: Column(
                                               children: [
                                                 Container(
-                                                  decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primary, // Màu nền xanh
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0), // Bo góc cho dropdown
-                                                  ),
-                                                  child: DropdownButton<String>(
-                                                    value: selectedCategory,
-                                                    onChanged:
-                                                        (String? newValue) {
-                                                      setState(() {
-                                                        selectedCategory =
-                                                            newValue!;
-                                                      });
-                                                    },
-                                                    items: <String>[
-                                                      'All',
-                                                      'DinhDuong',
-                                                      'LuyenTap',
-                                                      'LoiSong'
-                                                    ].map<
-                                                            DropdownMenuItem<
-                                                                String>>(
-                                                        (String value) {
-                                                      return DropdownMenuItem<
-                                                          String>(
-                                                        value: value,
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: Text(
-                                                            categoryNames[
-                                                                    value] ??
-                                                                value,
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .white, // Chữ màu trắng
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }).toList(),
-                                                    dropdownColor:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .primary,
-                                                    // Màu nền của menu dropdown
-                                                    style: TextStyle(
-                                                      color: Colors
-                                                          .white, // Chữ trên dropdown button
+                                                    decoration: BoxDecoration(
+                                                      color: FlutterFlowTheme
+                                                              .of(context)
+                                                          .primary, // Màu nền xanh
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0), // Bo góc cho dropdown
                                                     ),
-                                                    iconEnabledColor:
-                                                        Colors.white,
-                                                    // Màu của icon
-                                                    iconSize:
-                                                        24, // Kích thước của icon
-                                                  ),
-                                                ),
+                                                    child:
+                                                        DropdownButton<String>(
+                                                      value: selectedCategory,
+                                                      onChanged:
+                                                          (String? newValue) {
+                                                        setState(() {
+                                                          selectedCategory =
+                                                              newValue!; // Lưu giá trị category đã chọn
+                                                        });
+                                                        _fetchData(); // Fetch lại dữ liệu khi category thay đổi
+                                                      },
+                                                      items: <String>[
+                                                        'All',
+                                                        'DinhDuong',
+                                                        'LuyenTap',
+                                                        'LoiSong'
+                                                      ].map<
+                                                          DropdownMenuItem<
+                                                              String>>(
+                                                        (String value) {
+                                                          return DropdownMenuItem<
+                                                              String>(
+                                                            value: value,
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              child: Text(
+                                                                categoryNames[
+                                                                        value] ??
+                                                                    value,
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ).toList(),
+                                                      dropdownColor:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primary,
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                      iconEnabledColor:
+                                                          Colors.white,
+                                                      iconSize: 24,
+                                                    ))
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
                                       Container(
-                                        width: 500,
+                                        width: double.infinity,
                                         height: 300,
                                         decoration: BoxDecoration(
                                             border: Border.all(
@@ -239,51 +246,85 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
                                             borderRadius:
                                                 BorderRadius.circular(12)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Lời khuyên:",
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Expanded(
-                                                child: SingleChildScrollView(
-                                                  child: MarkdownBody(
-                                                    data: _model.aisuggestion,
-                                                    styleSheet:
-                                                        MarkdownStyleSheet(
-                                                      p: const TextStyle(
-                                                          fontSize: 16),
-                                                      strong: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: ListView.builder(
+                                              itemCount: filteredSuggestions
+                                                  .length, // Sử dụng filteredSuggestions để hiển thị
+                                              itemBuilder: (context, index) {
+                                                final suggestion =
+                                                    filteredSuggestions[index];
+
+                                                // Định dạng 'createdAt' trực tiếp ở đây
+                                                // Định dạng 'createdAt' trực tiếp ở đây
+                                                String formattedDate =
+                                                    DateFormat(
+                                                            'HH:mm dd/MM/yyyy')
+                                                        .format(
+                                                  DateTime.parse(
+                                                      suggestion.createdAt),
+                                                );
+                                                return Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 5.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Lời khuyên:",
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      Text(
+                                                        "Tạo lúc:$formattedDate",
+                                                        style: TextStyle(
+                                                            color: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .primary),
+                                                      ),
+                                                      MarkdownBody(
+                                                        data:
+                                                            suggestion.content,
+                                                        styleSheet:
+                                                            MarkdownStyleSheet(
+                                                          p: const TextStyle(
+                                                              fontSize: 16),
+                                                          strong:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                        ),
+                                                      ),
+                                                      // Text(suggestion.content),
+                                                    ],
                                                   ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                                );
+                                              },
+                                            )),
                                       ),
                                       Text(
                                           "Nếu bạn cảm thấy chưa phù hợp, hãy tạo lại! "),
                                       FFButtonWidget(
                                         onPressed: () async {
                                           setState(() {
-                                            isCreating = true;
+                                            isCreating =
+                                                true; // Đánh dấu là đang tạo lại
                                           });
 
+                                          // Gọi API để tạo lại lời khuyên AI dựa trên category đã chọn
                                           await _model.createAiSuggestion(
                                               selectedCategory);
-                                          await _model.fetchHealthProfile();
+                                          // Gọi lại _fetchData để tải lại dữ liệu và lọc lại danh sách
+                                          await _fetchData();
 
                                           setState(() {
-                                            isCreating = false;
+                                            isCreating =
+                                                false; // Đánh dấu là đã hoàn thành việc tạo lại
                                           });
                                         },
                                         text: isCreating

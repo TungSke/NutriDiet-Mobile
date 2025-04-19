@@ -194,7 +194,7 @@ class SelectAllergyScreenModel extends ChangeNotifier {
         height: height,
         weight: weight,
         activityLevel: activityLevel,
-        aisuggestion: null,
+        // aisuggestion: null,
         allergies: selectedAllergyIds,
         diseases: [],
       );

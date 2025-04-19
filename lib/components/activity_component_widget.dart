@@ -931,6 +931,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                   .format(createdAt);
                               final goalType = _goalTypeMap[item['goalType']];
                               final targetWeight = item['targetWeight'];
+                              final progressPercentage =
+                                  item['progressPercentage'];
                               final weightChangeRate = _weightChangeRateMap[
                                   item['weightChangeRate']];
                               return GestureDetector(
@@ -938,7 +940,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                 child: ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   title: Text(
-                                    formattedDate,
+                                    '$formattedDate - Hoàn thành: $progressPercentage% ',
                                     style: GoogleFonts.roboto(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
