@@ -632,13 +632,16 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                             _buildCalorieColumn(
                               _model.foodCalories.toString(),
                               'Thức ăn',
-                              FontWeight.normal,
+                              FontWeight.bold,
                             ),
                             _buildOperator('='),
                             _buildCalorieColumn(
                               _model.remainingCalories.toString(),
                               'Còn lại',
                               FontWeight.bold,
+                              color: _model.remainingCalories < 0
+                                  ? Colors.red
+                                  : Colors.black,
                             ),
                           ],
                         ),
@@ -702,7 +705,12 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     );
   }
 
-  Widget _buildCalorieColumn(String value, String label, FontWeight weight) {
+  Widget _buildCalorieColumn(
+    String value,
+    String label,
+    FontWeight weight, {
+    Color color = Colors.black, // thêm tham số color với mặc định là đen
+  }) {
     return Column(
       children: [
         Text(
@@ -711,6 +719,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
             fontFamily: 'Figtree',
             fontSize: 20,
             fontWeight: weight,
+            color: color,
           ),
         ),
         Text(
