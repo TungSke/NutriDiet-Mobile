@@ -169,6 +169,31 @@ class MealPlanDetailModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> copyMealPlanDetail(int mealPlanId, int dayNumberFrom, int dayNumberTo, BuildContext context) async {
+    try {
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      final success = await _mealPlanService.copyMealPlanDetail(mealPlanId, dayNumberFrom, dayNumberTo, context);
+      if (success) {
+        await fetchMealPlanById(mealPlanId);
+        errorMessage = null;
+      } else {
+        errorMessage = "Không thể sao chép chi tiết thực đơn";
+      }
+
+      isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      isLoading = false;
+      errorMessage = "Lỗi khi sao chép chi tiết thực đơn: $e";
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> addNewDay(int mealPlanId) async {
     try {
       isLoading = true;

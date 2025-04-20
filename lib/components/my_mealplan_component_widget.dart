@@ -14,6 +14,31 @@ class MyMealPlanScreenWidget extends StatefulWidget {
   @override
   State<MyMealPlanScreenWidget> createState() => _MyMealPlanScreenWidgetState();
 }
+// Painter cho ribbon của thực đơn đang áp dụng
+class RibbonPainter extends CustomPainter {
+  final Color color;
+
+  RibbonPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width - 10, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
 
 class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
     with SingleTickerProviderStateMixin {
@@ -508,7 +533,7 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
     final theme = FlutterFlowTheme.of(context);
     bool isActive = mealPlan.status == 'Active';
 
-    // Màu sắc dựa trên mục tiêu sức khỏe và trạng thái
+    // Màu sắc dựa trên mục tiêu sức khỏe
     Color accentColor;
     IconData goalIcon;
     switch (mealPlan.healthGoal) {
@@ -529,8 +554,23 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
         goalIcon = Icons.help_outline;
     }
 
-    // Màu viền cho trạng thái Active
+    // Màu viền và nền cho trạng thái Active
     Color borderColor = isActive ? theme.primary : accentColor.withOpacity(0.3);
+
+    // Tính ngày kết thúc cho trạng thái Active
+    String dateRangeText = '';
+    if (isActive && mealPlan.startAt != null && mealPlan.duration != null) {
+      try {
+        final startDate = DateTime.parse(mealPlan.startAt!);
+        final endDate = startDate.add(Duration(days: mealPlan.duration! - 1)); // -1 để lấy ngày cuối
+        final dateFormat = DateFormat('dd/MM');
+        dateRangeText = 'Từ ${dateFormat.format(startDate)} đến ${dateFormat.format(endDate)}';
+      } catch (e) {
+        dateRangeText = 'Ngày không xác định';
+      }
+    } else if (isActive) {
+      dateRangeText = 'Ngày không xác định';
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -550,19 +590,31 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
           }
         },
         borderRadius: BorderRadius.circular(16),
+        splashColor: theme.primary.withOpacity(0.2),
+        highlightColor: theme.primary.withOpacity(0.1),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.grey.shade50,
+            gradient: isActive
+                ? LinearGradient(
+              colors: [
+                theme.primary.withOpacity(0.1),
+                Colors.white,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            )
+                : null,
+            color: isActive ? null : Colors.grey.shade50,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: borderColor,
-              width: isActive ? 2 : 1,
+              width: isActive ? 3 : 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withOpacity(isActive ? 0.2 : 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -575,12 +627,10 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Cột thông tin chính
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Tiêu đề
                           Text(
                             mealPlan.planName,
                             style: theme.titleMedium.copyWith(
@@ -592,7 +642,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 8),
-                          // Phụ đề
                           Text(
                             mealPlan.healthGoal ?? 'Không có mục tiêu',
                             style: theme.bodyMedium.copyWith(
@@ -604,7 +653,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
-                          // Thông tin bổ sung
                           Text(
                             isActive
                                 ? 'Đang áp dụng'
@@ -614,12 +662,13 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                               color: isActive
                                   ? theme.primary
                                   : theme.secondaryText.withOpacity(0.7),
+                              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
-                          if (isActive && mealPlan.startAt != null) ...[
+                          if (isActive) ...[
                             const SizedBox(height: 4),
                             Text(
-                              'Từ: ${DateFormat('dd/MM').format(DateTime.parse(mealPlan.startAt!))}',
+                              dateRangeText,
                               style: theme.bodySmall.copyWith(
                                 fontSize: 12,
                                 color: theme.secondaryText.withOpacity(0.7),
@@ -629,7 +678,6 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                         ],
                       ),
                     ),
-                    // Cột biểu tượng
                     Container(
                       width: 48,
                       height: 48,
@@ -637,28 +685,43 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: accentColor.withOpacity(0.1),
+                        boxShadow: isActive
+                            ? [
+                          BoxShadow(
+                            color: theme.primary.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                            : null,
                       ),
                       child: Icon(
                         isActive ? Icons.check_circle : goalIcon,
                         color: isActive ? theme.primary : accentColor,
-                        size: 24,
+                        size: isActive ? 28 : 24,
                       ),
                     ),
                   ],
                 ),
               ),
-              // Badge số ngày
               Positioned(
                 top: 8,
                 right: 36,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: isActive ? theme.primary : accentColor,
+                    gradient: isActive
+                        ? LinearGradient(
+                      colors: [theme.primary, Colors.green.shade400],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                        : null,
+                    color: isActive ? null : accentColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    "${mealPlan.duration ?? 0} ngày",
+                    isActive ? 'Đang áp dụng' : '${mealPlan.duration ?? 0} ngày',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -667,7 +730,25 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                   ),
                 ),
               ),
-              // Điểm nhấn viền trái
+              if (isActive)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: CustomPaint(
+                    painter: RibbonPainter(color: theme.primary),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      child: const Text(
+                        'Áp dụng',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
                 left: 0,
                 top: 0,
@@ -683,21 +764,43 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                   ),
                 ),
               ),
-              // Nút ba chấm
               Positioned(
                 top: 8,
                 right: 8,
                 child: PopupMenuButton<String>(
+                  tooltip: 'Tùy chọn',
                   icon: Icon(Icons.more_vert, color: theme.primary, size: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  color: Colors.white,
+                  elevation: 8,
                   onSelected: (value) {
                     if (value == 'delete') {
                       _showDeleteConfirmation(mealPlan);
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'delete',
-                      child: Text('Xóa'),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete,
+                            color: Colors.redAccent,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Xóa',
+                            style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -723,24 +826,45 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
           ),
           child: AlertDialog(
             backgroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation: 8,
-            title: const Text(
-              'Xác nhận xóa',
-              style: TextStyle(
-                color: Colors.redAccent,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(
+                color: Colors.redAccent.withOpacity(0.3),
+                width: 1,
               ),
             ),
+            elevation: 8,
+            title: Row(
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.redAccent,
+                  size: 28,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Xác nhận xóa',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
             content: Text(
-              'Bạn có chắc muốn xóa "${mealPlan.planName}" không?',
+              'Bạn có chắc muốn xóa "${mealPlan.planName}" không? Hành động này không thể hoàn tác.',
               style: const TextStyle(fontSize: 16, color: Colors.black87),
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
                 child: Text(
                   'Hủy',
                   style: TextStyle(
@@ -750,28 +874,32 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
                   ),
                 ),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: () async {
                   Navigator.pop(context);
-                  final success =
-                      await _model.deleteMealPlan(mealPlan.mealPlanId!);
+                  final success = await _model.deleteMealPlan(mealPlan.mealPlanId!);
                   if (mounted) {
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
                         content: Text(
-                          success
-                              ? 'Xóa Meal Plan thành công'
-                              : 'Lỗi khi xóa Meal Plan',
+                          success ? 'Xóa thực đơn thành công' : 'Lỗi khi xóa thực đơn',
                         ),
                         backgroundColor: success ? Colors.green : Colors.red,
                       ),
                     );
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
                 child: const Text(
                   'Xóa',
                   style: TextStyle(
-                    color: Colors.redAccent,
+                    color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),

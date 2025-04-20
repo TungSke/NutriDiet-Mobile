@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../flutter_flow/flutter_flow_theme.dart';
@@ -239,6 +241,305 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     );
   }
 
+  void _showCopyMealPlanDialog() {
+    final activeDays = _model.getActiveDays();
+    int? dayNumberFrom = activeDays.contains(selectedDay) ? selectedDay : activeDays.isNotEmpty ? activeDays.first : null;
+    int? dayNumberTo = _model.getTotalActiveDays() + 1; // Mặc định là ngày mới
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return ScaleTransition(
+          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          ),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 8,
+            contentPadding: const EdgeInsets.all(24),
+            title: Text(
+              'Sao chép thực đơn theo ngày',
+              style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                color: FlutterFlowTheme.of(context).primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            content: StatefulBuilder(
+              builder: (context, setDialogState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<int>(
+                      value: dayNumberFrom,
+                      decoration: InputDecoration(
+                        labelText: 'Sao chép từ ngày',
+                        labelStyle: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      dropdownColor: Colors.white,
+                      style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                      items: activeDays.isNotEmpty
+                          ? activeDays
+                          .map((day) => DropdownMenuItem(
+                        value: day,
+                        child: Text('Ngày $day'),
+                      ))
+                          .toList()
+                          : [
+                        const DropdownMenuItem(
+                          value: null,
+                          child: Text('Không có ngày nào'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setDialogState(() {
+                          dayNumberFrom = value;
+                          // Nếu ngày đích trùng với ngày nguồn, đặt lại ngày đích
+                          if (dayNumberTo == value) {
+                            dayNumberTo = _model.getTotalActiveDays() + 1;
+                          }
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<int>(
+                      value: dayNumberTo,
+                      decoration: InputDecoration(
+                        labelText: 'Sao chép đến ngày',
+                        labelStyle: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      dropdownColor: Colors.white,
+                      style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                      items: List.generate(_model.getTotalActiveDays() + 1, (index) => index + 1)
+                          .map((day) => DropdownMenuItem(
+                        value: day,
+                        enabled: day != dayNumberFrom, // Vô hiệu hóa ngày trùng với ngày nguồn
+                        child: Text(
+                          'Ngày $day',
+                          style: TextStyle(
+                            color: day == dayNumberFrom ? Colors.grey : FlutterFlowTheme.of(context).primary,
+                          ),
+                        ),
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        setDialogState(() {
+                          dayNumberTo = value;
+                        });
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Hủy',
+                  style: TextStyle(
+                    color: FlutterFlowTheme.of(context).primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (dayNumberFrom == null || dayNumberTo == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Vui lòng chọn cả ngày nguồn và ngày đích'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Hiển thị loading dialog
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (dialogContext) {
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  );
+
+                  try {
+                    print('Bắt đầu sao chép: mealPlanId=$widget.mealPlanId, from=$dayNumberFrom, to=$dayNumberTo');
+                    final success = await _model
+                        .copyMealPlanDetail(
+                      widget.mealPlanId,
+                      dayNumberFrom!,
+                      dayNumberTo!,
+                      context,
+                    )
+                        .timeout(const Duration(seconds: 30), onTimeout: () {
+                      throw TimeoutException('Sao chép thực đơn quá thời gian chờ');
+                    });
+
+                    print('Kết quả sao chép: $success');
+
+                    // Đóng loading dialog
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+
+                    if (success && mounted) {
+                      setState(() {
+                        selectedDay = dayNumberTo!;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Sao chép ngày thực đơn thành công'),
+                          backgroundColor: Colors.green,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } else if (mounted) {
+                      // Kiểm tra lỗi 404 khi success == false
+                      final errorMessage = _model.errorMessage ?? 'Lỗi khi sao chép ngày thực đơn';
+                      if (errorMessage.contains('No MealPlanDetails')) {
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            return AlertDialog(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              elevation: 8,
+                              contentPadding: const EdgeInsets.all(24),
+                              title: Text(
+                                'Không thể sao chép',
+                                style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              content: Text(
+                                'Không thể sao chép đến ngày $dayNumberTo vì thực đơn ở ngày $dayNumberFrom không có món ăn nào.',
+                                style: const TextStyle(color: Colors.black87, fontSize: 16),
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: FlutterFlowTheme.of(context).primary,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  child: const Text(
+                                    'OK',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(errorMessage),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    // Đóng loading dialog và dialog chính
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+
+                    if (mounted) {
+                      // Kiểm tra lỗi 404 trong ngoại lệ
+                      if (e.toString().contains('No MealPlanDetails')) {
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            return AlertDialog(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              elevation: 8,
+                              contentPadding: const EdgeInsets.all(24),
+                              title: Text(
+                                'Không thể sao chép',
+                                style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              content: Text(
+                                'Không thể sao chép đến ngày $dayNumberTo vì thực đơn ở ngày $dayNumberFrom không có món ăn nào.',
+                                style: const TextStyle(color: Colors.black87, fontSize: 16),
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: FlutterFlowTheme.of(context).primary,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  child: const Text(
+                                    'OK',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Lỗi khi sao chép ngày thực đơn: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: FlutterFlowTheme.of(context).primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text(
+                  'Sao chép',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -284,42 +585,42 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                 ),
               ),
             ),
-            body: Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildMealPlanCard(mealPLAN),
-                        const SizedBox(height: 12),
-                        _buildDaySelector(),
-                        const SizedBox(height: 12),
-                        _buildNutrientProgress(),
-                        const SizedBox(height: 12),
-                        const SizedBox(height: 12),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: MealPlanDetailModel.mealTypes.length,
-                            itemBuilder: (context, index) {
-                              final mealType = MealPlanDetailModel.mealTypes[index];
-                              final meals = _model.getMealsForDay(selectedDay)[mealType] ?? [];
-                              return _buildMealCard(mealType, meals);
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildActionButtons(),
-                      ],
+            body: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildMealPlanCard(mealPLAN),
+                  const SizedBox(height: 12),
+                  _buildDaySelector(),
+                  const SizedBox(height: 12),
+                  _buildNutrientProgress(),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: MealPlanDetailModel.mealTypes.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index < MealPlanDetailModel.mealTypes.length) {
+                          // Hiển thị MealCard
+                          final mealType = MealPlanDetailModel.mealTypes[index];
+                          final meals = _model.getMealsForDay(selectedDay)[mealType] ?? [];
+                          return _buildMealCard(mealType, meals);
+                        } else {
+                          // Hiển thị ActionButtons ở cuối danh sách
+                          return Container(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: _buildActionButtons(),
+                          );
+                        }
+                      },
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -743,133 +1044,156 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
     switch (widget.source) {
       case MealPlanSource.myMealPlan:
         final isActive = _model.mealPlan?.status == 'Active';
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isActive ? Colors.red : FlutterFlowTheme.of(context).primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () async {
-              try {
-                final success = await _model.applyMealPlan(widget.mealPlanId);
-                if (!mounted) return;
-                if (success) {
-                  final isActive = _model.mealPlan?.status == 'Active';
-                  showGeneralDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-                    pageBuilder: (context, animation, secondaryAnimation) {
-                      return ScaleTransition(
-                        scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                          CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-                        ),
-                        child: AlertDialog(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          elevation: 8,
-                          contentPadding: const EdgeInsets.all(24),
-                          title: Text(
-                            isActive ? "Thực đơn đang được áp dụng" : "Hủy áp dụng thành công",
-                            style: FlutterFlowTheme.of(context).titleLarge.copyWith(
-                              color: FlutterFlowTheme.of(context).primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
+        return Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isActive ? Colors.red : FlutterFlowTheme.of(context).primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () async {
+                  // Existing apply/hide apply logic remains unchanged
+                  try {
+                    final success = await _model.applyMealPlan(widget.mealPlanId);
+                    if (!mounted) return;
+                    if (success) {
+                      final isActive = _model.mealPlan?.status == 'Active';
+                      showGeneralDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                        pageBuilder: (context, animation, secondaryAnimation) {
+                          return ScaleTransition(
+                            scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                              CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
                             ),
-                          ),
-                          content: Text(
-                            isActive
-                                ? "Thực đơn đã được áp dụng thành công."
-                                : "Thực đơn đã được hủy áp dụng thành công.",
-                            style: TextStyle(color: Colors.black87, fontSize: 16),
-                          ),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () => Navigator.pop(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: FlutterFlowTheme.of(context).primary,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            child: AlertDialog(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              elevation: 8,
+                              contentPadding: const EdgeInsets.all(24),
+                              title: Text(
+                                isActive ? "Thực đơn đang được áp dụng" : "Hủy áp dụng thành công",
+                                style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
                               ),
-                              child: const Text(
-                                "OK",
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                              content: Text(
+                                isActive
+                                    ? "Thực đơn đã được áp dụng thành công."
+                                    : "Thực đơn đã được hủy áp dụng thành công.",
+                                style: TextStyle(color: Colors.black87, fontSize: 16),
                               ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: FlutterFlowTheme.of(context).primary,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  child: const Text(
+                                    "OK",
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
-                    },
-                  );
-                } else {
-                  final errorMessage = _model.errorMessage ?? 'Lỗi khi áp dụng/hủy áp dụng thực đơn';
-                  if (errorMessage.contains("Bạn đã có một thực đơn đang được áp dụng")) {
-                    showGeneralDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-                      pageBuilder: (context, animation, secondaryAnimation) {
-                        return ScaleTransition(
-                          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-                          ),
-                          child: AlertDialog(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            elevation: 8,
-                            contentPadding: const EdgeInsets.all(24),
-                            title: Text(
-                              "Thông báo",
-                              style: FlutterFlowTheme.of(context).titleLarge.copyWith(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
+                    } else {
+                      final errorMessage = _model.errorMessage ?? 'Lỗi khi áp dụng/hủy áp dụng thực đơn';
+                      if (errorMessage.contains("Bạn đã có một thực đơn đang được áp dụng")) {
+                        showGeneralDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                          pageBuilder: (context, animation, secondaryAnimation) {
+                            return ScaleTransition(
+                              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                                CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
                               ),
-                            ),
-                            content: const Text(
-                              "Bạn đang có thực đơn khác được áp dụng",
-                              style: TextStyle(color: Colors.black87, fontSize: 16),
-                            ),
-                            actions: [
-                              ElevatedButton(
-                                onPressed: () => Navigator.pop(context),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              child: AlertDialog(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                elevation: 8,
+                                contentPadding: const EdgeInsets.all(24),
+                                title: Text(
+                                  "Thông báo",
+                                  style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
                                 ),
-                                child: const Text(
-                                  "OK",
-                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                content: const Text(
+                                  "Bạn đang có thực đơn khác được áp dụng",
+                                  style: TextStyle(color: Colors.black87, fontSize: 16),
                                 ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                    child: const Text(
+                                      "OK",
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            );
+                          },
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(errorMessage),
+                            backgroundColor: Colors.red,
                           ),
                         );
-                      },
-                    );
-                  } else {
+                      }
+                    }
+                  } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(errorMessage),
+                        content: Text("Lỗi không xác định: $e"),
                         backgroundColor: Colors.red,
                       ),
                     );
                   }
-                }
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Lỗi không xác định: $e"),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            child: Text(
-              isActive ? "HỦY ÁP DỤNG THỰC ĐƠN" : "ÁP DỤNG THỰC ĐƠN",
-              style: const TextStyle(color: Colors.white),
+                },
+                child: Text(
+                  isActive ? "HỦY ÁP DỤNG THỰC ĐƠN" : "ÁP DỤNG THỰC ĐƠN",
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: _showCopyMealPlanDialog,
+                child: Text(
+                  "SAO CHÉP NGÀY",
+                  style: TextStyle(
+                    color: FlutterFlowTheme.of(context).primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       case MealPlanSource.sampleMealPlan:
         return SizedBox(
