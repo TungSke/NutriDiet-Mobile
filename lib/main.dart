@@ -1,7 +1,5 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
 
-import 'dart:io';
-
 import 'package:diet_plan_app/services/models/health_profile_provider.dart';
 import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,13 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
+
+import 'firebase_options.dart'; // Tùy chọn Firebase (tự động tạo khi cấu hình Firebase)
 import 'flutter_flow/flutter_flow_util.dart';
 import 'meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
-import 'firebase_options.dart'; // Tùy chọn Firebase (tự động tạo khi cấu hình Firebase)
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,8 +36,8 @@ void main() async {
       version: "v15.0",
     );
   }
-  runApp(
-    MultiProvider(
+  runApp(ShowCaseWidget(
+    builder: (context) => MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => appState),
         ChangeNotifierProvider(create: (context) => PersonalGoalProvider()),
@@ -48,9 +46,8 @@ void main() async {
       ],
       child: const MyApp(),
     ),
-  );
+  ));
 }
-
 
 Future<void> setupPermissions() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -83,7 +80,7 @@ Future<void> setupPermissions() async {
   // Yêu cầu quyền Activity Recognition
   if (defaultTargetPlatform == TargetPlatform.android) {
     PermissionStatus activityRecognitionStatus =
-    await Permission.activityRecognition.request();
+        await Permission.activityRecognition.request();
     if (!activityRecognitionStatus.isGranted) {
       print("Quyền Activity Recognition không được cấp.");
     }
@@ -94,7 +91,6 @@ Future<void> setupPermissions() async {
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Nhận thông báo khi ở chế độ nền: ${message.notification?.title}");
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -120,8 +116,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void setThemeMode(ThemeMode mode) => safeSetState(() {
-    _themeMode = mode;
-  });
+        _themeMode = mode;
+      });
 
   @override
   Widget build(BuildContext context) {

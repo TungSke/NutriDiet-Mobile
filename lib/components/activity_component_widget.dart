@@ -11,6 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart'; // Để format ngày tháng
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../flutter_flow/flutter_flow_model.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
@@ -61,6 +63,14 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     }
   }
 
+  final GlobalKey _updateWeight = GlobalKey();
+
+  final GlobalKey _hisWeight = GlobalKey();
+  final GlobalKey _hisGoal = GlobalKey();
+  final GlobalKey _chartWeight = GlobalKey();
+  final GlobalKey _chartGoal = GlobalKey();
+  final GlobalKey _updloadImage = GlobalKey();
+  final GlobalKey _description = GlobalKey();
   final animationsMap = <String, AnimationInfo>{};
 
   Future<void> _uploadImage(int profileId) async {
@@ -312,6 +322,23 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     }
   }
 
+  Future<void> _checkShowcaseStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final showcaseShown = prefs.getBool('showcase_shown_1') ?? false;
+    if (!showcaseShown) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        ShowCaseWidget.of(context).startShowCase([
+          _updateWeight,
+          _hisWeight,
+          _updloadImage,
+          _hisGoal,
+        ]);
+        prefs.setBool(
+            'showcase_shown_1', true); // Đánh dấu showcase đã hiển thị
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -322,7 +349,16 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     // Gọi API lấy lịch sử cân nặng
     _fetchWeightHistory();
     _fetchPersonalGoalHistory();
+    _checkShowcaseStatus();
     // Thêm animation cho tiêu đề
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   ShowCaseWidget.of(context).startShowCase([
+    //     _updateWeight,
+    //     _hisWeight,
+    //     _updloadImage,
+    //     _hisGoal,
+    //   ]);
+    // });
     animationsMap.addAll({
       'textOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
@@ -464,7 +500,6 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Thông tin người dùng
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -587,18 +622,26 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                 ),
                               ],
                             ),
-                            FloatingActionButton(
-                              onPressed: () {
-                                _showBottomSheet(context);
-                              },
-                              backgroundColor: Colors.green,
-                              elevation: 4.0,
-                              shape: const CircleBorder(),
-                              mini: true,
-                              heroTag: null,
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
+                            // Thông tin người dùng
+                            Showcase(
+                              key: _updateWeight,
+                              targetShapeBorder: const CircleBorder(),
+                              overlayOpacity: 0.5,
+                              description:
+                                  'Cập nhật cân nặng thường xuyên ở đây.',
+                              child: FloatingActionButton(
+                                onPressed: () {
+                                  _showBottomSheet(context);
+                                },
+                                backgroundColor: Colors.green,
+                                elevation: 4.0,
+                                shape: const CircleBorder(),
+                                mini: true,
+                                heroTag: null,
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],
@@ -841,8 +884,10 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         if (_weightHistory.isNotEmpty)
                           // Dùng Column + map để hiển thị nhanh
                           Column(
-                            children: _weightHistory.map((item) {
-                              // Parse ngày
+                            children:
+                                _weightHistory.asMap().entries.map((entry) {
+                              int index = entry.key;
+                              var item = entry.value;
                               final date = DateTime.parse(item['date']);
                               // Format ngày tháng bằng tiếng Việt
 
@@ -851,7 +896,81 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                   .format(date);
                               final weight = item['value'];
                               final imageUrl = item['imageUrl'];
-
+                              if (index == 0) {
+                                return Showcase(
+                                  key: _hisWeight,
+                                  // The key for showcasing
+                                  enableAutoScroll: true,
+                                  overlayOpacity: 0.5,
+                                  description:
+                                      'Đây là lịch sử cân nặng của bạn',
+                                  child: GestureDetector(
+                                    onLongPress: () => _showEntryMenu(item),
+                                    // Show popup on long press
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(
+                                        formattedDate,
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        '$weight kg',
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      trailing: imageUrl != null
+                                          ? GestureDetector(
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) => Dialog(
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: InteractiveViewer(
+                                                        child: Image.network(
+                                                          imageUrl,
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Image.network(
+                                                imageUrl,
+                                                width: 40,
+                                                height: 40,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            )
+                                          : Showcase(
+                                              key: _updloadImage,
+                                              enableAutoScroll: true,
+                                              overlayOpacity: 0.5,
+                                              targetShapeBorder:
+                                                  const CircleBorder(),
+                                              description:
+                                                  'Hãy đánh dấu cột mốc đã đạt được bằng việc tải ảnh ',
+                                              child: IconButton(
+                                                icon: const Icon(
+                                                    Icons.cloud_upload),
+                                                onPressed: () async {
+                                                  // Upload image when icon is pressed
+                                                  await _uploadImage(
+                                                      item['profileId']);
+                                                },
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                );
+                              }
                               return GestureDetector(
                                 onLongPress: () => _showEntryMenu(
                                     item), // Gọi popup khi long press
@@ -919,13 +1038,18 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                         if (_personalGoalHistory.isEmpty)
                           const Text('Chưa có dữ liệu.'),
                         if (_personalGoalHistory.isNotEmpty)
-                          // Dùng Column + map để hiển thị nhanh
+                          // Use Column + map to display items quickly
                           Column(
-                            children: _personalGoalHistory.map((item) {
-                              // Parse ngày
+                            children: _personalGoalHistory
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                              int index = entry.key;
+                              var item = entry.value;
+
+                              // Parse date
                               final createdAt =
                                   DateTime.parse(item['startDate']);
-                              // Format ngày tháng bằng tiếng Việt
                               final formattedDate = DateFormat(
                                       "EEEE, dd 'thg' M, yyyy - HH:mm", "vi_VN")
                                   .format(createdAt);
@@ -936,8 +1060,88 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                               final weightChangeRate = _weightChangeRateMap[
                                   item['weightChangeRate']];
 
+                              // Wrap the first item in the Showcase widget
+                              if (index == 0) {
+                                return Showcase(
+                                  key: _hisGoal,
+                                  enableAutoScroll: true,
+                                  overlayOpacity: 0.5,
+                                  description:
+                                      'Đây là lịch sử mục tiêu của bạn',
+                                  child: GestureDetector(
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(
+                                        formattedDate,
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '$goalType - Mục tiêu: $targetWeight kg - Mức độ: $weightChangeRate ',
+                                            style: GoogleFonts.roboto(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          // Row to display completion percentage
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "Đã hoàn thành",
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primary,
+                                                ),
+                                              ),
+                                              Text(
+                                                "$progressPercentage/100 %",
+                                                style: TextStyle(
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primary,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                              height:
+                                                  8), // Space between text and progress bar
+                                          // Progress bar
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: LinearProgressIndicator(
+                                              value: progressPercentage /
+                                                  100.0, // Value from 0.0 to 1.0
+                                              minHeight: 10,
+                                              backgroundColor:
+                                                  Colors.grey.shade300,
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              // For other items, display normally without Showcase
                               return GestureDetector(
-                                // Gọi popup khi long press
                                 child: ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   title: Text(
@@ -958,7 +1162,6 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                         ),
                                       ),
                                       SizedBox(height: 8),
-                                      // Row hiển thị thông tin phần trăm hoàn thành
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -984,15 +1187,11 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(
-                                          height:
-                                              8), // Khoảng cách giữa text và progress bar
-                                      // Progress bar trực quan
+                                      const SizedBox(height: 8),
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
                                         child: LinearProgressIndicator(
-                                          value: progressPercentage /
-                                              100.0, // Giá trị từ 0.0 đến 1.0
+                                          value: progressPercentage / 100.0,
                                           minHeight: 10,
                                           backgroundColor: Colors.grey.shade300,
                                           color: FlutterFlowTheme.of(context)
