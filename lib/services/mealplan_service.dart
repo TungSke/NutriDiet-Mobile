@@ -450,4 +450,54 @@ class MealPlanService{
     }
   }
 
+  Future<List<MealPlanDetail>> getMealPlanDetailByDayNumber(
+      int mealPlanId, int dayNumber, BuildContext context) async {
+    final token = await _apiService.getAccessToken(context);
+    if (token == null) {
+      throw Exception('No access token found');
+    }
+
+    final response = await _apiService.get(
+      'api/meal-plan/$mealPlanId/$dayNumber',
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> detailsJson = data['data'] ?? [];
+      return detailsJson
+          .map((json) => MealPlanDetail.fromJson(json, mealPlanId))
+          .toList();
+    } else if (response.statusCode == 404) {
+      return [];
+    } else {
+      throw Exception(
+          'Lỗi lấy chi tiết thực đơn: ${response.statusCode} - ${response.body}');
+    }
+  }
+
+  Future<bool> copyMealPlanDetail(
+      int mealPlanId, int dayNumberFrom, int dayNumberTo, BuildContext context) async {
+    final token = await _apiService.getAccessToken(context);
+    if (token == null) {
+      throw Exception('No access token found');
+    }
+
+    final response = await _apiService.post(
+      'api/meal-plan-detail/copy/$mealPlanId',
+      body: {
+        'dayNumberFrom': dayNumberFrom,
+        'dayNumberTo': dayNumberTo,
+      },
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception(
+          'Lỗi sao chép chi tiết thực đơn: ${response.statusCode} - ${response.body}');
+    }
+  }
+
 }
