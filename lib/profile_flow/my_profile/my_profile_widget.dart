@@ -493,11 +493,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Chiều cao',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
+                                    Expanded(
+                                      child: Text(
+                                        'Chiều cao',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -514,11 +516,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Cân nặng',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
+                                    Expanded(
+                                      child: Text(
+                                        'Cân nặng',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -535,11 +539,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Tần suất vận động',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
+                                    Expanded(
+                                      child: Text(
+                                        'Tần suất vận động',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -556,11 +562,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Thói quen ăn uống',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
+                                    Expanded(
+                                      child: Text(
+                                        'Thói quen ăn uống',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -645,11 +653,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "Mục tiêu sức khỏe",
-                              style: GoogleFonts.lato(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Text(
+                                "Mục tiêu sức khỏe",
+                                style: GoogleFonts.lato(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             GestureDetector(
@@ -711,11 +721,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Mục tiêu (gần đây)',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
+                                    Expanded(
+                                      child: Text(
+                                        'Mục tiêu (gần đây)',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -732,11 +744,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Mục tiêu cân nặng (gần đây)',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
+                                    Expanded(
+                                      child: Text(
+                                        'Mục tiêu cân nặng (gần đây)',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -753,11 +767,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Mức độ',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
+                                    Expanded(
+                                      child: Text(
+                                        'Mức độ',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -803,11 +819,13 @@ class _MyProfileWidgetState extends State<MyProfileWidget>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "Dinh dưỡng cần nạp mỗi ngày",
-                              style: GoogleFonts.lato(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Text(
+                                "Dinh dưỡng cần nạp mỗi ngày",
+                                style: GoogleFonts.lato(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             GestureDetector(

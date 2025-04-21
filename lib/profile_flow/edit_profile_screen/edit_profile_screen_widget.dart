@@ -90,9 +90,11 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
             },
             child: Icon(Icons.arrow_back, size: 28),
           ),
-          Text(
-            'Chỉnh sửa hồ sơ',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Flexible(
+            child: Text(
+              'Chỉnh sửa hồ sơ',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ),
           InkWell(
             onTap: isEdited &&
@@ -240,8 +242,11 @@ class _EditProfileScreenWidgetState extends State<EditProfileScreenWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Flexible(
+                child: Text(title,
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
               SizedBox(
                 width: 150,
                 child: TextFormField(

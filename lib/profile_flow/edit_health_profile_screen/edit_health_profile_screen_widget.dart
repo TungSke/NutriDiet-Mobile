@@ -692,9 +692,11 @@ class _EditHealthProfileScreenWidgetState
             },
             child: const Icon(Icons.arrow_back, size: 28),
           ),
-          const Text(
-            'Chỉnh sửa hồ sơ sức khỏe',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Flexible(
+            child: const Text(
+              'Chỉnh sửa hồ sơ sức khỏe',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ),
           // InkWell(
           //   onTap: isEdited && (_formKey.currentState?.validate() ?? false)
@@ -807,9 +809,11 @@ class _EditHealthProfileScreenWidgetState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Flexible(
+            child: Text(title,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
           SizedBox(
             width: 150,
             child: TextFormField(
@@ -906,9 +910,11 @@ class _EditHealthProfileScreenWidgetState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Flexible(
+            child: Text(title,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
           SizedBox(
             width: 150,
             child: TextFormField(
@@ -1142,9 +1148,11 @@ class _EditHealthProfileScreenWidgetState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Flexible(
+            child: Text(title,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
           InkWell(
             onTap: () =>
                 _showCupertinoPicker(title, options, value, onSelected),

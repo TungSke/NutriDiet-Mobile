@@ -314,7 +314,7 @@ class _IngredientAvoidScreenWidgetState
                                             ),
                                           ),
 
-                                          // FFButtonWidget(
+                                          // FFButonWidget(
                                           //   onPressed: () async {
                                           //     if (!isPremium) {
                                           //       await _showPremiumRequiredDialog();
