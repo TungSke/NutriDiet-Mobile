@@ -173,29 +173,45 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          title: const Text('Cảnh báo'),
-                          content: const Text(
+                          title: Text(
+                            'Cảnh báo',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orangeAccent,
+                            ),
+                          ),
+                          content: Text(
                             'Đã vượt lượng Calories mục tiêu. Bạn có chắc muốn thêm?',
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.black, // màu chữ
+                              child: Text(
+                                'Hủy',
+                                style: TextStyle(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                ),
                               ),
-                              child: const Text('Hủy'),
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                foregroundColor: primaryColor,
+                                foregroundColor:
+                                    FlutterFlowTheme.of(context).primary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
-                                  side: BorderSide(color: primaryColor),
+                                  side: BorderSide(
+                                      color:
+                                          FlutterFlowTheme.of(context).primary),
                                 ),
                               ),
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Đồng ý'),
+                              child: Text(
+                                'Đồng ý',
+                                style: TextStyle(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -216,24 +232,45 @@ class _MealLogListFoodWidgetState extends State<MealLogListFoodWidget> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5),
                             ),
-                            title: const Text('Cảnh báo'),
-                            content: Text(msg),
+                            title: Text(
+                              'Cảnh báo',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orangeAccent,
+                              ),
+                            ),
+                            content: Text(
+                              msg,
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Hủy'),
+                                child: Text(
+                                  'Hủy',
+                                  style: TextStyle(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                  ),
+                                ),
                               ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
-                                  foregroundColor: primaryColor,
+                                  foregroundColor:
+                                      FlutterFlowTheme.of(context).primary,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5),
-                                    side: BorderSide(color: primaryColor),
+                                    side: BorderSide(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary),
                                   ),
                                 ),
                                 onPressed: () => Navigator.pop(context, true),
-                                child: const Text('Đồng ý'),
+                                child: Text(
+                                  'Đồng ý',
+                                  style: TextStyle(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                  ),
+                                ),
                               ),
                             ],
                           ),

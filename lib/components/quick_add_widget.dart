@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:diet_plan_app/components/barcode_scanner_widget.dart';
+import 'package:diet_plan_app/flutter_flow/flutter_flow_theme.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:diet_plan_app/services/food_service.dart';
 import 'package:diet_plan_app/services/meallog_service.dart';
@@ -31,7 +32,8 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     'Snacks'
   ];
   late String _selectedMeal;
-
+  File? _scannedImage;
+  bool _isLoadingImage = false;
   final TextEditingController _caloriesController = TextEditingController();
   final TextEditingController _fatController = TextEditingController();
   final TextEditingController _carbsController = TextEditingController();
@@ -83,8 +85,8 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     final int fats = int.tryParse(_fatController.text) ?? 0;
     final int carbs = int.tryParse(_carbsController.text) ?? 0;
     final int protein = int.tryParse(_proteinController.text) ?? 0;
+    final int finalCalories = _typedCalories;
 
-    int finalCalories = _typedCalories;
     if (finalCalories == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Calories không được để trống!')),
@@ -101,25 +103,47 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       final bool? confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Cảnh báo'),
-          content: const Text(
+          title: Text(
+            'Cảnh báo',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.orangeAccent,
+            ),
+          ),
+          content: Text(
             'Đã vượt lượng Calories mục tiêu. Bạn có chắc chắn muốn thêm?',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Hủy'),
+              child: Text(
+                'Hủy',
+                style: TextStyle(
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+              ),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: FlutterFlowTheme.of(context).primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  side: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                ),
+              ),
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Đồng ý'),
+              child: Text(
+                'Đồng ý',
+                style: TextStyle(
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+              ),
             ),
           ],
         ),
       );
-      if (confirm != true) {
-        return;
-      }
+      if (confirm != true) return;
     }
 
     final success = await _mealLogService.quickAddMeal(
@@ -130,6 +154,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       carbohydrates: carbs,
       fats: fats,
       protein: protein,
+      imageFile: _scannedImage, // thêm field ảnh
     );
 
     if (success) {
@@ -159,58 +184,52 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
-  /// Hàm _onAddImage sẽ mở file picker để người dùng chọn ảnh,
-  /// sau đó gọi FoodService.scanFoodImage để xử lý và lấy dữ liệu trả về từ AI,
-  /// cuối cùng cập nhật các trường calories, fat, carbs, protein và foodName.
   Future<void> _onAddImage() async {
-    final ImagePicker picker = ImagePicker();
+    final picker = ImagePicker();
     final XFile? pickedFile =
         await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile == null) return; // Người dùng hủy chọn ảnh
+    if (pickedFile == null) return;
 
     final File imageFile = File(pickedFile.path);
+    setState(() {
+      _scannedImage = imageFile;
+      _isLoadingImage = true;
+    });
+
     try {
-      FoodService foodService = FoodService();
-      final result = await foodService.scanFoodImage(
-          imageFile: imageFile, context: context);
-      if (result != null) {
-        // API trả về dữ liệu ở field "data"
-        final data = result['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          setState(() {
-            _caloriesController.text =
-                (double.tryParse(data['calories']?.toString() ?? '0') ?? 0)
-                    .round()
-                    .toString();
-            _fatController.text =
-                (double.tryParse(data['fat']?.toString() ?? '0') ?? 0)
-                    .round()
-                    .toString();
-            _carbsController.text =
-                (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0)
-                    .round()
-                    .toString();
-            _proteinController.text =
-                (double.tryParse(data['protein']?.toString() ?? '0') ?? 0)
-                    .round()
-                    .toString();
-            _foodNameController.text = data['foodName']?.toString() ?? '';
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Không nhận được dữ liệu từ API.')),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Scan ảnh thất bại!')),
-        );
-      }
+      final result = await FoodService().scanFoodImage(
+        imageFile: imageFile,
+        context: context,
+      );
+      final data = (result?['data'] as Map<String, dynamic>?) ?? {};
+      setState(() {
+        _caloriesController.text =
+            (double.tryParse(data['calories']?.toString() ?? '0') ?? 0)
+                .round()
+                .toString();
+        _fatController.text =
+            (double.tryParse(data['fat']?.toString() ?? '0') ?? 0)
+                .round()
+                .toString();
+        _carbsController.text =
+            (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0)
+                .round()
+                .toString();
+        _proteinController.text =
+            (double.tryParse(data['protein']?.toString() ?? '0') ?? 0)
+                .round()
+                .toString();
+        _foodNameController.text = data['foodName']?.toString() ?? '';
+      });
     } catch (e) {
-      print('Error in _onAddImage: $e');
+      debugPrint('Error in _onAddImage: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Lỗi khi scan ảnh: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoadingImage = false;
+      });
     }
   }
 
@@ -332,6 +351,30 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
             hintText: 'Không bắt buộc',
           ),
           const Divider(),
+          if (_scannedImage != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Image.file(
+                    _scannedImage!,
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.contain,
+                  ),
+                  if (_isLoadingImage)
+                    Container(
+                      width: double.infinity,
+                      height: 200,
+                      color: Colors.black26,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                ],
+              ),
+            ),
         ],
       ),
     );
