@@ -1,21 +1,20 @@
 import 'dart:convert';
-
-import 'package:diet_plan_app/services/user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // for date formatting
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
 import '../flutter_flow/flutter_flow_theme.dart';
+import '../services/user_service.dart';
 
 // Định nghĩa model cho dữ liệu cân nặng
 class WeightData {
-  WeightData(this.date, this.weight);
+  WeightData(this.date, this.weight, {this.imageUrl});
   final DateTime date;
   final double weight;
+  final String? imageUrl;
 }
 
 class WeightLineChart extends StatefulWidget {
-  final VoidCallback? refreshChart; // Callback để làm mới biểu đồ
+  final VoidCallback? refreshChart;
   const WeightLineChart({this.refreshChart, super.key});
 
   @override
@@ -23,93 +22,107 @@ class WeightLineChart extends StatefulWidget {
 }
 
 class WeightLineChartState extends State<WeightLineChart> {
-  List<WeightData> weightChartData = [];
-  double targetWeight = 80.0;
-  DateTime? minDate;
-  DateTime? maxDate;
+  WeightData? initialWeight; // Cân nặng ban đầu
+  WeightData? latestWeight; // Cân nặng hiện tại
+  double targetWeight = 80.0; // Mục tiêu cân nặng
+  DateTime? minDate; // Ngày sớm nhất
+  DateTime? maxDate; // Ngày mới nhất
+  String? errorMessage;
   UserService userService = UserService();
 
   @override
   void initState() {
     super.initState();
-    fetchWeightData();
-    fetchTargetWeight();
+    fetchData();
     if (widget.refreshChart != null) {
-      widget.refreshChart!(); // Gọi callback nếu được cung cấp
+      widget.refreshChart!();
     }
   }
 
   // Phương thức công khai để làm mới dữ liệu
   Future<void> refresh() async {
-    await fetchWeightData();
-    await fetchTargetWeight();
+    setState(() {
+      fetchData();
+    });
   }
 
-  Future<void> fetchWeightData() async {
+  // Lấy dữ liệu từ API
+  Future<void> fetchData() async {
     try {
+      // Lấy dữ liệu cân nặng
       final response = await userService.getHealthProfileReport();
       if (response.statusCode == 200) {
         final dataJson = jsonDecode(response.body)['data'];
+        if (dataJson.isEmpty) {
+          setState(() {
+            errorMessage = 'Chưa có dữ liệu cân nặng. Hãy cập nhật ngay!';
+          });
+          return;
+        }
 
-        // Lấy giá trị cân nặng mới nhất mỗi ngày
-        Map<String, double> latestDataMap = {};
+        // Xử lý dữ liệu cân nặng
+        List<WeightData> tempData = [];
         for (var item in dataJson) {
           double weight = item['value'].toDouble();
           String rawDate = item['date'];
-          String dateKey = rawDate.split('T')[0]; // "yyyy-MM-dd"
-          latestDataMap[dateKey] = weight;
+          DateTime date = DateTime.parse(rawDate).toLocal();
+          String? imageUrl = item['imageUrl'];
+          tempData.add(WeightData(date, weight, imageUrl: imageUrl));
         }
 
-        List<WeightData> tempData = [];
-        latestDataMap.forEach((dateKey, weight) {
-          DateTime date = DateTime.parse(dateKey);
-          tempData.add(WeightData(date, weight));
-        });
-
-        // Sắp xếp theo thời gian tăng dần
+        // Sắp xếp theo thời gian
         tempData.sort((a, b) => a.date.compareTo(b.date));
 
-        if (mounted) {
-          setState(() {
-            weightChartData = tempData;
-            if (weightChartData.isNotEmpty) {
-              minDate = weightChartData.first.date;
-              maxDate = weightChartData.last.date;
-            }
-          });
-        }
-      } else {
-        throw Exception('Failed to load weight data');
-      }
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
+        // Xác định cân nặng ban đầu và mới nhất
+        setState(() {
+          initialWeight = tempData.first;
+          latestWeight = tempData.last;
+          minDate = DateTime(initialWeight!.date.year, initialWeight!.date.month, initialWeight!.date.day);
+          maxDate = DateTime(latestWeight!.date.year, latestWeight!.date.month, latestWeight!.date.day);
+        });
 
-  Future<void> fetchTargetWeight() async {
-    try {
-      final response = await userService.getPersonalGoal();
-      if (response.statusCode == 200) {
-        final dataJson = jsonDecode(response.body)['data'];
-        if (mounted) {
+        // Lấy cân nặng mục tiêu
+        final goalResponse = await userService.getPersonalGoal();
+        if (goalResponse.statusCode == 200) {
+          final goalData = jsonDecode(goalResponse.body)['data'];
           setState(() {
-            targetWeight = dataJson['targetWeight']?.toDouble() ?? 80.0;
+            targetWeight = goalData['targetWeight']?.toDouble() ?? 80.0;
           });
         }
       } else {
-        throw Exception('Failed to load target weight');
+        setState(() {
+          errorMessage = 'Không thể tải dữ liệu cân nặng';
+        });
       }
     } catch (e) {
-      print('Error fetching target weight: $e');
+      setState(() {
+        errorMessage = 'Lỗi khi tải dữ liệu: $e';
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (weightChartData.isEmpty ||
-        targetWeight == 0.0 ||
-        minDate == null ||
-        maxDate == null) {
+    // Trường hợp lỗi
+    if (errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              errorMessage!,
+              style: TextStyle(
+                color: FlutterFlowTheme.of(context).error,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Trường hợp đang tải
+    if (initialWeight == null || latestWeight == null || minDate == null || maxDate == null) {
       return Center(
         child: CircularProgressIndicator(
           color: FlutterFlowTheme.of(context).primary,
@@ -117,57 +130,149 @@ class WeightLineChartState extends State<WeightLineChart> {
       );
     }
 
-    // Nếu chỉ có 1 data point, mở rộng khoảng thời gian hiển thị (thêm 1 ngày trước và sau)
+    // Điều chỉnh trục x
+    DateTime displayMinDate = minDate!;
+    DateTime displayMaxDate = maxDate!;
+
+    // Nếu cả hai điểm nằm trong cùng ngày, tạo 2 thời điểm khác nhau để vẽ đường
     if (minDate == maxDate) {
-      minDate = minDate!.subtract(const Duration(days: 1));
-      maxDate = maxDate!.add(const Duration(days: 1));
+      displayMinDate = DateTime(minDate!.year, minDate!.month, minDate!.day, 0, 0); // 00:00
+      displayMaxDate = DateTime(maxDate!.year, maxDate!.month, maxDate!.day, 23, 59); // 23:59
     }
 
-    // Tạo dữ liệu cho đường trọng lượng mục tiêu
-    final List<WeightData> targetSeriesData = [
-      WeightData(minDate!, targetWeight),
-      WeightData(maxDate!, targetWeight)
+    // Dữ liệu cho đường cân nặng thực tế
+    final actualWeightData = [
+      WeightData(displayMinDate, initialWeight!.weight, imageUrl: initialWeight!.imageUrl),
+      WeightData(displayMaxDate, latestWeight!.weight, imageUrl: latestWeight!.imageUrl),
+    ];
+
+    // Dữ liệu cho đường mục tiêu
+    final targetWeightData = [
+      WeightData(displayMinDate, targetWeight),
+      WeightData(displayMaxDate, targetWeight),
     ];
 
     return Scaffold(
       body: Center(
         child: Container(
           color: Colors.white,
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           child: SfCartesianChart(
             tooltipBehavior: TooltipBehavior(
               enable: true,
-              format: 'Ngày: point.x\nCân nặng: point.y kg\n', // Custom tooltip format
+              color: Colors.black87, // Đặt màu nền tooltip là trắng
+              borderWidth: 1,
+              borderColor: Colors.grey[300]!, // Viền nhẹ để dễ nhìn
+              builder: (data, point, series, pointIdx, seriesIdx) {
+                WeightData weightData = data as WeightData;
+                String date = DateFormat('dd/MM/yyyy - HH:mm').format(weightData.date);
+                return Container(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Ngày: $date',
+                        style: TextStyle(color: Colors.white), // Chữ màu đen
+                      ),
+                      Text(
+                        'Cân nặng: ${weightData.weight} kg',
+                        style: TextStyle(color: Colors.white), // Chữ màu đen
+                      ),
+                      if (weightData.imageUrl != null)
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                child: InteractiveViewer(
+                                  child: Image.network(weightData.imageUrl!),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                );
+              },
             ),
-            // Bật legend hiển thị
             legend: Legend(
               isVisible: true,
               position: LegendPosition.bottom,
-              overflowMode: LegendItemOverflowMode.wrap,
+              textStyle: TextStyle(fontSize: 12),
+              overflowMode: LegendItemOverflowMode.wrap, // Chia thành nhiều hàng nếu dài
+              height: '20%', // Đảm bảo đủ không gian cho 2 hàng
             ),
             primaryXAxis: DateTimeAxis(
-              dateFormat: DateFormat('dd/MM'),
+              isVisible: false, // Ẩn trục x
+              minimum: displayMinDate,
+              maximum: displayMaxDate,
+              intervalType: DateTimeIntervalType.days,
+              interval: 1,
             ),
-            primaryYAxis: NumericAxis(),
+            primaryYAxis: NumericAxis(
+              decimalPlaces: 1,
+              majorGridLines: MajorGridLines(width: 0.5, color: Colors.grey[200]),
+              title: AxisTitle(text: 'Cân nặng (kg)'),
+              minimum: [initialWeight!.weight, latestWeight!.weight, targetWeight].reduce((a, b) => a < b ? a : b) - 5,
+              maximum: [initialWeight!.weight, latestWeight!.weight, targetWeight].reduce((a, b) => a > b ? a : b) + 5,
+              interval: 1, // Hiển thị các mức cách nhau 1 kg
+            ),
             series: <CartesianSeries>[
-              // Đường biểu diễn cân nặng thực tế với chú thích
+              // Đường mục tiêu cân nặng (nét liền)
               LineSeries<WeightData, DateTime>(
-                name: 'Cân nặng thực tế', // Chú thích cho biểu đồ này
-                dataSource: weightChartData,
+                name: 'Mục tiêu cân nặng',
+                dataSource: targetWeightData,
                 xValueMapper: (WeightData data, _) => data.date,
                 yValueMapper: (WeightData data, _) => data.weight,
-                markerSettings: const MarkerSettings(isVisible: true),
-                color: Colors.blue,
-              ),
-              // Đường biểu diễn trọng lượng mục tiêu với chú thích
-              LineSeries<WeightData, DateTime>(
-                name: 'Cân nặng mục tiêu', // Chú thích cho biểu đồ này
-                dataSource: targetSeriesData,
-                xValueMapper: (WeightData data, _) => data.date,
-                yValueMapper: (WeightData data, _) => data.weight,
+                color: Colors.teal[200],
                 width: 2,
+                markerSettings: MarkerSettings(isVisible: false),
+              ),
+              // Đường cân nặng thực tế
+              LineSeries<WeightData, DateTime>(
+                name: 'Cân nặng thực tế',
+                dataSource: actualWeightData,
+                xValueMapper: (WeightData data, _) => data.date,
+                yValueMapper: (WeightData data, _) => data.weight,
+                color: Colors.blue[700],
+                width: 3,
+                markerSettings: MarkerSettings(isVisible: false),
+              ),
+              // Điểm cân nặng ban đầu
+              LineSeries<WeightData, DateTime>(
+                name: 'Cân nặng ban đầu',
+                dataSource: [WeightData(displayMinDate, initialWeight!.weight, imageUrl: initialWeight!.imageUrl)],
+                xValueMapper: (WeightData data, _) => data.date,
+                yValueMapper: (WeightData data, _) => data.weight,
+                width: 0,
+                markerSettings: const MarkerSettings(
+                  isVisible: true,
+                  shape: DataMarkerType.circle,
+                  width: 6,
+                  height: 6,
+                  color: Colors.tealAccent,
+                ),
                 color: Colors.tealAccent,
-                markerSettings: const MarkerSettings(isVisible: false),
+                legendIconType: LegendIconType.circle,
+              ),
+              // Điểm cân nặng hiện tại
+              LineSeries<WeightData, DateTime>(
+                name: 'Cân nặng hiện tại',
+                dataSource: [WeightData(displayMaxDate, latestWeight!.weight, imageUrl: latestWeight!.imageUrl)],
+                xValueMapper: (WeightData data, _) => data.date,
+                yValueMapper: (WeightData data, _) => data.weight,
+                width: 0,
+                markerSettings: MarkerSettings(
+                  isVisible: true,
+                  shape: DataMarkerType.circle,
+                  width: 12,
+                  height: 12,
+                  color: Colors.orangeAccent,
+                  borderWidth: 2,
+                  borderColor: Colors.white,
+                ),
               ),
             ],
           ),
