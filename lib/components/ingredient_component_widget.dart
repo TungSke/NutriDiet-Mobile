@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:diet_plan_app/components/ingredient_component_model.dart';
+import 'ingredient_component_model.dart';
 
 class IngredientListScreen extends StatefulWidget {
   const IngredientListScreen({super.key});
@@ -17,6 +14,7 @@ class IngredientListScreen extends StatefulWidget {
 class _IngredientListScreenState extends State<IngredientListScreen> {
   late IngredientComponentModel _model;
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -29,6 +27,7 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     _model.maybeDispose();
     super.dispose();
   }
@@ -37,12 +36,31 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
     _model.searchIngredients(value, context);
   }
 
+  void _clearSearch() {
+    _searchController.clear();
+    _model.searchIngredients('', context);
+    _searchFocusNode.unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
       appBar: AppBar(
-        backgroundColor: FlutterFlowTheme.of(context).primary,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                FlutterFlowTheme.of(context).primary,
+                FlutterFlowTheme.of(context).secondary,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(
@@ -65,7 +83,6 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
           ),
         ),
         centerTitle: true,
-        elevation: 0,
       ),
       body: Container(
         width: double.infinity,
@@ -77,25 +94,36 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 0.0),
+              padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 16.0),
               child: TextField(
                 controller: _searchController,
+                focusNode: _searchFocusNode,
                 decoration: InputDecoration(
-                  hintText: "Nhập tên nguyên liệu",
+                  hintText: 'Nhập tên nguyên liệu',
                   hintStyle: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'figtree',
                     color: FlutterFlowTheme.of(context).grey,
                     useGoogleFonts: false,
                   ),
-                  // prefixIcon: Padding(
-                  //   padding: const EdgeInsets.all(12.0),
-                  //   child: SvgPicture.asset(
-                  //     'assets/images/search.svg',
-                  //     width: 24.0,
-                  //     height: 24.0,
-                  //     color: FlutterFlowTheme.of(context).grey,
-                  //   ),
-                  // ),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: SvgPicture.asset(
+                      'assets/images/search.svg',
+                      width: 24.0,
+                      height: 24.0,
+                      color: FlutterFlowTheme.of(context).grey,
+                    ),
+                  ),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: FlutterFlowTheme.of(context).grey,
+                      size: 20.0,
+                    ),
+                    onPressed: _clearSearch,
+                  )
+                      : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16.0),
                     borderSide: BorderSide.none,
@@ -109,21 +137,34 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
             ),
             Expanded(
               child: _model.isLoading
-                  ? Center(
-                child: CircularProgressIndicator(
-                  color: FlutterFlowTheme.of(context).primary,
+                  ? ListView.builder(
+                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
+                itemCount: 5,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Container(
+                    height: 100.0,
+                    decoration: BoxDecoration(
+                      color: FlutterFlowTheme.of(context).lightGrey,
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                  ),
                 ),
               )
-                  : ListView.builder(
-                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 24.0),
+                  : ListView.separated(
+                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 24.0),
                 itemCount: _model.ingredients.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 12.0),
                 itemBuilder: (context, index) {
                   final ingredient = _model.ingredients[index];
                   return IngredientComponentWidget(
                     ingredient: ingredient,
                     onUpdatePreference: (newPreference) async {
                       await _model.updateIngredientPreference(
-                          ingredient['ingredientId'], newPreference, context);
+                        ingredient['ingredientId'],
+                        newPreference,
+                        context,
+                      );
                     },
                   );
                 },
@@ -159,90 +200,200 @@ class _IngredientComponentWidgetState extends State<IngredientComponentWidget> {
     _selectedPreference = widget.ingredient['preference'] ?? 'Neutral';
   }
 
-  void _handlePreferenceChange(String newPreference) async {
-    setState(() {
-      print(_selectedPreference);
-      _selectedPreference = newPreference;
-    });
-
-    await widget.onUpdatePreference(newPreference);
+  void _handlePreferenceChange(String? newPreference) {
+    if (newPreference != null) {
+      setState(() {
+        _selectedPreference = newPreference;
+      });
+      widget.onUpdatePreference(newPreference);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
-      child: Container(
+    final theme = FlutterFlowTheme.of(context);
+    return InkWell(
+      onTap: () {
+        // Có thể thêm hành động khi nhấn vào item (ví dụ, xem chi tiết nguyên liệu)
+      },
+      borderRadius: BorderRadius.circular(16.0),
+      splashColor: theme.primary.withOpacity(0.2),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
         decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).secondaryBackground,
+          color: theme.secondaryBackground,
           borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(
+            color: _selectedPreference == 'Like'
+                ? theme.primary
+                : _selectedPreference == 'Dislike'
+                ? Colors.redAccent
+                : Colors.transparent,
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: FlutterFlowTheme.of(context).grey.withOpacity(0.1),
-              blurRadius: 5.0,
+              color: theme.grey.withOpacity(0.2),
+              blurRadius: 8.0,
               spreadRadius: 2.0,
-              offset: const Offset(0, 3),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
-            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.ingredient['ingredientName'] ?? 'N/A',
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      fontFamily: 'figtree',
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      useGoogleFonts: false,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.ingredient['ingredientName'] ?? 'N/A',
+                      style: theme.bodyMedium.override(
+                        fontFamily: 'figtree',
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        useGoogleFonts: false,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Text(
-                    '${widget.ingredient['calories']?.toString() ?? '0'} kcal',
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      fontFamily: 'figtree',
-                      color: FlutterFlowTheme.of(context).grey,
-                      fontSize: 14.0,
-                      useGoogleFonts: false,
+                    const SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.local_fire_department,
+                          size: 16.0,
+                          color: theme.primary,
+                        ),
+                        const SizedBox(width: 4.0),
+                        Text(
+                          '${widget.ingredient['calories']?.toString() ?? '0'} kcal',
+                          style: theme.bodyMedium.override(
+                            fontFamily: 'figtree',
+                            color: theme.grey,
+                            fontSize: 14.0,
+                            useGoogleFonts: false,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    "Protein: ${widget.ingredient['protein']?.toString() ?? '0'}g",
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      fontFamily: 'figtree',
-                      color: FlutterFlowTheme.of(context).grey,
-                      fontSize: 14.0,
-                      useGoogleFonts: false,
+                    const SizedBox(height: 4.0),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.fitness_center,
+                          size: 16.0,
+                          color: theme.secondary,
+                        ),
+                        const SizedBox(width: 4.0),
+                        Text(
+                          'Protein: ${widget.ingredient['protein']?.toString() ?? '0'}g',
+                          style: theme.bodyMedium.override(
+                            fontFamily: 'figtree',
+                            color: theme.grey,
+                            fontSize: 14.0,
+                            useGoogleFonts: false,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ].divide(const SizedBox(height: 4.0)),
-              ),
-              DropdownButton<String>(
-                value: _selectedPreference,
-                dropdownColor: FlutterFlowTheme.of(context).secondaryBackground,
-                style: FlutterFlowTheme.of(context).bodyMedium.override(
-                  fontFamily: 'figtree',
-                  color: FlutterFlowTheme.of(context).primaryText,
-                  fontSize: 14.0,
-                  useGoogleFonts: false,
+                  ],
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'Like', child: Text('Thích')),
-                  DropdownMenuItem(value: 'Neutral', child: Text('Bình thường')),
-                  DropdownMenuItem(value: 'Dislike', child: Text('Không thích')),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
-                    _handlePreferenceChange(value);
-                  }
-                },
-                underline: Container(),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: _selectedPreference == 'Like'
+                      ? theme.primary.withOpacity(0.05)
+                      : _selectedPreference == 'Dislike'
+                      ? Colors.redAccent.withOpacity(0.05)
+                      : theme.grey.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: _selectedPreference == 'Like'
+                        ? theme.primary
+                        : _selectedPreference == 'Dislike'
+                        ? Colors.redAccent
+                        : theme.grey,
+                    width: 0.5,
+                  ),
+                ),
+                child: DropdownButton<String>(
+                  value: _selectedPreference,
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: _selectedPreference == 'Like'
+                        ? theme.primary
+                        : _selectedPreference == 'Dislike'
+                        ? Colors.redAccent
+                        : theme.grey,
+                    size: 20.0,
+                  ),
+                  underline: Container(),
+                  dropdownColor: theme.secondaryBackground,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'Like',
+                      child: Row(
+                        children: [
+                          Icon(Icons.favorite, size: 14.0, color: theme.primary),
+                          const SizedBox(width: 6.0),
+                          Text(
+                            'Thích',
+                            style: theme.bodyMedium.override(
+                              fontFamily: 'figtree',
+                              color: theme.primary,
+                              fontSize: 13.0,
+                              useGoogleFonts: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Neutral',
+                      child: Row(
+                        children: [
+                          Icon(Icons.remove_circle, size: 14.0, color: theme.grey),
+                          const SizedBox(width: 6.0),
+                          Text(
+                            'Bình thường',
+                            style: theme.bodyMedium.override(
+                              fontFamily: 'figtree',
+                              color: theme.grey,
+                              fontSize: 13.0,
+                              useGoogleFonts: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Dislike',
+                      child: Row(
+                        children: [
+                          Icon(Icons.cancel, size: 14.0, color: Colors.redAccent),
+                          const SizedBox(width: 6.0),
+                          Text(
+                            'Không thích',
+                            style: theme.bodyMedium.override(
+                              fontFamily: 'figtree',
+                              color: Colors.redAccent,
+                              fontSize: 13.0,
+                              useGoogleFonts: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  onChanged: _handlePreferenceChange,
+                ),
               ),
             ],
           ),
