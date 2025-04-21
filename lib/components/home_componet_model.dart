@@ -24,6 +24,7 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
   final UserService _userService = UserService();
   StreamSubscription<int>? _stepsSubscription;
   StreamSubscription<bool>? _runningSubscription;
+  StreamSubscription<double>? _caloriesBurnedSubscription;
 
   double stepProgress = 0.0;
   double caloriesBurnedProgress = 0.0;
@@ -107,27 +108,37 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
           : result['caloriesBurned'] as int;
       activityError = result['error'] as String?;
 
-      // Tính toán lại stepProgress dựa trên steps
+      // Tính toán lại stepProgress và caloriesBurnedProgress
       stepProgress = (steps / 10000).clamp(0.0, 1.0);
       caloriesBurnedProgress = (caloriesBurned / 500).clamp(0.0, 1.0);
-      print("Fetched activity data: steps=$steps, stepProgress=$stepProgress");
+      print("Fetched activity data: steps=$steps, caloriesBurned=$caloriesBurned, stepProgress=$stepProgress");
+
+      // Nếu là ngày hiện tại, đảm bảo đồng bộ với dữ liệu thời gian thực
+      if (isSameDay(selectedDate, DateTime.now())) {
+        steps = GGFitService().getRealTimeSteps();
+        caloriesBurned = GGFitService().getCaloriesBurned().toInt();
+        stepProgress = (steps / 10000).clamp(0.0, 1.0);
+        caloriesBurnedProgress = (caloriesBurned / 500).clamp(0.0, 1.0);
+        print("Synced with real-time data for today: steps=$steps, caloriesBurned=$caloriesBurned");
+      }
     } catch (e) {
       debugPrint('Lỗi khi fetch Activity Data: $e');
       steps = GGFitService().getRealTimeSteps();
-      caloriesBurned = 0;
+      caloriesBurned = GGFitService().getCaloriesBurned().toInt();
       activityError = "Đã xảy ra lỗi khi lấy dữ liệu hoạt động: $e";
       stepProgress = (steps / 10000).clamp(0.0, 1.0);
-      caloriesBurnedProgress = 0.0;
+      caloriesBurnedProgress = (caloriesBurned / 500).clamp(0.0, 1.0);
     } finally {
       if (_isMounted) _updateCallback?.call();
     }
   }
 
-  void startListeningToSteps() {
+  void startListeningToStepsAndCalories() {
     if (!_isMounted) return;
     _stepsSubscription?.cancel();
     _runningSubscription?.cancel();
-    print("Starting step and running subscriptions");
+    _caloriesBurnedSubscription?.cancel();
+    print("Starting step, running, and calories burned subscriptions");
     try {
       _stepsSubscription = GGFitService().stepsStream.listen(
             (newSteps) {
@@ -164,6 +175,24 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
           if (_isMounted) _updateCallback?.call();
         },
       );
+
+      _caloriesBurnedSubscription = GGFitService().caloriesBurnedStream.listen(
+            (newCaloriesBurned) {
+          if (!_isMounted) return;
+          caloriesBurned = newCaloriesBurned.toInt();
+          caloriesBurnedProgress = (caloriesBurned / 500).clamp(0.0, 1.0);
+          print("Calories burned updated from stream: $caloriesBurned");
+          if (_isMounted) {
+            _updateCallback?.call();
+          }
+        },
+        onError: (error) {
+          if (!_isMounted) return;
+          print("Calories Burned Stream Error: $error");
+          activityError = "Không thể lấy dữ liệu calories burned thời gian thực: $error";
+          if (_isMounted) _updateCallback?.call();
+        },
+      );
     } catch (e) {
       print("Error starting subscriptions: $e");
       activityError = "Không thể khởi tạo dữ liệu hoạt động: $e";
@@ -187,13 +216,18 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     activityError = null;
     isRunning = false;
 
-    // Hủy lắng nghe stream trước khi lấy dữ liệu mới
+    // Hủy lắng nghe tất cả các stream trước khi lấy dữ liệu mới
     _stepsSubscription?.cancel();
     _runningSubscription?.cancel();
+    _caloriesBurnedSubscription?.cancel();
 
     if (!isSameDay(newDate, DateTime.now())) {
       GGFitService().resetSteps();
-      print("Steps reset for new date: $newDate");
+      print("Steps and calories reset for new date: $newDate");
+    } else {
+      // Khi chuyển về ngày hiện tại, reset để đồng bộ với dữ liệu thời gian thực
+      GGFitService().resetSteps();
+      print("Steps and calories reset for current date to sync with real-time data");
     }
 
     isLoading = true;
@@ -207,7 +241,7 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
 
     // Sau khi lấy dữ liệu, nếu là ngày hiện tại thì bắt đầu lắng nghe stream
     if (isSameDay(newDate, DateTime.now())) {
-      startListeningToSteps();
+      startListeningToStepsAndCalories();
     }
 
     isLoading = false;
@@ -258,7 +292,7 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     fetchUserProfile();
     fetchMealLogs();
     fetchActivityData();
-    startListeningToSteps();
+    startListeningToStepsAndCalories();
   }
 
   @override
@@ -267,6 +301,7 @@ class HomeComponetModel extends FlutterFlowModel<HomeComponetWidget> {
     _updateCallback = null;
     _stepsSubscription?.cancel();
     _runningSubscription?.cancel();
+    _caloriesBurnedSubscription?.cancel();
     mealLogs = [];
     steps = 0;
     caloriesBurned = 0;

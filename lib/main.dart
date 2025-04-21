@@ -9,11 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import 'firebase_options.dart'; // Tùy chọn Firebase (tự động tạo khi cấu hình Firebase)
+import 'firebase_options.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'meal_plan_flow/sample_meal_plan_screen/sample_meal_plan_model.dart';
 
@@ -51,6 +52,7 @@ void main() async {
 
 Future<void> setupPermissions() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+  final Health health = Health();
 
   // Yêu cầu quyền thông báo
   NotificationSettings settings = await messaging.requestPermission(
@@ -80,9 +82,41 @@ Future<void> setupPermissions() async {
   // Yêu cầu quyền Activity Recognition
   if (defaultTargetPlatform == TargetPlatform.android) {
     PermissionStatus activityRecognitionStatus =
-        await Permission.activityRecognition.request();
+    await Permission.activityRecognition.request();
     if (!activityRecognitionStatus.isGranted) {
       print("Quyền Activity Recognition không được cấp.");
+    }
+  }
+
+  // Yêu cầu quyền Health Connect
+  if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) {
+    try {
+      final status = await health.getHealthConnectSdkStatus();
+      if (status == HealthConnectSdkStatus.sdkAvailable) {
+        await health.configure();
+        final types = [
+          HealthDataType.STEPS,
+          HealthDataType.TOTAL_CALORIES_BURNED,
+        ];
+        final permissions = List.filled(types.length, HealthDataAccess.READ_WRITE);
+        bool? hasPermission = await health.hasPermissions(types, permissions: permissions);
+
+        if (hasPermission == null || !hasPermission) {
+          final authorized = await health.requestAuthorization(types, permissions: permissions);
+          if (authorized) {
+            print("Quyền Health Connect được cấp cho: $types");
+          } else {
+            print("Người dùng từ chối cấp quyền Health Connect.");
+          }
+        } else {
+          print("Quyền Health Connect đã được cấp trước đó.");
+        }
+      } else {
+        print("Health Connect SDK không khả dụng, yêu cầu cài đặt.");
+        await health.installHealthConnect();
+      }
+    } catch (e) {
+      print("Lỗi khi yêu cầu quyền Health Connect: $e");
     }
   }
 }
@@ -116,8 +150,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void setThemeMode(ThemeMode mode) => safeSetState(() {
-        _themeMode = mode;
-      });
+    _themeMode = mode;
+  });
 
   @override
   Widget build(BuildContext context) {
