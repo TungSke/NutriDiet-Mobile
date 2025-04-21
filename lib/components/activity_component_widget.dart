@@ -73,7 +73,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   final GlobalKey _chartWeight = GlobalKey();
   final GlobalKey _chartGoal = GlobalKey();
   final GlobalKey _updloadImage = GlobalKey();
-  final GlobalKey _description = GlobalKey();
+  final GlobalKey _overlayKey = GlobalKey();
   final animationsMap = <String, AnimationInfo>{};
 
   Future<void> _uploadImage(int profileId) async {
@@ -331,12 +331,8 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     final showcaseShown = prefs.getBool('showcase_shown_1') ?? false;
     if (!showcaseShown) {
       Future.delayed(const Duration(milliseconds: 500), () {
-        ShowCaseWidget.of(context).startShowCase([
-          _updateWeight,
-          _hisWeight,
-          _updloadImage,
-          _hisGoal,
-        ]);
+        ShowCaseWidget.of(context).startShowCase(
+            [_updateWeight, _hisWeight, _updloadImage, _hisGoal]);
         prefs.setBool(
             'showcase_shown_1', true); // Đánh dấu showcase đã hiển thị
       });
@@ -361,6 +357,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     //     _hisWeight,
     //     _updloadImage,
     //     _hisGoal,
+    //
     //   ]);
     // });
     animationsMap.addAll({
@@ -445,6 +442,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
     }
   }
 
+  bool _isContainerVisible = false;
   @override
   Widget build(BuildContext context) {
     // Ensure context is used properly for modal dialog
@@ -455,732 +453,174 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
       }
     });
     return Container(
-      decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).secondaryBackground,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          // Header
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primary,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(16.0),
-                bottomRight: Radius.circular(16.0),
-              ),
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsetsDirectional.fromSTEB(20.0, 25.0, 20.0, 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0.0, 0.0, 0.0, 16.0),
-                    child: Text(
-                      'Hoạt động',
-                      maxLines: 1,
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily: 'figtree',
-                            fontSize: 22.0,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            useGoogleFonts: false,
-                            lineHeight: 1.5,
-                          ),
-                    ).animateOnPageLoad(
-                        animationsMap['textOnPageLoadAnimation']!),
+        decoration: BoxDecoration(
+          color: FlutterFlowTheme.of(context).secondaryBackground,
+        ),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                // Header
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).primary,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(16.0),
+                      bottomRight: Radius.circular(16.0),
+                    ),
                   ),
-                ],
-              ),
-            ),
-          ),
-
-          // Nội dung chính
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(top: 30),
-                        decoration: BoxDecoration(
-                          color:
-                              FlutterFlowTheme.of(context).secondaryBackground,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(0.0),
-                          child: _model.avatar.isNotEmpty
-                              ? Image.network(
-                                  _model.avatar,
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.asset(
-                                  'assets/images/dummy_profile.png',
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        20.0, 25.0, 20.0, 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 0.0, 0.0, 16.0),
+                          child: Text(
+                            'Hoạt động',
+                            maxLines: 1,
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  fontFamily: 'figtree',
+                                  fontSize: 22.0,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  useGoogleFonts: false,
+                                  lineHeight: 1.5,
                                 ),
+                          ).animateOnPageLoad(
+                              animationsMap['textOnPageLoadAnimation']!),
                         ),
-                      ),
-                      SizedBox(
-                        width: 200,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Column(
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Nội dung chính
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.only(top: 30),
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(0.0),
+                                child: _model.avatar.isNotEmpty
+                                    ? Image.network(
+                                        _model.avatar,
+                                        width: 80.0,
+                                        height: 80.0,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.asset(
+                                        'assets/images/dummy_profile.png',
+                                        width: 80.0,
+                                        height: 80.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 200,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      _model.name,
+                                      style: GoogleFonts.roboto(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Text(
+                                      "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
+                                      style: GoogleFonts.roboto(
+                                          fontSize: 12, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Mục tiêu
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              20.0, 24.0, 20.0, 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                _model.name,
+                                'Mục tiêu gần đây:',
                                 style: GoogleFonts.roboto(
-                                    fontSize: 18, fontWeight: FontWeight.w600),
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                "• ${_model.age} tuổi • ${_model.height} cm • ${_model.weight} kg",
-                                style: GoogleFonts.roboto(
-                                    fontSize: 12, color: Colors.grey),
+                                _model.goalType,
+                                style: TextStyle(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
 
-                  // Mục tiêu
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        20.0, 24.0, 20.0, 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Mục tiêu gần đây:',
-                          style: GoogleFonts.roboto(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          _model.goalType,
-                          style: TextStyle(
-                            color: FlutterFlowTheme.of(context).primary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Cân nặng ban đầu, mục tiêu, button cập nhật
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Cân nặng ban đầu: ",
-                                      style: TextStyle(
-                                          fontSize: 14, color: Colors.grey),
-                                    ),
-                                    Text(
-                                      "${_model.weight} kg",
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Cân nặng mục tiêu:",
-                                      style: TextStyle(
-                                          fontSize: 14, color: Colors.grey),
-                                    ),
-                                    Text(
-                                      "${_model.targetWeight} kg",
-                                      style: TextStyle(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            // Thông tin người dùng
-                            Showcase(
-                              key: _updateWeight,
-                              targetShapeBorder: const CircleBorder(),
-                              overlayOpacity: 0.5,
-                              description:
-                                  'Cập nhật cân nặng thường xuyên ở đây.',
-                              child: FloatingActionButton(
-                                onPressed: () {
-                                  _showBottomSheet(context);
-                                },
-                                backgroundColor: Colors.green,
-                                elevation: 4.0,
-                                shape: const CircleBorder(),
-                                mini: true,
-                                heroTag: null,
-                                child: const Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Row hiển thị thông tin phần trăm hoàn thành
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Đã hoàn thành",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: FlutterFlowTheme.of(context).primary,
-                                  ),
-                                ),
-                                Text(
-                                  "${_model.progressPercentage}/100 %",
-                                  style: TextStyle(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                                height:
-                                    8), // Khoảng cách giữa text và progress bar
-                            // Progress bar trực quan
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: LinearProgressIndicator(
-                                value: _model.progressPercentage /
-                                    100.0, // Giá trị từ 0.0 đến 1.0
-                                minHeight: 10,
-                                backgroundColor: Colors.grey.shade300,
-                                color: FlutterFlowTheme.of(context).primary,
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-
-                  // Biểu đồ
-
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        20.0, 24.0, 20.0, 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Quá trình thay đổi cân nặng",
-                          style: GoogleFonts.roboto(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: SingleChildScrollView(
-                      child: SizedBox(
-                        height: 400,
-                        child: WeightLineChart(
-                          key: _weightLineChartKey,
-                          refreshChart: _refreshChart,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        20.0, 24.0, 20.0, 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Quá trình thay đổi mục tiêu",
-                          style: GoogleFonts.roboto(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: SingleChildScrollView(
-                      child: SizedBox(
-                        height: 400,
-                        child: PersonalGoalChart(
-                          key: _personalGoalChartKey,
-                          refreshChart: _refreshChart,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // BMI / TDEE
-                  Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 25),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Tình trạng hiện tại:",
-                          style: GoogleFonts.roboto(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          _model.bmiType,
-                          style: GoogleFonts.roboto(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: _getBmiTypeColor(_model.bmiType),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          const Text(
-                            "BMI",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 24.0),
-                            child: CircularPercentIndicator(
-                              radius: 75.0,
-                              lineWidth: 12.0,
-                              animation: true,
-                              animateFromLastPercent: true,
-                              progressColor:
-                                  FlutterFlowTheme.of(context).primary,
-                              backgroundColor:
-                                  const Color.fromRGBO(204, 129, 17, 1),
-                              center: Text(
-                                _model.bmi,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Figtree',
-                                      color: FlutterFlowTheme.of(context).grey,
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.normal,
-                                      useGoogleFonts: false,
-                                    ),
-                              ),
-                            ),
-                          ),
-                          Text("Chỉ số BMI ")
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          const Text(
-                            "TDEE",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 24.0),
-                            child: CircularPercentIndicator(
-                              radius: 75.0,
-                              lineWidth: 12.0,
-                              animation: true,
-                              animateFromLastPercent: true,
-                              progressColor:
-                                  FlutterFlowTheme.of(context).primary,
-                              backgroundColor:
-                                  const Color.fromARGB(255, 4, 142, 135),
-                              center: Text(
-                                _model.tdee,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Figtree',
-                                      color: FlutterFlowTheme.of(context).grey,
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.normal,
-                                      useGoogleFonts: false,
-                                    ),
-                              ),
-                            ),
-                          ),
-                          Text("Chỉ số TDEE ")
-                        ],
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 15),
-                    child: Text(
-                      (_model.evaluate),
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.roboto(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: FlutterFlowTheme.of(context).primary,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(25, 25, 25, 25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Lịch sử cân nặng:",
-                          style: GoogleFonts.roboto(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 10),
-                        if (_weightHistory.isEmpty)
-                          const Text('Chưa có dữ liệu.'),
-                        if (_weightHistory.isNotEmpty)
-                          // Dùng Column + map để hiển thị nhanh
-                          Column(
-                            children:
-                                _weightHistory.asMap().entries.map((entry) {
-                              int index = entry.key;
-                              var item = entry.value;
-                              final date = DateTime.parse(item['date']);
-                              // Format ngày tháng bằng tiếng Việt
-
-                              final formattedDate = DateFormat(
-                                      "EEEE, dd 'thg' M, yyyy - HH:mm", "vi_VN")
-                                  .format(date);
-                              final weight = item['value'];
-                              final imageUrl = item['imageUrl'];
-                              if (index == 0) {
-                                return Showcase(
-                                  key: _hisWeight,
-                                  // The key for showcasing
-                                  enableAutoScroll: true,
-                                  overlayOpacity: 0.5,
-                                  description:
-                                      'Đây là lịch sử cân nặng của bạn',
-                                  child: GestureDetector(
-                                    onLongPress: () => _showEntryMenu(item),
-                                    // Show popup on long press
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      title: Text(
-                                        formattedDate,
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        '$weight kg',
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      trailing: imageUrl != null
-                                          ? GestureDetector(
-                                              onTap: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (context) => Dialog(
-                                                    child: GestureDetector(
-                                                      onTap: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: InteractiveViewer(
-                                                        child: Image.network(
-                                                          imageUrl,
-                                                          fit: BoxFit.contain,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Image.network(
-                                                imageUrl,
-                                                width: 40,
-                                                height: 40,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            )
-                                          : Showcase(
-                                              key: _updloadImage,
-                                              enableAutoScroll: true,
-                                              overlayOpacity: 0.5,
-                                              targetShapeBorder:
-                                                  const CircleBorder(),
-                                              description:
-                                                  'Hãy đánh dấu cột mốc đã đạt được bằng việc tải ảnh ',
-                                              child: IconButton(
-                                                icon: const Icon(
-                                                    Icons.cloud_upload),
-                                                onPressed: () async {
-                                                  // Upload image when icon is pressed
-                                                  await _uploadImage(
-                                                      item['profileId']);
-                                                },
-                                              ),
-                                            ),
-                                    ),
-                                  ),
-                                );
-                              }
-                              return GestureDetector(
-                                onLongPress: () => _showEntryMenu(
-                                    item), // Gọi popup khi long press
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  title: Text(
-                                    formattedDate,
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    '$weight kg',
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  trailing: imageUrl != null
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) => Dialog(
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: InteractiveViewer(
-                                                    child: Image.network(
-                                                      imageUrl,
-                                                      fit: BoxFit.contain,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Image.network(
-                                            imageUrl,
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        )
-                                      : IconButton(
-                                          icon: const Icon(Icons.cloud_upload),
-                                          onPressed: () async {
-                                            // Nếu muốn cho phép upload ngay khi bấm icon
-                                            await _uploadImage(
-                                                item['profileId']);
-                                          },
-                                        ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "Lịch sử mục tiêu :",
-                          style: GoogleFonts.roboto(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 10),
-                        if (_personalGoalHistory.isEmpty)
-                          const Text('Chưa có dữ liệu.'),
-                        if (_personalGoalHistory.isNotEmpty)
-                          // Use Column + map to display items quickly
-                          Column(
-                            children: _personalGoalHistory
-                                .asMap()
-                                .entries
-                                .map((entry) {
-                              int index = entry.key;
-                              var item = entry.value;
-
-                              // Parse date
-                              final createdAt =
-                                  DateTime.parse(item['startDate']);
-                              final formattedDate = DateFormat(
-                                      "EEEE, dd 'thg' M, yyyy - HH:mm", "vi_VN")
-                                  .format(createdAt);
-                              final goalType = _goalTypeMap[item['goalType']];
-                              final targetWeight = item['targetWeight'];
-                              final progressPercentage =
-                                  item['progressPercentage'];
-                              final weightChangeRate = _weightChangeRateMap[
-                                  item['weightChangeRate']];
-
-                              // Wrap the first item in the Showcase widget
-                              if (index == 0) {
-                                return Showcase(
-                                  key: _hisGoal,
-                                  enableAutoScroll: true,
-                                  overlayOpacity: 0.5,
-                                  description:
-                                      'Đây là lịch sử mục tiêu của bạn',
-                                  child: GestureDetector(
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      title: Text(
-                                        formattedDate,
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                        // Cân nặng ban đầu, mục tiêu, button cập nhật
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Row(
                                         children: [
                                           Text(
-                                            '$goalType - Mục tiêu: $targetWeight kg - Mức độ: $weightChangeRate ',
-                                            style: GoogleFonts.roboto(
+                                            "Cân nặng ban đầu: ",
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          Text(
+                                            "${_model.weight} kg",
+                                            style: const TextStyle(
+                                              color: Colors.black,
                                               fontSize: 14,
-                                            ),
-                                          ),
-                                          SizedBox(height: 8),
-                                          // Row to display completion percentage
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                "Đã hoàn thành",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primary,
-                                                ),
-                                              ),
-                                              Text(
-                                                "$progressPercentage/100 %",
-                                                style: TextStyle(
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primary,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                              height:
-                                                  8), // Space between text and progress bar
-                                          // Progress bar
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: LinearProgressIndicator(
-                                              value: progressPercentage /
-                                                  100.0, // Value from 0.0 to 1.0
-                                              minHeight: 10,
-                                              backgroundColor:
-                                                  Colors.grey.shade300,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              // For other items, display normally without Showcase
-                              return GestureDetector(
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  title: Text(
-                                    formattedDate,
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '$goalType - Mục tiêu: $targetWeight kg - Mức độ: $weightChangeRate ',
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
+                                      const SizedBox(height: 8),
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            "Đã hoàn thành",
+                                            "Cân nặng mục tiêu:",
                                             style: TextStyle(
-                                              fontSize: 14,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
-                                            ),
+                                                fontSize: 14,
+                                                color: Colors.grey),
                                           ),
                                           Text(
-                                            "$progressPercentage/100 %",
+                                            "${_model.targetWeight} kg",
                                             style: TextStyle(
                                               color:
                                                   FlutterFlowTheme.of(context)
@@ -1191,33 +631,681 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 8),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: LinearProgressIndicator(
-                                          value: progressPercentage / 100.0,
-                                          minHeight: 10,
-                                          backgroundColor: Colors.grey.shade300,
+                                    ],
+                                  ),
+                                  // Thông tin người dùng
+                                  Showcase(
+                                    key: _updateWeight,
+                                    targetShapeBorder: const CircleBorder(),
+                                    overlayOpacity: 0.5,
+                                    description:
+                                        'Cập nhật cân nặng thường xuyên ở đây.',
+                                    child: FloatingActionButton(
+                                      onPressed: () {
+                                        _showBottomSheet(context);
+                                      },
+                                      backgroundColor: Colors.green,
+                                      elevation: 4.0,
+                                      shape: const CircleBorder(),
+                                      mini: true,
+                                      heroTag: null,
+                                      child: const Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Row hiển thị thông tin phần trăm hoàn thành
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Đã hoàn thành",
+                                        style: TextStyle(
+                                          fontSize: 14,
                                           color: FlutterFlowTheme.of(context)
                                               .primary,
                                         ),
                                       ),
+                                      Text(
+                                        "${_model.progressPercentage}/100 %",
+                                        style: TextStyle(
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                ),
-                              );
-                            }).toList(),
+                                  const SizedBox(
+                                      height:
+                                          8), // Khoảng cách giữa text và progress bar
+                                  // Progress bar trực quan
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: LinearProgressIndicator(
+                                      value: _model.progressPercentage /
+                                          100.0, // Giá trị từ 0.0 đến 1.0
+                                      minHeight: 10,
+                                      backgroundColor: Colors.grey.shade300,
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
                           ),
+                        ),
+
+                        // Biểu đồ
+
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              20.0, 24.0, 20.0, 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Quá trình thay đổi cân nặng",
+                                style: GoogleFonts.roboto(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: SingleChildScrollView(
+                            child: SizedBox(
+                              height: 400,
+                              child: WeightLineChart(
+                                key: _weightLineChartKey,
+                                refreshChart: _refreshChart,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              20.0, 24.0, 20.0, 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Quá trình thay đổi mục tiêu",
+                                style: GoogleFonts.roboto(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: SingleChildScrollView(
+                            child: SizedBox(
+                              height: 400,
+                              child: PersonalGoalChart(
+                                key: _personalGoalChartKey,
+                                refreshChart: _refreshChart,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // BMI / TDEE
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              25, 25, 25, 25),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Tình trạng hiện tại:",
+                                style: GoogleFonts.roboto(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                _model.bmiType,
+                                style: GoogleFonts.roboto(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: _getBmiTypeColor(_model.bmiType),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: [
+                                const Text(
+                                  "BMI",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 24.0),
+                                  child: CircularPercentIndicator(
+                                    radius: 75.0,
+                                    lineWidth: 12.0,
+                                    animation: true,
+                                    animateFromLastPercent: true,
+                                    progressColor:
+                                        FlutterFlowTheme.of(context).primary,
+                                    backgroundColor:
+                                        const Color.fromRGBO(204, 129, 17, 1),
+                                    center: Text(
+                                      _model.bmi,
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                            fontFamily: 'Figtree',
+                                            color: FlutterFlowTheme.of(context)
+                                                .grey,
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.normal,
+                                            useGoogleFonts: false,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                                Text("Chỉ số BMI ")
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                const Text(
+                                  "TDEE",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 24.0),
+                                  child: CircularPercentIndicator(
+                                    radius: 75.0,
+                                    lineWidth: 12.0,
+                                    animation: true,
+                                    animateFromLastPercent: true,
+                                    progressColor:
+                                        FlutterFlowTheme.of(context).primary,
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 4, 142, 135),
+                                    center: Text(
+                                      _model.tdee,
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                            fontFamily: 'Figtree',
+                                            color: FlutterFlowTheme.of(context)
+                                                .grey,
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.normal,
+                                            useGoogleFonts: false,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                                Text("Chỉ số TDEE ")
+                              ],
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              25, 25, 25, 15),
+                          child: Text(
+                            (_model.evaluate),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.roboto(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: FlutterFlowTheme.of(context).primary,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              25, 25, 25, 25),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Lịch sử cân nặng:",
+                                style: GoogleFonts.roboto(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 10),
+                              if (_weightHistory.isEmpty)
+                                const Text('Chưa có dữ liệu.'),
+                              if (_weightHistory.isNotEmpty)
+                                // Dùng Column + map để hiển thị nhanh
+                                Column(
+                                  children: _weightHistory
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                    int index = entry.key;
+                                    var item = entry.value;
+                                    final date = DateTime.parse(item['date']);
+                                    // Format ngày tháng bằng tiếng Việt
+
+                                    final formattedDate = DateFormat(
+                                            "EEEE, dd 'thg' M, yyyy - HH:mm",
+                                            "vi_VN")
+                                        .format(date);
+                                    final weight = item['value'];
+                                    final imageUrl = item['imageUrl'];
+                                    if (index == 0) {
+                                      return Showcase(
+                                        key: _hisWeight,
+                                        // The key for showcasing
+                                        enableAutoScroll: true,
+                                        overlayOpacity: 0.5,
+                                        description:
+                                            'Đây là lịch sử cân nặng của bạn',
+                                        child: GestureDetector(
+                                          onLongPress: () =>
+                                              _showEntryMenu(item),
+                                          // Show popup on long press
+                                          child: ListTile(
+                                            contentPadding: EdgeInsets.zero,
+                                            title: Text(
+                                              formattedDate,
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              '$weight kg',
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            trailing: imageUrl != null
+                                                ? GestureDetector(
+                                                    onTap: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) =>
+                                                            Dialog(
+                                                          child:
+                                                              GestureDetector(
+                                                            onTap: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child:
+                                                                InteractiveViewer(
+                                                              child:
+                                                                  Image.network(
+                                                                imageUrl,
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Image.network(
+                                                      imageUrl,
+                                                      width: 40,
+                                                      height: 40,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                                : Showcase(
+                                                    key: _updloadImage,
+                                                    enableAutoScroll: true,
+                                                    overlayOpacity: 0.5,
+                                                    targetShapeBorder:
+                                                        const CircleBorder(),
+                                                    description:
+                                                        'Hãy đánh dấu cột mốc đã đạt được bằng việc tải ảnh ',
+                                                    child: IconButton(
+                                                      icon: const Icon(
+                                                          Icons.cloud_upload),
+                                                      onPressed: () async {
+                                                        // Upload image when icon is pressed
+                                                        await _uploadImage(
+                                                            item['profileId']);
+                                                      },
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return GestureDetector(
+                                      onLongPress: () => _showEntryMenu(
+                                          item), // Gọi popup khi long press
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: Text(
+                                          formattedDate,
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          '$weight kg',
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        trailing: imageUrl != null
+                                            ? GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        Dialog(
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child:
+                                                            InteractiveViewer(
+                                                          child: Image.network(
+                                                            imageUrl,
+                                                            fit: BoxFit.contain,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Image.network(
+                                                  imageUrl,
+                                                  width: 40,
+                                                  height: 40,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              )
+                                            : IconButton(
+                                                icon: const Icon(
+                                                    Icons.cloud_upload),
+                                                onPressed: () async {
+                                                  // Nếu muốn cho phép upload ngay khi bấm icon
+                                                  await _uploadImage(
+                                                      item['profileId']);
+                                                },
+                                              ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              const SizedBox(height: 10),
+                              Text(
+                                "Lịch sử mục tiêu :",
+                                style: GoogleFonts.roboto(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 10),
+                              if (_personalGoalHistory.isEmpty)
+                                const Text('Chưa có dữ liệu.'),
+                              if (_personalGoalHistory.isNotEmpty)
+                                // Use Column + map to display items quickly
+                                Column(
+                                  children: _personalGoalHistory
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                    int index = entry.key;
+                                    var item = entry.value;
+
+                                    // Parse date
+                                    final createdAt =
+                                        DateTime.parse(item['startDate']);
+                                    final formattedDate = DateFormat(
+                                            "EEEE, dd 'thg' M, yyyy - HH:mm",
+                                            "vi_VN")
+                                        .format(createdAt);
+                                    final goalType =
+                                        _goalTypeMap[item['goalType']];
+                                    final targetWeight = item['targetWeight'];
+                                    final progressPercentage =
+                                        item['progressPercentage'];
+                                    final weightChangeRate =
+                                        _weightChangeRateMap[
+                                            item['weightChangeRate']];
+
+                                    // Wrap the first item in the Showcase widget
+                                    if (index == 0) {
+                                      return Showcase(
+                                        key: _hisGoal,
+                                        onTargetClick: () {
+                                          // You can trigger setState outside the onTargetClick if necessary
+                                          setState(() {
+                                            _isContainerVisible =
+                                                true; // Change state when target is tapped
+                                          });
+                                        },
+                                        disposeOnTap: true,
+                                        enableAutoScroll: true,
+                                        overlayOpacity: 0.5,
+                                        description:
+                                            'Đây là lịch sử mục tiêu của bạn',
+                                        child: GestureDetector(
+                                          child: ListTile(
+                                            contentPadding: EdgeInsets.zero,
+                                            title: Text(
+                                              formattedDate,
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            subtitle: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '$goalType - Mục tiêu: $targetWeight kg - Mức độ: $weightChangeRate ',
+                                                  style: GoogleFonts.roboto(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8),
+                                                // Row to display completion percentage
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "Đã hoàn thành",
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primary,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "$progressPercentage/100 %",
+                                                      style: TextStyle(
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primary,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(
+                                                    height:
+                                                        8), // Space between text and progress bar
+                                                // Progress bar
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child:
+                                                      LinearProgressIndicator(
+                                                    value: progressPercentage /
+                                                        100.0, // Value from 0.0 to 1.0
+                                                    minHeight: 10,
+                                                    backgroundColor:
+                                                        Colors.grey.shade300,
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    // For other items, display normally without Showcase
+                                    return GestureDetector(
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: Text(
+                                          formattedDate,
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '$goalType - Mục tiêu: $targetWeight kg - Mức độ: $weightChangeRate ',
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            SizedBox(height: 8),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Đã hoàn thành",
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "$progressPercentage/100 %",
+                                                  style: TextStyle(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 8),
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: LinearProgressIndicator(
+                                                value:
+                                                    progressPercentage / 100.0,
+                                                minHeight: 10,
+                                                backgroundColor:
+                                                    Colors.grey.shade300,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+            if (_isContainerVisible)
+              Container(
+                width: double.infinity,
+                height: double.infinity, // Full screen height
+                color:
+                    Colors.black12.withOpacity(0.5), // Black with 50% opacity
+                child:
+                    Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _isContainerVisible =
+                              false; // Hide the container when the button is clicked
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // Green background
+                        // White text
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 5, // Add shadow effect
+                      ),
+                      child: Text(
+                        "Bỏ qua ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold, // Bold text
+                          fontSize: 16, // Adjust font size
+                        ),
+                      ),
+                    ),
+                  ),
+                ]),
+              ),
+          ],
+        ));
   }
 
   late double minWeight = 30; // Mặc định minWeight
