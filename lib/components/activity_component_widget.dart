@@ -49,9 +49,12 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
   // Key để truy cập state bên trong WeightLineChart
   final _weightLineChartKey = GlobalKey<WeightLineChartState>();
   final _personalGoalChartKey = GlobalKey<PersonalGoalChartState>();
+
   // Danh sách lưu lịch sử cân nặng
   List<Map<String, dynamic>> _weightHistory = [];
   List<Map<String, dynamic>> _personalGoalHistory = [];
+  final Map<int, bool> _isUploading = {};
+  late final AnimationController _rotationController;
   // Hàm gọi trong onPressed để làm mới biểu đồ
   void _refreshChart() async {
     await _model.fetchHealthProfile();
@@ -75,8 +78,9 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
 
   Future<void> _uploadImage(int profileId) async {
     final ImagePicker picker = ImagePicker();
+    // Mở camera thay vì gallery
     final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
+        await picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       final File imageFile = File(pickedFile.path);
 

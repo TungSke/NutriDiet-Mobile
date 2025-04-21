@@ -114,12 +114,21 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
                     builder: (dialogContext) {
                       loadingDialogContext = dialogContext;
                       return AlertDialog(
-                        content: Row(
-                          children: const [
-                            CircularProgressIndicator(),
-                            SizedBox(width: 16),
-                            Text("Đang tạo thực đơn mới từ yêu cầu của bạn"),
-                          ],
+                        content: SizedBox(
+                          height: 60,
+                          child: Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                CircularProgressIndicator(),
+                                SizedBox(width: 12),
+                                Text(
+                                  "Đang tạo",
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       );
                     },

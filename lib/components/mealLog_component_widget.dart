@@ -54,9 +54,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
     }
   }
 
-  /// Hàm hiển thị hộp thoại xác nhận nếu vào ngày đã áp dụng mealplan.
-  /// Nếu đã áp dụng, yêu cầu người dùng xác nhận tiếp tục.
-  /// Trả về true nếu người dùng cho phép, ngược lại false.
   Future<bool> _confirmProceedIfMealPlanApplied() async {
     bool applied = await _model.checkPlanApplied();
     if (applied) {
@@ -64,18 +61,37 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text("Cảnh báo"),
-            content: const Text(
+            title: Text(
+              "Cảnh báo",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.yellow,
+              ),
+            ),
+            content: Text(
               "Bạn đang áp dụng thực đơn. Bạn có chắc chắn muốn tiếp tục?",
+              style: TextStyle(
+                color: FlutterFlowTheme.of(context).primary,
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text("Hủy"),
+                child: Text(
+                  "Hủy",
+                  style: TextStyle(
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                ),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text("Tiếp tục"),
+                child: Text(
+                  "Tiếp tục",
+                  style: TextStyle(
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                ),
               ),
             ],
           );
@@ -161,7 +177,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               children: [
                 const Icon(
                   Icons.star,
-                  color: Colors.yellow,
+                  color: Colors.orangeAccent,
                   size: 50,
                 ),
                 const SizedBox(height: 16),
@@ -259,7 +275,10 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(5),
           ),
-          title: const Text("Thực đơn AI"),
+          title: Text(
+            "Thực đơn AI",
+            style: TextStyle(color: FlutterFlowTheme.of(context).accent5),
+          ),
           content: SizedBox(
             width: double.maxFinite,
             child: _model.mealLogAis.isNotEmpty
@@ -293,7 +312,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: primaryColor,
+                                color: FlutterFlowTheme.of(context).primary,
                               ),
                             ),
                           ),
@@ -301,7 +320,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                 contentPadding: EdgeInsets.zero,
                                 title: Text(
                                   meal.foodName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -313,15 +332,22 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                       );
                     }).toList(),
                   )
-                : const Text("Không có dữ liệu thực đơn AI"),
+                : Text(
+                    "Không có dữ liệu thực đơn AI",
+                    style:
+                        TextStyle(color: FlutterFlowTheme.of(context).primary),
+                  ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.black,
+                foregroundColor: FlutterFlowTheme.of(context).primary,
               ),
-              child: const Text("Reject"),
+              child: Text(
+                "Từ chối",
+                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+              ),
             ),
             TextButton(
               onPressed: () async {
@@ -335,7 +361,11 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      title: const Text("Nhập Feedback"),
+                      title: Text(
+                        "Nhập Feedback",
+                        style: TextStyle(
+                            color: FlutterFlowTheme.of(context).primary),
+                      ),
                       content: TextField(
                         onChanged: (value) {
                           feedback = value;
@@ -352,7 +382,15 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                 .sendAIChosenMealFeedback("No feedback");
                             await _model.fetchMealLogs();
                           },
-                          child: const Text("Cancel"),
+                          style: TextButton.styleFrom(
+                            foregroundColor:
+                                FlutterFlowTheme.of(context).primary,
+                          ),
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primary),
+                          ),
                         ),
                         TextButton(
                           onPressed: () async {
@@ -360,14 +398,28 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                             await _model.sendAIChosenMealFeedback(feedback);
                             await _model.fetchMealLogs();
                           },
-                          child: const Text("Submit"),
+                          style: TextButton.styleFrom(
+                            foregroundColor:
+                                FlutterFlowTheme.of(context).primary,
+                          ),
+                          child: Text(
+                            "Submit",
+                            style: TextStyle(
+                                color: FlutterFlowTheme.of(context).primary),
+                          ),
                         ),
                       ],
                     );
                   },
                 );
               },
-              child: const Text("Accept"),
+              style: TextButton.styleFrom(
+                foregroundColor: FlutterFlowTheme.of(context).primary,
+              ),
+              child: Text(
+                "Đồng ý",
+                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+              ),
             ),
           ],
         );
