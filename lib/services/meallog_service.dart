@@ -123,15 +123,16 @@ class MeallogService {
     required int carbohydrates,
     required int fats,
     required int protein,
+    required File? imageFile,
   }) async {
-    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-    final String? token = await secureStorage.read(key: 'accessToken');
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: 'accessToken');
 
     try {
-      // Dữ liệu form-data
-      Map<String, String> formData = {
-        'LogDate': logDate.toIso8601String(), // "2025-03-19T05:37:48.444Z"
-        'MealType': mealType, // "Breakfast", "Lunch", ...
+      // 1. Chuẩn bị các field text
+      final fields = <String, String>{
+        'LogDate': logDate.toIso8601String(),
+        'MealType': mealType,
         'Calories': calories.toString(),
         'FoodName': foodName,
         'Carbohydrates': carbohydrates.toString(),
@@ -139,16 +140,25 @@ class MeallogService {
         'Protein': protein.toString(),
       };
 
-      final response = await _apiService.postMultipart(
-        "api/meal-log/quick",
-        body: formData,
-        token: token,
-      );
+      // 2. Gọi ApiService.postMultipartWithFile
+      final response = imageFile != null
+          ? await _apiService.postMultipartWithFile(
+              'api/meal-log/quick',
+              fields: fields,
+              fileFieldName: 'Image',
+              filePath: imageFile.path,
+              token: token,
+            )
+          : await _apiService.postMultipart(
+              'api/meal-log/quick',
+              body: fields,
+              token: token,
+            );
 
       debugPrint(
-          "API quickAddMeal: Status ${response.statusCode}, Body: ${response.body}");
+          'API quickAddMeal: Status ${response.statusCode}, Body: ${response.body}');
 
-      // Thành công có thể là 200 hoặc 201, tùy backend
+      // 3. Xử lý kết quả
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
@@ -156,7 +166,7 @@ class MeallogService {
             'Lỗi quickAddMeal: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      debugPrint("Lỗi khi gọi API quickAddMeal: $e");
+      debugPrint('Lỗi khi gọi API quickAddMeal: $e');
       return false;
     }
   }

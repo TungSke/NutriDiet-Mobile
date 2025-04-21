@@ -60,7 +60,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
         setState(() {});
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Không thể phân tích món ăn")),
+          const SnackBar(content: Text("Không thể upload ảnh")),
         );
       }
     } catch (e) {
@@ -290,7 +290,7 @@ class _MealLogDetailWidgetState extends State<MealLogDetailWidget> {
                                     ),
                                   )
                                 : const Text(
-                                    "AI Phân tích ảnh",
+                                    "Thêm ảnh",
                                     style: TextStyle(fontSize: 16),
                                   ),
                           ),
