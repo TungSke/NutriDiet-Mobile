@@ -6,8 +6,10 @@ import 'package:diet_plan_app/flutter_flow/flutter_flow_theme.dart';
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:diet_plan_app/services/food_service.dart';
 import 'package:diet_plan_app/services/meallog_service.dart';
+import 'package:diet_plan_app/services/package_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 
 class QuickAddWidget extends StatefulWidget {
   final String mealName;
@@ -25,6 +27,7 @@ class QuickAddWidget extends StatefulWidget {
 
 class _QuickAddWidgetState extends State<QuickAddWidget> {
   final MeallogService _mealLogService = MeallogService();
+  final PackageService _packageService = PackageService();
   final List<String> _mealTypes = const [
     'Breakfast',
     'Lunch',
@@ -154,7 +157,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       carbohydrates: carbs,
       fats: fats,
       protein: protein,
-      imageFile: _scannedImage, // thêm field ảnh
+      imageFile: _scannedImage,
     );
 
     if (success) {
@@ -184,52 +187,169 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     );
   }
 
+  // Hàm hiển thị dialog "Yêu cầu Premium Advanced"
+  Future<void> _showPremiumRequiredDialog() async {
+    final proceedToPremium = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                FlutterFlowTheme.of(context).primary,
+                FlutterFlowTheme.of(context).secondary,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.star,
+                color: Colors.yellow,
+                size: 50,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Yêu cầu Premium Advanced',
+                style: FlutterFlowTheme.of(context).titleLarge.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Để sử dụng tính năng "Thêm ảnh", bạn cần nâng cấp lên gói Premium Advanced.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
+                textAlign: TextAlign.center,
+                style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white70,
+                    ),
+                    child: const Text(
+                      'Hủy',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text(
+                      'Tiếp tục',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (proceedToPremium == true && mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BuyPremiumPackageScreenWidget(),
+        ),
+      );
+    }
+  }
+
   Future<void> _onAddImage() async {
-    final picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile == null) return;
-
-    final File imageFile = File(pickedFile.path);
-    setState(() {
-      _scannedImage = imageFile;
-      _isLoadingImage = true;
-    });
-
+    // Kiểm tra trạng thái Premium Advanced
     try {
-      final result = await FoodService().scanFoodImage(
-        imageFile: imageFile,
-        context: context,
-      );
-      final data = (result?['data'] as Map<String, dynamic>?) ?? {};
+      final premiumData = await _packageService.isPremium();
+      final isPremium = premiumData['isPremium'] == true;
+      final isAdvanced = premiumData['packageType'] == 'Advanced';
+
+      if (!isPremium || !isAdvanced) {
+        await _showPremiumRequiredDialog();
+        return;
+      }
+
+      // Tiếp tục với logic quét ảnh nếu là Premium Advanced
+      final picker = ImagePicker();
+      final XFile? pickedFile =
+      await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) return;
+
+      final File imageFile = File(pickedFile.path);
       setState(() {
-        _caloriesController.text =
-            (double.tryParse(data['calories']?.toString() ?? '0') ?? 0)
-                .round()
-                .toString();
-        _fatController.text =
-            (double.tryParse(data['fat']?.toString() ?? '0') ?? 0)
-                .round()
-                .toString();
-        _carbsController.text =
-            (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0)
-                .round()
-                .toString();
-        _proteinController.text =
-            (double.tryParse(data['protein']?.toString() ?? '0') ?? 0)
-                .round()
-                .toString();
-        _foodNameController.text = data['foodName']?.toString() ?? '';
+        _scannedImage = imageFile;
+        _isLoadingImage = true;
       });
+
+      try {
+        final result = await FoodService().scanFoodImage(
+          imageFile: imageFile,
+          context: context,
+        );
+        final data = (result?['data'] as Map<String, dynamic>?) ?? {};
+        setState(() {
+          _caloriesController.text =
+              (double.tryParse(data['calories']?.toString() ?? '0') ?? 0)
+                  .round()
+                  .toString();
+          _fatController.text =
+              (double.tryParse(data['fat']?.toString() ?? '0') ?? 0)
+                  .round()
+                  .toString();
+          _carbsController.text =
+              (double.tryParse(data['carbs']?.toString() ?? '0') ?? 0)
+                  .round()
+                  .toString();
+          _proteinController.text =
+              (double.tryParse(data['protein']?.toString() ?? '0') ?? 0)
+                  .round()
+                  .toString();
+          _foodNameController.text = data['foodName']?.toString() ?? '';
+        });
+      } catch (e) {
+        debugPrint('Error in _onAddImage: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi khi scan ảnh: $e')),
+        );
+      } finally {
+        setState(() {
+          _isLoadingImage = false;
+        });
+      }
     } catch (e) {
-      debugPrint('Error in _onAddImage: $e');
+      debugPrint('Error checking Premium status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi khi scan ảnh: $e')),
+        const SnackBar(content: Text('Lỗi khi kiểm tra trạng thái Premium')),
       );
-    } finally {
-      setState(() {
-        _isLoadingImage = false;
-      });
     }
   }
 
@@ -452,7 +572,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     } else if (userTyped && hasMacros && (typedCals != macroCals.round())) {
       final diff = typedCals - macroCals.round();
       subLabel =
-          "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
+      "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
     }
 
     return Column(
