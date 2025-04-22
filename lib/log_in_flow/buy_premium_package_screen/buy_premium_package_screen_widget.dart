@@ -5,6 +5,7 @@ import 'package:diet_plan_app/flutter_flow/flutter_flow_widgets.dart';
 import 'package:diet_plan_app/log_in_flow/buy_premium_package_screen/buy_premium_package_screen_model.dart';
 import 'package:diet_plan_app/log_in_flow/buy_premium_package_screen/web_view_page.dart';
 import 'package:diet_plan_app/services/package_service.dart';
+import 'package:intl/intl.dart';
 
 class BuyPremiumPackageScreenWidget extends StatefulWidget {
   const BuyPremiumPackageScreenWidget({Key? key}) : super(key: key);
@@ -18,11 +19,16 @@ class _BuyPremiumPackageScreenWidgetState
     extends State<BuyPremiumPackageScreenWidget>
     with SingleTickerProviderStateMixin {
   late BuyPremiumPackageScreenModel _model;
+  final PackageService _packageService = PackageService();
 
   late AnimationController _animationController;
   late Animation<Offset> _textOffsetAnimation;
   late Animation<double> _buttonOpacityAnimation;
   late Animation<double> _rotatingImageAnimation;
+
+  List<dynamic> packages = [];
+  Map<String, dynamic>? premiumStatus;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -58,9 +64,107 @@ class _BuyPremiumPackageScreenWidgetState
       CurvedAnimation(parent: _animationController, curve: Curves.linear),
     );
 
+    _fetchData();
+
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) _animationController.forward();
     });
+  }
+
+  Future<void> _fetchData() async {
+    setState(() => isLoading = true);
+    try {
+      final packageList = await _packageService.getPackages();
+      final status = await _packageService.isPremium();
+      print("Packages: $packageList");
+      print("Premium Status: $status");
+      setState(() {
+        packages = packageList;
+        premiumStatus = status;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching data: $e");
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Lỗi khi tải dữ liệu: $e"),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Thử lại',
+            onPressed: _fetchData,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handlePayment(int packageId, String packageType) async {
+    print("Handling payment for packageId: $packageId, packageType: $packageType");
+    try {
+      final isPremium = premiumStatus?['isPremium'] == true;
+      final currentPackageType = premiumStatus?['packageType'] ?? 'None';
+
+      if (isPremium) {
+        if (currentPackageType == 'Advanced') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Bạn đang sử dụng gói Advanced Premium. Không thể thay đổi gói."),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 4),
+            ),
+          );
+          return;
+        }
+        if (currentPackageType == 'Basic' && packageType == 'Basic') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Bạn đang sử dụng gói Basic Premium. Vui lòng nâng cấp lên Advanced."),
+              backgroundColor: Colors.amber,
+              duration: Duration(seconds: 4),
+            ),
+          );
+          return;
+        }
+      }
+
+      final response = (isPremium && currentPackageType == 'Basic' && packageType == 'Advanced')
+          ? await _packageService.upgradePackage(packageId: packageId)
+          : await _packageService.fetchPackagePayment(packageId: packageId);
+
+      print("API response: $response");
+
+      if (response != null && response['data'] != null) {
+        final String paymentUrl = response['data'];
+        print("Navigating to payment URL: $paymentUrl");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WebViewPage(url: paymentUrl),
+          ),
+        );
+      } else {
+        print("Invalid response");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Phản hồi từ server không hợp lệ."),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 4),
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      print("❌ Payment error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Lỗi khi thanh toán: ${e.toString().replaceFirst('Exception: ', '')}"),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -70,35 +174,7 @@ class _BuyPremiumPackageScreenWidgetState
     super.dispose();
   }
 
-  Future<void> _handlePayment() async {
-    try {
-      final response = await PackageService().fetchPackagePayment(
-        packageId: "1",
-        cancelUrl: "https://yourapp.com/checkoutFailScreen",
-        returnUrl: "https://yourapp.com/checkoutSuccessScreen",
-      );
-      if (response != null && response["data"] != null) {
-        final String paymentUrl = response["data"];
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => WebViewPage(url: paymentUrl),
-          ),
-        );
-      } else {
-        Navigator.pushNamed(context, '/checkoutFailScreen');
-      }
-    } catch (e) {
-      print("❌ Lỗi khi thanh toán: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Bạn đã là thành viên trả phí!"),
-          backgroundColor: Colors.amber,
-        ),
-      );
-      Navigator.pushNamed(context, '/checkoutFailScreen');
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +183,7 @@ class _BuyPremiumPackageScreenWidgetState
     return Scaffold(
       body: Stack(
         children: [
-          // 1. Gradient background
+          // Gradient background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -121,7 +197,7 @@ class _BuyPremiumPackageScreenWidgetState
             ),
           ),
 
-          // 2. Rotating header image
+          // Rotating header image
           Positioned(
             top: 0,
             left: 0,
@@ -140,14 +216,13 @@ class _BuyPremiumPackageScreenWidgetState
             ),
           ),
 
-          // 3. Main scrollable content
+          // Main scrollable content
           CustomScrollView(
             slivers: [
               SliverList(
                 delegate: SliverChildListDelegate([
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
                     constraints: BoxConstraints(minHeight: size.height),
                     color: Colors.white.withOpacity(0.85),
                     child: Column(
@@ -178,7 +253,7 @@ class _BuyPremiumPackageScreenWidgetState
                           child: Column(
                             children: [
                               Text(
-                                "Chương trình đã sẵn sàng!",
+                                "Chọn Gói Premium Của Bạn!",
                                 style: GoogleFonts.roboto(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -187,85 +262,129 @@ class _BuyPremiumPackageScreenWidgetState
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 12),
-                              RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: "Đạt ",
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.black87,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: "mục tiêu cân nặng",
-                                      style: GoogleFonts.roboto(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF388E3C),
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: " nhanh hơn",
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.black87,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
+                              Text(
+                                "Mở khóa các tính năng AI cá nhân hóa để đạt mục tiêu sức khỏe nhanh hơn!",
+                                style: GoogleFonts.roboto(
+                                  fontSize: 16,
+                                  color: Colors.black87,
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              RichText(
                                 textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: "với một kế hoạch cá nhân bằng",
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.black87,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: " AI",
-                                      style: GoogleFonts.roboto(
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF1B5E20),
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 20),
 
-                        // Pay button with fade-in
-                        FadeTransition(
-                          opacity: _buttonOpacityAnimation,
-                          child: FFButtonWidget(
-                            onPressed: _handlePayment,
-                            text: 'Thanh toán',
-                            options: FFButtonOptions(
-                              width: double.infinity,
-                              height: 60,
-                              color: FlutterFlowTheme.of(context).primary,
-                              textStyle: GoogleFonts.roboto(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                        const SizedBox(height: 16),
+
+                        // Loading indicator or package list
+                        isLoading
+                            ? const CircularProgressIndicator()
+                            : Column(
+                          children: packages.map((package) {
+                            final isAdvanced = package['packageType'] == 'Advanced';
+                            final isPremium = premiumStatus?['isPremium'] == true;
+                            final currentPackageType = premiumStatus?['packageType'] ?? 'None';
+                            final isDisabled = isPremium &&
+                                (currentPackageType == 'Advanced' ||
+                                    (currentPackageType == 'Basic' && !isAdvanced));
+                            final buttonText = isPremium && currentPackageType == 'Basic' && isAdvanced
+                                ? 'Nâng cấp'
+                                : 'Mua ngay';
+                            final isActivePackage = isPremium && currentPackageType == package['packageType'];
+
+                            print("Package: ${package['packageName']}, isDisabled: $isDisabled, isActive: $isActivePackage");
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: Card(
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: isActivePackage
+                                      ? const BorderSide(color: Color(0xFF1B5E20), width: 2)
+                                      : BorderSide.none,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            package['packageName'] ?? 'Gói Premium',
+                                            style: GoogleFonts.roboto(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color(0xFF1B5E20),
+                                            ),
+                                          ),
+                                          if (isActivePackage)
+                                            const Icon(
+                                              Icons.check_circle,
+                                              color: Color(0xFF1B5E20),
+                                              size: 24,
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Giá: ${package['price']?.toStringAsFixed(0) ?? 'N/A'} VND',
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Thời gian: ${package['duration'] ?? 'N/A'} ngày',
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      Text(
+                                        package['description'] ?? 'Không có mô tả',
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      FadeTransition(
+                                        opacity: _buttonOpacityAnimation,
+                                        child: FFButtonWidget(
+                                          onPressed: isDisabled
+                                              ? null
+                                              : () => _handlePayment(
+                                            package['packageId'],
+                                            package['packageType'],
+                                          ),
+                                          text: buttonText,
+                                          options: FFButtonOptions(
+                                            width: double.infinity,
+                                            height: 50,
+                                            color: isDisabled
+                                                ? Colors.grey
+                                                : FlutterFlowTheme.of(context).primary,
+                                            textStyle: GoogleFonts.roboto(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                          ),
+                            );
+                          }).toList(),
                         ),
+
                         const SizedBox(height: 30),
 
                         // Terms & Privacy
@@ -313,7 +432,7 @@ class _BuyPremiumPackageScreenWidgetState
             ],
           ),
 
-          // 4. Close button on top
+          // Close button on top
           Positioned(
             top: MediaQuery.of(context).padding.top + 10,
             right: 20,
