@@ -1034,17 +1034,27 @@ class _EditHealthProfileScreenWidgetState
               );
 
               if (selected != null) {
-                setState(() {
-                  _model.selectedAllergyIds = selected;
-                  _model.allergies = selected.map((id) {
-                    return allergies
-                        .firstWhere((allergy) =>
-                            int.tryParse(allergy['id'].toString()) ==
-                            id)['title']
-                        .toString();
-                  }).toList();
-                  isEdited = true;
-                });
+                if (selected.length > 10) {
+                  // Show snackbar if more than 5 allergies are selected
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Bạn chỉ có thể chọn tối đa 10 dị ứng!"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } else {
+                  setState(() {
+                    _model.selectedAllergyIds = selected;
+                    _model.allergies = selected.map((id) {
+                      return allergies
+                          .firstWhere((allergy) =>
+                              int.tryParse(allergy['id'].toString()) ==
+                              id)['title']
+                          .toString();
+                    }).toList();
+                    isEdited = true;
+                  });
+                }
               }
             },
             child: Container(
@@ -1102,17 +1112,27 @@ class _EditHealthProfileScreenWidgetState
               );
 
               if (selected != null) {
-                setState(() {
-                  _model.selectedDiseaseIds = selected;
-                  _model.diseases = selected.map((id) {
-                    return diseases
-                        .firstWhere((disease) =>
-                            int.tryParse(disease['id'].toString()) ==
-                            id)['title']
-                        .toString();
-                  }).toList();
-                  isEdited = true;
-                });
+                if (selected.length > 5) {
+                  // Show snackbar if more than 5 allergies are selected
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Bạn chỉ có thể chọn tối đa 5 bệnh!"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } else {
+                  setState(() {
+                    _model.selectedDiseaseIds = selected;
+                    _model.diseases = selected.map((id) {
+                      return diseases
+                          .firstWhere((disease) =>
+                              int.tryParse(disease['id'].toString()) ==
+                              id)['title']
+                          .toString();
+                    }).toList();
+                    isEdited = true;
+                  });
+                }
               }
             },
             child: Container(

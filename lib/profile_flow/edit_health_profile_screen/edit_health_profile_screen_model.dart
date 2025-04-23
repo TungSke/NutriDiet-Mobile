@@ -214,6 +214,13 @@ class EditHealthProfileScreenModel extends ChangeNotifier {
   List<int> selectedDiseaseIds = [];
   String userId = '';
   String errorMessage = "";
+  bool isAllergySelectionValid() {
+    return selectedAllergyIds.length <= 5;
+  }
+
+  bool isDiseaseSelectionValid() {
+    return selectedAllergyIds.length <= 10;
+  }
 
   final Map<String, String> _activityLevelMap = {
     'Ít vận động': 'Sedentary',
