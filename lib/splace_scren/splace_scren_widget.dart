@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
 import '/flutter_flow/flutter_flow_animations.dart';
@@ -24,7 +25,6 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
   late SplaceScrenModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
   final animationsMap = <String, AnimationInfo>{};
 
   @override
@@ -32,14 +32,8 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
     super.initState();
     _model = createModel(context, () => SplaceScrenModel());
 
-    // On page load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(milliseconds: 3000));
-      if (FFAppState().isLogin == true) {
-        context.goNamed('bottom_navbar_screen');
-      } else {
-        context.goNamed('login_intro_screen');
-      }
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _handleSplashNavigation();
     });
 
     animationsMap.addAll({
@@ -48,8 +42,8 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
         effectsBuilder: () => [
           FadeEffect(
             curve: Curves.easeInOut,
-            delay: 50.0.ms,
-            duration: 2000.0.ms,
+            delay: 50.ms,
+            duration: 2000.ms,
             begin: 0.0,
             end: 1.0,
           ),
@@ -60,8 +54,8 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
         effectsBuilder: () => [
           FadeEffect(
             curve: Curves.easeInOut,
-            delay: 50.0.ms,
-            duration: 2000.0.ms,
+            delay: 50.ms,
+            duration: 2000.ms,
             begin: 0.0,
             end: 1.0,
           ),
@@ -72,8 +66,8 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
         effectsBuilder: () => [
           FadeEffect(
             curve: Curves.easeInOut,
-            delay: 100.0.ms,
-            duration: 2000.0.ms,
+            delay: 100.ms,
+            duration: 2000.ms,
             begin: 0.0,
             end: 1.0,
           ),
@@ -82,10 +76,27 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
     });
   }
 
+  Future<void> _handleSplashNavigation() async {
+    await Future.delayed(const Duration(milliseconds: 3000));
+
+    final storage = FlutterSecureStorage();
+    final String? token = await storage.read(key: 'accessToken');
+
+    final bool isLoggedIn = FFAppState().isLogin;
+
+    print('🔐 isLogin: $isLoggedIn');
+    print('🔑 accessToken: $token');
+
+    if (isLoggedIn && token != null && token.isNotEmpty) {
+      context.goNamed('bottom_navbar_screen');
+    } else {
+      context.goNamed('login_intro_screen');
+    }
+  }
+
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
   }
 
@@ -108,7 +119,7 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
               children: [
                 Padding(
                   padding:
-                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                  const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(0.0),
                     child: Image.asset(
@@ -123,23 +134,23 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
                 Text(
                   'NutriDiet',
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        fontFamily: 'figtree',
-                        fontSize: 28.0,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.bold,
-                        useGoogleFonts: false,
-                      ),
+                    fontFamily: 'figtree',
+                    fontSize: 28.0,
+                    letterSpacing: 0.0,
+                    fontWeight: FontWeight.bold,
+                    useGoogleFonts: false,
+                  ),
                 ).animateOnPageLoad(animationsMap['textOnPageLoadAnimation']!),
                 const SizedBox(height: 8.0),
                 Text(
                   'Hệ thống đề xuất chế độ ăn uống lành mạnh',
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        fontFamily: 'figtree',
-                        fontSize: 16.0,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.normal,
-                        useGoogleFonts: false,
-                      ),
+                    fontFamily: 'figtree',
+                    fontSize: 16.0,
+                    letterSpacing: 0.0,
+                    fontWeight: FontWeight.normal,
+                    useGoogleFonts: false,
+                  ),
                 ).animateOnPageLoad(
                     animationsMap['subtitleOnPageLoadAnimation']!),
               ],

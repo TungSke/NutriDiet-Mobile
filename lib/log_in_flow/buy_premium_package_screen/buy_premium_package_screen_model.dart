@@ -9,7 +9,7 @@ class BuyPremiumPackageScreenModel
   ///  Local state fields for this page.
 
   ///  State fields for stateful widgets in this page.
-  late AppbarModel appbarModel;
+  late AppbarModel? appbarModel;
 
   @override
   void initState(BuildContext context) {
@@ -18,6 +18,6 @@ class BuyPremiumPackageScreenModel
 
   @override
   void dispose() {
-    appbarModel.dispose();
+    appbarModel?.dispose();
   }
 }

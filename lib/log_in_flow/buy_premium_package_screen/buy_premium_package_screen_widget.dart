@@ -34,7 +34,7 @@ class _BuyPremiumPackageScreenWidgetState
   void initState() {
     super.initState();
     _model = BuyPremiumPackageScreenModel();
-
+    _model.initState(context);
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
