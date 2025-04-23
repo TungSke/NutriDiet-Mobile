@@ -156,6 +156,21 @@ class SelectAllergyScreenModel extends ChangeNotifier {
     print("📌 Danh sách dị ứng đã chọn: $selectedAllergyIds");
     notifyListeners();
   }
+  // void toggleSelection(int allergyId) {
+  //   if (selectedAllergyIds.contains(allergyId)) {
+  //     selectedAllergyIds.removeWhere((id) => id == allergyId);
+  //   } else {
+  //     if (selectedAllergyIds.length < 5) {
+  //       selectedAllergyIds.add(allergyId);
+  //     } else {
+  //       // Show Snackbar when trying to select more than 5 allergies
+  //       print("📌 Bạn chỉ có thể chọn ít hơn 5 dị ứng");
+  //       notifyListeners(); // Update UI after the change
+  //     }
+  //   }
+  //   print("📌 Danh sách dị ứng đã chọn: $selectedAllergyIds");
+  //   notifyListeners();
+  // }
 
   /// 🔹 Cập nhật dị ứng lên API
   Future<void> updateAllergy(BuildContext context) async {

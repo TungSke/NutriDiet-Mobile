@@ -92,6 +92,14 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
                                     backgroundColor: Colors.red,
                                   ),
                                 );
+                              } else if (model.selectedAllergyIds.length > 10) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Bạn chỉ có thể chọn ít hơn 10 dị ứng!"),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
                               } else {
                                 // Cập nhật allergies vào provider (dùng List<int>)
                                 context

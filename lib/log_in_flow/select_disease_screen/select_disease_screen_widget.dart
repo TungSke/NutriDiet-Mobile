@@ -92,6 +92,14 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                                     backgroundColor: Colors.red,
                                   ),
                                 );
+                              } else if (model.selectedDiseaseIds.length > 5) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Bạn chỉ có thể chọn ít hơn 5 bệnh!"),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
                               } else {
                                 // Cập nhật diseases vào provider (sử dụng List<int> thay vì List<String>)
                                 context
