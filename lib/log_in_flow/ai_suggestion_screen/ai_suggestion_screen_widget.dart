@@ -20,7 +20,7 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
   bool isLoading = true; // Biến để theo dõi trạng thái loading của trang
   bool isCreating =
       false; // Biến để theo dõi trạng thái loading của nút "Tạo lại"
-  String selectedCategory = "All";
+  String selectedCategory = "DinhDuong";
   @override
   void initState() {
     super.initState();
@@ -29,7 +29,7 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
   }
 
   final Map<String, String> categoryNames = {
-    'All': 'Tất cả',
+
     'DinhDuong': 'Dinh dưỡng',
     'LuyenTap': 'Luyện tập',
     'LoiSong': 'Lối sống',
@@ -40,10 +40,10 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
     setState(() {
       isLoading = false;
       // Lọc aisuggestions dựa trên selectedCategory
-      if (selectedCategory == 'All') {
+      if (selectedCategory == 'DinhDuong') {
         // Hiển thị chỉ những suggestion có type = 'All'
         filteredSuggestions = _model.aisuggestions
-            .where((suggestion) => suggestion.type == 'All')
+            .where((suggestion) => suggestion.type == 'DinhDuong')
             .toList();
       } else {
         // Hiển thị những suggestion có type tương ứng với selectedCategory
@@ -193,7 +193,7 @@ class _AiSuggestionScreenWidgetState extends State<AiSuggestionScreenWidget> {
                                                         _fetchData(); // Fetch lại dữ liệu khi category thay đổi
                                                       },
                                                       items: <String>[
-                                                        'All',
+
                                                         'DinhDuong',
                                                         'LuyenTap',
                                                         'LoiSong'
