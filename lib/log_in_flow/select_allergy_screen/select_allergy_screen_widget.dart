@@ -6,6 +6,7 @@ import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '../../services/models/health_profile_provider.dart';
+import '../../services/systemconfiguration_service.dart';
 import 'select_allergy_screen_model.dart';
 
 class SelectAllergyScreenWidget extends StatefulWidget {
@@ -24,6 +25,29 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
     super.initState();
     model = SelectAllergyScreenModel();
     model.fetchAllergyLevels();
+    Future.delayed(Duration.zero, () async {
+      await _getConfigValuesFromApi();
+      setState(() {});
+    });
+  }
+
+  late int minAllergy = 0; // Mặc định minHeight
+  late int maxAllergy = 10;
+  final SystemConfigurationService _systemConfigService =
+      SystemConfigurationService();
+  Future<void> _getConfigValuesFromApi() async {
+    try {
+      // Lấy min/max height từ API
+
+      final responseAllergy = await _systemConfigService.getSystemConfigById(5);
+      final allergyConfig = responseAllergy['data'];
+      minAllergy = allergyConfig['minValue']?.toDouble() ?? 0;
+      maxAllergy = allergyConfig['maxValue']?.toDouble() ?? 10;
+
+      setState(() {}); // Cập nhật UI sau khi lấy dữ liệu
+    } catch (e) {
+      print("❌ Lỗi khi lấy cấu hình: $e");
+    }
   }
 
   @override
@@ -92,11 +116,14 @@ class _SelectAllergyScreenWidgetState extends State<SelectAllergyScreenWidget> {
                                     backgroundColor: Colors.red,
                                   ),
                                 );
-                              } else if (model.selectedAllergyIds.length > 10) {
+                              } else if (model.selectedAllergyIds.length >
+                                      maxAllergy ||
+                                  model.selectedAllergyIds.length <
+                                      minAllergy) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
-                                        "Bạn chỉ có thể chọn ít hơn 10 dị ứng!"),
+                                        "Bạn chỉ có thể chọn dị ứng trong khoảng $minAllergy - $maxAllergy dị ứng!"),
                                     backgroundColor: Colors.red,
                                   ),
                                 );

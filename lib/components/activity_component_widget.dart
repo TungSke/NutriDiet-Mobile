@@ -1510,7 +1510,7 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                               return AlertDialog(
                                 title: Text('Cảnh báo'),
                                 content: Text(
-                                    "Cân nặng phải nằm trong khoảng $minWeight - $maxWeight"),
+                                    "Cân nặng phải nằm trong khoảng $minWeight - $maxWeight kg"),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
