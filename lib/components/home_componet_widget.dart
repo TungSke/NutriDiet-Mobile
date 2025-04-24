@@ -1,4 +1,3 @@
-import 'package:diet_plan_app/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -897,33 +896,33 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget>
                                         ],
                                       ),
                                     ),
-                                    Showcase(
-                                      key: _mealPlan,
-                                      enableAutoScroll: true,
-                                      description:
-                                          'Dưới đây là thông tin bữa ăn của bạn. Hãy bắt đầu bữa ăn bằng việc thêm món',
-                                      child: Padding(
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(20.0, 24.0, 20.0, 16.0),
-                                        child: Text(
-                                          'Bữa ăn hằng ngày',
-                                          maxLines: 1,
-                                          style: GoogleFonts.roboto(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    for (final category
-                                        in _model.mealCategories) ...[
-                                      _buildMealCategoryCard(context, category),
-                                      Container(
-                                        height: 10.0,
-                                        color: Colors.white,
-                                      ),
-                                    ],
+                                    // Showcase(
+                                    //   key: _mealPlan,
+                                    //   enableAutoScroll: true,
+                                    //   description:
+                                    //       'Dưới đây là thông tin bữa ăn của bạn. Hãy bắt đầu bữa ăn bằng việc thêm món',
+                                    //   child: Padding(
+                                    //     padding: const EdgeInsetsDirectional
+                                    //         .fromSTEB(20.0, 24.0, 20.0, 16.0),
+                                    //     child: Text(
+                                    //       'Bữa ăn hằng ngày',
+                                    //       maxLines: 1,
+                                    //       style: GoogleFonts.roboto(
+                                    //         fontSize: 20,
+                                    //         fontWeight: FontWeight.w600,
+                                    //         color: Colors.black,
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    // for (final category
+                                    //     in _model.mealCategories) ...[
+                                    //   _buildMealCategoryCard(context, category),
+                                    //   Container(
+                                    //     height: 10.0,
+                                    //     color: Colors.white,
+                                    //   ),
+                                    // ],
                                   ],
                                 ),
                                 if (FFAppState().isLogin == false)
@@ -966,41 +965,41 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget>
         return category;
     }
   }
-
-  Widget _buildMealCategoryCard(BuildContext context, String category) {
-    final vietnameseCategory = _mapCategoryToVietnamese(category);
-    final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
-
-    return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).lightGrey,
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Padding(
-                padding:
-                    const EdgeInsetsDirectional.fromSTEB(16, 16.0, 16, 16.0),
-                child: _buildMealCategoryContent(
-                  context,
-                  mealLog,
-                  category,
-                  vietnameseCategory,
-                ),
-              ),
-            ),
-          ),
-        ]
-            .divide(const SizedBox(width: 16.0))
-            .addToStart(const SizedBox(width: 20.0))
-            .addToEnd(const SizedBox(width: 20.0)),
-      ),
-    );
-  }
+  //
+  // Widget _buildMealCategoryCard(BuildContext context, String category) {
+  //   final vietnameseCategory = _mapCategoryToVietnamese(category);
+  //   final mealLog = _model.mealLogs.isNotEmpty ? _model.mealLogs[0] : null;
+  //
+  //   return Padding(
+  //     padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.start,
+  //       children: [
+  //         Expanded(
+  //           child: Container(
+  //             decoration: BoxDecoration(
+  //               color: FlutterFlowTheme.of(context).lightGrey,
+  //               borderRadius: BorderRadius.circular(16.0),
+  //             ),
+  //             child: Padding(
+  //               padding:
+  //                   const EdgeInsetsDirectional.fromSTEB(16, 16.0, 16, 16.0),
+  //               child: _buildMealCategoryContent(
+  //                 context,
+  //                 mealLog,
+  //                 category,
+  //                 vietnameseCategory,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ]
+  //           .divide(const SizedBox(width: 16.0))
+  //           .addToStart(const SizedBox(width: 20.0))
+  //           .addToEnd(const SizedBox(width: 20.0)),
+  //     ),
+  //   );
+  // }
 
   Color _getMealProgressColor(String category) {
     switch (category.toLowerCase()) {
@@ -1017,190 +1016,190 @@ class _HomeComponetWidgetState extends State<HomeComponetWidget>
     }
   }
 
-  Widget _buildMealCategoryContent(
-    BuildContext context,
-    mealLog,
-    String category,
-    String vietnameseCategory,
-  ) {
-    if (mealLog == null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildMealHeader(vietnameseCategory, null),
-          ListTile(
-            title: const Text(
-              'Thêm',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MealLogComponentWidget(),
-                ),
-              ).then((result) {
-                if (result == true) _model.fetchMealLogs();
-              });
-            },
-          ),
-        ],
-      );
-    }
-
-    final details = mealLog.mealLogDetails
-        .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
-        .toList();
-
-    final bool hasAnyFood = details.isNotEmpty;
-    final mealCals = details.fold(0, (sum, d) => sum + d.calories);
-    final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
-    final mealFat = details.fold(0, (sum, d) => sum + d.fat);
-    final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildMealHeader(vietnameseCategory, hasAnyFood ? mealCals : null),
-        if (hasAnyFood)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Text(
-              'Carbs $mealCarbs (g) • Fat $mealFat (g) • Protein $mealProtein (g)',
-              style: const TextStyle(
-                fontFamily: 'Figtree',
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: LinearProgressIndicator(
-            value: mealCals > 0 ? (mealCals / 1000) : 0,
-            backgroundColor: Colors.grey[300],
-            valueColor:
-                AlwaysStoppedAnimation<Color>(_getMealProgressColor(category)),
-          ),
-        ),
-        for (int i = 0; i < details.length; i++) ...[
-          GestureDetector(
-            onLongPress: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Nhật ký'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          title: const Text('Chuyển đến...'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Chuyển đến...'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      for (final mealType in [
-                                        'Breakfast',
-                                        'Lunch',
-                                        'Dinner',
-                                        'Snacks'
-                                      ])
-                                        ListTile(
-                                          title: Text(mealType),
-                                          onTap: () async {
-                                            Navigator.pop(context);
-                                            await _model
-                                                .transferMealLogDetailEntry(
-                                              detailId: details[i].detailId,
-                                              targetMealType: mealType,
-                                            );
-                                          },
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(16, 5, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 3,
-                            backgroundColor: Colors.orange,
-                          ),
-                          const SizedBox(width: 8.0),
-                          Row(
-                            children: [
-                              Text(
-                                details[i].foodName,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              Text(
-                                "(x${details[i].quantity})",
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Text("${details[i].calories} kcal"),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-        ListTile(
-          title: const Text(
-            'Thêm',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.green,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MealLogComponentWidget(),
-              ),
-            ).then((result) {
-              if (result == true) _model.fetchMealLogs();
-            });
-          },
-        ),
-      ],
-    );
-  }
+  // Widget _buildMealCategoryContent(
+  //   BuildContext context,
+  //   mealLog,
+  //   String category,
+  //   String vietnameseCategory,
+  // ) {
+  //   if (mealLog == null) {
+  //     return Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         _buildMealHeader(vietnameseCategory, null),
+  //         ListTile(
+  //           title: const Text(
+  //             'Thêm',
+  //             style: TextStyle(
+  //               fontSize: 14,
+  //               color: Colors.green,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //           onTap: () {
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (context) => MealLogComponentWidget(),
+  //               ),
+  //             ).then((result) {
+  //               if (result == true) _model.fetchMealLogs();
+  //             });
+  //           },
+  //         ),
+  //       ],
+  //     );
+  //   }
+  //
+  //   final details = mealLog.mealLogDetails
+  //       .where((d) => d.mealType.toLowerCase() == category.toLowerCase())
+  //       .toList();
+  //
+  //   final bool hasAnyFood = details.isNotEmpty;
+  //   final mealCals = details.fold(0, (sum, d) => sum + d.calories);
+  //   final mealCarbs = details.fold(0, (sum, d) => sum + d.carbs);
+  //   final mealFat = details.fold(0, (sum, d) => sum + d.fat);
+  //   final mealProtein = details.fold(0, (sum, d) => sum + d.protein);
+  //
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildMealHeader(vietnameseCategory, hasAnyFood ? mealCals : null),
+  //       if (hasAnyFood)
+  //         Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+  //           child: Text(
+  //             'Carbs $mealCarbs (g) • Fat $mealFat (g) • Protein $mealProtein (g)',
+  //             style: const TextStyle(
+  //               fontFamily: 'Figtree',
+  //               fontSize: 14,
+  //               color: Colors.grey,
+  //             ),
+  //           ),
+  //         ),
+  //       Padding(
+  //         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+  //         child: LinearProgressIndicator(
+  //           value: mealCals > 0 ? (mealCals / 1000) : 0,
+  //           backgroundColor: Colors.grey[300],
+  //           valueColor:
+  //               AlwaysStoppedAnimation<Color>(_getMealProgressColor(category)),
+  //         ),
+  //       ),
+  //       for (int i = 0; i < details.length; i++) ...[
+  //         GestureDetector(
+  //           onLongPress: () {
+  //             showDialog(
+  //               context: context,
+  //               builder: (BuildContext context) {
+  //                 return AlertDialog(
+  //                   title: const Text('Nhật ký'),
+  //                   content: Column(
+  //                     mainAxisSize: MainAxisSize.min,
+  //                     children: [
+  //                       ListTile(
+  //                         title: const Text('Chuyển đến...'),
+  //                         onTap: () {
+  //                           Navigator.pop(context);
+  //                           showDialog(
+  //                             context: context,
+  //                             builder: (BuildContext context) {
+  //                               return AlertDialog(
+  //                                 title: const Text('Chuyển đến...'),
+  //                                 content: Column(
+  //                                   mainAxisSize: MainAxisSize.min,
+  //                                   children: [
+  //                                     for (final mealType in [
+  //                                       'Breakfast',
+  //                                       'Lunch',
+  //                                       'Dinner',
+  //                                       'Snacks'
+  //                                     ])
+  //                                       ListTile(
+  //                                         title: Text(mealType),
+  //                                         onTap: () async {
+  //                                           Navigator.pop(context);
+  //                                           await _model
+  //                                               .transferMealLogDetailEntry(
+  //                                             detailId: details[i].detailId,
+  //                                             targetMealType: mealType,
+  //                                           );
+  //                                         },
+  //                                       ),
+  //                                   ],
+  //                                 ),
+  //                               );
+  //                             },
+  //                           );
+  //                         },
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 );
+  //               },
+  //             );
+  //           },
+  //           child: Padding(
+  //             padding: const EdgeInsetsDirectional.fromSTEB(16, 5, 16, 0),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Row(
+  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                   children: [
+  //                     Row(
+  //                       children: [
+  //                         CircleAvatar(
+  //                           radius: 3,
+  //                           backgroundColor: Colors.orange,
+  //                         ),
+  //                         const SizedBox(width: 8.0),
+  //                         Row(
+  //                           children: [
+  //                             Text(
+  //                               details[i].foodName,
+  //                               style: const TextStyle(fontSize: 14),
+  //                             ),
+  //                             Text(
+  //                               "(x${details[i].quantity})",
+  //                               style: const TextStyle(
+  //                                   fontSize: 14, color: Colors.grey),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     Text("${details[i].calories} kcal"),
+  //                   ],
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //       ListTile(
+  //         title: const Text(
+  //           'Thêm',
+  //           style: TextStyle(
+  //             fontSize: 14,
+  //             color: Colors.green,
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         ),
+  //         onTap: () {
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => MealLogComponentWidget(),
+  //             ),
+  //           ).then((result) {
+  //             if (result == true) _model.fetchMealLogs();
+  //           });
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildMealHeader(String category, int? mealCals) {
     return Padding(

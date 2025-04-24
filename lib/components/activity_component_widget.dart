@@ -1508,15 +1508,27 @@ class _ActivityComponentWidgetState extends State<ActivityComponentWidget> {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
+                                backgroundColor: Colors.white,
                                 title: Text('Cảnh báo'),
                                 content: Text(
-                                    "Cân nặng phải nằm trong khoảng $minWeight - $maxWeight"),
+                                    "Cân nặng phải nằm trong khoảng $minWeight - $maxWeight kg"),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.of(context).pop(); // Đóng modal
-                                    },
-                                    child: Text('Đóng'),
+                                      Navigator.of(context).pop();
+                                    }, // Đóng modal
+                                    style: TextButton.styleFrom(
+                                      backgroundColor:
+                                          FlutterFlowTheme.of(context)
+                                              .primary, // Nút xanh lá
+                                    ),
+
+                                    child: Text(
+                                      'Đóng',
+                                      style: TextStyle(
+                                        color: Colors.white, // Chữ trắng
+                                      ),
+                                    ),
                                   ),
                                 ],
                               );
