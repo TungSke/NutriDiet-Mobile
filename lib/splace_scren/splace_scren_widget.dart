@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:diet_plan_app/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -81,15 +82,72 @@ class _SplaceScrenWidgetState extends State<SplaceScrenWidget>
 
     final storage = FlutterSecureStorage();
     final String? token = await storage.read(key: 'accessToken');
-
     final bool isLoggedIn = FFAppState().isLogin;
 
     print('🔐 isLogin: $isLoggedIn');
     print('🔑 accessToken: $token');
 
     if (isLoggedIn && token != null && token.isNotEmpty) {
-      context.goNamed('bottom_navbar_screen');
+      try {
+        UserService userService = UserService();
+        final whoAmIResponse = await userService.whoAmI();
+
+        if (whoAmIResponse.statusCode == 200) {
+          // Token hợp lệ, điều hướng đến màn hình chính
+          context.goNamed('bottom_navbar_screen');
+        } else if (whoAmIResponse.statusCode == 401) {
+          // Access token hết hạn, thử làm mới token
+          final refreshResponse = await userService.refreshToken();
+
+          if (refreshResponse.statusCode == 200) {
+            // Làm mới token thành công, lưu token mới
+            final data = jsonDecode(refreshResponse.body);
+            if (data['data'] != null && data['data']['accessToken'] != null) {
+              await storage.write(
+                key: 'accessToken',
+                value: data['data']['accessToken'],
+              );
+              await storage.write(
+                key: 'refreshToken',
+                value: data['data']['refreshToken'] ?? await storage.read(key: 'refreshToken'), // Giữ refreshToken cũ nếu không có mới
+              );
+              context.goNamed('bottom_navbar_screen');
+            } else {
+              throw Exception('Invalid refresh token response structure');
+            }
+          } else if (refreshResponse.statusCode == 401) {
+            // Refresh token hết hạn
+            final errorData = jsonDecode(refreshResponse.body);
+            if (errorData['message'] == 'Refresh token is expired, please login again') {
+              // Xóa token và điều hướng đến đăng nhập
+              await storage.delete(key: 'accessToken');
+              await storage.delete(key: 'refreshToken');
+              FFAppState().isLogin = false;
+              context.goNamed('login_intro_screen');
+            } else {
+              throw Exception('Unexpected refresh token error: ${errorData['message']}');
+            }
+          } else {
+            // Lỗi khác khi làm mới token
+            throw Exception('Failed to refresh token: ${refreshResponse.statusCode}');
+          }
+        } else {
+          // Lỗi khác từ whoAmI, xóa token và đăng nhập lại
+          await storage.delete(key: 'accessToken');
+          await storage.delete(key: 'refreshToken');
+          FFAppState().isLogin = false;
+          context.goNamed('login_intro_screen');
+        }
+      } catch (e) {
+        print('Error: $e');
+        // Xử lý lỗi (mạng, JSON parsing, v.v.), xóa token và đăng nhập lại
+        await storage.delete(key: 'accessToken');
+        await storage.delete(key: 'refreshToken');
+        FFAppState().isLogin = false;
+        context.goNamed('login_intro_screen');
+      }
     } else {
+      // Không có token hoặc chưa đăng nhập
       context.goNamed('login_intro_screen');
     }
   }

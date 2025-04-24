@@ -91,6 +91,21 @@ class UserService {
     return response;
   }
 
+  Future<http.Response> refreshToken() async {
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+
+    final String? refreshToken = await flutterSecureStorage.read(key: 'refreshToken');
+    if (refreshToken == null || refreshToken.isEmpty) {
+      throw Exception("Refresh token not found.");
+    }
+
+    final response = await _apiService.post("api/user/refresh-token", body: {
+      "refreshToken": refreshToken
+    });
+
+    return response;
+  }
+
   // Future<http.Response> updateUser({
   //   required String fullName,
   //   required int age,
