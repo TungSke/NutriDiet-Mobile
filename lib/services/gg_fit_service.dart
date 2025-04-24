@@ -32,11 +32,40 @@ class GGFitService {
   Future<bool> _checkActivityRecognitionPermission() async {
     if (kIsWeb || !Platform.isAndroid) return true;
 
-    bool granted = await Permission.activityRecognition.isGranted;
-    if (!granted) {
-      granted = await Permission.activityRecognition.request() == PermissionStatus.granted;
+    // Check ACTIVITY_RECOGNITION permission
+    bool activityGranted = await Permission.activityRecognition.isGranted;
+    if (!activityGranted) {
+      activityGranted = await Permission.activityRecognition.request() == PermissionStatus.granted;
     }
-    return granted;
+
+    // Check Health Connect permissions
+    bool healthConnectAvailable = true;
+    final status = await _health.getHealthConnectSdkStatus();
+    if (status != HealthConnectSdkStatus.sdkAvailable) {
+      healthConnectAvailable = false;
+      await _health.installHealthConnect();
+    }
+
+    if (healthConnectAvailable) {
+      await _health.configure();
+      final types = [
+        HealthDataType.STEPS,
+        HealthDataType.TOTAL_CALORIES_BURNED,
+        HealthDataType.ACTIVE_ENERGY_BURNED,
+      ];
+      final permissions = List.filled(types.length, HealthDataAccess.READ_WRITE);
+      bool? hasPermission = await _health.hasPermissions(types, permissions: permissions);
+
+      if (hasPermission == null || !hasPermission) {
+        final authorized = await _health.requestAuthorization(types, permissions: permissions);
+        if (!authorized) {
+          print("Health Connect permissions not granted.");
+          return false;
+        }
+      }
+    }
+
+    return activityGranted && healthConnectAvailable;
   }
 
   Future<int> _fetchStepsFromHealthConnect(DateTime startDate, DateTime endDate) async {
