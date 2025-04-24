@@ -513,6 +513,10 @@ class _EditHealthProfileScreenWidgetState
   late double maxHeight = 220.0; // Mặc định maxHeight
   late double minWeight = 30.0; // Mặc định minWeight
   late double maxWeight = 250.0; // Mặc định maxWeight
+  late int minAllergy = 0; // Mặc định minHeight
+  late int maxAllergy = 10; // Mặc định maxHeight
+  late int minDisease = 0; // Mặc định minWeight
+  late int maxDisease = 5; // Mặc định maxWeight
   final SystemConfigurationService _systemConfigService =
       SystemConfigurationService();
   Future<void> _getConfigValuesFromApi() async {
@@ -529,6 +533,14 @@ class _EditHealthProfileScreenWidgetState
       minWeight = weightConfig['minValue']?.toDouble() ?? 30.0;
       maxWeight = weightConfig['maxValue']?.toDouble() ?? 250.0;
 
+      final responseAllergy = await _systemConfigService.getSystemConfigById(5);
+      final allergyConfig = responseAllergy['data'];
+      minAllergy = allergyConfig['minValue']?.toDouble() ?? 0;
+      maxAllergy = allergyConfig['maxValue']?.toDouble() ?? 10;
+      final responseDisease = await _systemConfigService.getSystemConfigById(6);
+      final diseaseConfig = responseDisease['data'];
+      minDisease = diseaseConfig['minValue']?.toDouble() ?? 0;
+      maxDisease = diseaseConfig['maxValue']?.toDouble() ?? 5;
       setState(() {}); // Cập nhật UI sau khi lấy dữ liệu
     } catch (e) {
       print("❌ Lỗi khi lấy cấu hình: $e");
@@ -1034,11 +1046,13 @@ class _EditHealthProfileScreenWidgetState
               );
 
               if (selected != null) {
-                if (selected.length > 10) {
+                if (selected.length > maxAllergy ||
+                    selected.length < minAllergy) {
                   // Show snackbar if more than 5 allergies are selected
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Bạn chỉ có thể chọn tối đa 10 dị ứng!"),
+                    SnackBar(
+                      content: Text(
+                          "Bạn chỉ có thể chọn dị ứng trong khoảng $minAllergy - $maxAllergy dị ứng!"),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -1112,13 +1126,14 @@ class _EditHealthProfileScreenWidgetState
               );
 
               if (selected != null) {
-                if (selected.length > 5) {
+                if (selected.length > maxDisease ||
+                    selected.length < minDisease) {
                   // Show snackbar if more than 5 allergies are selected
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Bạn chỉ có thể chọn tối đa 5 bệnh!"),
-                      backgroundColor: Colors.red,
-                    ),
+                    SnackBar(
+                        content: Text(
+                            "Bạn chỉ có thể chọn bệnh trong khoảng $minDisease - $maxDisease bệnh!"),
+                        backgroundColor: Colors.red),
                   );
                 } else {
                   setState(() {

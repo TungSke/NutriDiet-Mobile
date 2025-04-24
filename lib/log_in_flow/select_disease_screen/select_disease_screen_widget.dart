@@ -6,6 +6,7 @@ import '/components/appbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '../../services/models/health_profile_provider.dart';
+import '../../services/systemconfiguration_service.dart';
 import 'select_disease_screen_model.dart';
 
 class SelectDiseaseScreenWidget extends StatefulWidget {
@@ -18,12 +19,34 @@ class SelectDiseaseScreenWidget extends StatefulWidget {
 
 class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
   late SelectDiseaseScreenModel model;
+  late int minDisease = 0; // Mặc định minHeight
+  late int maxDisease = 5;
+  final SystemConfigurationService _systemConfigService =
+      SystemConfigurationService();
+  Future<void> _getConfigValuesFromApi() async {
+    try {
+      final responseDisease = await _systemConfigService.getSystemConfigById(6);
+      final diseaseConfig = responseDisease['data'];
+      minDisease = diseaseConfig['minValue']?.toDouble() ?? 0;
+      maxDisease = diseaseConfig['maxValue']?.toDouble() ?? 5;
+
+      setState(() {}); // Cập nhật UI sau khi lấy dữ liệu
+    } catch (e) {
+      print("❌ Lỗi khi lấy cấu hình: $e");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     model = SelectDiseaseScreenModel();
     model.fetchDiseaseLevels();
+
+    // Gọi async method sau 1 frame
+    Future.delayed(Duration.zero, () async {
+      await _getConfigValuesFromApi();
+      setState(() {});
+    });
   }
 
   @override
@@ -92,11 +115,14 @@ class _SelectDiseaseScreenWidgetState extends State<SelectDiseaseScreenWidget> {
                                     backgroundColor: Colors.red,
                                   ),
                                 );
-                              } else if (model.selectedDiseaseIds.length > 5) {
+                              } else if (model.selectedDiseaseIds.length >
+                                      maxDisease ||
+                                  model.selectedDiseaseIds.length <
+                                      minDisease) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
-                                        "Bạn chỉ có thể chọn ít hơn 5 bệnh!"),
+                                        "Bạn chỉ có thể chọn bệnh trong khoảng $minDisease - $maxDisease bệnh!"),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
