@@ -92,28 +92,44 @@ Future<void> setupPermissions() async {
   if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) {
     try {
       final status = await health.getHealthConnectSdkStatus();
-      if (status == HealthConnectSdkStatus.sdkAvailable) {
-        await health.configure();
-        final types = [
-          HealthDataType.STEPS,
-          HealthDataType.TOTAL_CALORIES_BURNED,
-        ];
-        final permissions = List.filled(types.length, HealthDataAccess.READ_WRITE);
-        bool? hasPermission = await health.hasPermissions(types, permissions: permissions);
-
-        if (hasPermission == null || !hasPermission) {
-          final authorized = await health.requestAuthorization(types, permissions: permissions);
-          if (authorized) {
-            print("Quyền Health Connect được cấp cho: $types");
-          } else {
-            print("Người dùng từ chối cấp quyền Health Connect.");
-          }
-        } else {
-          print("Quyền Health Connect đã được cấp trước đó.");
-        }
-      } else {
+      if (status != HealthConnectSdkStatus.sdkAvailable) {
         print("Health Connect SDK không khả dụng, yêu cầu cài đặt.");
         await health.installHealthConnect();
+        // Kiểm tra lại sau khi cài đặt
+        final newStatus = await health.getHealthConnectSdkStatus();
+        if (newStatus != HealthConnectSdkStatus.sdkAvailable) {
+          print("Không thể cài đặt Health Connect SDK.");
+          return;
+        }
+      }
+
+      await health.configure();
+      final types = [
+        HealthDataType.STEPS,
+        HealthDataType.TOTAL_CALORIES_BURNED,
+        HealthDataType.ACTIVE_ENERGY_BURNED,
+      ];
+      final permissions = List.filled(types.length, HealthDataAccess.READ_WRITE);
+
+      // Kiểm tra quyền
+      bool? hasPermission = await health.hasPermissions(types, permissions: permissions);
+      print("Health Connect permission status: $hasPermission");
+
+      if (hasPermission == null || !hasPermission) {
+        final authorized = await health.requestAuthorization(types, permissions: permissions);
+        if (authorized) {
+          // Kiểm tra lại quyền sau khi yêu cầu
+          hasPermission = await health.hasPermissions(types, permissions: permissions);
+          if (hasPermission == true) {
+            print("Quyền Health Connect được cấp cho: $types");
+          } else {
+            print("Không thể xác nhận quyền Health Connect sau khi yêu cầu.");
+          }
+        } else {
+          print("Người dùng từ chối cấp quyền Health Connect.");
+        }
+      } else {
+        print("Quyền Health Connect đã được cấp trước đó.");
       }
     } catch (e) {
       print("Lỗi khi yêu cầu quyền Health Connect: $e");
