@@ -73,120 +73,177 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
   }
 
   void _rejectMealPlan() {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      pageBuilder: (context, animation, secondaryAnimation) {
         String reason = '';
-        return AlertDialog(
-          title: const Text("Từ chối thực đơn"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Nêu lý do bạn không thích ở thực đơn, thực đơn sẽ được làm mới",
-                style: TextStyle(fontSize: 14),
+        return ScaleTransition(
+          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          ),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 8,
+            contentPadding: const EdgeInsets.all(24),
+            title: Row(
+              children: [
+                Icon(Icons.feedback, color: FlutterFlowTheme.of(context).primary, size: 28),
+                const SizedBox(width: 8),
+                Text(
+                  "Từ chối thực đơn",
+                  style: GoogleFonts.montserrat(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                ),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Vui lòng cho biết lý do bạn không hài lòng với thực đơn. Thực đơn sẽ được làm mới dựa trên phản hồi của bạn.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    onChanged: (value) => reason = value,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: "Nhập lý do...",
+                      hintStyle: TextStyle(color: Colors.grey.shade400),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              TextField(
-                onChanged: (value) => reason = value,
-                decoration: const InputDecoration(
-                  hintText: "Nhập lý do...",
-                  border: OutlineInputBorder(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  "Hủy",
+                  style: TextStyle(
+                    color: FlutterFlowTheme.of(context).primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context); // Đóng dialog nhập lý do
+
+                  BuildContext? loadingDialogContext;
+                  if (mounted) {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (dialogContext) {
+                        loadingDialogContext = dialogContext;
+                        return Dialog(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 80, maxHeight: 80), // Giới hạn kích thước Dialog
+                            padding: const EdgeInsets.all(16), // Giảm padding
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: FlutterFlowTheme.of(context).primary,
+                                strokeWidth: 3, // Giảm độ dày của vòng tròn
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+
+                  try {
+                    final result = await _model.rejectMealPlan(reason);
+
+                    if (!mounted) {
+                      if (loadingDialogContext != null && Navigator.canPop(loadingDialogContext!)) {
+                        Navigator.pop(loadingDialogContext!);
+                      }
+                      return;
+                    }
+
+                    if (result['success']) {
+                      if (result['mealPlan'] != null) {
+                        _model.setInitialMealPlan(result['mealPlan'] as MealPlan);
+                      } else {
+                        final newPlanResult = await _model.createSuitableMealPlanByAI();
+                        if (newPlanResult['success'] && newPlanResult['mealPlan'] != null) {
+                          _model.setInitialMealPlan(newPlanResult['mealPlan'] as MealPlan);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(newPlanResult['message'] ?? 'Lỗi khi tạo thực đơn mới'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Thực đơn đã được làm mới thành công"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result['message'] ?? 'Lỗi khi từ chối thực đơn'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Đã xảy ra lỗi: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  } finally {
+                    if (loadingDialogContext != null && Navigator.canPop(loadingDialogContext!)) {
+                      Navigator.pop(loadingDialogContext!);
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: FlutterFlowTheme.of(context).primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text(
+                  "Xác nhận",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Hủy"),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context); // Đóng dialog nhập lý do
-
-                BuildContext? loadingDialogContext;
-                if (mounted) {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (dialogContext) {
-                      loadingDialogContext = dialogContext;
-                      return AlertDialog(
-                        content: SizedBox(
-                          height: 60,
-                          child: Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                CircularProgressIndicator(),
-                                SizedBox(width: 12),
-                                Text(
-                                  "Đang tạo",
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }
-
-                try {
-                  final result = await _model.rejectMealPlan(reason);
-
-                  if (!mounted) {
-                    if (loadingDialogContext != null && Navigator.canPop(loadingDialogContext!)) {
-                      Navigator.pop(loadingDialogContext!);
-                    }
-                    return;
-                  }
-
-                  if (result['success']) {
-                    if (result['mealPlan'] != null) {
-                      _model.setInitialMealPlan(result['mealPlan'] as MealPlan);
-                    } else {
-                      final newPlanResult = await _model.createSuitableMealPlanByAI();
-                      if (newPlanResult['success'] && newPlanResult['mealPlan'] != null) {
-                        _model.setInitialMealPlan(newPlanResult['mealPlan'] as MealPlan);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(newPlanResult['message'] ?? 'Lỗi khi tạo thực đơn mới'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(result['message'] ?? 'Lỗi khi từ chối thực đơn'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Đã xảy ra lỗi: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                } finally {
-                  if (loadingDialogContext != null && Navigator.canPop(loadingDialogContext!)) {
-                    Navigator.pop(loadingDialogContext!);
-                  }
-                }
-              },
-              child: const Text("Xác nhận"),
-            ),
-          ],
         );
       },
     );
@@ -406,13 +463,18 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
         barrierDismissible: false,
         builder: (dialogContext) {
           loadingDialogContext = dialogContext;
-          return AlertDialog(
-            content: Row(
-              children: const [
-                CircularProgressIndicator(),
-                SizedBox(width: 16),
-                Text("Đang lưu thực đơn..."),
-              ],
+          return Dialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 80, maxHeight: 80), // Giới hạn kích thước Dialog
+              padding: const EdgeInsets.all(16), // Giảm padding
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: FlutterFlowTheme.of(context).primary,
+                  strokeWidth: 3, // Giảm độ dày của vòng tròn
+                ),
+              ),
             ),
           );
         },
@@ -847,26 +909,49 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
 
   Widget _buildActionButtons() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              minimumSize: const Size(0, 48), // Đảm bảo chiều cao tối thiểu
             ),
             onPressed: _rejectMealPlan,
-            child: const Text("TỪ CHỐI THỰC ĐƠN", style: TextStyle(color: Colors.white)),
+            child: Text(
+              "TỪ CHỐI THỰC ĐƠN",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14, // Giảm font size để tránh xuống dòng
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis, // Cắt bớt nếu văn bản quá dài
+            ),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: FlutterFlowTheme.of(context).primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              minimumSize: const Size(0, 48), // Đảm bảo chiều cao tối thiểu
             ),
             onPressed: _saveMealPlan,
-            child: const Text("LƯU THỰC ĐƠN", style: TextStyle(color: Colors.white)),
+            child: Text(
+              "LƯU THỰC ĐƠN",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14, // Giảm font size để nhất quán
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis, // Cắt bớt nếu văn bản quá dài
+            ),
           ),
         ),
       ],

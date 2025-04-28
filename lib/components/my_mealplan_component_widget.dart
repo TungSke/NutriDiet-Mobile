@@ -1167,12 +1167,23 @@ class _MyMealPlanScreenWidgetState extends State<MyMealPlanScreenWidget>
           backgroundColor: title == "Nhận thực đơn AI" && !isPremium
               ? Colors.grey[600] // Màu xám đen khi không premium
               : FlutterFlowTheme.of(context).primary, // Màu gốc khi premium
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          padding: const EdgeInsets.symmetric(horizontal: 12), // Giảm padding ngang để tối ưu không gian
         ),
         onPressed: onPressed,
-        child: Text(title,
-            style: const TextStyle(color: Colors.white, fontSize: 18)),
+        child: FittedBox(
+          fit: BoxFit.scaleDown, // Co giãn văn bản để vừa với nút
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ),
     );
   }

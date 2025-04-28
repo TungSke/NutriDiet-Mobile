@@ -45,7 +45,7 @@ class _ProfileEnterWidgetState extends State<ProfileEnterWidget> {
             children: [
               const AppbarWidget(title: 'Nhập thông tin cá nhân'),
               Expanded(
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(20.0),
                   child: Form(
                     key: _formKey,
