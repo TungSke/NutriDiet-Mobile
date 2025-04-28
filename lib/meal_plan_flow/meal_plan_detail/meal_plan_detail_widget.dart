@@ -864,41 +864,113 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: Colors.white,
-          title: const Text(
-            "Cảnh báo về thực đơn",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SingleChildScrollView(
-                  child: Text(
-                    _model.mealPlan?.aiWarning ?? _model.errorMessage ?? "Chưa có cảnh báo, vui lòng nhấn Làm mới để tạo.",
-                    style: const TextStyle(color: Colors.black),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: FlutterFlowTheme.of(context).primary,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "Cảnh báo về thực đơn",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: FlutterFlowTheme.of(context).primary,
+                    fontSize: 20,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  "Làm mới nếu bạn vừa thay đổi chi tiết thực đơn",
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                if (isRefreshing) ...[
-                  const SizedBox(height: 8),
-                  const Center(child: CircularProgressIndicator()),
+              ),
+            ],
+          ),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5, // Giới hạn chiều cao tối đa
+              minWidth: 280, // Đảm bảo chiều rộng tối thiểu
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_model.mealPlan?.aiWarning == null && _model.errorMessage == null) ...[
+                    const SizedBox(height: 16),
+                    Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.grey.shade600,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Chưa có cảnh báo",
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Nhấn 'Làm mới' để tạo cảnh báo từ AI.",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else ...[
+                    Text(
+                      _model.mealPlan?.aiWarning ?? _model.errorMessage ?? "Chưa có cảnh báo, vui lòng nhấn Làm mới để tạo.",
+                      style: const TextStyle(color: Colors.black87, fontSize: 14),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  Text(
+                    "Làm mới nếu bạn vừa thay đổi chi tiết thực đơn",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  if (isRefreshing) ...[
+                    const SizedBox(height: 12),
+                    Center(
+                      child: CircularProgressIndicator(
+                        color: FlutterFlowTheme.of(context).primary,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text("Đóng", style: TextStyle(color: Colors.black)),
+              child: Text(
+                "Đóng",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            TextButton(
-              onPressed: () async {
+            ElevatedButton(
+              onPressed: isRefreshing
+                  ? null
+                  : () async {
                 setDialogState(() {
                   isRefreshing = true;
                 });
@@ -911,9 +983,17 @@ class _MealPlanDetailWidgetState extends State<MealPlanDetailWidget> {
                   });
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: FlutterFlowTheme.of(context).primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
               child: Text(
                 "Làm mới",
-                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
