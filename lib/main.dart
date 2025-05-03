@@ -1,5 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
-
 import 'package:diet_plan_app/services/models/health_profile_provider.dart';
 import 'package:diet_plan_app/services/models/personal_goal_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,11 +20,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
+
   final appState = FFAppState();
   await appState.initializePersistedState();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupPermissions();
 
   if (kIsWeb) {
@@ -37,6 +35,7 @@ void main() async {
       version: "v15.0",
     );
   }
+
   runApp(ShowCaseWidget(
     builder: (context) => MultiProvider(
       providers: [
@@ -54,56 +53,54 @@ Future<void> setupPermissions() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   final Health health = Health();
 
-  // Yêu cầu quyền thông báo
+  // Notification permission
   NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-    announcement: false,
+    alert: true, badge: true, sound: true,
   );
 
-  // Lắng nghe thông báo khi ứng dụng đang hoạt động
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print("Nhận thông báo khi đang hoạt động: ${message.notification?.title}");
+    print("Foreground notification: ${message.notification?.title}");
   });
 
-  // Đăng ký hàm xử lý khi ứng dụng nhận thông báo ở chế độ nền
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // Kiểm tra trạng thái quyền thông báo
   if (settings.authorizationStatus == AuthorizationStatus.denied) {
-    print("Người dùng từ chối nhận thông báo.");
-  } else if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print("Quyền thông báo được cấp.");
-  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-    print("Quyền thông báo được cấp tạm thời.");
+    print("User denied notification permission.");
+  } else {
+    print("Notification permission granted: ${settings.authorizationStatus}");
   }
 
-  // Yêu cầu quyền Activity Recognition
+  // Activity Recognition permission
   if (defaultTargetPlatform == TargetPlatform.android) {
-    PermissionStatus activityRecognitionStatus =
-    await Permission.activityRecognition.request();
-    if (!activityRecognitionStatus.isGranted) {
-      print("Quyền Activity Recognition không được cấp.");
+    final status = await Permission.activityRecognition.request();
+    if (!status.isGranted) {
+      print("Activity Recognition permission not granted.");
+    }
+  }
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    final status = await Permission.location.request();
+    if (!status.isGranted) {
+      print("Location permission not granted.");
+    } else {
+      print("Location permission granted.");
     }
   }
 
-  // Yêu cầu quyền Health Connect
-  if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) {
+  // Health Connect permissions
+  if (defaultTargetPlatform == TargetPlatform.android) {
     try {
-      final status = await health.getHealthConnectSdkStatus();
-      if (status != HealthConnectSdkStatus.sdkAvailable) {
-        print("Health Connect SDK không khả dụng, yêu cầu cài đặt.");
+      final sdkStatus = await health.getHealthConnectSdkStatus();
+      if (sdkStatus != HealthConnectSdkStatus.sdkAvailable) {
+        print("Health Connect not available. Attempting install...");
         await health.installHealthConnect();
-        // Kiểm tra lại sau khi cài đặt
-        final newStatus = await health.getHealthConnectSdkStatus();
-        if (newStatus != HealthConnectSdkStatus.sdkAvailable) {
-          print("Không thể cài đặt Health Connect SDK.");
+        if (await health.getHealthConnectSdkStatus() != HealthConnectSdkStatus.sdkAvailable) {
+          print("Failed to install Health Connect.");
           return;
         }
       }
 
       await health.configure();
+
       final types = [
         HealthDataType.STEPS,
         HealthDataType.TOTAL_CALORIES_BURNED,
@@ -111,35 +108,25 @@ Future<void> setupPermissions() async {
       ];
       final permissions = List.filled(types.length, HealthDataAccess.READ_WRITE);
 
-      // Kiểm tra quyền
       bool? hasPermission = await health.hasPermissions(types, permissions: permissions);
-      print("Health Connect permission status: $hasPermission");
-
-      if (hasPermission == null || !hasPermission) {
+      if (hasPermission != true) {
         final authorized = await health.requestAuthorization(types, permissions: permissions);
         if (authorized) {
-          // Kiểm tra lại quyền sau khi yêu cầu
-          hasPermission = await health.hasPermissions(types, permissions: permissions);
-          if (hasPermission == true) {
-            print("Quyền Health Connect được cấp cho: $types");
-          } else {
-            print("Không thể xác nhận quyền Health Connect sau khi yêu cầu.");
-          }
+          print("Health Connect permissions granted.");
         } else {
-          print("Người dùng từ chối cấp quyền Health Connect.");
+          print("Health Connect permission denied.");
         }
       } else {
-        print("Quyền Health Connect đã được cấp trước đó.");
+        print("Health Connect permissions already granted.");
       }
     } catch (e) {
-      print("Lỗi khi yêu cầu quyền Health Connect: $e");
+      print("Error checking Health Connect permission: $e");
     }
   }
 }
 
-// Hàm xử lý thông báo ở chế độ nền
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Nhận thông báo khi ở chế độ nền: ${message.notification?.title}");
+  print("Background notification: ${message.notification?.title}");
 }
 
 class MyApp extends StatefulWidget {
@@ -165,9 +152,7 @@ class _MyAppState extends State<MyApp> {
     _router = createRouter(_appStateNotifier);
   }
 
-  void setThemeMode(ThemeMode mode) => safeSetState(() {
-    _themeMode = mode;
-  });
+  void setThemeMode(ThemeMode mode) => setState(() => _themeMode = mode);
 
   @override
   Widget build(BuildContext context) {
@@ -179,9 +164,7 @@ class _MyAppState extends State<MyApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en', '')],
-      theme: ThemeData(
-        brightness: Brightness.light,
-      ),
+      theme: ThemeData(brightness: Brightness.light),
       themeMode: _themeMode,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,

@@ -113,9 +113,14 @@ class GGFitService {
     }
 
     try {
-      bool granted = await _checkActivityRecognitionPermission();
-      if (!granted) {
-        print("Quyền Activity Recognition không được cấp.");
+      // Chỉ yêu cầu quyền ACTIVITY_RECOGNITION, không bắt buộc Health Connect
+      bool activityGranted = await Permission.activityRecognition.isGranted;
+      if (!activityGranted) {
+        activityGranted = await Permission.activityRecognition.request() == PermissionStatus.granted;
+      }
+
+      if (!activityGranted) {
+        print("Không có quyền ACTIVITY_RECOGNITION.");
         _stepsController ??= StreamController<int>.broadcast();
         _runningController ??= StreamController<bool>.broadcast();
         _caloriesBurnedController ??= StreamController<double>.broadcast();
@@ -129,35 +134,29 @@ class GGFitService {
       _runningController ??= StreamController<bool>.broadcast();
       _caloriesBurnedController ??= StreamController<double>.broadcast();
 
-      // Đọc bước chân và calories từ Health Connect cho ngày hiện tại
       final now = DateTime.now();
       final startOfDay = DateTime(now.year, now.month, now.day);
-      final stepsFromHealth = await _fetchStepsFromHealthConnect(startOfDay, now);
+
+      // Thử đọc bước từ Health Connect, nếu fail thì dùng 0
+      int stepsFromHealth = 0;
+      try {
+        stepsFromHealth = await _fetchStepsFromHealthConnect(startOfDay, now);
+      } catch (_) {
+        print("Không thể đọc từ Health Connect, dùng giá trị mặc định 0 bước.");
+      }
 
       _realTimeSteps = stepsFromHealth;
       _lastProcessedDate = now;
 
-      if (!_stepsController!.isClosed) {
-        _stepsController?.add(_realTimeSteps);
-        print("Initialized _realTimeSteps from Health Connect: $_realTimeSteps");
-      }
-      if (!_runningController!.isClosed) {
-        _runningController?.add(false);
-        print("Running status initialized");
-      }
-      if (!_caloriesBurnedController!.isClosed) {
-        _caloriesBurnedController?.add(caloriesBurned);
-        print("Calories burned initialized: $caloriesBurned");
-      }
+      if (!_stepsController!.isClosed) _stepsController?.add(_realTimeSteps);
+      if (!_runningController!.isClosed) _runningController?.add(false);
+      if (!_caloriesBurnedController!.isClosed) _caloriesBurnedController?.add(caloriesBurned);
 
       _isInitialized = true;
 
       _stepCountStream = Pedometer.stepCountStream;
       if (_stepCountStream == null) {
-        print("Pedometer.stepCountStream không khả dụng trên thiết bị này.");
-        if (!_stepsController!.isClosed) _stepsController?.add(0);
-        if (!_runningController!.isClosed) _runningController?.add(false);
-        if (!_caloriesBurnedController!.isClosed) _caloriesBurnedController?.add(0);
+        print("Pedometer.stepCountStream không khả dụng.");
         return;
       }
 
