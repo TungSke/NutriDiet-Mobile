@@ -157,34 +157,46 @@ class _EditPersonalGoalScreenWidgetState
                         final response =
                             await _model.validateBMIGoalBeforeUpdate();
 
-                        if (response != null &&
-                            response.statusCode != 200 &&
-                            response.statusCode != 204) {
+                        if (response != null && response.statusCode == 200) {
                           final responseData = jsonDecode(response.body);
                           final message = responseData['message'] ??
                               'Mục tiêu không hợp lệ.';
-
                           final continueUpdate = await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text("Cảnh báo"),
+                              title: const Text(
+                                "Cảnh báo",
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               content: Text(message),
                               actions: [
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.pop(context, false),
-                                  child: const Text("Hủy"),
+                                  child: Text(
+                                    "Hủy",
+                                    style: TextStyle(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary),
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text("Tiếp tục"),
+                                  child: Text(
+                                    "Tiếp tục",
+                                    style: TextStyle(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary),
+                                  ),
                                 ),
                               ],
                             ),
                           );
 
-                          if (continueUpdate != true)
-                            return; // Người dùng chọn huỷ
+                          if (continueUpdate != true) return;
                         }
 
                         await _model.updatePersonalGoal(context);
