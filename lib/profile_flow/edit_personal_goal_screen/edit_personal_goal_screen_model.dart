@@ -432,7 +432,7 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
         goalType: goalTypeInEnglish,
         targetWeight: targetWeight,
         weightChangeRate: weightChangeRateValue,
-        goalDescription: goalDescription,
+        goalDescription: "None",
         notes: notes,
       );
 

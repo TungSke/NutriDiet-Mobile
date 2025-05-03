@@ -248,7 +248,7 @@ class UserService {
     required String goalType,
     double? targetWeight,
     String? weightChangeRate,
-    String goalDescription = "",
+    String goalDescription = "none",
     String? notes,
   }) async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
