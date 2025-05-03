@@ -199,6 +199,7 @@
 // }
 import 'package:diet_plan_app/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../../services/user_service.dart';
 
@@ -418,6 +419,27 @@ class EditPersonalGoalScreenModel extends ChangeNotifier {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Đã xảy ra lỗi, vui lòng thử lại.')),
       );
+    }
+  }
+
+  Future<http.Response?> validateBMIGoalBeforeUpdate() async {
+    try {
+      final goalTypeInEnglish = _reverseGoalTypeMap[goalType] ?? 'LoseWeight';
+      final weightChangeRateValue =
+          _weightChangeRateMap[weightChangeRate]?.toString();
+
+      final response = await _userService.validateBMIBasedGoal(
+        goalType: goalTypeInEnglish,
+        targetWeight: targetWeight,
+        weightChangeRate: weightChangeRateValue,
+        goalDescription: goalDescription,
+        notes: notes,
+      );
+
+      return response;
+    } catch (e) {
+      print("❌ Lỗi khi gọi validate BMI goal: $e");
+      return null;
     }
   }
 }

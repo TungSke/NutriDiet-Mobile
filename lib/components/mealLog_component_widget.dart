@@ -65,7 +65,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
               "Cảnh báo",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.yellow,
+                color: Colors.orangeAccent,
               ),
             ),
             content: Text(

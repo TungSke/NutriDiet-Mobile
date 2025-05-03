@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -150,12 +152,60 @@ class _EditPersonalGoalScreenWidgetState
           InkWell(
             onTap: isEdited && canUpdate
                 ? () async {
-                    // Kiểm tra validation trước khi gửi API
                     if (_formKey.currentState?.validate() ?? false) {
-                      await _model.updatePersonalGoal(context);
-                      setState(() {
-                        isEdited = false;
-                      });
+                      try {
+                        final response =
+                            await _model.validateBMIGoalBeforeUpdate();
+
+                        if (response != null &&
+                            response.statusCode != 200 &&
+                            response.statusCode != 204) {
+                          final responseData = jsonDecode(response.body);
+                          final message = responseData['message'] ??
+                              'Mục tiêu không hợp lệ.';
+
+                          final continueUpdate = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("Cảnh báo"),
+                              content: Text(message),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text("Hủy"),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text("Tiếp tục"),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (continueUpdate != true)
+                            return; // Người dùng chọn huỷ
+                        }
+
+                        await _model.updatePersonalGoal(context);
+                        setState(() {
+                          isEdited = false;
+                        });
+                      } catch (e) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Lỗi"),
+                            content: Text(e.toString()),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("Đóng"),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     }
                   }
                 : null,

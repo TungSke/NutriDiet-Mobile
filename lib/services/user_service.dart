@@ -94,14 +94,14 @@ class UserService {
   Future<http.Response> refreshToken() async {
     final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
 
-    final String? refreshToken = await flutterSecureStorage.read(key: 'refreshToken');
+    final String? refreshToken =
+        await flutterSecureStorage.read(key: 'refreshToken');
     if (refreshToken == null || refreshToken.isEmpty) {
       throw Exception("Refresh token not found.");
     }
 
-    final response = await _apiService.post("api/user/refresh-token", body: {
-      "refreshToken": refreshToken
-    });
+    final response = await _apiService
+        .post("api/user/refresh-token", body: {"refreshToken": refreshToken});
 
     return response;
   }
@@ -241,6 +241,61 @@ class UserService {
     } catch (e) {
       print('Lỗi kết nối API: $e');
       throw Exception("Không thể kết nối đến server.");
+    }
+  }
+
+  Future<http.Response> validateBMIBasedGoal({
+    required String goalType,
+    double? targetWeight,
+    String? weightChangeRate,
+    String goalDescription = "",
+    String? notes,
+  }) async {
+    final FlutterSecureStorage flutterSecureStorage = FlutterSecureStorage();
+    final String? token = await flutterSecureStorage.read(key: 'accessToken');
+
+    if (token == null || token.isEmpty) {
+      throw Exception("⚠️ Access token không hợp lệ, vui lòng đăng nhập lại.");
+    }
+
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("${_apiService.baseUrl}/api/personal-goal/validate-bmi-goal"),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // ✅ Thêm các dữ liệu vào Form-Data
+      request.fields['GoalType'] = goalType;
+      if (targetWeight != null) {
+        request.fields['TargetWeight'] = targetWeight.toString();
+      }
+      if (weightChangeRate != null) {
+        request.fields['WeightChangeRate'] = weightChangeRate;
+      }
+      request.fields['GoalDescription'] = goalDescription;
+      if (notes != null) {
+        request.fields['Notes'] = notes;
+      }
+
+      print(
+          "🔹 Sending validate BMI goal request: ${jsonEncode(request.fields)}");
+
+      final response = await request.send();
+      final httpResponse = await http.Response.fromStream(response);
+
+      print("🔹 Response status: ${httpResponse.statusCode}");
+      print("🔹 Response body: ${httpResponse.body}");
+
+      if (httpResponse.statusCode == 200 || httpResponse.statusCode == 204) {
+        return httpResponse;
+      } else {
+        throw Exception("Xác thực mục tiêu BMI thất bại: ${httpResponse.body}");
+      }
+    } catch (e) {
+      print("❌ Lỗi khi xác thực mục tiêu BMI: $e");
+      throw Exception("Không thể xác thực mục tiêu BMI.");
     }
   }
 
