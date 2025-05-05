@@ -332,85 +332,91 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
                   ),
                 ],
               ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: [
-                          RadioListTile<String>(
-                            value: "Hài lòng với phản hồi về thực đơn",
-                            groupValue: selectedFeedback,
-                            title: Text(
-                              "Hài lòng",
-                              style: TextStyle(
-                                color: FlutterFlowTheme.of(context).primary,
-                                fontWeight: FontWeight.w600,
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.5, // Giới hạn chiều cao dialog
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          children: [
+                            RadioListTile<String>(
+                              value: "Hài lòng với phản hồi về thực đơn",
+                              groupValue: selectedFeedback,
+                              title: Text(
+                                "Hài lòng",
+                                style: TextStyle(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
+                              activeColor: FlutterFlowTheme.of(context).primary,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedFeedback = value;
+                                  additionalDetail = null;
+                                });
+                              },
                             ),
-                            activeColor: FlutterFlowTheme.of(context).primary,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedFeedback = value;
-                                additionalDetail = null;
-                              });
-                            },
-                          ),
-                          Divider(height: 1, color: Colors.grey.shade300),
-                          RadioListTile<String>(
-                            value: "Không hài lòng với phản hồi về thực đơn",
-                            groupValue: selectedFeedback,
-                            title: Text(
-                              "Không hài lòng",
-                              style: TextStyle(
-                                color: FlutterFlowTheme.of(context).primary,
-                                fontWeight: FontWeight.w600,
+                            Divider(height: 1, color: Colors.grey.shade300),
+                            RadioListTile<String>(
+                              value: "Không hài lòng với phản hồi về thực đơn",
+                              groupValue: selectedFeedback,
+                              title: Text(
+                                "Không hài lòng",
+                                style: TextStyle(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
+                              activeColor: FlutterFlowTheme.of(context).primary,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedFeedback = value;
+                                });
+                              },
                             ),
-                            activeColor: FlutterFlowTheme.of(context).primary,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedFeedback = value;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (selectedFeedback == "Không hài lòng với phản hồi về thực đơn") ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        "Chi tiết",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: FlutterFlowTheme.of(context).primary,
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        onChanged: (value) => additionalDetail = value,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          hintText: "Nhập chi tiết phản hồi của bạn...",
-                          hintStyle: TextStyle(color: Colors.grey.shade400),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
+                      if (selectedFeedback == "Không hài lòng với phản hồi về thực đơn") ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          "Chi tiết",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: FlutterFlowTheme.of(context).primary,
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          onChanged: (value) => additionalDetail = value,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            hintText: "Nhập chi tiết phản hồi của bạn...",
+                            hintStyle: TextStyle(color: Colors.grey.shade400),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
               actionsAlignment: MainAxisAlignment.spaceEvenly,
