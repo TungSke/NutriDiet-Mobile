@@ -109,10 +109,7 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
                 children: [
                   Text(
                     "Vui lòng cho biết lý do bạn không hài lòng với thực đơn. Thực đơn sẽ được làm mới dựa trên phản hồi của bạn.",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                   ),
                   const SizedBox(height: 16),
                   TextField(
@@ -543,6 +540,7 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
 
         final mealPlan = _model.mealPlan!;
         return Scaffold(
+          resizeToAvoidBottomInset: true,
           backgroundColor: Colors.white,
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(60),
@@ -571,29 +569,32 @@ class _AIMealPlanDetailWidgetState extends State<AIMealPlanDetailWidget> {
                     color: Colors.white,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildMealPlanCard(mealPlan),
-                      const SizedBox(height: 12),
-                      _buildDaySelector(),
-                      const SizedBox(height: 12),
-                      _buildNutrientProgress(),
-                      const SizedBox(height: 12),
-                      const SizedBox(height: 12),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: _model.getMealsForDay(selectedDay).length,
-                          itemBuilder: (context, index) {
-                            final mealType = _model.getMealsForDay(selectedDay).keys.elementAt(index);
-                            final meals = _model.getMealsForDay(selectedDay)[mealType]!;
-                            return _buildMealCard(mealType, meals);
-                          },
+                  child: SingleChildScrollView( // Thêm SingleChildScrollView
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildMealPlanCard(mealPlan),
+                        const SizedBox(height: 12),
+                        _buildDaySelector(),
+                        const SizedBox(height: 12),
+                        _buildNutrientProgress(),
+                        const SizedBox(height: 12),
+                        const SizedBox(height: 12),
+                        SizedBox( // Thay Expanded bằng SizedBox với chiều cao cụ thể
+                          height: 200, // Điều chỉnh chiều cao phù hợp
+                          child: ListView.builder(
+                            itemCount: _model.getMealsForDay(selectedDay).length,
+                            itemBuilder: (context, index) {
+                              final mealType = _model.getMealsForDay(selectedDay).keys.elementAt(index);
+                              final meals = _model.getMealsForDay(selectedDay)[mealType]!;
+                              return _buildMealCard(mealType, meals);
+                            },
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildActionButtons(),
-                    ],
+                        const SizedBox(height: 12),
+                        _buildActionButtons(),
+                      ],
+                    ),
                   ),
                 ),
               ),
