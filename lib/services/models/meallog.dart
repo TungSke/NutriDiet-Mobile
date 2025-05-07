@@ -5,7 +5,7 @@ class MealLog {
   final int totalProtein;
   final int totalCarbs;
   final int totalFat;
-  final int dailyCalories;
+  final double dailyCalories;
   final List<MealLogDetail> mealLogDetails;
 
   MealLog({
@@ -27,7 +27,7 @@ class MealLog {
       totalProtein: (json['totalProtein'] as num?)?.toInt() ?? 0,
       totalCarbs: (json['totalCarbs'] as num?)?.toInt() ?? 0,
       totalFat: (json['totalFat'] as num?)?.toInt() ?? 0,
-      dailyCalories: json['dailyCalories'] ?? 0,
+      dailyCalories: (json['dailyCalories'] as num?)?.toDouble() ?? 0,
       mealLogDetails: (json['mealLogDetails'] as List<dynamic>? ?? [])
           .map((e) => MealLogDetail.fromJson(e as Map<String, dynamic>))
           .toList(),

@@ -1,12 +1,11 @@
-import 'dart:convert';
 import 'package:diet_plan_app/services/user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../services/firebase_service.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import '../services/models/meallog.dart';
-import '../services/meallog_service.dart';
 import 'package:http/http.dart' as http;
+
+import '/flutter_flow/flutter_flow_util.dart';
+import '../services/firebase_service.dart';
+import '../services/meallog_service.dart';
+import '../services/models/meallog.dart';
 
 class MealLogComponentModel extends FlutterFlowModel {
   DateTime selectedDate = DateTime.now();
@@ -35,50 +34,46 @@ class MealLogComponentModel extends FlutterFlowModel {
   // Tính Remaining (Goal - Food + Exercise)
   int get remainingCalories => calorieGoal - foodCalories;
 
-  /// Gọi API lấy personal goal và cập nhật calorieGoal
-  Future<void> fetchPersonalGoal() async {
-    try {
-      isLoading = true;
-      final service = UserService();
-      // Gọi hàm getPersonalGoal đã được định nghĩa ở MeallogService
-      final http.Response response = await service.getPersonalGoal();
-      if (response.statusCode == 200) {
-        // Giả sử API trả về JSON với cấu trúc { "calorieGoal": number }
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        final Map<String, dynamic> goalData = responseData['data'];
-        calorieGoal = goalData['dailyCalories'] ?? calorieGoal;
-        debugPrint('Fetched personal goal: $calorieGoal');
-      } else {
-        debugPrint('Lỗi khi lấy personal goal: ${response.body}');
-      }
-    } catch (e) {
-      debugPrint('Error in fetchPersonalGoal: $e');
-    } finally {
-      isLoading = false;
-      _updateCallback?.call();
-    }
-  }
-
   /// Gọi API để lấy meal log của ngày [selectedDate].
   Future<void> fetchMealLogs() async {
     try {
       isLoading = true;
-      // Định dạng ngày thành yyyy-MM-dd
-      final dateString = DateFormat('yyyy-MM-dd').format(selectedDate);
-
-      // Gọi service để fetch Meal Logs
-      final service = MeallogService();
       _updateCallback?.call();
-      mealLogs = await service.getMealLogs(logDate: dateString);
 
-      // Tính tổng calories từ các MealLog
+      // 1. Gọi fetchMealLogs
+      final dateString = DateFormat('yyyy-MM-dd').format(selectedDate);
+      final mealLogService = MeallogService();
+      mealLogs = await mealLogService.getMealLogs(logDate: dateString);
+
+      // Tính tổng calories của ngày
       int sumCalories = 0;
       for (final log in mealLogs) {
         sumCalories += log.totalCalories;
       }
       foodCalories = sumCalories;
+
+      // 2. Gọi fetchPersonalGoal
+      final userService = UserService();
+      final http.Response response = await userService.getPersonalGoal();
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final Map<String, dynamic> goalData = responseData['data'];
+
+        // 3. Kiểm tra mealLogs.first.dailyCalories
+        final double? logDailyCalories =
+            mealLogs.isNotEmpty ? mealLogs.first.dailyCalories : null;
+        if (logDailyCalories != null && logDailyCalories > 0) {
+          calorieGoal = logDailyCalories.round();
+        } else {
+          calorieGoal = goalData['dailyCalories'] ?? calorieGoal;
+        }
+
+        debugPrint('Final calorieGoal: $calorieGoal');
+      } else {
+        debugPrint('Lỗi khi lấy personal goal: ${response.body}');
+      }
     } catch (e) {
-      debugPrint('Lỗi khi fetch Meal Logs: $e');
+      debugPrint('Lỗi khi fetchMealLogsAndGoal: $e');
       mealLogs = [];
       foodCalories = 0;
     } finally {

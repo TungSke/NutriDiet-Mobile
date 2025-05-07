@@ -33,7 +33,6 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
       }
     });
     _model.fetchMealLogs();
-    _model.fetchPersonalGoal();
     _checkPremiumStatus();
   }
 
