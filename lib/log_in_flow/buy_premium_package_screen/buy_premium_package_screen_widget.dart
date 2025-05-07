@@ -25,10 +25,19 @@ class _BuyPremiumPackageScreenWidgetState
   late Animation<Offset> _textOffsetAnimation;
   late Animation<double> _buttonOpacityAnimation;
   late Animation<double> _rotatingImageAnimation;
+  late Animation<double> _bannerOpacityAnimation; // Thêm animation cho banner
 
   List<dynamic> packages = [];
   Map<String, dynamic>? premiumStatus;
+  String? expiryDate;
   bool isLoading = true;
+
+  // Hàm định dạng giá (99000 -> 99.000)
+  String formatPrice(dynamic price) {
+    if (price == null) return 'N/A';
+    final formatter = NumberFormat('#,###', 'vi_VN');
+    return formatter.format(price).replaceAll(',', '.');
+  }
 
   @override
   void initState() {
@@ -64,6 +73,16 @@ class _BuyPremiumPackageScreenWidgetState
       CurvedAnimation(parent: _animationController, curve: Curves.linear),
     );
 
+    _bannerOpacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.3, 0.8, curve: Curves.easeIn),
+      ),
+    );
+
     _fetchData();
 
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -76,11 +95,18 @@ class _BuyPremiumPackageScreenWidgetState
     try {
       final packageList = await _packageService.getPackages();
       final status = await _packageService.isPremium();
-      print("Packages: $packageList");
-      print("Premium Status: $status");
+      final userPackage = await _packageService.getMyUserPackage();
+
+      String? formattedExpiryDate;
+      if (userPackage != null && userPackage['expiryDate'] != null) {
+        final expiryDateTime = DateTime.parse(userPackage['expiryDate']);
+        formattedExpiryDate = DateFormat('dd/MM/yyyy').format(expiryDateTime);
+      }
+
       setState(() {
         packages = packageList;
         premiumStatus = status;
+        expiryDate = formattedExpiryDate;
         isLoading = false;
       });
     } catch (e) {
@@ -173,8 +199,6 @@ class _BuyPremiumPackageScreenWidgetState
     _model.dispose();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -273,9 +297,56 @@ class _BuyPremiumPackageScreenWidgetState
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
-
                         const SizedBox(height: 16),
+
+                        // Expiry date banner
+                        if (expiryDate != null)
+                          FadeTransition(
+                            opacity: _bannerOpacityAnimation,
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFDFFFD7),
+                                    Color(0xFFA0F0B1),
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.event,
+                                    color: Color(0xFF1B5E20),
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      "Ngày hết hạn của gói: $expiryDate",
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFF1B5E20),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 20),
 
                         // Loading indicator or package list
                         isLoading
@@ -330,13 +401,28 @@ class _BuyPremiumPackageScreenWidgetState
                                         ],
                                       ),
                                       const SizedBox(height: 8),
-                                      Text(
-                                        'Giá: ${package['price']?.toStringAsFixed(0) ?? 'N/A'} VND',
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 16,
-                                          color: Colors.black87,
-                                        ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Giá: ${formatPrice(package['price'])} VND',
+                                            style: GoogleFonts.roboto(
+                                              fontSize: 16,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          if (isPremium && currentPackageType == 'Basic' && isAdvanced)
+                                            Text(
+                                              '(${formatPrice(package['price'])} VND là giá gốc. "Nâng cấp" để xem chi phí nâng cấp gói)',
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 12,
+                                                color: Colors.grey[600],
+                                                fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
+                                        ],
                                       ),
+                                      const SizedBox(height: 4),
                                       Text(
                                         'Thời gian: ${package['duration'] ?? 'N/A'} ngày',
                                         style: GoogleFonts.roboto(
