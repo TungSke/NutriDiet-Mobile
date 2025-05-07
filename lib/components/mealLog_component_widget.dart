@@ -1,16 +1,15 @@
-import 'dart:convert';
 import 'package:diet_plan_app/components/mealLog_list_food.dart';
 import 'package:diet_plan_app/components/mealLog_nutrition.dart';
 import 'package:diet_plan_app/services/models/meallog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:intl/intl.dart';
-import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
+
 import '/components/mealLog_component_model.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '../components/meallog_detail_widget.dart';
 import '../components/quick_add_widget.dart';
+import '../log_in_flow/buy_premium_package_screen/buy_premium_package_screen_widget.dart';
 
 class MealLogComponentWidget extends StatefulWidget {
   const MealLogComponentWidget({Key? key}) : super(key: key);
@@ -1006,7 +1005,8 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                         'Snacks'
                                       ])
                                         ListTile(
-                                          title: Text(mealType),
+                                          title: Text(_mapCategoryToVietnamese(
+                                              mealType)),
                                           onTap: () async {
                                             Navigator.pop(context);
                                             await _model
