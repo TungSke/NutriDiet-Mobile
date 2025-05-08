@@ -659,7 +659,7 @@ class _MealLogComponentWidgetState extends State<MealLogComponentWidget> {
                                 ),
                                 const PopupMenuItem<String>(
                                   value: 'end_day',
-                                  child: Text('Kết thúc ngày'),
+                                  child: Text('Đánh giá nhật ký'),
                                 ),
                                 const PopupMenuItem<String>(
                                   value: 'clone_log',
