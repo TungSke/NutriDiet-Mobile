@@ -233,14 +233,15 @@ class MealPlanService{
       final String? token = await flutterSecureStorage.read(key: 'accessToken');
       const String endpoint = "api/meal-plan/save-mealplan-AI";
 
-      final Map<String, dynamic> body = {};
+      final Map<String, String> body = {};
       if (feedback != null && feedback.isNotEmpty) {
         body['feedback'] = feedback;
       }
 
-      final response = await _apiService.put(
+      // Gọi putMultipart thay vì put
+      final response = await _apiService.putMultipart(
         endpoint,
-        body: body,
+        fields: body,
         token: token,
       );
       final data = jsonDecode(response.body);
