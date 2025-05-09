@@ -218,19 +218,19 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
               Text(
                 'Yêu cầu Premium Advanced',
                 style: FlutterFlowTheme.of(context).titleLarge.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
               ),
               const SizedBox(height: 12),
               Text(
                 'Để sử dụng tính năng "Thêm ảnh", bạn cần nâng cấp lên gói Premium Advanced.\nThưởng thức các tính năng độc quyền ngay hôm nay!',
                 textAlign: TextAlign.center,
                 style: FlutterFlowTheme.of(context).bodyMedium.copyWith(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
               ),
               const SizedBox(height: 24),
               Row(
@@ -301,7 +301,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
       // Tiếp tục với logic quét ảnh nếu là Premium Advanced
       final picker = ImagePicker();
       final XFile? pickedFile =
-      await picker.pickImage(source: ImageSource.gallery);
+          await picker.pickImage(source: ImageSource.gallery);
       if (pickedFile == null) return;
 
       final File imageFile = File(pickedFile.path);
@@ -335,6 +335,10 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
                   .toString();
           _foodNameController.text = data['foodName']?.toString() ?? '';
         });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Phân tích ảnh thành công!')),
+        );
       } catch (e) {
         debugPrint('Error in _onAddImage: $e');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -572,7 +576,7 @@ class _QuickAddWidgetState extends State<QuickAddWidget> {
     } else if (userTyped && hasMacros && (typedCals != macroCals.round())) {
       final diff = typedCals - macroCals.round();
       subLabel =
-      "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
+          "Tổng calo của macros là ${macroCals.round()} cals.\nChênh lệch: $diff cals";
     }
 
     return Column(
