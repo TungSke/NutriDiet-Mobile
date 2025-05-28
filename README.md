@@ -1,97 +1,94 @@
-Dưới đây là mẫu nội dung chuyên nghiệp và đầy đủ cho file `README.md` dành cho **NutriDiet - Mobile**, một ứng dụng Flutter hỗ trợ quản lý dinh dưỡng và sức khỏe cá nhân:
-
----
-
 # NutriDiet - Mobile 📱🥗
 
-NutriDiet là một ứng dụng di động được phát triển bằng Flutter, tích hợp với nền tảng **Health Connect** của Android và sử dụng trí tuệ nhân tạo để đề xuất thực đơn theo sức khỏe, khẩu vị, dị ứng, và mục tiêu cá nhân. Ứng dụng là một phần của hệ sinh thái NutriDiet bao gồm cả nền tảng web và cơ sở dữ liệu backend mạnh mẽ.
+**NutriDiet** is a mobile application developed with **Flutter**, integrated with **Android Health Connect**, and powered by **Gemini AI** to suggest personalized meal plans based on health profiles, preferences, allergies, and personal goals. This app is part of the NutriDiet ecosystem, which also includes a robust web platform and backend database system.
 
 ---
 
-## 🚀 Tính năng nổi bật
+## 🚀 Key Features
 
-- 🔎 **Tìm kiếm & Quản lý thực phẩm**: Lọc theo thành phần, bệnh lý, hoặc dị ứng.
-- 🧠 **Đề xuất bữa ăn thông minh**: AI gợi ý thực đơn theo hồ sơ sức khỏe, mục tiêu cá nhân.
-- 🚫 **Từ chối thực đơn**: Cho phép người dùng báo lý do từ chối món và cập nhật dữ liệu AI.
-- 👣 **Đếm bước chân**: Ghi lại bước đi hàng ngày từ Pedometer hoặc Health Connect.
-- 🔥 **Theo dõi calories & sức khỏe**: Ghi calorie tiêu thụ và hoạt động thể chất tự động.
-- 🔔 **Nhắc nhở & Thông báo**: Gợi ý giờ ăn, cảnh báo thiếu hụt dinh dưỡng.
-- 🌐 **Đồng bộ & Lưu trữ**: Đồng bộ dữ liệu với server để đảm bảo không mất dữ liệu.
-
----
-
-## 🏗️ Kiến trúc chính
-
-- **Flutter**: Giao diện người dùng đa nền tảng.
-- **Provider / Riverpod**: State management (tuỳ chọn theo project).
-- **Health Connect SDK**: Tương tác với dữ liệu sức khỏe Android.
-- **Pedometer Plugin**: Ghi dữ liệu bước chân theo thời gian thực.
-- **RESTful API**: Kết nối với hệ thống backend (ASP.NET Web API).
-- **SQLServer / SharedPreferences**: Lưu dữ liệu tạm thời hoặc cục bộ.
+- 🔎 **Search & Manage Foods**: Filter foods by ingredients, medical conditions, or allergies.
+- 🧠 **Smart Meal Suggestions**: AI-powered meal recommendations tailored to user health profiles and goals.
+- 🚫 **Reject Meal Suggestions**: Users can reject AI-suggested meals and provide reasons to improve AI training.
+- 👣 **Step Counter Integration**: Tracks daily steps using Pedometer or Android Health Connect.
+- 🔥 **Calories & Health Tracking**: Automatically logs calorie consumption and physical activity.
+- 🔔 **Reminders & Notifications**: Meal time alerts and nutritional deficiency warnings.
+- 🌐 **Data Sync & Backup**: Synchronizes data with the server to ensure data integrity and backup.
 
 ---
 
-## 📲 Hướng dẫn cài đặt
+## 🏗️ Core Architecture
 
-### 1. Yêu cầu hệ thống
+- **Flutter**: Cross-platform UI development.
+- **Provider / Riverpod**: State management (configurable per project).
+- **Health Connect SDK**: Integration with Android health data.
+- **Pedometer Plugin**: Real-time step tracking.
+- **RESTful API**: Backend communication (ASP.NET Web API).
+- **SQLServer / SharedPreferences**: For temporary or local data storage.
+
+---
+
+## 📲 Installation Guide
+
+### 1. System Requirements
 
 - Flutter >= 3.10
 - Dart >= 3.0
 - Android SDK >= 30
-- Health Connect (đã cài đặt trên thiết bị)
+- Health Connect installed on the device
 
-### 2. Cài đặt dự án
+### 2. Project Setup
 
 ```bash
-https://github.com/TungSke/NutriDiet-Mobile.git
+git clone https://github.com/TungSke/NutriDiet-Mobile.git
 cd nutridiet-mobile
 flutter pub get
 ````
 
-### 3. Chạy ứng dụng
+### 3. Run the App
 
 ```bash
 flutter run
 ```
 
-> 💡 Đảm bảo bạn đã cấp quyền truy cập Health Connect và bật cảm biến bước chân.
+> 💡 Make sure you have granted Health Connect permissions and enabled motion sensors.
 
 ---
 
-## 🔐 Phân quyền & Quyền truy cập
+## 🔐 Permissions Required
 
-Ứng dụng yêu cầu các quyền sau:
+The application requires the following permissions:
 
-* `ACTIVITY_RECOGNITION`: để ghi lại bước chân.
-* `BODY_SENSORS`: để truy cập dữ liệu sức khỏe.
-* `INTERNET`: để giao tiếp với server AI.
-* `READ_HEALTH_DATA`, `WRITE_HEALTH_DATA`: dùng với Health Connect.
+* `ACTIVITY_RECOGNITION`: To track step count.
+* `BODY_SENSORS`: To access health-related sensors.
+* `INTERNET`: To communicate with the AI server.
+* `READ_HEALTH_DATA`, `WRITE_HEALTH_DATA`: For interacting with Health Connect.
 
 ---
 
-## 📁 Cấu trúc thư mục
+## 📁 Project Structure
 
 ```plaintext
 lib/
 ├── main.dart
-├── models/           # Các model dữ liệu
-├── services/         # Health, AI, API, Local DB...
-├── screens/          # Giao diện người dùng
-├── components/       # Widget tái sử dụng
+├── models/           # Data models
+├── services/         # Health, AI, API, Local DB services
+├── screens/          # UI screens
+├── components/       # Reusable widgets
 ├── app_state.dart/   # State management
 ```
 
 ---
 
-## 🤖 AI Đề xuất bữa ăn
+## 🤖 AI-Powered Meal Suggestions
 
-Ứng dụng sẽ gửi hồ sơ sức khỏe và khẩu vị lên server Gemini AI, nhận lại thực đơn phù hợp, đồng thời ghi nhận phản hồi từ người dùng để cải thiện gợi ý về sau.
+The app sends health profiles and user preferences to **Gemini AI**, which returns personalized meal plans. User feedback is also collected to improve future recommendations.
+
+---
+
+## 📜 License
+
+NutriDiet - Mobile is released under the [MIT License](LICENSE).
 
 ---
 
-## 📜 Giấy phép
-
-NutriDiet - Mobile được phát hành dưới giấy phép [MIT](LICENSE).
-
----
-> Hãy cùng nhau xây dựng một hệ sinh thái chăm sóc sức khỏe cá nhân thông minh và toàn diện!
+> Let's build a smart and comprehensive personal health ecosystem together!
